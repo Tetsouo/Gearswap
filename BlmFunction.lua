@@ -1,4 +1,3 @@
-
 --commentaire de test voir si le commmit a lieu
 function BuffSelf(spell, eventArgs)
     local allRecasts = windower.ffxi.get_spell_recasts()
@@ -95,76 +94,23 @@ function refine_various_spells(spell, action, spellMap, eventArgs)
     sleeps = S {'Sleep II', 'Sleep'}
     banish = S {'Banish II', 'Banish'}
     sleepgas = S {'Sleepga II', 'Sleepga'}
-    nukes =
-        S {
-        'Fire',
-        'Blizzard',
-        'Aero',
-        'Stone',
-        'Thunder',
-        'Water',
-        'Fire II',
-        'Blizzard II',
-        'Aero II',
-        'Stone II',
-        'Thunder II',
-        'Water II',
-        'Fire III',
-        'Blizzard III',
-        'Aero III',
-        'Stone III',
-        'Thunder III',
-        'Water III',
-        'Fire IV',
-        'Blizzard IV',
-        'Aero IV',
-        'Stone IV',
-        'Thunder IV',
-        'Water IV',
-        'Fire V',
-        'Blizzard V',
-        'Aero V',
-        'Stone V',
-        'Thunder V',
-        'Water V',
-        'Fire VI',
-        'Blizzard VI',
-        'Aero VI',
-        'Stone VI',
-        'Thunder VI',
-        'Water VI',
-        'Firaga',
-        'Blizzaga',
-        'Aeroga',
-        'Stonega',
-        'Thundaga',
-        'Waterga',
-        'Firaga II',
-        'Blizzaga II',
-        'Aeroga II',
-        'Stonega II',
-        'Thundaga II',
-        'Waterga II',
-        'Firaga III',
-        'Blizzaga III',
-        'Aeroga III',
-        'Stonega III',
-        'Thundaga III',
-        'Waterga III',
-        'Firaja',
-        'Blizzaja',
-        'Aeroja',
-        'Stoneja',
-        'Thundaja',
-        'Waterja'
-    }
+    nukes = S {'Fire','Blizzard','Aero','Stone','Thunder','Water',
+        'Fire II','Blizzard II','Aero II','Stone II','Thunder II','Water II',
+        'Fire III','Blizzard III','Aero III','Stone III','Thunder III','Water III',
+        'Fire IV','Blizzard IV','Aero IV','Stone IV','Thunder IV','Water IV',
+        'Fire V','Blizzard V','Aero V','Stone V','Thunder V','Water V',
+        'Fire VI','Blizzard VI','Aero VI','Stone VI','Thunder VI','Water VI',
+        'Firaga','Blizzaga','Aeroga','Stonega','Thundaga','Waterga',
+        'Firaga II','Blizzaga II','Aeroga II','Stonega II','Thundaga II','Waterga II',
+        'Firaga III','Blizzaga III','Aeroga III','Stonega III','Thundaga III','Waterga III',
+        'Firaja','Blizzaja','Aeroja','Stoneja','Thundaja','Waterja'}
 
     if
         not sleepgas:contains(spell.english) and not banish:contains(spell.english) and
             not sleeps:contains(spell.english) and
             not aspirs:contains(spell.english) and
             not nukes:contains(spell.english)
-     then
+    then
         return
     end
 
