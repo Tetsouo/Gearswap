@@ -37,4 +37,4 @@ Feel free to enhance these scripts or fix any bugs you might encounter! Fork thi
 
 ## License
 
-This project falls under the terms of the MIT license. More details are available in the [LICENSE](./LICENSE) file in the repository.
+This project falls under the terms of the MIT license. More details are available in the [LICENSE](LICENSE.md) file in the repository.
