@@ -28,8 +28,7 @@ function job_setup()
     incapacitated_states =
         T {
         'stun', -- Stun status
-        'petrification',
-        -- Petrification status
+        'petrification', -- Petrification status
         'terror', -- Terror status
         'sleep' -- Sleep status
     }
