@@ -1,3 +1,4 @@
+--test
 function BuffSelf(spell, eventArgs)
     local allRecasts = windower.ffxi.get_spell_recasts()
     local PhalanxCD = allRecasts[106]
