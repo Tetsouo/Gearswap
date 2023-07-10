@@ -1,4 +1,3 @@
---commentaire de test voir si le commmit a lieu
 function BuffSelf(spell, eventArgs)
     local allRecasts = windower.ffxi.get_spell_recasts()
     local PhalanxCD = allRecasts[106]
