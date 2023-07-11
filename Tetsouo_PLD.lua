@@ -132,7 +132,6 @@ function incapacitated()
     return false, nil
 end
 
-
 -- Check the recast time of a spell or ability and cancel the action if not ready
 function handleRecastCooldown(spell, eventArgs)
     -- Retrieve the recast time of the spell or ability
@@ -186,7 +185,6 @@ function job_precast(spell, action, spellMap, eventArgs)
     handleRecastCooldown(spell, eventArgs)
 end
 
-
 -- Actions to perform during casting of a spell or ability
 function job_midcast(spell, action, spellMap, eventArgs)
     -- Check for incapacitated state
@@ -196,7 +194,6 @@ function job_midcast(spell, action, spellMap, eventArgs)
         return
     end
 end
-
 
 -- Variable pour suivre si le sort a déjà été traité
 local spellHandled = false
@@ -258,7 +255,6 @@ function job_buff_change(buff, gain)
         end
     end
 end
-
 
 -- Customize the idle gear set
 function customize_idle_set(idleSet)
