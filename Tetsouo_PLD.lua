@@ -133,17 +133,34 @@ function incapacitated()
 end
 
 -- Check the recast time of a spell or ability and cancel the action if not ready
-function check_recast_and_cancel(spell, eventArgs)
+function handleRecastCooldown(spell, eventArgs)
+    -- Retrieve the recast time of the spell or ability
     local recast = 0
     if spell.action_type == 'Magic' then
-        recast = windower.ffxi.get_spell_recasts()[spell.id]
+        recast = windower.ffxi.get_spell_recasts()[spell.id] / 1000 -- Convert milliseconds to seconds
     elseif spell.action_type == 'Ability' then
-        recast = windower.ffxi.get_ability_recasts()[spell.recast_id]
+        recast = windower.ffxi.get_ability_recasts()[spell.recast_id] -- Recasts are already in seconds
     end
+    -- If recast is greater than 0, cancel the action and display a message indicating the remaining recast time
     if recast > 0 then
         cancel_spell()
         eventArgs.cancel = true
-        add_to_chat(167, string.char(0x1F, 167) .. 'Cannot use ' .. string.char(0x1F, 005) .. spell.name .. string.char(0x1F, 167) .. ' . Waiting on recast.')
+        -- Format the message based on the recast time, either in minutes or seconds
+        local recastFormatted = ""
+        if recast >= 60 then
+            local minutes = math.floor(recast / 60)
+            local seconds = math.floor(recast % 60)
+            recastFormatted = string.format("%02d:%02d min", minutes, seconds)
+        else
+            recastFormatted = string.format("%.1f sec", recast)
+        end
+        -- Display the formatted message indicating the remaining recast time
+        local message = 
+            string.char(0x1F, 057) .. "Cannot use: " ..
+            string.char(0x1F, 028) .. "[" .. string.char(0x1F, 050) .. spell.name .. string.char(0x1F, 028) .. "]" ..
+            string.char(0x1F, 057) .. " Recast: " ..
+            string.char(0x1F, 028) .. "(" .. string.char(0x1F, 050) .. recastFormatted .. string.char(0x1F, 028) .. ")"
+        add_to_chat(167, message)
     end
 end
 
@@ -157,7 +174,7 @@ function job_precast(spell, action, spellMap, eventArgs)
     end
     auto_majesty(spell, eventArgs)
     auto_divineEmblem(spell, eventArgs)
-    check_recast_and_cancel(spell, eventArgs)
+    handleRecastCooldown(spell, eventArgs)
 end
 
 -- Actions to perform during casting of a spell or ability
@@ -195,7 +212,7 @@ function job_aftercast(spell, action, spellMap, eventArgs)
                 -- Perform the appropriate actions, for example:
                 eventArgs.handled = true
                 equip(sets.idle)
-                add_to_chat(123, string.char(0x1F, 167) .. "Spell interrupted: " .. string.char(0x1F, 005) .. spell.name)
+                add_to_chat(123, string.char(0x1F, 167) .. "Spell interrupted: " .. string.char(0x1F, 057) .. spell.name)
             else
                 -- The spell completed normally
                 -- Perform the appropriate actions after the spell
