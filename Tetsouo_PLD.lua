@@ -77,7 +77,7 @@ function auto_majesty(spell, eventArgs)
     -- Retrieve the recast time of the spell
     local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
     -- Check if the spell belongs to the 'Healing Magic' category or if its name is 'Protect V', excluding 'Phalanx'
-    if (spell.name == 'Cure III' or spell.name == 'Cure IV' or spell.name == 'Protect V') and spell.name ~= 'Phalanx' then
+    if (spell.action_type == 'Magic' and spell.skill == 'Healing Magic') or spell.name == 'Protect V' then
         -- Check if the recast time of the spell is less than 1 second
         if spellRecast < 1 then
             -- Check if the player is not affected by the 'Amnesia' debuff and 'Majesty' is not already active
@@ -86,8 +86,8 @@ function auto_majesty(spell, eventArgs)
                 if MajestyCD < 1 then
                     -- Cancel the current spell
                     cancel_spell()
-                    -- Perform the command to cast 'Majesty', wait for 1 seconds, then cast the original spell on the original target
-                    send_command(string.format('input /ja "Majesty" <me>; wait 1.1; input /ma "%s" %s', spell.name, spell.target.name))
+                    -- Perform the command to cast 'Majesty', wait for 1 second, then cast the original spell on the original target
+                    send_command(string.format('input /ja "Majesty" <me>; wait 1.2; input /ma "%s" %s', spell.name, spell.target.id))
                 end
             end
         else
@@ -106,8 +106,8 @@ function auto_divineEmblem(spell, eventArgs)
             if DivineEmblemCD < 1 then -- Check if the recast time of 'Divine Emblem' is less than 1 second
                 if not state.Buff.Divine then -- Check if the 'Divine' buff is not active
                     cancel_spell() -- Cancel the current spell
-                    -- Perform the command to cast 'Divine Emblem', wait for 1 seconds, then cast the original spell on the original target
-                    send_command('input /ja "Divine Emblem" <me>; wait 1; input /ma "' .. spell.name .. '" ' .. spell.target.id)
+                    -- Perform the command to cast 'Divine Emblem', wait for 1 second, then cast the original spell on the original target
+                    send_command('input /ja "Divine Emblem" <me>; wait 1.2; input /ma "' .. spell.name .. '" ' .. spell.target.id)
                 end
             end
         else
@@ -132,7 +132,26 @@ function incapacitated()
     return false, nil
 end
 
-function handleRecastCooldown(spell, eventArgs)
+-- Helper function to format recast time
+local function formatRecastTime(recast)
+    if recast >= 60 then
+        local minutes = math.floor(recast / 60)
+        local seconds = math.floor(recast % 60)
+        return string.format("%02d:%02d min", minutes, seconds)
+    else
+        return string.format("%.1f sec", recast)
+    end
+end
+
+-- Helper function to create a message with spell name and recast time
+local function createMessage(spellName, recast)
+    local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spellName .. string.char(0x1F, 050) .. "]" ..
+                    " Recast: " .. string.char(0x1F, 050) .. "(" .. string.char(0x1F, 221) .. formatRecastTime(recast) .. string.char(0x1F, 050) .. ")"
+    return message
+end
+
+-- Handle recast cooldown and display messages
+local function handleRecastCooldown(spell, eventArgs)
     -- Check if the action type is not "Weapon Skill"
     if spell.action_type ~= 'Weapon Skill' then
         -- Retrieve the recast time of the spell or ability
@@ -143,23 +162,11 @@ function handleRecastCooldown(spell, eventArgs)
             recast = windower.ffxi.get_ability_recasts()[spell.recast_id] -- Recasts are already in seconds
         end
         -- Check if the recast value is not nil
-        if recast ~= nil and recast > 0 then
+        if recast and recast > 0 then
             cancel_spell()
             eventArgs.cancel = true
             -- Format and display the recast message
-            local recastFormatted = ""
-            if recast >= 60 then
-                local minutes = math.floor(recast / 60)
-                local seconds = math.floor(recast % 60)
-                recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-            else
-                recastFormatted = string.format("%.1f sec", recast)
-            end
-            local message =
-                string.char(0x1F, 159) .. "Cannot use: " ..
-                string.char(0x1F, 159) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]" ..
-                string.char(0x1F, 159) .. " Recast: " ..
-                string.char(0x1F, 159) .. "(" .. string.char(0x1F, 221) .. recastFormatted .. string.char(0x1F, 159) .. ")"
+            local message = createMessage(spell.name, recast)
             add_to_chat(123, message)
             add_to_chat(259, "=======================================")
         end
@@ -173,11 +180,8 @@ function job_precast(spell, action, spellMap, eventArgs)
     if isIncapacitated then
         eventArgs.handled = true
         equip(sets.idle)
-        local message =
-            string.char(0x1F, 159) .. "Cannot use: " ..
-            string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]" ..
-            string.char(0x1F, 159) .. " Incapacitated: " ..
-            string.char(0x1F, 050) .. "(" .. string.char(0x1F, 221) .. incapType .. string.char(0x1F, 050) .. ")"
+        local message = string.char(0x1F, 159) .. "Cannot use: [" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]" ..
+                        " Incapacitated: (" .. string.char(0x1F, 221) .. incapType .. string.char(0x1F, 159) .. ")"
         add_to_chat(167, message)
         return
     end
@@ -197,22 +201,18 @@ function job_midcast(spell, action, spellMap, eventArgs)
     end
 end
 
--- Variable pour suivre si le sort a déjà été traité
-local spellHandled = false
-
+-- Aftercast actions
 function job_aftercast(spell, action, spellMap, eventArgs)
-    -- Check if the spell is Crusade, Reprisal, Phalanx or Cocoon
+    -- Check if the spell is Crusade, Reprisal, Phalanx, or Cocoon
     if spell.name == 'Crusade' or spell.name == 'Reprisal' or spell.name == 'Phalanx' or spell.name == 'Cocoon' then
         if spell.interrupted then
             -- The spell was interrupted
-            -- Perform the appropriate actions, for example:
+            -- Perform the appropriate actions
             eventArgs.handled = true
             equip(sets.idle)
-            local message =
-                string.char(0x1F, 159) .. "Spell interrupted: " ..
-                string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]"
-                add_to_chat(123, message)
-                add_to_chat(259, "=======================================")
+            local message = string.char(0x1F, 159) .. "Spell interrupted: [" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]"
+            add_to_chat(123, message)
+            add_to_chat(259, "=======================================")
         else
             -- The spell completed normally
             -- Perform the appropriate actions after the spell
@@ -222,18 +222,16 @@ function job_aftercast(spell, action, spellMap, eventArgs)
         if not spellHandled then
             if spell.interrupted then
                 -- The spell was interrupted
-                -- Perform the appropriate actions, for example:
+                -- Perform the appropriate actions
                 eventArgs.handled = true
                 equip(sets.idle)
-                local message =
-                string.char(0x1F, 159) .. "Spell interrupted: " ..
-                string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]"
+                local message = string.char(0x1F, 159) .. "Spell interrupted: [" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]"
                 add_to_chat(123, message)
                 add_to_chat(259, "=======================================")
             else
                 -- The spell completed normally
                 -- Perform the appropriate actions after the spell
-            end  
+            end
             -- Mark the spell as handled
             spellHandled = true
         else
@@ -243,67 +241,92 @@ function job_aftercast(spell, action, spellMap, eventArgs)
     end
 end
 
--- Perform actions when a buff changes
-function job_buff_change(buff, gain)
-    -- Check if the buff changed is 'Doom'
-    if buff == 'Doom' then
-        -- Check if the buff was gained
-        if gain then
-            -- Equip the 'Doom' buff set
-            equip(sets.buff.Doom)
-            -- Disable the 'neck' slot
-            disable('neck')
-        else
-            -- Enable the 'neck' slot
-            enable('neck')
+-- Variables to store the spell IDs
+local spellsSingle = {
+    Flash = 112,
+    BlankGaze = 592
+}
+
+local spellsAoe = {
+    GeistWall = 605,
+    SheepSong = 584,
+    Jettatura = 575
+}
+
+-- Helper function to handle the Single command logic
+local function handleSingleCommand()
+    local messages = {}
+    local recastFlash = windower.ffxi.get_spell_recasts()[spellsSingle.Flash]
+    local recastBlankGaze = windower.ffxi.get_spell_recasts()[spellsSingle.BlankGaze]
+    if recastFlash < 1 then
+        send_command('input /ma "Flash" <stnpc>')
+    elseif recastFlash > 1 and recastBlankGaze < 1 then
+        send_command('input /ma "Blank Gaze" <stnpc>')
+    else
+        if recastFlash > 0 then
+            local message = createMessage("Flash", recastFlash / 60)
+            table.insert(messages, { spell = "Flash", recast = recastFlash, message = message })
         end
+        if recastBlankGaze > 0 then
+            local message = createMessage("Blank Gaze", recastBlankGaze / 60)
+            table.insert(messages, { spell = "Blank Gaze", recast = recastBlankGaze, message = message })
+        end
+    end
+    if #messages > 0 then
+        table.sort(messages, function(a, b) return a.recast < b.recast end) -- Sort messages by recast time in ascending order
+        add_to_chat(159, "No spells available")
+        for _, msgData in ipairs(messages) do
+            add_to_chat(167, msgData.message)
+        end
+        add_to_chat(259, "=======================================")
     end
 end
 
--- Customize the idle gear set
-function customize_idle_set(idleSet)
-    -- Check if 'Doom' buff is active
-    local isDoomActive = buffactive['Doom']
-    -- Set the default idle gear set based on HybridMode
-    if state.HybridMode.value == 'PDT' then
-        idleSet = sets.idle
-    elseif state.HybridMode.value == 'Ody' then
-        idleSet = sets.idle.Ody
-    elseif state.HybridMode.value == 'MDT' then
-        idleSet = set_combine(sets.idle, sets.defense.MDT)
-    elseif state.HybridMode.value == 'Normal' then
-        idleSet = set_combine(sets.idle, sets.engaged)
+-- Helper function to handle the Aoe command logic
+local function handleAoeCommand()
+    local messages = {}
+    local recastGeistWall = windower.ffxi.get_spell_recasts()[spellsAoe.GeistWall]
+    local recastSheepSong = windower.ffxi.get_spell_recasts()[spellsAoe.SheepSong]
+    local recastJettatura = windower.ffxi.get_spell_recasts()[spellsAoe.Jettatura]
+    if recastGeistWall < 1 then
+        send_command('input /ma "Geist Wall" <stnpc>')
+    elseif recastGeistWall > 1 and recastSheepSong < 1 then
+        send_command('input /ma "Sheep Song" <stnpc>')
+    elseif recastGeistWall > 1 and recastSheepSong > 1 and recastJettatura < 1 then
+        send_command('input /ma "Jettatura" <stnpc>')
     else
-        idleSet = set_combine(sets.idle, sets.buff.Doom)
-    end
-    -- Check if in a city area and adjust idle gear set accordingly
-    if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
-        if player.mp < 700 then
-            idleSet = set_combine(idleSet, sets.latent_refresh)
-        else
-            idleSet = set_combine(idleSet, sets.idle.Town)
+        if recastGeistWall > 0 then
+            local message = createMessage("Geist Wall", recastGeistWall / 60)
+            table.insert(messages, { spell = "Geist Wall", recast = recastGeistWall, message = message })
+        end
+        if recastSheepSong > 0 then
+            local message = createMessage("Sheep Song", recastSheepSong / 60)
+            table.insert(messages, { spell = "Sheep Song", recast = recastSheepSong, message = message })
+        end
+        if recastJettatura > 0 then
+            local message = createMessage("Jettatura", recastJettatura / 60)
+            table.insert(messages, { spell = "Jettatura", recast = recastJettatura, message = message })
         end
     end
-    return idleSet
+    if #messages > 0 then
+        table.sort(messages, function(a, b) return a.recast < b.recast end) -- Sort messages by recast time in ascending order
+        add_to_chat(159, "No spells available")
+        for _, msgData in ipairs(messages) do
+            add_to_chat(167, msgData.message)
+        end
+        add_to_chat(259, "=======================================")
+    end
 end
 
--- Customize the gear set for melee mode
-function customize_melee_set(meleeSet)
-    -- Check if 'Doom' buff is active
-    local isDoomActive = buffactive['Doom']
-    -- Set the default melee gear set based on HybridMode
-    if state.HybridMode.value == 'PDT' then
-        meleeSet = sets.idle
-    elseif state.HybridMode.value == 'Ody' then
-        meleeSet = sets.idle.Ody
-    elseif state.HybridMode.value == 'MDT' then
-        meleeSet = set_combine(sets.idle, sets.defense.MDT)
-    elseif state.HybridMode.value == 'Normal' then
-        meleeSet = set_combine(sets.idle, sets.engaged)
-    else
-        meleeSet = set_combine(sets.idle, sets.buff.Doom)
+-- Handle custom commands
+function job_self_command(cmdParams, eventArgs)
+    if cmdParams[1]:lower() == 'single' then
+        handleSingleCommand()
+        eventArgs.handled = true
+    elseif cmdParams[1]:lower() == 'aoe' then
+        handleAoeCommand()
+        eventArgs.handled = true
     end
-    return meleeSet
 end
 
 -- Actions to perform when the player's equipment changes
@@ -326,270 +349,6 @@ function job_state_change(field, new_value, old_value)
     check_weaponset()
     -- Check and adjust the gear subset
     check_subset()
-end
-
---[[ function job_self_command(cmdParams, eventArgs)
-    -- Gérer les commandes définies par l'utilisateur
-    if cmdParams[1] == 'Single' then
-        -- Logique pour Single
-        -- Variable pour stocker les recasts des sorts
-        local spellRecasts = windower.ffxi.get_spell_recasts()
-        local recastFlash = spellRecasts[112]
-        local recastBlankGaze = spellRecasts[592]
-        local spell = ""
-        if recastFlash < 1 then
-            spell = "Flash"
-        elseif recastFlash > 1 and recastBlankGaze < 1 then
-            spell = "Blank Gaze"
-        end
-        if spell == "Flash" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        elseif spell == "Blank Gaze" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        else
-            if recastFlash > 0 then
-                local recast = recastFlash / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Flash"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                add_to_chat(159, "No spells available")
-                add_to_chat(167, message)
-            end
-            if recastBlankGaze > 0 then
-                local recast = recastBlankGaze / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Blank Gaze"..string.char(0x1F, 050) .. "]" ..
-                string.char(0x1F, 159) .. " Recast: " ..
-                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                add_to_chat(167, message)
-                add_to_chat(259, "=======================================")
-            end
-        end
-    elseif cmdParams[1] == 'Aoe' then
-        -- Logique pour Aoe
-        -- Variable pour stocker les recasts des sorts
-        local spellRecasts = windower.ffxi.get_spell_recasts()
-        local recastGeistWall = spellRecasts[605]
-        local recastSheepSong = spellRecasts[584]
-        local recastJettatura = spellRecasts[575]
-        local spell = ""
-        if recastGeistWall < 1 then
-            spell = "Geist Wall"
-        elseif recastGeistWall > 1 and recastSheepSong < 1 then
-            spell = "Sheep Song"
-        elseif recastGeistWall > 1 and recastSheepSong > 1 and recastJettatura < 1 then
-            spell = "Jettatura"
-        end
-        if spell == "Geist Wall" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        elseif spell == "Sheep Song" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        elseif spell == "Jettatura" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        else
-            if recastGeistWall > 0 then
-                local recast = recastGeistWall / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Geist Wall"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                add_to_chat(159, "No spells available")
-                add_to_chat(167, message)
-            end
-            if recastSheepSong > 0 then
-                local recast = recastSheepSong / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Sheep Song"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                add_to_chat(167, message)
-            end
-            if recastJettatura > 0 then
-                local recast = recastJettatura / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Jettatura"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                add_to_chat(167, message)
-                add_to_chat(259, "=======================================")
-            end
-        end
-    end
-end ]]
-
-function job_self_command(cmdParams, eventArgs)
-    -- Gérer les commandes définies par l'utilisateur
-    if cmdParams[1] == 'Single' then
-        -- Logique pour Single
-        -- Variable pour stocker les recasts des sorts
-        local spellRecasts = windower.ffxi.get_spell_recasts()
-        local recastFlash = spellRecasts[112]
-        local recastBlankGaze = spellRecasts[592]
-        local spell = ""
-        if recastFlash < 1 then
-            spell = "Flash"
-        elseif recastFlash > 1 and recastBlankGaze < 1 then
-            spell = "Blank Gaze"
-        end
-        if spell == "Flash" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        elseif spell == "Blank Gaze" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        else
-            local messages = {}
-            if recastFlash > 0 then
-                local recast = recastFlash / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Flash"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                table.insert(messages, {spell = "Flash", recast = recast, message = message})
-            end
-            if recastBlankGaze > 0 then
-                local recast = recastBlankGaze / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Blank Gaze"..string.char(0x1F, 050) .. "]" ..
-                string.char(0x1F, 159) .. " Recast: " ..
-                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                table.insert(messages, {spell = "Blank Gaze", recast = recast, message = message})
-            end
-            if #messages > 0 then
-                table.sort(messages, function(a, b) return a.recast < b.recast end) -- Tri des messages par recast croissant
-                add_to_chat(159, "No spells available")
-                for _, msgData in ipairs(messages) do
-                    add_to_chat(167, msgData.message)
-                end
-                add_to_chat(259, "=======================================")
-            end
-        end
-    elseif cmdParams[1] == 'Aoe' then
-        -- Logique pour Aoe
-        -- Variable pour stocker les recasts des sorts
-        local spellRecasts = windower.ffxi.get_spell_recasts()
-        local recastGeistWall = spellRecasts[605]
-        local recastSheepSong = spellRecasts[584]
-        local recastJettatura = spellRecasts[575]
-        local spell = ""
-        if recastGeistWall < 1 then
-            spell = "Geist Wall"
-        elseif recastGeistWall > 1 and recastSheepSong < 1 then
-            spell = "Sheep Song"
-        elseif recastGeistWall > 1 and recastSheepSong > 1 and recastJettatura < 1 then
-            spell = "Jettatura"
-        end
-        if spell == "Geist Wall" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        elseif spell == "Sheep Song" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        elseif spell == "Jettatura" then
-            send_command('input /ma "' .. spell .. '" <stnpc>')
-        else
-            local messages = {}
-            if recastGeistWall > 0 then
-                local recast = recastGeistWall / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Geist Wall"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                table.insert(messages, {spell = "Geist Wall", recast = recast, message = message})
-            end
-            if recastSheepSong > 0 then
-                local recast = recastSheepSong / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Sheep Song"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                table.insert(messages, {spell = "Sheep Song", recast = recast, message = message})
-            end
-            if recastJettatura > 0 then
-                local recast = recastJettatura / 60 -- Convert milliseconds to seconds
-                local recastFormatted = ""
-                if recast >= 60 then
-                    local minutes = math.floor(recast / 60)
-                    local seconds = math.floor(recast % 60)
-                    recastFormatted = string.format("%02d:%02d min", minutes, seconds)
-                else
-                    recastFormatted = string.format("%.1f sec", recast)
-                end
-                local message = string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221).."Jettatura"..string.char(0x1F, 050) .. "]" ..
-                                string.char(0x1F, 159) .. " Recast: " ..
-                                string.char(0x1F, 221) .. "(" .. recastFormatted .. ")" .. string.char(0x1F, 159)
-                table.insert(messages, {spell = "Jettatura", recast = recast, message = message})
-            end
-            if #messages > 0 then
-                table.sort(messages, function(a, b) return a.recast < b.recast end) -- Tri des messages par recast croissant
-                add_to_chat(159, "No spells available")
-                for _, msgData in ipairs(messages) do
-                    add_to_chat(167, msgData.message)
-                end
-                add_to_chat(259, "=======================================")
-            end
-        end
-    end
 end
 
 -- Select the default macro book
