@@ -36,14 +36,14 @@ end
 
 -- User-specific configuration
 function user_setup()
-    -- Commande pour changer le mode hybride : /console gs c cycle HybridMode
+    -- Command to change hybrid mode: /console gs c cycle HybridMode
     state.HybridMode:options('PDT', 'MDT', 'Normal') -- Hybrid mode options: 'PDT' (physical), 'MDT' (magical), 'Normal'
+    -- Command to cycle main weapon set: /console gs c cycle WeaponSet
     state.WeaponSet = M {['description'] = 'Main Weapon', 'Burtgang', 'Naegling'} -- Main weapon choice: 'Burtgang', 'Naegling'
--- Commande pour changer l'ensemble d'armes principales : /console gs c cycle WeaponSet
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'Burtgang', 'Naegling'} -- Main weapon choice: 'Burtgang', 'Naegling'
-    -- Commande pour changer l'ensemble d'armes secondaires : /console gs c set SubSet [Nom de l'ensemble]
+    -- Command to set sub weapon set: /console gs c set SubSet [Name of the set]
     state.SubSet = M {['description'] = 'Sub Weapon', 'Duban', 'Aegis', 'Ochain', 'Blurred'} -- Sub weapon choice: 'Duban', 'Aegis', 'Ochain', 'Blurred'
-    select_default_macro_book() -- Select default macro book
+    -- Select default macro book
+    select_default_macro_book()
 end
 
 -- Load gear sets
@@ -123,14 +123,15 @@ function incapacitated()
     for _, value in ipairs(incapacitated_states) do
         -- Check if the value exists as a buff in the buffactive table
         if buffactive[value] then
-            -- If an incapacitated state is detected, equip the idle gear and return true
+            -- If an incapacitated state is detected, equip the idle gear and return the incapacitation type and name
             equip(sets.idle)
-            return true
+            return true, value
         end
     end
-    -- If no incapacitated state is detected, return false
-    return false
+    -- If no incapacitated state is detected, return false and nil for the incapacitation type and name
+    return false, nil
 end
+
 
 -- Check the recast time of a spell or ability and cancel the action if not ready
 function handleRecastCooldown(spell, eventArgs)
@@ -156,26 +157,35 @@ function handleRecastCooldown(spell, eventArgs)
         end
         -- Display the formatted message indicating the remaining recast time
         local message = 
-            string.char(0x1F, 057) .. "Cannot use: " ..
-            string.char(0x1F, 028) .. "[" .. string.char(0x1F, 050) .. spell.name .. string.char(0x1F, 028) .. "]" ..
-            string.char(0x1F, 057) .. " Recast: " ..
-            string.char(0x1F, 028) .. "(" .. string.char(0x1F, 050) .. recastFormatted .. string.char(0x1F, 028) .. ")"
+            string.char(0x1F, 159) .. "Cannot use: " ..
+            string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]" ..
+            string.char(0x1F, 159) .. " Recast: " ..
+            string.char(0x1F, 050) .. "(" .. string.char(0x1F, 221) .. recastFormatted .. string.char(0x1F, 050) .. ")"
         add_to_chat(167, message)
     end
 end
 
 -- Actions to perform before casting a spell or ability
 function job_precast(spell, action, spellMap, eventArgs)
-    -- Check for incapacitated state
-    if incapacitated() then
+    -- Get the incapacitation state and name
+    local isIncapacitated, incapType = incapacitated()
+    if isIncapacitated then
         eventArgs.handled = true
         equip(sets.idle)
+        local message =
+            string.char(0x1F, 159) .. "Cannot use: " ..
+            string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]" ..
+            string.char(0x1F, 159) .. " Incapacitated: " ..
+            string.char(0x1F, 050) .. "(" .. string.char(0x1F, 221) .. incapType .. string.char(0x1F, 050) .. ")"
+        add_to_chat(167, message)
         return
     end
+    -- Rest of the code for precast actions
     auto_majesty(spell, eventArgs)
     auto_divineEmblem(spell, eventArgs)
     handleRecastCooldown(spell, eventArgs)
 end
+
 
 -- Actions to perform during casting of a spell or ability
 function job_midcast(spell, action, spellMap, eventArgs)
@@ -199,7 +209,10 @@ function job_aftercast(spell, action, spellMap, eventArgs)
             -- Perform the appropriate actions, for example:
             eventArgs.handled = true
             equip(sets.idle)
-            add_to_chat(123, string.char(0x1F, 167) .. "Spell interrupted: " .. string.char(0x1F, 005) .. spell.name)
+            local message =
+                string.char(0x1F, 159) .. "Spell interrupted: " ..
+                string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]"
+                add_to_chat(123, message)
         else
             -- The spell completed normally
             -- Perform the appropriate actions after the spell
@@ -212,7 +225,10 @@ function job_aftercast(spell, action, spellMap, eventArgs)
                 -- Perform the appropriate actions, for example:
                 eventArgs.handled = true
                 equip(sets.idle)
-                add_to_chat(123, string.char(0x1F, 167) .. "Spell interrupted: " .. string.char(0x1F, 057) .. spell.name)
+                local message =
+                string.char(0x1F, 159) .. "Spell interrupted: " ..
+                string.char(0x1F, 050) .. "[" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 050) .. "]"
+                add_to_chat(123, message)
             else
                 -- The spell completed normally
                 -- Perform the appropriate actions after the spell
