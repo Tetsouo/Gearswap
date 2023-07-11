@@ -57,7 +57,7 @@ function init_gear_sets()
     sets['Blurred'] = {sub = 'Blurred Shield +1'}
 
     -- Include the PldSet.lua file containing equipment sets
-    include('PldSet.lua')
+    include('PLD_SET.lua')
 end
 
 -- Check current main weapon set
