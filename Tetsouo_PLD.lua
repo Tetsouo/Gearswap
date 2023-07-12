@@ -12,7 +12,7 @@ function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua') -- Inclusion of the Mote-Include.lua library (Version 2)
     include('0_AutoMove.lua') -- (Movement Speed Gear Management)
-    include('SharedFunctions.lua') -- (Movement Speed Gear Management)
+    include('SharedFunctions.lua') -- (Function Shared)
 end
 
 -- Initial job configuration
@@ -70,7 +70,13 @@ function auto_majesty(spell, eventArgs)
                     -- Cancel the current spell
                     cancel_spell()
                     -- Perform the command to cast 'Majesty', wait for 1 second, then cast the original spell on the original target
-                    send_command(string.format('input /ja "Majesty" <me>; wait 1.2; input /ma "%s" %s', spell.name, spell.target.id))
+                    send_command(
+                        string.format(
+                            'input /ja "Majesty" <me>; wait 1.2; input /ma "%s" %s',
+                            spell.name,
+                            spell.target.id
+                        )
+                    )
                 end
             end
         else
@@ -90,32 +96,25 @@ function auto_divineEmblem(spell, eventArgs)
                 if not state.Buff.Divine then -- Check if the 'Divine' buff is not active
                     cancel_spell() -- Cancel the current spell
                     -- Perform the command to cast 'Divine Emblem', wait for 1 second, then cast the original spell on the original target
-                    send_command('input /ja "Divine Emblem" <me>; wait 1.2; input /ma "' .. spell.name .. '" ' .. spell.target.id)
+                    send_command(
+                        'input /ja "Divine Emblem" <me>; wait 1.2; input /ma "' .. spell.name .. '" ' .. spell.target.id
+                    )
                 end
             end
         else
-            eventArgs.handled = true -- Mark the event as handled
-            cancel_spell() -- Cancel the current spell
+            incapacitated(spell, eventArgs)
         end
     end
 end
 
 -- Actions to perform before casting a spell or ability
 function job_precast(spell, action, spellMap, eventArgs)
-    -- Get the incapacitation state and name
-    local isIncapacitated, incapType = incapacitated()
-    if isIncapacitated then
-        eventArgs.handled = true
-        equip(sets.idle)
-        local message = string.char(0x1F, 159) .. "Cannot use: [" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]" ..
-                        " Incapacitated: (" .. string.char(0x1F, 221) .. incapType .. string.char(0x1F, 159) .. ")"
-        add_to_chat(167, message)
-        return
+    if incapacitated(spell, eventArgs) then
+    else
+        auto_majesty(spell, eventArgs)
+        auto_divineEmblem(spell, eventArgs)
+        handleRecastCooldown(spell, eventArgs)
     end
-    -- Rest of the code for precast actions
-    auto_majesty(spell, eventArgs)
-    auto_divineEmblem(spell, eventArgs)
-    handleRecastCooldown(spell, eventArgs)
 end
 
 -- Actions to perform during casting of a spell or ability
@@ -137,9 +136,11 @@ function job_aftercast(spell, action, spellMap, eventArgs)
             -- Perform the appropriate actions
             eventArgs.handled = true
             equip(sets.idle)
-            local message = string.char(0x1F, 159) .. "Spell interrupted: [" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]"
+            local message =
+                string.char(0x1F, 159) ..
+                'Spell interrupted: [' .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. ']'
             add_to_chat(123, message)
-            add_to_chat(259, "=======================================")
+            add_to_chat(259, '=================================================')
         else
             -- The spell completed normally
             -- Perform the appropriate actions after the spell
@@ -152,9 +153,11 @@ function job_aftercast(spell, action, spellMap, eventArgs)
                 -- Perform the appropriate actions
                 eventArgs.handled = true
                 equip(sets.idle)
-                local message = string.char(0x1F, 159) .. "Spell interrupted: [" .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. "]"
+                local message =
+                    string.char(0x1F, 159) ..
+                    'Spell interrupted: [' .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. ']'
                 add_to_chat(123, message)
-                add_to_chat(259, "=======================================")
+                add_to_chat(259, '=================================================')
             else
                 -- The spell completed normally
                 -- Perform the appropriate actions after the spell
@@ -191,21 +194,26 @@ local function handleSingleCommand()
         send_command('input /ma "Blank Gaze" <stnpc>')
     else
         if recastFlash > 0 then
-            local message = createMessage("Flash", recastFlash / 60)
-            table.insert(messages, { spell = "Flash", recast = recastFlash, message = message })
+            local message = createMessage('Flash', recastFlash / 60)
+            table.insert(messages, {spell = 'Flash', recast = recastFlash, message = message})
         end
         if recastBlankGaze > 0 then
-            local message = createMessage("Blank Gaze", recastBlankGaze / 60)
-            table.insert(messages, { spell = "Blank Gaze", recast = recastBlankGaze, message = message })
+            local message = createMessage('Blank Gaze', recastBlankGaze / 60)
+            table.insert(messages, {spell = 'Blank Gaze', recast = recastBlankGaze, message = message})
         end
     end
     if #messages > 0 then
-        table.sort(messages, function(a, b) return a.recast < b.recast end) -- Sort messages by recast time in ascending order
-        add_to_chat(159, "No spells available")
+        table.sort(
+            messages,
+            function(a, b)
+                return a.recast < b.recast
+            end
+        ) -- Sort messages by recast time in ascending order
+        add_to_chat(159, 'No spells available')
         for _, msgData in ipairs(messages) do
             add_to_chat(167, msgData.message)
         end
-        add_to_chat(259, "=======================================")
+        add_to_chat(259, '=================================================')
     end
 end
 
@@ -223,25 +231,30 @@ local function handleAoeCommand()
         send_command('input /ma "Jettatura" <stnpc>')
     else
         if recastGeistWall > 0 then
-            local message = createMessage("Geist Wall", recastGeistWall / 60)
-            table.insert(messages, { spell = "Geist Wall", recast = recastGeistWall, message = message })
+            local message = createMessage('Geist Wall', recastGeistWall / 60)
+            table.insert(messages, {spell = 'Geist Wall', recast = recastGeistWall, message = message})
         end
         if recastSheepSong > 0 then
-            local message = createMessage("Sheep Song", recastSheepSong / 60)
-            table.insert(messages, { spell = "Sheep Song", recast = recastSheepSong, message = message })
+            local message = createMessage('Sheep Song', recastSheepSong / 60)
+            table.insert(messages, {spell = 'Sheep Song', recast = recastSheepSong, message = message})
         end
         if recastJettatura > 0 then
-            local message = createMessage("Jettatura", recastJettatura / 60)
-            table.insert(messages, { spell = "Jettatura", recast = recastJettatura, message = message })
+            local message = createMessage('Jettatura', recastJettatura / 60)
+            table.insert(messages, {spell = 'Jettatura', recast = recastJettatura, message = message})
         end
     end
     if #messages > 0 then
-        table.sort(messages, function(a, b) return a.recast < b.recast end) -- Sort messages by recast time in ascending order
-        add_to_chat(159, "No spells available")
+        table.sort(
+            messages,
+            function(a, b)
+                return a.recast < b.recast
+            end
+        ) -- Sort messages by recast time in ascending order
+        add_to_chat(159, 'No spells available')
         for _, msgData in ipairs(messages) do
             add_to_chat(167, msgData.message)
         end
-        add_to_chat(259, "=======================================")
+        add_to_chat(259, '=================================================')
     end
 end
 

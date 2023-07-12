@@ -17,14 +17,13 @@ function get_sets()
     -----------------------------------------------
     include('Mote-Include.lua')
     include('0_AutoMove.lua')
+    include('SharedFunctions.lua') -- (Function Shared)
 end
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Configuration des variables pour ce job. les variables State.Buff initialisées ici seront automatiquement suivies.
 ----------------------------------------------------------------------------------------------------------------------
 function job_setup()
-    state.Buff.Doom = buffactive.Doom or false
-    incapacitated_states = T {'stun', 'petrification', 'terror', 'sleep'}
 end
 
 -------------------------------------------------------------------------------------------------------------------
@@ -80,58 +79,7 @@ function check_subset()
     equip(sets[state.SubSet.current])
 end
 
-----------------------------------------------------------------
--- Verifie quel status incapacitant est appliqué sur le joueur.
-----------------------------------------------------------------
-function incapacitated()
-    if
-        incapacitated_states:find(
-            function(value)
-                return buffactive[value] or false
-            end
-        )
-     then
-        equip(sets.idle)
-        return true
-    end
-end
-
-----------------------------------------------------------------
--- Function qui détermine le Jump
-----------------------------------------------------------------
-function jump(spell)
-    if spell.name == 'Jump' then
-        local allRecasts = windower.ffxi.get_ability_recasts()
-        local JumpCD = allRecasts[158]
-        local HighJumpCD = allRecasts[159]
-        if player.tp < 800 then
-            if JumpCD < 1 then
-                if HighJumpCD < 1 then
-                    if player.tp < 500 then
-                        send_command('wait 1; input /ja "High Jump" <t>')
-                    end
-                else
-                    add_to_chat(123, "High Jump n'est pas pret !")
-                end
-            else
-                if HighJumpCD < 1 then
-                    if player.tp < 500 then
-                        cancel_spell()
-                        send_command('input /ja "High Jump" <t>')
-                    end
-                else
-                    cancel_spell()
-                    add_to_chat(123, 'Vos Jumps ne sont pas pret !')
-                end
-            end
-        else
-            cancel_spell()
-            add_to_chat(123, 'Vous avez vos TP !')
-        end
-    end
-end
-
-include('Function War2.lua')
+include('Tetsouo_WAR_FUNCTION.lua')
 
 --------------------------------------------------------------------------------------------------------------
 -- Function qui s'applique juste avant que le sort/Abilité soit lancés.
@@ -139,21 +87,8 @@ include('Function War2.lua')
 -- Mettre eventArgs.handled en true Si on ne veut pas que le changement automatique d'equipement ce fasse.
 --------------------------------------------------------------------------------------------------------------
 function job_precast(spell, action, spellMap, eventArgs)
-    if incapacitated() then
-        eventArgs.handled = true
-        return
-    end
-    jump(spell)
-    if spell.name == 'Impulse Drive' then
-        local allRecasts = windower.ffxi.get_ability_recasts()
-        local warChargeCD = allRecasts[6]
-        if warChargeCD < 1 then
-            cancel_spell()
-            send_command(
-                "input /ja \"Warrior's Charge\" <me>; wait 2; input /ws \"" .. spell.name .. '"' .. spell.target.id
-            )
-        end
-    end
+    incapacitated(spell, eventArgs)
+    handleRecastCooldown(spell, eventArgs)
 end
 
 --------------------------------------------------------------------------------------------------------------
@@ -161,7 +96,9 @@ end
 
 -- Mettre eventArgs.handled en true Si on ne veut pas que le changement automatique d'equipement ce fasse.
 --------------------------------------------------------------------------------------------------------------
+-- Actions to perform during casting of a spell or ability
 function job_midcast(spell, action, spellMap, eventArgs)
+    -- Check for incapacitated state
     if incapacitated() then
         eventArgs.handled = true
         equip(sets.idle)
@@ -169,21 +106,54 @@ function job_midcast(spell, action, spellMap, eventArgs)
     end
 end
 
+-- Aftercast actions
+function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Check if the spell is Crusade, Reprisal, Phalanx, or Cocoon
+    if spell.name == 'Crusade' or spell.name == 'Reprisal' or spell.name == 'Phalanx' or spell.name == 'Cocoon' then
+        if spell.interrupted then
+            -- The spell was interrupted
+            -- Perform the appropriate actions
+            eventArgs.handled = true
+            equip(sets.idle)
+            local message =
+                string.char(0x1F, 159) ..
+                'Spell interrupted: [' .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. ']'
+            add_to_chat(123, message)
+            add_to_chat(259, '=================================================')
+        else
+            -- The spell completed normally
+            -- Perform the appropriate actions after the spell
+        end
+    else
+        -- Process other spells
+        if not spellHandled then
+            if spell.interrupted then
+                -- The spell was interrupted
+                -- Perform the appropriate actions
+                eventArgs.handled = true
+                equip(sets.idle)
+                local message =
+                    string.char(0x1F, 159) ..
+                    'Spell interrupted: [' .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. ']'
+                add_to_chat(123, message)
+                add_to_chat(259, '=================================================')
+            else
+                -- The spell completed normally
+                -- Perform the appropriate actions after the spell
+            end
+            -- Mark the spell as handled
+            spellHandled = true
+        else
+            -- Reset the variable for subsequent spells
+            spellHandled = false
+        end
+    end
+end
+
 -------------------------------------------------------------------------------
 -- Function qui verifie si un buff vient d'être appliqué ou retiré du joueur.
 -------------------------------------------------------------------------------
 function job_buff_change(buff, gain)
-    if buff == 'Doom' then
-        if gain then
-            equip(sets.buff.Doom)
-            disable('neck')
-        elseif not gain then
-            enable('neck')
-        end
-    end
-    if incapacitated_states:contains(name) then
-        status_change(player.status)
-    end
 end
 
 ------------------------------------------------------------
