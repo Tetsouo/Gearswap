@@ -1,7 +1,12 @@
---____________________________________________________________________________________________________________________________________________________
+--============================================================--
+--=                       WARRIOR                            =--
+--============================================================--
+--=                    Author: Tetsouo                       =--
+--=                     Version: 1.0                         =--
+--=                  Created: 2023-07-10                     =--
+--=               Last Modified: 2023-07-10                  =--
+--============================================================--
 
---                                                            WARRIOR BY TETSOUO
---____________________________________________________________________________________________________________________________________________________
 ---------------------------------------------------
 --                  VARIABLES
 ---------------------------------------------------
@@ -18,6 +23,7 @@ function get_sets()
     include('Mote-Include.lua')
     include('0_AutoMove.lua')
     include('SharedFunctions.lua') -- (Function Shared)
+    include('WAR_FUNCTION.lua')
 end
 
 ----------------------------------------------------------------------------------------------------------------------
@@ -50,13 +56,6 @@ end
 -- Initialise les Sets d'équipement pour ce Job.
 ----------------------------------------------------
 function init_gear_sets()
-    sets['Shining'] = {main = 'Shining one'}
-    sets['Naegling'] = {main = 'Naegling'}
-    sets['Lycurgos'] = {main = 'Lycurgos'}
-    sets['Bonesplitter'] = {main = 'Bonesplitter'}
-    sets['Loxotic'] = {main = 'Loxotic Mace +1'}
-    sets['Blurred'] = {sub = 'Blurred Shield +1'}
-    sets['Utu'] = {sub = 'Utu Grip'}
     include('WarSet.lua')
 end
 
@@ -79,7 +78,6 @@ function check_subset()
     equip(sets[state.SubSet.current])
 end
 
-include('Tetsouo_WAR_FUNCTION.lua')
 
 --------------------------------------------------------------------------------------------------------------
 -- Function qui s'applique juste avant que le sort/Abilité soit lancés.

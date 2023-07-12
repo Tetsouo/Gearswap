@@ -9,31 +9,37 @@
 
 -- Helper function to format recast time
 function formatRecastTime(recast)
-    if recast >= 60 then
-        local minutes = math.floor(recast / 60)
-        local seconds = math.floor(recast % 60)
-        return string.format('%02d:%02d min', minutes, seconds)
-    else
-        return string.format('%.1f sec', recast)
+    if recast then
+        if recast >= 60 then
+            local minutes = math.floor(recast / 60)
+            local seconds = math.floor(recast % 60)
+            return string.format('%02d:%02d min', minutes, seconds)
+        else
+            return string.format('%.1f sec', recast)
+        end
     end
 end
 
--- Helper function to create a message with spell name and recast time
-function createMessage(spellName, recast)
-    local message =
-        string.char(0x1F, 050) ..
-        '[' ..
-            string.char(0x1F, 221) ..
-                spellName ..
-                    string.char(0x1F, 050) ..
-                        ']' ..
-                            ' Recast: ' ..
-                                string.char(0x1F, 050) ..
-                                    '(' ..
-                                        string.char(0x1F, 221) ..
-                                            formatRecastTime(recast) .. string.char(0x1F, 050) .. ')'
-    return message
-end
+    -- Helper function to create a message with spell name and recast time
+    function createMessage(spellName, recast)
+        if recast then
+            local message =
+                string.char(0x1F, 050) .. '[' ..
+                string.char(0x1F, 221) .. spellName ..
+                string.char(0x1F, 050) .. ']' ..
+                ' Recast: ' ..
+                string.char(0x1F, 050) .. '(' ..
+                string.char(0x1F, 221) ..
+                formatRecastTime(recast) .. string.char(0x1F, 050) .. ')'
+            return message
+        else
+            local message =
+                string.char(0x1F, 050) .. '[' ..
+                string.char(0x1F, 221) .. spellName ..
+                string.char(0x1F, 050) .. ']'
+            return message
+        end
+    end
 
 -- Handle recast cooldown and display messages
 function handleRecastCooldown(spell, eventArgs)
@@ -66,8 +72,7 @@ function incapacitated(spell, eventArgs)
         'Stun', -- Stun status
         'Petrification', -- Petrification status
         'Terror', -- Terror status
-        'Sleep', -- Sleep status
-        'Protect'
+        'Sleep' -- Sleep status
     }
     -- Iterate over each value in the incapacitated_states table
     for _, value in ipairs(incapacitated_states) do
@@ -127,11 +132,59 @@ function job_state_change(field, new_value, old_value)
     check_subset()
 end
 
+-- Perform actions after a spell is cast
+function handleSpellAftercast(spell, eventArgs)
+    if spell.name == 'Crusade' or spell.name == 'Reprisal' or spell.name == 'Phalanx' or spell.name == 'Cocoon' then
+        -- Handle Crusade, Reprisal, Phalanx, or Cocoon spells
+        if spell.interrupted then
+            -- Spell was interrupted
+            handleInterruptedSpell(spell, eventArgs)
+        else
+            -- Spell completed normally
+            handleCompletedSpell(spell)
+        end
+    else
+        -- Process other spells
+        if not spellHandled then
+            if spell.interrupted then
+                -- Spell was interrupted
+                handleInterruptedSpell(spell, eventArgs)
+            else
+                -- Spell completed normally
+                handleCompletedSpell(spell)
+            end
+            -- Mark the spell as handled
+            spellHandled = true
+        else
+            -- Reset the variable for subsequent spells
+            spellHandled = false
+        end
+    end
+end
+
+-- Handle actions for an interrupted spell
+function handleInterruptedSpell(spell, eventArgs)
+    eventArgs.handled = true
+    equip(sets.idle)
+    local bracketColor = string.char(0x1F, 050) -- Color code for the brackets
+    local message =
+        bracketColor .. 'Spell interrupted: ' ..
+        bracketColor .. '[' .. string.char(0x1F, 221) .. spell.name .. bracketColor .. ']'
+    add_to_chat(123, message)
+    add_to_chat(259, '=================================================')
+end
+
+-- Handle actions for a completed spell
+function handleCompletedSpell(spell)
+    -- Perform appropriate actions after the spell is completed normally
+end
+
 return {
     handleRecastCooldown = handleRecastCooldown,
     incapacitated = incapacitated,
     check_weaponset = check_weaponset,
     check_subset = check_subset,
     job_handle_equipping_gear = job_handle_equipping_gear,
-    job_state_change = job_state_change
+    job_state_change = job_state_change,
+    handleSpellAftercast = handleSpellAftercast,
 }

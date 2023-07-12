@@ -1,6 +1,6 @@
---___________________________________________________________________________________________________________________________________________________
---                                                                          Equipments
---___________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                              EQUIPMENT
+--=========================================================================================================
 SouvHead = {
     name = 'Souv. Schaller +1',
     augments = {'HP+105', 'Enmity+9', 'Potency of "Cure" effect received +15%'},
@@ -64,33 +64,41 @@ ChirichRing2 = {
     bag = 'wardrobe 2'
 }
 
---________________________________________________________________________________________________________________________________________________
---                                                                        IDLE
---________________________________________________________________________________________________________________________________________________
+-- Equipment sets for different weapons and shields
+sets['Burtgang'] = {main = 'Burtgang'}
+sets['Naegling'] = {main = 'Naegling'}
+sets['Ochain'] = {sub = 'Ochain'}
+sets['Aegis'] = {sub = 'Aegis'}
+sets['Duban'] = {sub = 'Duban'}
+sets['Blurred'] = {sub = 'Blurred Shield +1'}
+--=========================================================================================================
+--                                              IDLE
+--=========================================================================================================
 sets.idle = {
-    --[[ Main = "Burtgang", ]] --Enmity 18                PDTII 18
-    --[[ Sub = "Duban", ]] --Enmity 0                 DT 0
-    ammo = {name = 'Staunch tathlum', priority = 0}, --Enmity 0                 DT 2
-    head = {name = 'Loess Barbuta +1', priority = 12}, --Enmity 24                DT 20
-    neck = {name = 'Creed Collar', priority = 7}, --Enmity 0                 DT 0
-    left_ear = {name = 'Tuisto earring', priority = 16}, --Enmity 0                 DT 0
-    right_ear = {name = 'Chev. earring +1', priority = 1}, --Enmity 0                 DT 3
-    body = {name = "Sakpata's breastplate", priority = 2}, --Enmity 0                 DT 10
-    hands = {name = "Sakpata's gauntlets", priority = 1}, --Enmity 0                 DT 8
-    left_ring = {name = 'Supershear Ring', priority = 1}, --Enmity 5                 DT 0
-    right_ring = {name = 'Apeile Ring +1', priority = 1}, --Enmity 9                 DT 0
-    back = Rudianos.tank, --Enmity 10                DT 5
-    waist = {name = 'Platinum Moogle belt', priority = 17}, --Enmity 0                 DT 3
-    legs = {name = 'Chev. Cuisses +3', priority = 13}, --Enmity 0                 DT 13
-    feet = {name = 'Chev. Sabatons +3', priority = 14} --Enmity 15                DT 0
+    --[[ Main = "Burtgang", ]]                                          --Enmity 18       |       PDTII  18
+    --[[ Sub = "Duban", ]]                                              --Enmity  0       |        DT     0
+    ammo = {name = 'Staunch tathlum', priority = 0},                    --Enmity  0       |        DT     2
+    head = {name = 'Loess Barbuta +1', priority = 12},                  --Enmity 24       |        DT    20
+    neck = {name = 'Creed Collar', priority = 7},                       --Enmity  0       |        DT     0
+    left_ear = {name = 'Tuisto earring', priority = 16},                --Enmity  0       |        DT     0
+    right_ear = {name = 'Chev. earring +1', priority = 1},              --Enmity  0       |        DT     3
+    body = {name = "Sakpata's breastplate", priority = 2},              --Enmity  0       |        DT    10
+    hands = {name = "Sakpata's gauntlets", priority = 1},               --Enmity  0       |        DT     8
+    left_ring = {name = 'Supershear Ring', priority = 1},               --Enmity  5       |        DT     0
+    right_ring = {name = 'Apeile Ring +1', priority = 1},               --Enmity  9       |        DT     0
+    back = Rudianos.tank,                                               --Enmity 10       |        DT     5
+    waist = {name = 'Platinum Moogle belt', priority = 17},             --Enmity  0       |        DT     3
+    legs = {name = 'Chev. Cuisses +3', priority = 13},                  --Enmity  0       |        DT    13
+    feet = {name = 'Chev. Sabatons +3', priority = 14}                  --Enmity 15       |        DT     0
 }
---                                                                Gear    Enmity 81         Total PDT   59
---                                                                Crusade Enmity 30         Total MDT   64
---                                                                Total   Enmity 111        Total PDTII 77
-
---________________________________________________________________________________________________________________________________________________
---                                                                      IDLE TOWN
---________________________________________________________________________________________________________________________________________________
+--                                                            _____________________________________________________
+--                                                             Gear:      Enmity 81             Total PDT   59
+--                                                             Crusade:   Enmity 30             Total MDT   64
+--                                                             Total:     Enmity 111            Total PDTII 77
+--                                                            _____________________________________________________
+--=========================================================================================================
+--                                              IDLE TOWN
+--=========================================================================================================
 sets.idle.Town =
     set_combine(
     sets.idle,
@@ -123,10 +131,9 @@ sets.idle.Ody =
         }
     }
 )
-
---________________________________________________________________________________________________________________________________________________
---                                                                       REFRESH
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                                  REFRESH
+--=========================================================================================================
 sets.latent_refresh = {
     ammo = {name = 'Staunch tathlum', priority = 0},
     head = JumalikHead, --Refresh 1
@@ -143,30 +150,28 @@ sets.latent_refresh = {
     feet = {name = 'Chev. Sabatons +3', priority = 14}
     --Total Refresh 5
 }
-
---________________________________________________________________________________________________________________________________________________
---                                                                      PRECAST
---                                                                    JOB ABILITY
---________________________________________________________________________________________________________________________________________________
-
+--=========================================================================================================
+--                                                  PRECAST
+--                                                JOB ABILITY
+--=========================================================================================================
 sets.FullEnmity = {
     -- main={name="Burtgang", priority=2},                                             --Enmity  23
     -- sub={name="Ajax +1", priority=15},                                              --Enmity  11
-    ammo = {name = 'Sapience Orb', priority = 0}, --Enmity  02
-    head = {name = 'Loess Barbuta +1', augments = {'Path: A'}, priority = 14}, --Enmity  24
-    neck = {name = 'Moonlight Necklace', priority = 4}, --Enmity  15
-    right_ear = {name = 'Cryptic Earring', priority = 12}, --Enmity  04
-    left_ear = {name = 'Friomisi earring', priority = 5}, --Enmity  02
-    body = SouvBody, --Enmity  20
-    hands = SouvHands, --Enmity  09
-    left_ring = {name = 'Apeile ring', priority = 1}, --Enmity  09
-    right_ring = {name = 'Apeile ring +1', priority = 1}, --Enmity  09
-    back = Rudianos.tank, --Enmity  10
-    waist = {name = 'Creed Baudrier', priority = 1}, --Enmity  05
-    legs = SouvLegs, --Enmity  09
-    feet = {name = "Chevalier's Sabatons +3", priority = 0} --Enmity  15
-    --                                                                                   Gear Enmity 156
-    --                                                                                Crusade Enmity 186
+    ammo = {name = 'Sapience Orb', priority = 0},                                      --Enmity  02
+    head = {name = 'Loess Barbuta +1', augments = {'Path: A'}, priority = 14},         --Enmity  24
+    neck = {name = 'Moonlight Necklace', priority = 4},                                --Enmity  15
+    right_ear = {name = 'Cryptic Earring', priority = 12},                             --Enmity  04
+    left_ear = {name = 'Friomisi earring', priority = 5},                              --Enmity  02
+    body = SouvBody,                                                                   --Enmity  20
+    hands = SouvHands,                                                                 --Enmity  09
+    left_ring = {name = 'Apeile ring', priority = 1},                                  --Enmity  09
+    right_ring = {name = 'Apeile ring +1', priority = 1},                              --Enmity  09
+    back = Rudianos.tank,                                                              --Enmity  10
+    waist = {name = 'Creed Baudrier', priority = 1},                                   --Enmity  05
+    legs = SouvLegs,                                                                   --Enmity  09
+    feet = {name = "Chevalier's Sabatons +3", priority = 0}                            --Enmity  15
+    --                                                                                Gear Enmity 156
+    --                                                                               Crusade Enmity 186
 }
 
 sets.precast.JA = set_combine(sets.FullEnmity, {})
@@ -182,11 +187,10 @@ sets.precast.JA['Holy Circle'] = set_combine(sets.FullEnmity, {feet = 'Rev. Legg
 sets.precast.JA['Shield Bash'] = set_combine(sets.FullEnmity, {hands = {name = 'Cab. Gauntlets +3', priority = 0}})
 sets.precast.JA['Sentinel'] = set_combine(sets.FullEnmity, {feet = 'Cab. Leggings +3'})
 sets.precast.JA['Rampart'] = set_combine(sets.FullEnmity, {head = 'Cab. Coronet'})
-
---________________________________________________________________________________________________________________________________________________
---                                                                      SETS PRECAST
---                                                                       FAST CAST
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                              SETS PRECAST
+--                                               FAST CAST
+--=========================================================================================================
 sets.precast.FC = {
     --[[ main={name="Sakpata's Sword", priority=15},
     sub={name="Priwen", priority=14}, ]]
@@ -219,15 +223,13 @@ sets.precast.FC['Jettatura'] = sets.precast.FC
 sets.precast.FC['Sheep Song'] = sets.precast.FC
 sets.precast.FC['Geist Wall'] = sets.precast.FC
 sets.precast.FC['Sandspin'] = sets.precast.FC
-
---________________________________________________________________________________________________________________________________________________
---                                                                      ENMITY
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                               ENMITY
+--=========================================================================================================
 sets.midcast.Enmity = set_combine(sets.FullEnmity, {})
-
---________________________________________________________________________________________________________________________________________________
---                                                                      PHALANX
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                              PHALANX
+--=========================================================================================================
 sets.midcast.Phalanx = {
     --[[ main={name="Sakpata's Sword", priority=0},
     sub={ name="Priwen", priority=15}, ]]
@@ -245,10 +247,9 @@ sets.midcast.Phalanx = {
     legs = {name = "Sakpata's Cuisses", priority = 1},
     feet = {name = 'Souveran Schuhs +1', priority = 0}
 }
-
---________________________________________________________________________________________________________________________________________________
---                                                                      SIRD
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                                SIRD
+--=========================================================================================================
 sets.midcast.SIRD = {
     --[[ main={name="Burtgang", priority=0},
     sub={name="Ajax +1", priority=16}, ]]
@@ -266,10 +267,9 @@ sets.midcast.SIRD = {
     legs = {name = "Founder's Hose", priority = 1},
     feet = {name = 'Odyssean greaves', priority = 2}
 }
-
---________________________________________________________________________________________________________________________________________________
---                                                                    SETS CURE
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                             SETS CURE
+--=========================================================================================================
 sets.midcast.Cure = {
     --[[ main={name="Burtgang", priority=0},
     sub={ name="Ajax +1" , priority=13}, ]]
@@ -287,10 +287,9 @@ sets.midcast.Cure = {
     legs = {name = "Founder's Hose", priority = 8},
     feet = {name = 'Odyssean Greaves', priority = 9}
 }
-
---________________________________________________________________________________________________________________________________________________
---                                                                      ENLIGHT
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                              ENLIGHT
+--=========================================================================================================
 sets.midcast['Enlight'] =
     set_combine(
     sets.idle,
@@ -301,10 +300,9 @@ sets.midcast['Enlight'] =
         hands = 'Regal Gauntlets'
     }
 )
-
---________________________________________________________________________________________________________________________________________________
---                                                                      OTHERS
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                              OTHERS
+--=========================================================================================================
 sets.midcast.FastRecast = {}
 
 sets.midcast.Flash = sets.midcast.Enmity
@@ -348,11 +346,10 @@ sets.midcast['Reprisal'] =
 
 sets.midcast.Protect = sets.midcast['Enhancing Magic']
 sets.midcast.Shell = sets.midcast['Enhancing Magic']
-
---________________________________________________________________________________________________________________________________________________
---                                                                        PRECAST
---                                                                      WEAPON SKILL
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                             PRECAST
+--                                           WEAPON SKILL
+--=========================================================================================================
 sets.precast.WS = {
     ammo = "Oshasha's Treatise",
     head = "Sakpata's Helm",
@@ -398,10 +395,9 @@ sets.precast.WS['Sanguine Blade'] =
 sets.precast.WS['Atonement'] = set_combine(sets.precast.WS, sets.midcast.Enmity)
 
 sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {})
-
---________________________________________________________________________________________________________________________________________________
---                                                                       DEFENSE
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                             DEFENSE
+--=========================================================================================================
 sets.defense.MDT = {
     main = 'Burtgang',
     sub = 'Aegis',
@@ -425,13 +421,12 @@ sets.defense.MDT = {
         augments = {'HP+60', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Damage taken-5%'}
     }
 }
-
---________________________________________________________________________________________________________________________________________________
---                                                                        ENGAGED
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                             ENGAGED
+--=========================================================================================================
 sets.engaged = {
-    Main = 'Burtgang', --Enmity 18                PDTII 18
-    Sub = 'Duban', --Enmity 0                 DT 0
+    Main = 'Burtgang',
+    Sub = 'Duban',
     ammo = {name = 'Aurgelmir Orb +1', priority = 12},
     head = {name = 'Chev. Armet +3', priority = 16},
     body = {name = "Sakpata's Plate", priority = 0},
@@ -455,14 +450,15 @@ sets.engaged.PDT =
         sub = 'Duban'
     }
 )
-
+--=========================================================================================================
+--                                          MOVESPEED
+--=========================================================================================================
 sets.MoveSpeed = {
     legs = {name = 'Carmine Cuisses +1', priority = 3}
 }
-
---________________________________________________________________________________________________________________________________________________
---                                                                      CUSTOM BUFF
---________________________________________________________________________________________________________________________________________________
+--=========================================================================================================
+--                                            CUSTOM BUFF
+--=========================================================================================================
 sets.buff.Doom = {
     neck = "Nicander's Necklace"
 }
