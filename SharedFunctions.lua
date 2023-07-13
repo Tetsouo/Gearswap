@@ -7,27 +7,26 @@
 --=               Last Modified: 2023-07-13                  =--
 --============================================================--
 
--- List of color for object in message
-    PUNCTUATION = 161
-    SPELLANDRECAST = 057
-    SEPARATOR = 161
-    INCAP = 167
+-- List of colors for objects in messages
+PUNCTUATION = 161 -- Color for punctuation marks
+SPELLANDRECAST = 057 -- Color for spell names and recast timers
+SEPARATOR = 161 -- Color for separators
+INCAP = 167 -- Color for incapacitated state
 
 -- List of incapacitated states
 local incapacitated_states =
 T {
-'Stun', -- Stun status
-'Petrification', -- Petrification status
-'Terror', -- Terror status
-'Sleep', -- Sleep status
+    'Stun', -- Stun status
+    'Petrification', -- Petrification status
+    'Terror', -- Terror status
+    'Sleep', -- Sleep status
 }
 
--- Helper function to format recast time
--- Formats a recast time value into a readable string representation
+-- Formats a recast time value into a readable string representation.
 -- Parameters:
---   recast (number): The recast time value in seconds
+--   recast (number): The recast time value in seconds.
 -- Returns:
---   (string) The formatted recast time string
+--   (string) The formatted recast time string.
 local function formatRecastDuration(recast)
     -- Check if a recast value is provided
     if recast then
@@ -45,24 +44,22 @@ local function formatRecastDuration(recast)
     end
 end
 
--- Helper function to create a message with spell name, recast time, and additional text
--- Creates a formatted message with the spell name, its recast time, and additional text
+-- Creates a formatted message with the spell name, its recast time, and additional text.
 -- Parameters:
---   startMsg (string): The starting part of the message (can be nil)
---   spellName (string): The name of the spell
---   recast (number): The recast time value in seconds (can be nil)
---   endMsg (string): The ending part of the message (can be nil)
+--   startMsg (string): The starting part of the message (can be nil).
+--   spellName (string): The name of the spell.
+--   recast (number): The recast time value in seconds (can be nil).
+--   endMsg (string): The ending part of the message (can be nil).
+--   isLast (boolean): Indicates if it is the last message in a sequence (default: true).
 -- Returns:
---   (string) The formatted message with spell name, recast time, additional text, and separator
+--   (string) The formatted message with spell name, recast time, additional text, and separator.
 local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     -- Assign default values if parameters are nil
     startMsg = startMsg or ""
     spellName = spellName or ""
     recast = recast or nil
     endMsg = endMsg or ""
-    if isLast == nil then
-        isLast = true
-    end
+    isLast = isLast == nil or isLast
     -- Check if a recast value is provided
     if recast then
         -- Build the message with spell name, recast time, and additional text
@@ -107,11 +104,10 @@ local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     end
 end
 
--- Handle recast cooldown and display messages
--- Handles the recast cooldown for spells and abilities and displays appropriate messages
+-- Handles the recast cooldown for spells and abilities and displays appropriate messages.
 -- Parameters:
---   spell (table): The spell or ability being used
---   eventArgs (table): Additional event arguments
+--   spell (table): The spell or ability being used.
+--   eventArgs (table): Additional event arguments.
 function checkDisplayCooldown(spell, eventArgs)
     -- Check if the action type is not "Weapon Skill"
     if spell.action_type ~= 'Weapon Skill' then
@@ -133,10 +129,9 @@ function checkDisplayCooldown(spell, eventArgs)
     end
 end
 
--- Helper function to handle the command logic
--- Handles the logic for executing commands based on spell availability
+-- Handles the logic for executing commands based on spell availability.
 -- Parameters:
---   spellTable (table): A table containing spell data (name and ID)
+--   spellTable (table): A table containing spell data (name and ID).
 function handleCommand(spellTable)
     local messages = {}
     -- Iterate over each spell in the spellTable
@@ -174,14 +169,13 @@ function handleCommand(spellTable)
     end
 end
 
--- Check for incapacitated state
--- Checks if the player is in an incapacitated state that prevents spell usage
+-- Checks if the player is in an incapacitated state that prevents spell usage.
 -- Parameters:
---   spell (table): The spell being cast
---   eventArgs (table): Additional event arguments
+--   spell (table): The spell being cast.
+--   eventArgs (table): Additional event arguments.
 -- Returns:
---   (boolean) true if incapacitated, false otherwise
---   (string or nil) The type of incapacitation if incapacitated, nil otherwise
+--   (boolean) true if incapacitated, false otherwise.
+--   (string or nil) The type of incapacitation if incapacitated, nil otherwise.
 function incapacitated(spell, eventArgs)
     -- Iterate over each value in the incapacitated_states table
     for _, value in ipairs(incapacitated_states) do
@@ -192,7 +186,7 @@ function incapacitated(spell, eventArgs)
             eventArgs.handled = true
             equip(sets.idle)
             -- Create and display the incapacitated message
-            local message = createFormatMsg('Cannot Use: ', spell.name, nil , value)
+            local message = createFormatMsg('Cannot Use: ', spell.name, nil, value)
             add_to_chat(167, message)
             return true, value
         end
@@ -201,25 +195,22 @@ function incapacitated(spell, eventArgs)
     return false, nil
 end
 
--- Check current main weapon set
--- Checks the current main weapon set and equips the corresponding gear
+-- Checks the current main weapon set and equips the corresponding gear.
 local function check_weaponset()
     -- Equip the gear set based on the current state of the WeaponSet
     equip(sets[state.WeaponSet.current])
 end
 
--- Check current sub weapon set
--- Checks the current sub weapon set and equips the corresponding gear
+-- Checks the current sub weapon set and equips the corresponding gear.
 local function check_subset()
     -- Equip the gear set based on the current state of the SubSet
     equip(sets[state.SubSet.current])
 end
 
--- Actions to perform when the player's equipment changes
--- Handles the necessary gear adjustments when the player's equipment changes
+-- Handles the necessary gear adjustments when the player's equipment changes.
 -- Parameters:
---   playerStatus (table): The player's current status information
---   eventArgs (table): Additional event arguments
+--   playerStatus (table): The player's current status information.
+--   eventArgs (table): Additional event arguments.
 local function job_handle_equipping_gear(playerStatus, eventArgs)
     -- Check and adjust the main weapon set
     check_weaponset()
@@ -232,12 +223,11 @@ local function job_handle_equipping_gear(playerStatus, eventArgs)
     end
 end
 
--- Actions to perform when the job state changes
--- Handles the necessary actions when the job state changes
+-- Handles the necessary actions when the job state changes.
 -- Parameters:
---   field (string): The field that changed in the job state
---   new_value (any): The new value of the changed field
---   old_value (any): The old value of the changed field
+--   field (string): The field that changed in the job state.
+--   new_value (any): The new value of the changed field.
+--   old_value (any): The old value of the changed field.
 function job_state_change(field, new_value, old_value)
     -- Handle equipping gear based on player status
     job_handle_equipping_gear(player.status)
@@ -247,11 +237,10 @@ function job_state_change(field, new_value, old_value)
     check_subset()
 end
 
--- Perform actions after a spell is cast
--- Handles actions to be performed after a spell has been cast
+-- Handles actions to be performed after a spell has been cast.
 -- Parameters:
---   spell (table): The spell that was cast
---   eventArgs (table): Additional event arguments
+--   spell (table): The spell that was cast.
+--   eventArgs (table): Additional event arguments.
 function handleSpellAftercast(spell, eventArgs)
     if spell.name == 'Crusade' or spell.name == 'Reprisal' or spell.name == 'Phalanx' or spell.name == 'Cocoon' then
         -- Handle Crusade, Reprisal, Phalanx, or Cocoon spells
@@ -281,11 +270,10 @@ function handleSpellAftercast(spell, eventArgs)
     end
 end
 
--- Handle actions for an interrupted spell
--- Handles actions to be performed when a spell is interrupted
+-- Handles actions to be performed when a spell is interrupted.
 -- Parameters:
---   spell (table): The interrupted spell
---   eventArgs (table): Additional event arguments
+--   spell (table): The interrupted spell.
+--   eventArgs (table): Additional event arguments.
 function handleInterruptedSpell(spell, eventArgs)
     eventArgs.handled = true
     equip(sets.idle)
@@ -293,19 +281,17 @@ function handleInterruptedSpell(spell, eventArgs)
     add_to_chat(123, message)
 end
 
--- Handle actions for a completed spell
--- Handles actions to be performed when a spell is completed normally
+-- Handles actions to be performed when a spell is completed normally.
 -- Parameters:
---   spell (table): The completed spell
+--   spell (table): The completed spell.
 function handleCompletedSpell(spell)
     -- Perform appropriate actions after the spell is completed normally
 end
 
--- Handle changes in buffs
--- Handles equipment and actions based on changes in buffs
+-- Handles equipment and actions based on changes in buffs.
 -- Parameters:
---   buff (string): The name of the buff that changed
---   gain (boolean): Indicates whether the buff was gained (true) or lost (false)
+--   buff (string): The name of the buff that changed.
+--   gain (boolean): Indicates whether the buff was gained (true) or lost (false).
 function buff_change(buff, gain)
     if buff == 'Doom' then
         if gain then
@@ -318,7 +304,7 @@ function buff_change(buff, gain)
             -- Buff is lost, update sets and display a message
             enable('neck')
             send_command('gs c update')
-            local message = createFormatMsg(nil , 'Doom', nil, 'is no longer active!')
+            local message = createFormatMsg(nil, 'Doom', nil, 'is no longer active!')
             add_to_chat(123, message)
         end
     end

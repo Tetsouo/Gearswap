@@ -7,48 +7,53 @@
 --=               Last Modified: 2023-07-13                  =--
 --============================================================--
 
--- Spell IDs for single target spells
+-- A table containing the spell IDs and names for single target spells.
 local spellsSingle = {
     {name = 'Flash', id = 112},  -- Spell ID for the "Flash" spell
     {name = 'Blank Gaze', id = 592}  -- Spell ID for the "Blank Gaze" spell
 }
 
--- Spell IDs for area of effect spells
+-- A table containing the spell IDs and names for area of effect spells.
 local spellsAoe = {
     {name = 'Jettatura', id = 575},  -- Spell ID for the "Jettatura" spell
     {name = 'Sheep Song', id = 584},  -- Spell ID for the "Sheep Song" spell
     {name = 'Geist Wall', id = 605}  -- Spell ID for the "Geist Wall" spell
 }
 
--- Handles the execution of a single command
-function handleSingleCommand()
-    handleCommand(spellsSingle)
-end
+-- Calls the handleCommand function with the spellsSingle table.
+    function handleSingleCommand()
+        handleCommand(spellsSingle)
+    end
 
--- Handles the execution of an AoE command
-function handleAoeCommand()
-    handleCommand(spellsAoe)
-end
+    -- Calls the handleCommand function with the spellsAoe table.
+    function handleAoeCommand()
+        handleCommand(spellsAoe)
+    end
 
--- Automatically triggers the use of the "Divine Emblem" ability
+-- Automatically uses the "Divine Emblem" ability before casting the "Flash" spell if conditions are met.
 -- Parameters:
---   spell (table): The spell being cast
---   eventArgs (table): Additional event arguments
+--   spell (table): The spell being cast.
+--   eventArgs (table): Additional event arguments.
 function auto_divineEmblem(spell, eventArgs)
+    local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
+    local divineEmblemCD = windower.ffxi.get_ability_recasts()[80]
     if spell.name == 'Flash' then
-        local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
-        local divineEmblemCD = windower.ffxi.get_ability_recasts()[80]
-        if spellRecast < 1 and divineEmblemCD < 1 and not buffactive['Divine Emblem'] then
-            cancel_spell()
-            send_command(
-                string.format(
-                    'input /ja "Divine Emblem" <me>; wait 1.2; input /ma %s %s',
-                    spell.name,
-                    spell.target.id
-                )
-            )
+        if spellRecast < 1 then
+            if not (buffactive['Amnesia'] or buffactive['Silence']) then
+                if divineEmblemCD < 1 and not buffactive['Divine Emblem'] then
+                    cancel_spell()
+                    send_command(
+                        string.format(
+                            'input /ja "Divine Emblem" <me>; wait 1.2; input /ma %s %s',
+                            spell.name,
+                            spell.target.id
+                        )
+                    )
+                end
+            end
         else
-            incapacitated(spell, eventArgs)
+            cancel_spell()
+            eventArgs.handled = true
         end
     end
 end
@@ -58,12 +63,12 @@ end
 --   spell (table): The spell being cast
 --   eventArgs (table): Additional event arguments
 function auto_majesty(spell, eventArgs)
-    local MajestyCD = windower.ffxi.get_ability_recasts()[150]
     local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
+    local majestyCD = windower.ffxi.get_ability_recasts()[150]
     if (spell.action_type == 'Magic' and spell.skill == 'Healing Magic') or spell.name == 'Protect V' then
         if spellRecast < 1 then
-            if not (buffactive['Amnesia'] or buffactive['Silence']) and not state.Buff.Majesty then
-                if MajestyCD < 1 then
+            if not (buffactive['Amnesia'] or buffactive['Silence']) then
+                if majestyCD < 1 and not buffactive['Majesty'] then
                     cancel_spell()
                     send_command(
                         string.format(
@@ -81,31 +86,31 @@ function auto_majesty(spell, eventArgs)
     end
 end
 
--- Customizes the idle gear set based on different conditions and modes
+-- Modifies the default idle gear set to customize it based on the current conditions and modes.
 -- Parameters:
---   idleSet (table): The default idle gear set
+--   idleSet (table): The default idle gear set.
 -- Returns:
---   idleSet (table): The customized idle gear set
+--   idleSet (table): The customized idle gear set.
 function customize_idle_set(idleSet)
-    -- Set the default idle gear set based on HybridMode
+    -- Set the default idle gear set based on HybridMode.
     if state.HybridMode.value == 'PDT' then
-        idleSet = sets.idle
+        idleSet = sets.idle -- Use the default idle gear set 'sets.idle'
     elseif state.HybridMode.value == 'Ody' then
-        idleSet = sets.idle.Ody
+        idleSet = sets.idle.Ody -- Use the 'sets.idle.Ody' idle gear set specific to 'Ody'
     elseif state.HybridMode.value == 'MDT' then
-        idleSet = sets.defense.MDT
+        idleSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
     elseif state.HybridMode.value == 'Normal' then
-        idleSet = sets.engaged
+        idleSet = sets.engaged -- Use the engaged gear set 'sets.engaged'
     end
-    -- Check if in a city area and adjust idle gear set accordingly
+    -- Check if in a city area and adjust idle gear set accordingly.
     if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
         if player.mp < 700 then
-            idleSet = set_combine(idleSet, sets.latent_refresh)
+            idleSet = set_combine(idleSet, sets.latent_refresh) -- Combine the idle gear set with 'sets.latent_refresh'
         else
-            idleSet = set_combine(idleSet, sets.idle.Town)
+            idleSet = set_combine(idleSet, sets.idle.Town) -- Combine the idle gear set with 'sets.idle.Town'
         end
     end
-    return idleSet
+    return idleSet -- Return the customized idle gear set
 end
 
 -- Customizes the gear set for melee based on different conditions and modes
@@ -116,13 +121,13 @@ end
 function customize_melee_set(meleeSet)
     -- Set the default melee gear set based on HybridMode
     if state.HybridMode.value == 'PDT' then
-        meleeSet = sets.idle
+        meleeSet = sets.idle -- Use the default idle gear set 'sets.idle'
     elseif state.HybridMode.value == 'Ody' then
-        meleeSet = sets.idle.Ody
+        meleeSet = sets.idle.Ody -- Use the 'sets.idle.Ody' idle gear set specific to 'Ody'
     elseif state.HybridMode.value == 'MDT' then
-        meleeSet = sets.defense.MDT
+        meleeSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
     elseif state.HybridMode.value == 'Normal' then
-        meleeSet = sets.engaged
+        meleeSet = sets.engaged -- Use the engaged gear set 'sets.engaged'
     end
-    return meleeSet
+    return meleeSet -- Return the customized melee gear set
 end
