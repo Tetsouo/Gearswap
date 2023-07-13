@@ -1,3 +1,12 @@
+--============================================================--
+--=                    PALADIN_FUNCTION                      =--
+--============================================================--
+--=                    Author: Tetsouo                       =--
+--=                     Version: 1.0                         =--
+--=                  Created: 2023-07-10                     =--
+--=               Last Modified: 2023-07-13                  =--
+--============================================================--
+
 -- Spell IDs for single target spells
 local spellsSingle = {
     {name = 'Flash', id = 112},  -- Spell ID for the "Flash" spell
