@@ -8,7 +8,6 @@
 --============================================================--
 
 -- List of color for object in message
-
     PUNCTUATION = 161
     SPELLANDRECAST = 057
     SEPARATOR = 161
@@ -308,7 +307,7 @@ end
 --   buff (string): The name of the buff that changed
 --   gain (boolean): Indicates whether the buff was gained (true) or lost (false)
 function buff_change(buff, gain)
-    if buff == 'Protect' then
+    if buff == 'Doom' then
         if gain then
             -- Buff is gained, equip the Doom set and display a message
             equip(sets.buff.Doom)
