@@ -60,7 +60,6 @@ end
 function auto_majesty(spell, eventArgs)
     local MajestyCD = windower.ffxi.get_ability_recasts()[150]
     local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
-
     if (spell.action_type == 'Magic' and spell.skill == 'Healing Magic') or spell.name == 'Protect V' then
         if spellRecast < 1 then
             if not (buffactive['Amnesia'] or buffactive['Silence']) and not state.Buff.Majesty then
@@ -98,7 +97,6 @@ function customize_idle_set(idleSet)
     elseif state.HybridMode.value == 'Normal' then
         idleSet = sets.engaged
     end
-
     -- Check if in a city area and adjust idle gear set accordingly
     if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
         if player.mp < 700 then
@@ -107,7 +105,6 @@ function customize_idle_set(idleSet)
             idleSet = set_combine(idleSet, sets.idle.Town)
         end
     end
-
     return idleSet
 end
 
@@ -127,27 +124,5 @@ function customize_melee_set(meleeSet)
     elseif state.HybridMode.value == 'Normal' then
         meleeSet = sets.engaged
     end
-
     return meleeSet
-end
-
--- Handle changes in buffs
--- Handles equipment and actions based on changes in buffs
--- Parameters:
---   buff (string): The name of the buff that changed
---   gain (boolean): Indicates whether the buff was gained (true) or lost (false)
-function buff_change(buff, gain)
-    if buff == 'Doom' then
-        if gain then
-            -- Buff is gained, equip the Doom set and display a message
-            equip(sets.buff.Doom)
-            disable('neck')
-            add_to_chat(123, 'WARNING: Doom is active!')
-        else
-            -- Buff is lost, update sets and display a message
-            enable('neck')
-            send_command('gs c update')
-            add_to_chat(123, 'Doom is no longer active.')
-        end
-    end
 end

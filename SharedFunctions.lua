@@ -7,13 +7,29 @@
 --=               Last Modified: 2023-07-13                  =--
 --============================================================--
 
+-- List of color for object in message
+
+    PUNCTUATION = 161
+    SPELLANDRECAST = 057
+    SEPARATOR = 161
+    INCAP = 167
+
+-- List of incapacitated states
+local incapacitated_states =
+T {
+'Stun', -- Stun status
+'Petrification', -- Petrification status
+'Terror', -- Terror status
+'Sleep', -- Sleep status
+}
+
 -- Helper function to format recast time
 -- Formats a recast time value into a readable string representation
 -- Parameters:
 --   recast (number): The recast time value in seconds
 -- Returns:
 --   (string) The formatted recast time string
-function formatRecastTime(recast)
+local function formatRecastDuration(recast)
     -- Check if a recast value is provided
     if recast then
         -- Check if the recast time is greater than or equal to 60 seconds (1 minute)
@@ -30,33 +46,63 @@ function formatRecastTime(recast)
     end
 end
 
--- Helper function to create a message with spell name and recast time
--- Creates a formatted message with the spell name and its recast time
+-- Helper function to create a message with spell name, recast time, and additional text
+-- Creates a formatted message with the spell name, its recast time, and additional text
 -- Parameters:
+--   startMsg (string): The starting part of the message (can be nil)
 --   spellName (string): The name of the spell
---   recast (number): The recast time value in seconds
+--   recast (number): The recast time value in seconds (can be nil)
+--   endMsg (string): The ending part of the message (can be nil)
 -- Returns:
---   (string) The formatted message with spell name and recast time
-function createMessage(spellName, recast)
+--   (string) The formatted message with spell name, recast time, additional text, and separator
+local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
+    -- Assign default values if parameters are nil
+    startMsg = startMsg or ""
+    spellName = spellName or ""
+    recast = recast or nil
+    endMsg = endMsg or ""
+    if isLast == nil then
+        isLast = true
+    end
     -- Check if a recast value is provided
     if recast then
-        -- Build the message with spell name and recast time
+        -- Build the message with spell name, recast time, and additional text
         local message =
-            string.char(0x1F, 050) .. '[' ..
-            string.char(0x1F, 221) .. spellName ..
-            string.char(0x1F, 050) .. ']' ..
+            string.char(0x1F, PUNCTUATION) .. '[' ..
+            string.char(0x1F, SPELLANDRECAST) .. spellName ..
+            string.char(0x1F, PUNCTUATION) .. ']' ..
             ' Recast: ' ..
-            string.char(0x1F, 050) .. '(' ..
-            string.char(0x1F, 221) ..
-            formatRecastTime(recast) .. string.char(0x1F, 050) .. ')'
+            string.char(0x1F, PUNCTUATION) .. '(' ..
+            string.char(0x1F, SPELLANDRECAST) .. formatRecastDuration(recast) .. 
+            string.char(0x1F, PUNCTUATION) .. ')'
+        -- Append the separator to the message
+        if isLast then
+            message = message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
+        end
         -- Return the constructed message
         return message
     else
-        -- Build the message with only the spell name
+        -- Build the message with only the spell name and additional text
+        for _, value in ipairs(incapacitated_states) do
+            if endMsg == value then
+                originalEndMsg = endMsg
+                endMsg =
+                    TextColors.incap .. 'Incapacitated: ' ..
+                    string.char(0x1F, PUNCTUATION) .. '[' ..
+                    string.char(0x1F, SPELLANDRECAST) .. originalEndMsg ..
+                    string.char(0x1F, PUNCTUATION) .. ']'
+            end
+        end
         local message =
-            string.char(0x1F, 050) .. '[' ..
-            string.char(0x1F, 221) .. spellName ..
-            string.char(0x1F, 050) .. ']'
+            startMsg .. ' ' ..
+            string.char(0x1F, PUNCTUATION) .. '[' ..
+            string.char(0x1F, SPELLANDRECAST) .. spellName ..
+            string.char(0x1F, PUNCTUATION) .. ']' ..
+            ' ' .. endMsg
+        -- Append the separator to the message
+        if isLast then
+            message = message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
+        end
         -- Return the constructed message
         return message
     end
@@ -67,7 +113,7 @@ end
 -- Parameters:
 --   spell (table): The spell or ability being used
 --   eventArgs (table): Additional event arguments
-function handleRecastCooldown(spell, eventArgs)
+function checkDisplayCooldown(spell, eventArgs)
     -- Check if the action type is not "Weapon Skill"
     if spell.action_type ~= 'Weapon Skill' then
         -- Retrieve the recast time of the spell or ability
@@ -82,9 +128,8 @@ function handleRecastCooldown(spell, eventArgs)
             cancel_spell()
             eventArgs.cancel = true
             -- Format and display the recast message
-            local message = createMessage(spell.name, recast)
+            local message = createFormatMsg(nil, spell.name, recast, nil)
             add_to_chat(123, message)
-            add_to_chat(259, '=================================================')
         end
     end
 end
@@ -108,7 +153,7 @@ function handleCommand(spellTable)
             return
         elseif recast > 0 then
             -- Create a message for the spell with its name and recast time
-            local message = createMessage(spellName, recast)
+            local message = createFormatMsg(nil, spellName, recast, nil)
             -- Add the spell message to the messages table
             table.insert(messages, {spell = spellName, recast = recast, message = message})
         end
@@ -122,16 +167,11 @@ function handleCommand(spellTable)
                 return a.recast < b.recast
             end
         )
-        -- Display a message indicating no spells are available
-        add_to_chat(159, 'No spells available')
         -- Display each spell message in the messages table
-        for _, msgData in ipairs(messages) do
-            add_to_chat(167, msgData.message)
+        for i, msgData in ipairs(messages) do
+            local isLast = (i == #messages) -- Check if it's the last message
+            add_to_chat(167, createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast))
         end
-        add_to_chat(259, '=================================================')
-    else
-        -- Display a message indicating all spells are unavailable
-        add_to_chat(159, 'All spells are unavailable')
     end
 end
 
@@ -144,14 +184,6 @@ end
 --   (boolean) true if incapacitated, false otherwise
 --   (string or nil) The type of incapacitation if incapacitated, nil otherwise
 function incapacitated(spell, eventArgs)
-    -- List of incapacitated states
-    local incapacitated_states =
-        T {
-        'Stun', -- Stun status
-        'Petrification', -- Petrification status
-        'Terror', -- Terror status
-        'Sleep', -- Sleep status
-    }
     -- Iterate over each value in the incapacitated_states table
     for _, value in ipairs(incapacitated_states) do
         -- Check if the value exists as a buff in the buffactive table
@@ -161,17 +193,8 @@ function incapacitated(spell, eventArgs)
             eventArgs.handled = true
             equip(sets.idle)
             -- Create and display the incapacitated message
-            local message =
-                string.char(0x1F, 159) ..
-                'Cannot use: [' ..
-                    string.char(0x1F, 221) ..
-                        spell.name ..
-                            string.char(0x1F, 028) ..
-                                ']' ..
-                                    ' Incapacitated: (' ..
-                                        string.char(0x1F, 221) .. value .. string.char(0x1F, 028) .. ')'
+            local message = createFormatMsg('Cannot Use: ', spell.name, nil , value)
             add_to_chat(167, message)
-            add_to_chat(259, '=================================================')
             return true, value
         end
     end
@@ -181,14 +204,14 @@ end
 
 -- Check current main weapon set
 -- Checks the current main weapon set and equips the corresponding gear
-function check_weaponset()
+local function check_weaponset()
     -- Equip the gear set based on the current state of the WeaponSet
     equip(sets[state.WeaponSet.current])
 end
 
 -- Check current sub weapon set
 -- Checks the current sub weapon set and equips the corresponding gear
-function check_subset()
+local function check_subset()
     -- Equip the gear set based on the current state of the SubSet
     equip(sets[state.SubSet.current])
 end
@@ -198,7 +221,7 @@ end
 -- Parameters:
 --   playerStatus (table): The player's current status information
 --   eventArgs (table): Additional event arguments
-function job_handle_equipping_gear(playerStatus, eventArgs)
+local function job_handle_equipping_gear(playerStatus, eventArgs)
     -- Check and adjust the main weapon set
     check_weaponset()
     -- Check and adjust the sub weapon set
@@ -267,12 +290,8 @@ end
 function handleInterruptedSpell(spell, eventArgs)
     eventArgs.handled = true
     equip(sets.idle)
-    local bracketColor = string.char(0x1F, 050) -- Color code for the brackets
-    local message =
-        bracketColor .. 'Spell interrupted: ' ..
-        bracketColor .. '[' .. string.char(0x1F, 221) .. spell.name .. bracketColor .. ']'
+    local message = createFormatMsg('Spell interrupted:', spell.name)
     add_to_chat(123, message)
-    add_to_chat(259, '=================================================')
 end
 
 -- Handle actions for a completed spell
@@ -283,12 +302,25 @@ function handleCompletedSpell(spell)
     -- Perform appropriate actions after the spell is completed normally
 end
 
-return {
-    handleRecastCooldown = handleRecastCooldown,
-    incapacitated = incapacitated,
-    check_weaponset = check_weaponset,
-    check_subset = check_subset,
-    job_handle_equipping_gear = job_handle_equipping_gear,
-    job_state_change = job_state_change,
-    handleSpellAftercast = handleSpellAftercast,
-}
+-- Handle changes in buffs
+-- Handles equipment and actions based on changes in buffs
+-- Parameters:
+--   buff (string): The name of the buff that changed
+--   gain (boolean): Indicates whether the buff was gained (true) or lost (false)
+function buff_change(buff, gain)
+    if buff == 'Protect' then
+        if gain then
+            -- Buff is gained, equip the Doom set and display a message
+            equip(sets.buff.Doom)
+            disable('neck')
+            local message = createFormatMsg('WARNING:', 'Doom', nil, 'is active!')
+            add_to_chat(123, message)
+        else
+            -- Buff is lost, update sets and display a message
+            enable('neck')
+            send_command('gs c update')
+            local message = createFormatMsg(nil , 'Doom', nil, 'is no longer active!')
+            add_to_chat(123, message)
+        end
+    end
+end

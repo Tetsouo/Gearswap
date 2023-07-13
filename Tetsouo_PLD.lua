@@ -68,7 +68,7 @@ function job_precast(spell, action, spellMap, eventArgs)
     else
         auto_majesty(spell, eventArgs) -- Automatically cast Majesty ability before certain spells
         auto_divineEmblem(spell, eventArgs) -- Automatically use Divine Emblem ability
-        handleRecastCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
+        checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
     end
 end
 
