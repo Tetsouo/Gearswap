@@ -46,9 +46,9 @@ end
 -- Handles the unload event when changing job or reloading the file.
 function file_unload()
     -- Unbinds the keys associated with the states.
-    unbind_key('^F9')
-    unbind_key('^F10')
-    unbind_key('^F11')
+    send_command('unbind F9')
+    send_command('unbind F10')
+    send_command('unbind F11')
 end
 
 -- Loads the gear sets from the PLD_SET.lua file.
@@ -63,7 +63,9 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    if incapacitated(spell, eventArgs) then
+    updateTable(spellsSingle, spell.name, 'Precast')
+    updateTable(spellsAoe, spell.name, 'Precast')
+    if incapacitated(spell, eventArgs, true) then
         -- Spell cannot be cast due to incapacitation, no further actions needed
     else
         auto_majesty(spell, eventArgs) -- Automatically cast Majesty ability before certain spells
@@ -79,6 +81,8 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
+    updateTable(spellsSingle, spell.name, 'Midcast')
+    updateTable(spellsAoe, spell.name, 'Midcast')
     incapacitated(spell, eventArgs) -- Check for incapacitated state
 end
 
@@ -89,6 +93,8 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_aftercast(spell, action, spellMap, eventArgs)
+    updateTable(spellsSingle, spell.name, 'Aftercast')
+    updateTable(spellsAoe, spell.name, 'Aftercast')
     handleSpellAftercast(spell, eventArgs) -- Perform actions after the spell is cast
 end
 
@@ -109,13 +115,13 @@ function select_default_macro_book()
     -- Set the default macro book and lockstyle command based on the sub job
     -- If sub job is WAR
     if player.sub_job == 'WAR' then
+        -- If sub job is BLU
         set_macro_page(1, 21) -- Set macro book page 1, macro 21 for sub job WAR
         send_command('wait 20; input /lockstyleset 4') -- Lockstyle command for sub job WAR
-    -- If sub job is BLU
     elseif player.sub_job == 'BLU' then
+        -- For other sub jobs
         set_macro_page(1, 22) -- Set macro book page 1, macro 22 for sub job BLU
         send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
-    -- For other sub jobs
     else
         set_macro_page(1, 21) -- Set macro book page 1, macro 21 for other sub jobs
         send_command('wait 20;input /lockstyleset 4') -- Default lockstyle command

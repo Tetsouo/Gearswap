@@ -8,27 +8,27 @@
 --============================================================--
 
 -- A table containing the spell IDs and names for single target spells.
-local spellsSingle = {
-    {name = 'Flash', id = 112},  -- Spell ID for the "Flash" spell
-    {name = 'Blank Gaze', id = 592}  -- Spell ID for the "Blank Gaze" spell
+spellsSingle = {
+    {name = 'Flash', id = 112, step = "Aftercast"}, -- Spell ID for the "Flash" spell
+    {name = 'Blank Gaze', id = 592, step = "Aftercast"} -- Spell ID for the "Blank Gaze" spell
 }
 
 -- A table containing the spell IDs and names for area of effect spells.
-local spellsAoe = {
-    {name = 'Jettatura', id = 575},  -- Spell ID for the "Jettatura" spell
-    {name = 'Sheep Song', id = 584},  -- Spell ID for the "Sheep Song" spell
-    {name = 'Geist Wall', id = 605}  -- Spell ID for the "Geist Wall" spell
+spellsAoe = {
+    {name = 'Jettatura', id = 575, step = "Aftercast"}, -- Spell ID for the "Jettatura" spell
+    {name = 'Sheep Song', id = 584, step = "Aftercast"}, -- Spell ID for the "Sheep Song" spell
+    {name = 'Geist Wall', id = 605, step = "Aftercast"} -- Spell ID for the "Geist Wall" spell
 }
 
 -- Calls the handleCommand function with the spellsSingle table.
-    function handleSingleCommand()
-        handleCommand(spellsSingle)
-    end
+function handleSingleCommand()
+    handleCommand(spellsSingle)
+end
 
-    -- Calls the handleCommand function with the spellsAoe table.
-    function handleAoeCommand()
-        handleCommand(spellsAoe)
-    end
+-- Calls the handleCommand function with the spellsAoe table.
+function handleAoeCommand()
+    handleCommand(spellsAoe)
+end
 
 -- Automatically uses the "Divine Emblem" ability before casting the "Flash" spell if conditions are met.
 -- Parameters:
@@ -38,13 +38,13 @@ function auto_divineEmblem(spell, eventArgs)
     local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
     local divineEmblemCD = windower.ffxi.get_ability_recasts()[80]
     if spell.name == 'Flash' then
-        if spellRecast < 1 then
+        if spellRecast == 0 then
             if not (buffactive['Amnesia'] or buffactive['Silence']) then
                 if divineEmblemCD < 1 and not buffactive['Divine Emblem'] then
                     cancel_spell()
                     send_command(
                         string.format(
-                            'input /ja "Divine Emblem" <me>; wait 1.2; input /ma %s %s',
+                            'input /ja "Divine Emblem" <me>; wait 1.5; input /ma %s %s',
                             spell.name,
                             spell.target.id
                         )
@@ -66,13 +66,13 @@ function auto_majesty(spell, eventArgs)
     local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
     local majestyCD = windower.ffxi.get_ability_recasts()[150]
     if (spell.action_type == 'Magic' and spell.skill == 'Healing Magic') or spell.name == 'Protect V' then
-        if spellRecast < 1 then
+        if spellRecast == 0 then
             if not (buffactive['Amnesia'] or buffactive['Silence']) then
                 if majestyCD < 1 and not buffactive['Majesty'] then
                     cancel_spell()
                     send_command(
                         string.format(
-                            'input /ja "Majesty" <me>; wait 1.2; input /ma %s %s',
+                            'input /ja "Majesty" <me>; wait 1.5; input /ma %s %s',
                             spell.name,
                             spell.target.id
                         )
@@ -80,8 +80,8 @@ function auto_majesty(spell, eventArgs)
                 end
             end
         else
-            eventArgs.handled = true
             cancel_spell()
+            eventArgs.handled = true
         end
     end
 end

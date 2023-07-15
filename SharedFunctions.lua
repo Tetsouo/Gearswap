@@ -7,6 +7,9 @@
 --=               Last Modified: 2023-07-13                  =--
 --============================================================--
 
+-- Shared Variables
+spellLanded = ''
+
 -- List of colors for objects in messages
 PUNCTUATION = 161 -- Color for punctuation marks
 SPELLANDRECAST = 057 -- Color for spell names and recast timers
@@ -15,11 +18,11 @@ INCAP = 167 -- Color for incapacitated state
 
 -- List of incapacitated states
 local incapacitated_states =
-T {
+    T {
     'Stun', -- Stun status
     'Petrification', -- Petrification status
     'Terror', -- Terror status
-    'Sleep', -- Sleep status
+    'Sleep' -- Sleep status
 }
 
 -- Formats a recast time value into a readable string representation.
@@ -55,25 +58,30 @@ end
 --   (string) The formatted message with spell name, recast time, additional text, and separator.
 local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     -- Assign default values if parameters are nil
-    startMsg = startMsg or ""
-    spellName = spellName or ""
+    startMsg = startMsg or ''
+    spellName = spellName or ''
     recast = recast or nil
-    endMsg = endMsg or ""
+    endMsg = endMsg or ''
     isLast = isLast == nil or isLast
     -- Check if a recast value is provided
     if recast then
         -- Build the message with spell name, recast time, and additional text
         local message =
-            string.char(0x1F, PUNCTUATION) .. '[' ..
-            string.char(0x1F, SPELLANDRECAST) .. spellName ..
-            string.char(0x1F, PUNCTUATION) .. ']' ..
-            ' Recast: ' ..
-            string.char(0x1F, PUNCTUATION) .. '(' ..
-            string.char(0x1F, SPELLANDRECAST) .. formatRecastDuration(recast) .. 
-            string.char(0x1F, PUNCTUATION) .. ')'
+            string.char(0x1F, PUNCTUATION) ..
+            '[' ..
+                string.char(0x1F, SPELLANDRECAST) ..
+                    spellName ..
+                        string.char(0x1F, PUNCTUATION) ..
+                            ']' ..
+                                ' Recast: ' ..
+                                    string.char(0x1F, PUNCTUATION) ..
+                                        '(' ..
+                                            string.char(0x1F, SPELLANDRECAST) ..
+                                                formatRecastDuration(recast) .. string.char(0x1F, PUNCTUATION) .. ')'
         -- Append the separator to the message
         if isLast then
-            message = message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
+            message =
+                message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
         end
         -- Return the constructed message
         return message
@@ -83,21 +91,25 @@ local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
             if endMsg == value then
                 originalEndMsg = endMsg
                 endMsg =
-                    TextColors.incap .. 'Incapacitated: ' ..
-                    string.char(0x1F, PUNCTUATION) .. '[' ..
-                    string.char(0x1F, SPELLANDRECAST) .. originalEndMsg ..
-                    string.char(0x1F, PUNCTUATION) .. ']'
+                    string.char(0x1F, INCAP) ..
+                    'Incapacitated: ' ..
+                        string.char(0x1F, PUNCTUATION) ..
+                            '[' ..
+                                string.char(0x1F, SPELLANDRECAST) ..
+                                    originalEndMsg .. string.char(0x1F, PUNCTUATION) .. ']'
             end
         end
         local message =
-            startMsg .. ' ' ..
-            string.char(0x1F, PUNCTUATION) .. '[' ..
-            string.char(0x1F, SPELLANDRECAST) .. spellName ..
-            string.char(0x1F, PUNCTUATION) .. ']' ..
-            ' ' .. endMsg
+            startMsg ..
+            ' ' ..
+                string.char(0x1F, PUNCTUATION) ..
+                    '[' ..
+                        string.char(0x1F, SPELLANDRECAST) ..
+                            spellName .. string.char(0x1F, PUNCTUATION) .. ']' .. ' ' .. endMsg
         -- Append the separator to the message
         if isLast then
-            message = message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
+            message =
+                message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
         end
         -- Return the constructed message
         return message
@@ -121,7 +133,7 @@ function checkDisplayCooldown(spell, eventArgs)
         -- Check if the recast value is not nil
         if recast and recast > 0 then
             cancel_spell()
-            eventArgs.cancel = true
+            eventArgs.handled = true
             -- Format and display the recast message
             local message = createFormatMsg(nil, spell.name, recast, nil)
             add_to_chat(123, message)
@@ -129,42 +141,115 @@ function checkDisplayCooldown(spell, eventArgs)
     end
 end
 
--- Handles the logic for executing commands based on spell availability.
--- Parameters:
---   spellTable (table): A table containing spell data (name and ID).
+-- Function to handle a command for gearswap Lua script
 function handleCommand(spellTable)
-    local messages = {}
-    -- Iterate over each spell in the spellTable
-    for _, spellData in ipairs(spellTable) do
-        local spellName = spellData.name
-        local spellId = spellData.id
-        -- Retrieve the recast time of the spell in minutes
-        local recast = windower.ffxi.get_spell_recasts()[spellId] / 60
-        -- Check if the recast time is less than 1 minute
-        if recast < 1 then
-            -- Execute the spell command with <stnpc> as the target
-            send_command('input /ma "' .. spellName .. '" <stnpc>')
-            return
-        elseif recast > 0 then
-            -- Create a message for the spell with its name and recast time
-            local message = createFormatMsg(nil, spellName, recast, nil)
+    local messages = {} -- Table to store spell messages
+    local spellId = nil -- ID of the current spell
+    local spellStep = nil -- Current step of the spell
+    local spellToCast = nil -- Spell ready to be cast
+    local spellToTest = nil -- Spell to test if it's ready to be cast
+    local spellRecast = nil -- Recast time of the spell
+    local spellPosition = nil -- Position of the spell in the spellTable
+
+    -- Find the spell ready to be cast
+    for i, spellData in ipairs(spellTable) do
+        spellId = spellData.id
+        spellStep = spellData.step
+        spellRecast = windower.ffxi.get_spell_recasts()[spellId] / 60 -- Convert recast time to minutes
+        spellPosition = i
+
+        if spellRecast == 0 then
+            if spellStep == 'Aftercast' then
+                spellToCast = spellData
+                break
+            else
+                spellToTest = spellData
+
+                if i < #spellTable then
+                    spellToTest = spellData
+                    spellToCast = spellTable[i + 1]
+                    spellRecast = windower.ffxi.get_spell_recasts()[spellToCast.id] / 60
+                    break
+                else
+                    spellToCast = spellTable[#spellTable]
+                    spellRecast = windower.ffxi.get_spell_recasts()[spellToCast.id] / 60
+                    break
+                end
+            end
+        elseif spellRecast > 0 then
+            local message = createFormatMsg(nil, spellData.name, spellRecast, nil)
             -- Add the spell message to the messages table
-            table.insert(messages, {spell = spellName, recast = recast, message = message})
+            table.insert(messages, {spell = spellData.name, recast = spellRecast, message = message})
         end
     end
-    -- Check if there are any messages
-    if #messages > 0 then
-        -- Sort the messages table based on recast time in ascending order
-        table.sort(
-            messages,
-            function(a, b)
-                return a.recast < b.recast
+
+    -- If there is a spell ready to be cast
+    if spellRecast == 0 then
+        -- Check if there is a spell to test
+        if spellToTest then
+            -- Check the step of the spell to test
+            if spellToTest.step == 'Aftercast' then
+                send_command('input /ma "' .. spellToCast.name .. '" <stnpc>') -- Cast the spell on the target
+            else
+                -- Check if the spell to cast is the same as the spell to test
+                if spellToCast == spellToTest then
+                    -- Check if the recast time is 0
+                    if spellRecast == 0 then
+                        send_command('input /ma "' .. spellToCast.name .. '" <stnpc>') -- Cast the spell on the target
+                    end
+                else
+                    -- Check if the recast time is 0
+                    if spellRecast == 0 then
+                        -- Cast the first spell, wait for 6 seconds, then cast the second spell
+                        send_command(
+                            'input /ma "' ..
+                                spellToCast.name .. '" <stnpc>; wait 6; input /ma "' .. spellToTest.name .. '" <t>'
+                        )
+                    else
+                        -- Check if the recast time is greater than 0
+                        if spellRecast > 0 then
+                            spellToTest = spellToTest + 1 -- Increment the spell to test
+                        end
+                        send_command('input /ma "' .. spellToTest.name .. '" <stnpc>') -- Cast the spell to test on the target
+                    end
+                end
             end
-        )
+        else
+            -- Check the step of the spell to cast
+            if spellToCast.step == 'Aftercast' then
+                send_command('input /ma "' .. spellToCast.name .. '" <stnpc>') -- Cast the spell on the target
+            end
+        end
+    else
+        -- Check if there is a spell two positions ahead in the spellTable
+        if spellPosition + 2 <= #spellTable then
+            spellToCast = spellTable[spellPosition + 2]
+            spellRecast = windower.ffxi.get_spell_recasts()[spellToCast.id] / 60
+
+            -- Check if the recast time of the spell to cast is 0
+            if spellRecast == 0 then
+                -- Cast the second spell, wait for 6 seconds, then cast the first spell
+                send_command(
+                    'input /ma "' .. spellToCast.name .. '" <stnpc>; wait 6; input /ma "' .. spellToTest.name .. '" <t>'
+                )
+            end
+        end
+
+        -- Check if there are messages in the table
+        if #messages > 0 then
+            -- Sort the messages table based on recast time in ascending order
+            table.sort(
+                messages,
+                function(a, b)
+                    return a.recast < b.recast
+                end
+            )
+        end
+
         -- Display each spell message in the messages table
         for i, msgData in ipairs(messages) do
             local isLast = (i == #messages) -- Check if it's the last message
-            add_to_chat(167, createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast))
+            add_to_chat(167, createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
         end
     end
 end
@@ -176,16 +261,17 @@ end
 -- Returns:
 --   (boolean) true if incapacitated, false otherwise.
 --   (string or nil) The type of incapacitation if incapacitated, nil otherwise.
-function incapacitated(spell, eventArgs)
+function incapacitated(spell, eventArgs, cancel)
+    cancel = false
     -- Iterate over each value in the incapacitated_states table
     for _, value in ipairs(incapacitated_states) do
         -- Check if the value exists as a buff in the buffactive table
         if buffactive[value] then
             -- If an incapacitated state is detected, equip the idle gear and return the incapacitation type and name
+            -- Create and display the incapacitated message
             cancel_spell()
             eventArgs.handled = true
             equip(sets.idle)
-            -- Create and display the incapacitated message
             local message = createFormatMsg('Cannot Use: ', spell.name, nil, value)
             add_to_chat(167, message)
             return true, value
@@ -211,7 +297,7 @@ end
 -- Parameters:
 --   playerStatus (table): The player's current status information.
 --   eventArgs (table): Additional event arguments.
-local function job_handle_equipping_gear(playerStatus, eventArgs)
+local function job_handle_equipping_gear()
     -- Check and adjust the main weapon set
     check_weaponset()
     -- Check and adjust the sub weapon set
@@ -230,7 +316,7 @@ end
 --   old_value (any): The old value of the changed field.
 function job_state_change(field, new_value, old_value)
     -- Handle equipping gear based on player status
-    job_handle_equipping_gear(player.status)
+    job_handle_equipping_gear()
     -- Check and adjust the main weapon set
     check_weaponset()
     -- Check and adjust the sub weapon set
@@ -242,31 +328,12 @@ end
 --   spell (table): The spell that was cast.
 --   eventArgs (table): Additional event arguments.
 function handleSpellAftercast(spell, eventArgs)
-    if spell.name == 'Crusade' or spell.name == 'Reprisal' or spell.name == 'Phalanx' or spell.name == 'Cocoon' then
-        -- Handle Crusade, Reprisal, Phalanx, or Cocoon spells
-        if spell.interrupted then
-            -- Spell was interrupted
-            handleInterruptedSpell(spell, eventArgs)
-        else
-            -- Spell completed normally
-            handleCompletedSpell(spell)
-        end
+    if spell.interrupted then
+        -- Spell was interrupted
+        handleInterruptedSpell(spell, eventArgs)
     else
-        -- Process other spells
-        if not spellHandled then
-            if spell.interrupted then
-                -- Spell was interrupted
-                handleInterruptedSpell(spell, eventArgs)
-            else
-                -- Spell completed normally
-                handleCompletedSpell(spell)
-            end
-            -- Mark the spell as handled
-            spellHandled = true
-        else
-            -- Reset the variable for subsequent spells
-            spellHandled = false
-        end
+        -- Spell completed normally
+        handleCompletedSpell(spell)
     end
 end
 
@@ -275,8 +342,18 @@ end
 --   spell (table): The interrupted spell.
 --   eventArgs (table): Additional event arguments.
 function handleInterruptedSpell(spell, eventArgs)
-    eventArgs.handled = true
+    for _, spellTest in ipairs(spellsSingle) do
+        if spellTest.name == spell.name then
+            spellTest.step = 'Midcast'
+        end
+    end
+    for _, spellTest in ipairs(spellsAoe) do
+        if spellTest.name == spell.name then
+            spellTest.step = 'Midcast'
+        end
+    end
     equip(sets.idle)
+    eventArgs.handled = true
     local message = createFormatMsg('Spell interrupted:', spell.name)
     add_to_chat(123, message)
 end
@@ -285,6 +362,9 @@ end
 -- Parameters:
 --   spell (table): The completed spell.
 function handleCompletedSpell(spell)
+    recast = windower.ffxi.get_spell_recasts()[spell.id]
+    local message = createFormatMsg(nil, spell.name, nil, 'Completed !')
+    add_to_chat(123, message)
     -- Perform appropriate actions after the spell is completed normally
 end
 
@@ -306,6 +386,15 @@ function buff_change(buff, gain)
             send_command('gs c update')
             local message = createFormatMsg(nil, 'Doom', nil, 'is no longer active!')
             add_to_chat(123, message)
+        end
+    end
+end
+
+function updateTable(table, spellName, step)
+    for i, spell in ipairs(table) do
+        if spell.name == spellName then
+            spell.step = step
+            return
         end
     end
 end
