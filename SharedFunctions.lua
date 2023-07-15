@@ -183,37 +183,62 @@ function handleCommand(spellTable)
         if spellToTest then
             -- Check the step of the spell to test
             if spellToTest.step == 'Aftercast' then
-                send_command('input /ma "' .. spellToCast.name .. '" <stnpc>') -- Cast the spell on the target
+                -- Cast the spell on the target
+                send_command(
+                    string.format(
+                        'input /ma "%s" <stnpc>',
+                        spellToCast.name
+                    )
+                )
             else
                 -- Check if the spell to cast is the same as the spell to test
                 if spellToCast == spellToTest then
                     -- Check if the recast time is 0
                     if spellRecast == 0 then
-                        send_command('input /ma "' .. spellToCast.name .. '" <stnpc>') -- Cast the spell on the target
+                        -- Cast the spell on the target
+                        send_command(
+                            string.format(
+                                'input /ma "%s" <stnpc>',
+                                spellToCast.name
+                            )
+                        )
                     end
                 else
                     -- Check if the recast time is 0
                     if spellRecast == 0 then
-                        -- Cast the first spell, wait for 6 seconds, then cast the second spell
+                        -- Cast the first spell, wait for x seconds, then cast the second spell
                         send_command(
-                            'input /ma "' ..
-                                spellToCast.name .. 
-                                '" <stnpc>; wait 6; input /ma "' .. 
-                                spellToTest.name .. '" <t>'
+                            string.format(
+                                'input /ma "%s" <stnpc>; wait 6; input /ma "%s" <t>',
+                                spellToCast.name,
+                                spellToTest.name
+                            )
                         )
                     else
                         -- Check if the recast time is greater than 0
                         if spellRecast > 0 then
                             spellToTest = spellToTest + 1 -- Increment the spell to test
                         end
-                        send_command('input /ma "' .. spellToTest.name .. '" <stnpc>') -- Cast the spell to test on the target
+                        -- Cast the spell to test on the target
+                        send_command(
+                            string.format(
+                                'input /ma "%s" <stnpc>',
+                                spellToTest.name
+                            )
+                        )
                     end
                 end
             end
         else
             -- Check the step of the spell to cast
             if spellToCast.step == 'Aftercast' then
-                send_command('input /ma "' .. spellToCast.name .. '" <stnpc>') -- Cast the spell on the target
+                -- Cast the spell on the target
+                send_command(
+                    string.format(
+                        'input /ma "%s" <stnpc>',
+                        spellToCast.name
+                    )
+                )
             end
         end
     else
@@ -226,9 +251,11 @@ function handleCommand(spellTable)
             if spellRecast == 0 then
                 -- Cast the second spell, wait for 6 seconds, then cast the first spell
                 send_command(
-                    'input /ma "' .. spellToCast.name .. 
-                    '" <stnpc>; wait 6; input /ma "' .. 
-                    spellToTest.name .. '" <t>'
+                    string.format(
+                        'input /ma "%s" <stnpc>; wait 6; input /ma "%s" <t>',
+                        spellToCast.name,
+                        spellToTest.name
+                    )
                 )
             end
         end
@@ -247,7 +274,7 @@ function handleCommand(spellTable)
         -- Display each spell message in the messages table
         for i, msgData in ipairs(messages) do
             local isLast = (i == #messages) -- Check if it's the last message
-            add_to_chat(167, 
+            add_to_chat(167,
             createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
         end
     end
@@ -332,7 +359,7 @@ function handleSpellAftercast(spell, eventArgs)
         handleInterruptedSpell(spell, eventArgs)
     else
         -- Spell completed normally
-        handleCompletedSpell(spell)
+        handleCompletedSpell(spell, eventArgs)
     end
 end
 
@@ -360,10 +387,11 @@ end
 -- Handles actions to be performed when a spell is completed normally.
 -- Parameters:
 --   spell (table): The completed spell.
-function handleCompletedSpell(spell)
-    recast = windower.ffxi.get_spell_recasts()[spell.id]
+function handleCompletedSpell(spell, eventArgs)
+    --[[ recast = windower.ffxi.get_spell_recasts()[spell.id]
     local message = createFormatMsg(nil, spell.name, nil, 'Completed !')
-    add_to_chat(123, message)
+    add_to_chat(123, message) ]]
+    eventArgs.handled = true
     -- Perform appropriate actions after the spell is completed normally
 end
 
