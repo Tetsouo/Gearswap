@@ -22,7 +22,7 @@ local incapacitated_states =
     'Stun', -- Stun status
     'Petrification', -- Petrification status
     'Terror', -- Terror status
-    'Sleep' -- Sleep status
+    'Sleep', -- Sleep status
 }
 
 -- Formats a recast time value into a readable string representation.
@@ -67,21 +67,17 @@ local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     if recast then
         -- Build the message with spell name, recast time, and additional text
         local message =
-            string.char(0x1F, PUNCTUATION) ..
-            '[' ..
-                string.char(0x1F, SPELLANDRECAST) ..
-                    spellName ..
-                        string.char(0x1F, PUNCTUATION) ..
-                            ']' ..
-                                ' Recast: ' ..
-                                    string.char(0x1F, PUNCTUATION) ..
-                                        '(' ..
-                                            string.char(0x1F, SPELLANDRECAST) ..
-                                                formatRecastDuration(recast) .. string.char(0x1F, PUNCTUATION) .. ')'
+            string.char(0x1F, PUNCTUATION) .. '[' ..
+            string.char(0x1F, SPELLANDRECAST) .. spellName ..
+            string.char(0x1F, PUNCTUATION) .. ']' .. ' Recast: ' ..
+            string.char(0x1F, PUNCTUATION) .. '(' ..
+            string.char(0x1F, SPELLANDRECAST) .. formatRecastDuration(recast) .. 
+            string.char(0x1F, PUNCTUATION) .. ')'
         -- Append the separator to the message
         if isLast then
             message =
-                message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
+                message .. '\n' .. 
+                string.char(0x1F, SEPARATOR) .. '================================================='
         end
         -- Return the constructed message
         return message
@@ -91,25 +87,23 @@ local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
             if endMsg == value then
                 originalEndMsg = endMsg
                 endMsg =
-                    string.char(0x1F, INCAP) ..
-                    'Incapacitated: ' ..
-                        string.char(0x1F, PUNCTUATION) ..
-                            '[' ..
-                                string.char(0x1F, SPELLANDRECAST) ..
-                                    originalEndMsg .. string.char(0x1F, PUNCTUATION) .. ']'
+                    string.char(0x1F, INCAP) .. 'Incapacitated: ' ..
+                    string.char(0x1F, PUNCTUATION) .. '[' ..
+                    string.char(0x1F, SPELLANDRECAST) .. originalEndMsg ..
+                    string.char(0x1F, PUNCTUATION) .. ']'
             end
         end
         local message =
             startMsg ..
             ' ' ..
-                string.char(0x1F, PUNCTUATION) ..
-                    '[' ..
-                        string.char(0x1F, SPELLANDRECAST) ..
-                            spellName .. string.char(0x1F, PUNCTUATION) .. ']' .. ' ' .. endMsg
+            string.char(0x1F, PUNCTUATION) .. '[' ..
+            string.char(0x1F, SPELLANDRECAST) .. spellName ..
+            string.char(0x1F, PUNCTUATION) .. ']' .. ' ' .. endMsg
         -- Append the separator to the message
         if isLast then
             message =
-                message .. '\n' .. string.char(0x1F, SEPARATOR) .. '================================================='
+                message .. '\n' .. 
+                string.char(0x1F, SEPARATOR) .. '================================================='
         end
         -- Return the constructed message
         return message
@@ -203,7 +197,9 @@ function handleCommand(spellTable)
                         -- Cast the first spell, wait for 6 seconds, then cast the second spell
                         send_command(
                             'input /ma "' ..
-                                spellToCast.name .. '" <stnpc>; wait 6; input /ma "' .. spellToTest.name .. '" <t>'
+                                spellToCast.name .. 
+                                '" <stnpc>; wait 6; input /ma "' .. 
+                                spellToTest.name .. '" <t>'
                         )
                     else
                         -- Check if the recast time is greater than 0
@@ -230,7 +226,9 @@ function handleCommand(spellTable)
             if spellRecast == 0 then
                 -- Cast the second spell, wait for 6 seconds, then cast the first spell
                 send_command(
-                    'input /ma "' .. spellToCast.name .. '" <stnpc>; wait 6; input /ma "' .. spellToTest.name .. '" <t>'
+                    'input /ma "' .. spellToCast.name .. 
+                    '" <stnpc>; wait 6; input /ma "' .. 
+                    spellToTest.name .. '" <t>'
                 )
             end
         end
@@ -249,7 +247,8 @@ function handleCommand(spellTable)
         -- Display each spell message in the messages table
         for i, msgData in ipairs(messages) do
             local isLast = (i == #messages) -- Check if it's the last message
-            add_to_chat(167, createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
+            add_to_chat(167, 
+            createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
         end
     end
 end
