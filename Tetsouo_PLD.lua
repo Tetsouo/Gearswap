@@ -93,9 +93,9 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_aftercast(spell, action, spellMap, eventArgs)
-    updateTable(spellsSingle, spell.name, 'Aftercast')
-    updateTable(spellsAoe, spell.name, 'Aftercast')
-    handleSpellAftercast(spell, eventArgs) -- Perform actions after the spell is cast
+        updateTable(spellsSingle, spell.name, 'Aftercast')
+        updateTable(spellsAoe, spell.name, 'Aftercast')
+        handleSpellAftercast(spell, eventArgs) -- Perform actions after the spell is cast
 end
 
 -- Sets the default macro book based on the player's sub job.
@@ -106,9 +106,9 @@ function select_default_macro_book()
         set_macro_page(1, 21) -- Set macro book page 1, macro 21 for sub job WAR
         send_command('wait 20; input /lockstyleset 4') -- Lockstyle command for sub job WAR
     elseif player.sub_job == 'BLU' then
-        -- For other sub jobs
         set_macro_page(1, 23) -- Set macro book page 1, macro 22 for sub job BLU
         send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
+    -- For other sub jobs
     else
         set_macro_page(1, 21) -- Set macro book page 1, macro 21 for other sub jobs
         send_command('wait 20;input /lockstyleset 4') -- Default lockstyle command

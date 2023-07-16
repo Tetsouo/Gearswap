@@ -196,7 +196,7 @@ function handleCommand(spellTable)
                 -- Cast the spell on the target
                 send_command(
                     string.format(
-                        'input /ma "%s" <stnpc>',
+                        'input /ma "%s" <t>',
                         spellToCast.name
                     )
                 )
@@ -208,7 +208,7 @@ function handleCommand(spellTable)
                         -- Cast the spell on the target
                         send_command(
                             string.format(
-                                'input /ma "%s" <stnpc>',
+                                'input /ma "%s" <t>',
                                 spellToCast.name
                             )
                         )
@@ -219,7 +219,7 @@ function handleCommand(spellTable)
                         -- Cast the first spell, wait for x seconds, then cast the second spell
                         send_command(
                             string.format(
-                                'input /ma "%s" <stnpc>; wait 6; input /ma "%s" <t>',
+                                'input /ma "%s" <t>; wait 6; input /ma "%s" <t>',
                                 spellToCast.name,
                                 spellToTest.name
                             )
@@ -232,7 +232,7 @@ function handleCommand(spellTable)
                         -- Cast the spell to test on the target
                         send_command(
                             string.format(
-                                'input /ma "%s" <stnpc>',
+                                'input /ma "%s" <t>',
                                 spellToTest.name
                             )
                         )
@@ -245,7 +245,7 @@ function handleCommand(spellTable)
                 -- Cast the spell on the target
                 send_command(
                     string.format(
-                        'input /ma "%s" <stnpc>',
+                        'input /ma "%s" <t>',
                         spellToCast.name
                     )
                 )
@@ -262,7 +262,7 @@ function handleCommand(spellTable)
                 -- Cast the second spell, wait for 6 seconds, then cast the first spell
                 send_command(
                     string.format(
-                        'input /ma "%s" <stnpc>; wait 6; input /ma "%s" <t>',
+                        'input /ma "%s" <t>; wait 6; input /ma "%s" <t>',
                         spellToCast.name,
                         spellToTest.name
                     )
@@ -390,6 +390,7 @@ function buff_change(buff, gain)
     end
 end
 
+-- update the table with actual Step Cast of spell
 function updateTable(table, spellName, step)
     for i, spell in ipairs(table) do
         if spell.name == spellName then
@@ -399,8 +400,8 @@ function updateTable(table, spellName, step)
     end
 end
 
+-- Check if there are messages in the table
 function checkAndDisplayMessages(msgTable)
-    -- Check if there are messages in the table
     if #msgTable > 0 then
         -- Sort the messages table based on recast time in ascending order
         table.sort(
