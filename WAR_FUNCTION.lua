@@ -12,19 +12,18 @@ local abilityEquipment = {
 local function buffSelf(param)
     -- Retrieve the ability recasts and buff status
     local AbilityRecasts = windower.ffxi.get_ability_recasts()
-    local buffBloodRage = buffactive['Blood Rage']
     local buffWarcry = buffactive['Warcry']
-
     -- Define the abilities and their recasts
     local abilities = {
-        {name = 'Berserk', recast = AbilityRecasts[1]},
-        {name = 'Defender', recast = AbilityRecasts[3]},
-        {name = 'Aggressor', recast = AbilityRecasts[4]},
-        {name = 'Retaliation', recast = AbilityRecasts[8]},
-        {name = 'Restraint', recast = AbilityRecasts[9]},
+        {name = 'Berserk', recast = AbilityRecasts[1], equip = abilityEquipment['Berserk']},
+        {name = 'Defender', recast = AbilityRecasts[3], equip = abilityEquipment['Defender']},
+        {name = 'Aggressor', recast = AbilityRecasts[4], equip = abilityEquipment['Aggressor']},
+        {name = 'Retaliation', recast = AbilityRecasts[8], equip = abilityEquipment['Retaliation']},
+        {name = 'Restraint', recast = AbilityRecasts[9], equip = abilityEquipment['Restraint']},
         {
             name = (AbilityRecasts[2] > 1 and not buffWarcry) and 'Blood Rage' or 'Warcry',
-            recast = (AbilityRecasts[2] > 1 and not buffWarcry) and AbilityRecasts[11] or AbilityRecasts[2]
+            recast = (AbilityRecasts[2] > 1 and not buffWarcry) and AbilityRecasts[11] or AbilityRecasts[2],
+            equip = {}
         }
     }
     -- Initialize variables
@@ -39,25 +38,33 @@ local function buffSelf(param)
         -- Check if the ability is ready and not already active
         if
             not buffActive and abilityRecast < 1 and
-                ((param == 'Berserk' and abilityName ~= 'Defender') or
-                    (param == 'Defender' and abilityName ~= 'Berserk'))
+            ((param == 'Berserk' and abilityName ~= 'Defender') or
+            (param == 'Defender' and abilityName ~= 'Berserk'))
         then
             -- Assign the first ready ability to be used immediately
             if not readyAbility then
-                readyAbility = abilityName
+                readyAbility = ability
             else
                 -- Add other ready abilities to be used after the delay
-                table.insert(delayedAbilities, abilityName)
+                table.insert(delayedAbilities, ability)
             end
         end
     end
     -- Use the ready ability immediately
     if readyAbility then
-        send_command('input /ja "' .. readyAbility .. '" <me>')
+        -- Equip the corresponding gear
+        for slot, item in pairs(readyAbility.equip) do
+            send_command('equip ' .. item .. ' ' .. slot)
+        end   
+        send_command('input /ja "' .. readyAbility.name .. '" <me>')
     end
     -- Use delayed abilities with a delay between each usage
-    for _, abilityName in ipairs(delayedAbilities) do
-        send_command('wait ' .. delay .. '; input /ja "' .. abilityName .. '" <me>')
+    for _, ability in ipairs(delayedAbilities) do
+        -- Equip the corresponding gear
+        for slot, item in pairs(ability.equip) do
+            send_command('equip ' .. item .. ' ' .. slot)
+        end   
+        send_command('wait ' .. delay .. '; input /ja "' .. ability.name .. '" <me>')
         delay = delay + 1
     end
 end
