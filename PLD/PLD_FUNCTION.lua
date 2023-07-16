@@ -149,11 +149,11 @@ end
 --   spell (table): The interrupted spell.
 --   eventArgs (table): Additional event arguments.
 function handleInterruptedSpell(spell, eventArgs)
-    --[[ for _, spellTest in ipairs(spellsSingle) do
+    for _, spellTest in ipairs(spellsSingle) do
         if spellTest.name == spell.name then
             spellTest.step = 'Midcast'
         end
-    end ]]
+    end
     for _, spellTest in ipairs(spellsAoe) do
         if spellTest.name == spell.name then
             spellTest.step = 'Midcast'
