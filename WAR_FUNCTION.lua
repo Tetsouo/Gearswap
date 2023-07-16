@@ -3,7 +3,7 @@ local abilityEquipment = {
     Berserk = {body = 'Pumm. Lorica +3', feet = 'Agoge Calligae +3'},
     Defender = {hands = 'Agoge Mufflers +3'},
     Aggressor = {body = 'Agoge Lorica +3'},
-    Warcry = {body = 'Agoge Mask +3'},
+    Warcry = {head = 'Agoge Mask +3'},
     Retaliation = {feet = 'Boii Calligae +3'},
     Restraint = {feet = 'Boii Mufflers +3'}
 }
@@ -52,18 +52,12 @@ local function buffSelf(param)
     end
     -- Use the ready ability immediately
     if readyAbility then
-        -- Equip the corresponding gear
-        for slot, item in pairs(readyAbility.equip) do
-            send_command('equip ' .. item .. ' ' .. slot)
-        end   
+        equip(abilityEquipment[readyAbility.name])
         send_command('input /ja "' .. readyAbility.name .. '" <me>')
     end
     -- Use delayed abilities with a delay between each usage
     for _, ability in ipairs(delayedAbilities) do
-        -- Equip the corresponding gear
-        for slot, item in pairs(ability.equip) do
-            send_command('equip ' .. item .. ' ' .. slot)
-        end   
+        equip(abilityEquipment[readyAbility.name])
         send_command('wait ' .. delay .. '; input /ja "' .. ability.name .. '" <me>')
         delay = delay + 1
     end
