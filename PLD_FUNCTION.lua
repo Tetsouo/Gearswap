@@ -131,3 +131,36 @@ function customize_melee_set(meleeSet)
     end
     return meleeSet -- Return the customized melee gear set
 end
+
+-- Handles custom commands specific to the job.
+-- Parameters:
+--   cmdParams (table): The command parameters
+--   eventArgs (table): Additional event arguments
+function job_self_command(cmdParams, eventArgs)
+    if cmdParams[1]:lower() == 'single' then
+        handleSingleCommand() -- Handle the "single" command
+    elseif cmdParams[1]:lower() == 'aoe' then
+        handleAoeCommand() -- Handle the "aoe" command
+    end
+end
+
+-- Handles actions to be performed when a spell is interrupted.
+-- Parameters:
+--   spell (table): The interrupted spell.
+--   eventArgs (table): Additional event arguments.
+function handleInterruptedSpell(spell, eventArgs)
+    for _, spellTest in ipairs(spellsSingle) do
+        if spellTest.name == spell.name then
+            spellTest.step = 'Midcast'
+        end
+    end
+    for _, spellTest in ipairs(spellsAoe) do
+        if spellTest.name == spell.name then
+            spellTest.step = 'Midcast'
+        end
+    end
+    equip(sets.idle)
+    eventArgs.handled = true
+    local message = createFormatMsg('Spell interrupted:', spell.name)
+    add_to_chat(123, message)
+end

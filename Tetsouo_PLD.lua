@@ -98,21 +98,8 @@ function job_aftercast(spell, action, spellMap, eventArgs)
     handleSpellAftercast(spell, eventArgs) -- Perform actions after the spell is cast
 end
 
--- Handles custom commands specific to the job.
--- Parameters:
---   cmdParams (table): The command parameters
---   eventArgs (table): Additional event arguments
-function job_self_command(cmdParams, eventArgs)
-    if cmdParams[1]:lower() == 'single' then
-        handleSingleCommand() -- Handle the "single" command
-    elseif cmdParams[1]:lower() == 'aoe' then
-        handleAoeCommand() -- Handle the "aoe" command
-    end
-end
-
 -- Sets the default macro book based on the player's sub job.
 function select_default_macro_book()
-    -- Set the default macro book and lockstyle command based on the sub job
     -- If sub job is WAR
     if player.sub_job == 'WAR' then
         -- If sub job is BLU
@@ -120,7 +107,7 @@ function select_default_macro_book()
         send_command('wait 20; input /lockstyleset 4') -- Lockstyle command for sub job WAR
     elseif player.sub_job == 'BLU' then
         -- For other sub jobs
-        set_macro_page(1, 22) -- Set macro book page 1, macro 22 for sub job BLU
+        set_macro_page(1, 23) -- Set macro book page 1, macro 22 for sub job BLU
         send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
     else
         set_macro_page(1, 21) -- Set macro book page 1, macro 21 for other sub jobs

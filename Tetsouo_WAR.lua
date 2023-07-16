@@ -1,233 +1,94 @@
 --============================================================--
---=                       WARRIOR                            =--
+--=                        WARRIOR                           =--
 --============================================================--
 --=                    Author: Tetsouo                       =--
 --=                     Version: 1.0                         =--
 --=                  Created: 2023-07-10                     =--
---=               Last Modified: 2023-07-10                  =--
+--=               Last Modified: 2023-07-16                  =--
 --============================================================--
 
----------------------------------------------------
---                  VARIABLES
----------------------------------------------------
-
----------------------------------------------------
--- Initialisation des function pour ce fichier.
----------------------------------------------------
+-- Sets up the necessary libraries and files for Gearswap.
 function get_sets()
     mote_include_version = 2
-
-    -----------------------------------------------
-    -- Chargement et initialisation des inclusions.
-    -----------------------------------------------
-    include('Mote-Include.lua')
-    include('0_AutoMove.lua')
-    include('SharedFunctions.lua') -- (Function Shared)
-    include('WAR_FUNCTION.lua')
+    include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2).
+    include('0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management.
+    include('SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions.
+    include('WAR_FUNCTION.lua') -- Includes the WAR_FUNCTION.lua file for advanced functions specific to Warrior.
 end
 
-----------------------------------------------------------------------------------------------------------------------
--- Configuration des variables pour ce job. les variables State.Buff initialisées ici seront automatiquement suivies.
-----------------------------------------------------------------------------------------------------------------------
-function job_setup()
-end
-
--------------------------------------------------------------------------------------------------------------------
--- Configuration des functions utilisateurs pour ce job.
--------------------------------------------------------------------------------------------------------------------
-
-------------------------------------------------------
--- Configuration des variables pour cet utilisateurs.
-------------------------------------------------------
+-- Handles user-specific configuration and setup.
 function user_setup()
+    -- Hybrid mode options: 'PDT' (Defense physical), 'Normal (Damage Dealer)'
     state.HybridMode:options('PDT', 'Normal')
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'Lycurgos', 'Naegling', 'Shining', 'Loxotic'} --gs c cycle WeaponSet
-    state.SubSet = M {['description'] = 'Sub Weapon', 'Utu', 'Blurred'} --gs c cycle SubSet
+    -- Main weapon choice: 'Lycurgos', 'Naegling', 'Shining', 'Loxotic'
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'Lycurgos', 'Shining', 'Naegling', 'Loxotic'} --gs c cycle WeaponSet
+    -- Sub weapon choice: 'Utu Grip', 'Blurred Shield +1'
+    --[[ state.SubSet = M {['description'] = 'Sub Weapon', 'Utu', 'Blurred'} --gs c cycle SubSet ]]
+    -- Calls the function to select the default macro book
     select_default_macro_book()
+    -- Binds F9 to cycle through hybrid modes
+    send_command('bind F9 gs c cycle HybridMode')
+    -- Binds F10 to cycle through main weapon sets
+    send_command('bind F10 gs c cycle WeaponSet')
+    -- Binds F11 to cycle through sub weapon sets
+    send_command('bind F11 gs c cycle SubSet')
 end
 
--------------------------------------------------------------------------------------------------------------------------
--- Vide les variables (ex: Bind de touches) lorsque l'ont quitte ce fichier (ex: Changement de job quitte le jeu etc.)
--------------------------------------------------------------------------------------------------------------------------
-function user_unload()
+-- Handles the unload event when changing job or reloading the file.
+function file_unload()
+    -- Unbinds the keys associated with the states.
+    send_command('unbind F9')
+    send_command('unbind F10')
+    send_command('unbind F11')
 end
 
-----------------------------------------------------
--- Initialise les Sets d'équipement pour ce Job.
-----------------------------------------------------
+-- Loads the gear sets from the PLD_SET.lua file.
 function init_gear_sets()
-    include('WarSet.lua')
+    include('WAR_SET.lua')
 end
 
---____________________________________________________________________________________________________________________________________________________
-
---                                                                          FUNCTION
---____________________________________________________________________________________________________________________________________________________
-
---------------------------------------------------
--- Etablie quel Arme principal doit être équipée
---------------------------------------------------
-function check_weaponset()
-    equip(sets[state.WeaponSet.current])
-end
-
---------------------------------------------------
--- Etablie quel Arme secondaire doit être équipée
---------------------------------------------------
-function check_subset()
-    equip(sets[state.SubSet.current])
-end
-
-
---------------------------------------------------------------------------------------------------------------
--- Function qui s'applique juste avant que le sort/Abilité soit lancés.
-
--- Mettre eventArgs.handled en true Si on ne veut pas que le changement automatique d'equipement ce fasse.
---------------------------------------------------------------------------------------------------------------
+-- Handles actions and checks to perform before casting a spell or ability.
+-- Parameters:
+--   spell (table): The spell being cast
+--   action (table): The action being performed
+--   spellMap (table): The spell mapping table
+--   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    incapacitated(spell, eventArgs)
-    handleRecastCooldown(spell, eventArgs)
+    if incapacitated(spell, eventArgs, true) then
+        -- Spell cannot be cast due to incapacitation, no further actions needed
+    else
+        checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
+    end
 end
 
---------------------------------------------------------------------------------------------------------------
--- Function qui s'applique pendant que le sort soit lancé.
-
--- Mettre eventArgs.handled en true Si on ne veut pas que le changement automatique d'equipement ce fasse.
---------------------------------------------------------------------------------------------------------------
--- Actions to perform during casting of a spell or ability
+-- Handles actions to perform during the casting of a spell or ability.
+-- Parameters:
+--   spell (table): The spell being cast
+--   action (table): The action being performed
+--   spellMap (table): The spell mapping table
+--   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
-    -- Check for incapacitated state
-    if incapacitated() then
-        eventArgs.handled = true
-        equip(sets.idle)
-        return
-    end
+    incapacitated(spell, eventArgs) -- Check for incapacitated state
 end
 
--- Aftercast actions
+-- Handles actions to perform after the casting of a spell or ability.
+-- Parameters:
+--   spell (table): The spell that was cast
+--   action (table): The action that was performed
+--   spellMap (table): The spell mapping table
+--   eventArgs (table): Additional event arguments
 function job_aftercast(spell, action, spellMap, eventArgs)
-    -- Check if the spell is Crusade, Reprisal, Phalanx, or Cocoon
-    if spell.name == 'Crusade' or spell.name == 'Reprisal' or spell.name == 'Phalanx' or spell.name == 'Cocoon' then
-        if spell.interrupted then
-            -- The spell was interrupted
-            -- Perform the appropriate actions
-            eventArgs.handled = true
-            equip(sets.idle)
-            local message =
-                string.char(0x1F, 159) ..
-                'Spell interrupted: [' .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. ']'
-            add_to_chat(123, message)
-            add_to_chat(259, '=================================================')
-        else
-            -- The spell completed normally
-            -- Perform the appropriate actions after the spell
-        end
-    else
-        -- Process other spells
-        if not spellHandled then
-            if spell.interrupted then
-                -- The spell was interrupted
-                -- Perform the appropriate actions
-                eventArgs.handled = true
-                equip(sets.idle)
-                local message =
-                    string.char(0x1F, 159) ..
-                    'Spell interrupted: [' .. string.char(0x1F, 221) .. spell.name .. string.char(0x1F, 159) .. ']'
-                add_to_chat(123, message)
-                add_to_chat(259, '=================================================')
-            else
-                -- The spell completed normally
-                -- Perform the appropriate actions after the spell
-            end
-            -- Mark the spell as handled
-            spellHandled = true
-        else
-            -- Reset the variable for subsequent spells
-            spellHandled = false
-        end
-    end
 end
 
--------------------------------------------------------------------------------
--- Function qui verifie si un buff vient d'être appliqué ou retiré du joueur.
--------------------------------------------------------------------------------
-function job_buff_change(buff, gain)
-end
-
-------------------------------------------------------------
--- Function qui change le idleSet sous certaines conditions.
-------------------------------------------------------------
-function customize_idle_set(idleSet)
-    if state.HybridMode.value == 'PDT' then
-        idleSet = sets.idle.PDT
-    end
-    if state.HybridMode.value == 'Normal' then
-        idleSet = set_combine(sets.idle, sets.engaged)
-    end
-    if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
-        idleSet = sets.idle.Town
-    end
-    return idleSet
-end
-
-------------------------------------------------------------
--- Function qui change le melee sous certaines conditions.
-------------------------------------------------------------
-function customize_melee_set(meleeSet)
-    if state.HybridMode.value == 'PDT' then
-        meleeSet = sets.engaged.PDT
-    end
-    if state.HybridMode.value == 'Normal' then
-        meleeSet = set_combine(sets.idle, sets.engaged)
-    end
-    return meleeSet
-end
-
-----------------------------------------------------------------------------------------------
--- Function qui verifie et équipe L'arme principale et secondaire et la pièce movement speed.
-----------------------------------------------------------------------------------------------
-function job_handle_equipping_gear(playerStatus, eventArgs)
-    check_weaponset()
-    check_subset()
-    if state.Moving.value == 'true' then
-        send_command('gs equip sets.MoveSpeed')
-    end
-end
-
----------------------------------------------
--- Function qui vérifie le status du joueur.
----------------------------------------------
-function job_status_change(new)
-    if new == 'Engaged' then
-        if state.HybridMode.value == 'Normal' then
-            equip(sets.engaged)
-        elseif state.HybridMode.value == 'PDT' then
-            equip(sets.engaged.PDT)
-        end
-    else
-        equip(sets.idle)
-    end
-end
-
----------------------------------------------------------
--- Function qui vérifie si l'état d'une variable change.
----------------------------------------------------------
-function job_state_change(field, new_value, old_value)
-    job_handle_equipping_gear(player.status)
-    check_weaponset()
-    check_subset()
-end
-
--------------------------------------------------------------------------------------------------
--- Function  qui sélectionne le book de macro a appliqué et le lockstyle en fonction du sub job.
--------------------------------------------------------------------------------------------------
+-- Sets the default macro book based on the player's sub job.
 function select_default_macro_book()
-    -- Default macro set/book
+    -- If sub job is DRG
     if player.sub_job == 'DRG' then
-        set_macro_page(1, 24)
-        send_command('wait 20;input /lockstyleset 13')
+        set_macro_page(1, 25)
+        send_command('wait 20; input /lockstyleset 13')
+        -- If sub job is SAM
     elseif player.sub_job == 'SAM' then
         set_macro_page(1, 27)
-        send_command('wait 20;input /lockstyleset 13')
+        send_command('wait 20; input /lockstyleset 13')
     end
 end

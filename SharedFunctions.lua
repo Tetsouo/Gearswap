@@ -56,13 +56,15 @@ end
 --   isLast (boolean): Indicates if it is the last message in a sequence (default: true).
 -- Returns:
 --   (string) The formatted message with spell name, recast time, additional text, and separator.
-local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
+function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     -- Assign default values if parameters are nil
-    startMsg = startMsg or ''
-    spellName = spellName or ''
+    startMsg = startMsg or nil
+    spellName = spellName or nil
     recast = recast or nil
-    endMsg = endMsg or ''
+    endMsg = endMsg or nil
     isLast = isLast == nil or isLast
+    local startMessage = nil
+    local endMessage = nil
     -- Check if a recast value is provided
     if recast then
         -- Build the message with spell name, recast time, and additional text
@@ -93,12 +95,20 @@ local function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
                     string.char(0x1F, PUNCTUATION) .. ']'
             end
         end
+        if startMsg then
+            startMessage = startMsg .. ' ' .. string.char(0x1F, PUNCTUATION) .. '['
+        else
+            startMessage = string.char(0x1F, PUNCTUATION) .. '['
+        end
+        if endMsg then
+            endMessage = string.char(0x1F, PUNCTUATION) .. ']' .. ' ' .. endMsg
+        else
+            endMessage = string.char(0x1F, PUNCTUATION) .. ']'
+        end
         local message =
-            startMsg ..
-            ' ' ..
-            string.char(0x1F, PUNCTUATION) .. '[' ..
+            startMessage ..
             string.char(0x1F, SPELLANDRECAST) .. spellName ..
-            string.char(0x1F, PUNCTUATION) .. ']' .. ' ' .. endMsg
+            endMessage
         -- Append the separator to the message
         if isLast then
             message =
@@ -261,22 +271,7 @@ function handleCommand(spellTable)
         end
 
         -- Check if there are messages in the table
-        if #messages > 0 then
-            -- Sort the messages table based on recast time in ascending order
-            table.sort(
-                messages,
-                function(a, b)
-                    return a.recast < b.recast
-                end
-            )
-        end
-
-        -- Display each spell message in the messages table
-        for i, msgData in ipairs(messages) do
-            local isLast = (i == #messages) -- Check if it's the last message
-            add_to_chat(167,
-            createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
-        end
+        checkAndDisplayMessages(messages)
     end
 end
 
@@ -316,7 +311,9 @@ end
 -- Checks the current sub weapon set and equips the corresponding gear.
 local function check_subset()
     -- Equip the gear set based on the current state of the SubSet
-    equip(sets[state.SubSet.current])
+    if state.Subset then
+        equip(sets[state.SubSet.current])
+    end
 end
 
 -- Handles the necessary gear adjustments when the player's equipment changes.
@@ -363,36 +360,12 @@ function handleSpellAftercast(spell, eventArgs)
     end
 end
 
--- Handles actions to be performed when a spell is interrupted.
--- Parameters:
---   spell (table): The interrupted spell.
---   eventArgs (table): Additional event arguments.
-function handleInterruptedSpell(spell, eventArgs)
-    for _, spellTest in ipairs(spellsSingle) do
-        if spellTest.name == spell.name then
-            spellTest.step = 'Midcast'
-        end
-    end
-    for _, spellTest in ipairs(spellsAoe) do
-        if spellTest.name == spell.name then
-            spellTest.step = 'Midcast'
-        end
-    end
-    equip(sets.idle)
-    eventArgs.handled = true
-    local message = createFormatMsg('Spell interrupted:', spell.name)
-    add_to_chat(123, message)
-end
-
 -- Handles actions to be performed when a spell is completed normally.
 -- Parameters:
 --   spell (table): The completed spell.
 function handleCompletedSpell(spell, eventArgs)
-    --[[ recast = windower.ffxi.get_spell_recasts()[spell.id]
-    local message = createFormatMsg(nil, spell.name, nil, 'Completed !')
-    add_to_chat(123, message) ]]
-    eventArgs.handled = true
     -- Perform appropriate actions after the spell is completed normally
+    eventArgs.handled = true
 end
 
 -- Handles equipment and actions based on changes in buffs.
@@ -423,5 +396,25 @@ function updateTable(table, spellName, step)
             spell.step = step
             return
         end
+    end
+end
+
+function checkAndDisplayMessages(msgTable)
+    -- Check if there are messages in the table
+    if #msgTable > 0 then
+        -- Sort the messages table based on recast time in ascending order
+        table.sort(
+            msgTable,
+            function(a, b)
+                return a.recast < b.recast
+            end
+        )
+    end
+
+    -- Display each spell message in the messages table
+    for i, msgData in ipairs(msgTable) do
+        local isLast = (i == #msgTable) -- Check if it's the last message
+        add_to_chat(167,
+        createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
     end
 end

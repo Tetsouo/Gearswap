@@ -72,13 +72,12 @@ ChirichRing2 = {
     bag = 'wardrobe 2'
 }
 
-sets['Shining'] = {main = 'Shining one'}
-sets['Naegling'] = {main = 'Naegling'}
-sets['Lycurgos'] = {main = 'Lycurgos'}
-sets['Bonesplitter'] = {main = 'Bonesplitter'}
-sets['Loxotic'] = {main = 'Loxotic Mace +1'}
-sets['Blurred'] = {sub = 'Blurred Shield +1'}
-sets['Utu'] = {sub = 'Utu Grip'}
+sets['Lycurgos'] = {main = 'Lycurgos', sub = 'Utu Grip'}
+sets['Shining'] = {main = 'Shining one', sub = 'Utu Grip'}
+sets['Naegling'] = {main = 'Naegling', sub = 'Blurred Shield +1'}
+sets['Loxotic'] = {main = 'Loxotic Mace +1', sub = 'Blurred Shield +1'}
+--[[ sets['Blurred'] = {sub = 'Blurred Shield +1'}
+sets['Utu'] = {sub = 'Utu Grip'} ]]
 
 --________________________________________________________________________________________________________________________________________________
 --                                                                        IDLE

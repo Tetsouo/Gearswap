@@ -62,42 +62,6 @@ local function buffSelf(param)
     end
 end
 
--- Function to handle job-specific self commands
-function job_self_command(cmdParams)
-    -- Check the input command parameters
-    if cmdParams[1] == 'Berserk' then
-        local buffDefender = buffactive['Defender']
-        -- Handle HybridMode if necessary
-        if state.HybridMode.value == 'PDT' then
-            send_command('gs c set HybridMode Normal')
-        end
-        -- Cancel Defender if active
-        if buffDefender then
-            send_command('cancel defender')
-        end
-        -- Call buffSelf with the appropriate parameter
-        buffSelf('Berserk')
-    elseif cmdParams[1] == 'Defender' then
-        local buffBerserk = buffactive['Berserk']
-        -- Handle HybridMode if necessary
-        if state.HybridMode.value == 'Normal' then
-            send_command('gs c set HybridMode PDT')
-        end
-        -- Cancel Berserk if active
-        if buffBerserk then
-            send_command('cancel berserk')
-        end
-        -- Call buffSelf with the appropriate parameter
-        buffSelf('Defender')
-    elseif cmdParams[1] == 'ThirdEye' then
-        -- Call ThirdEye function
-        ThirdEye()
-    elseif cmdParams[1] == 'Jump' then
-        -- Call Jump function
-        jump()
-    end
-end
-
 -- Function to handle the Third Eye ability
 function ThirdEye()
     -- Retrieve ability recasts and buff statuses
@@ -138,26 +102,143 @@ function ThirdEye()
     end
 end
 
+
+--[[ if playerTP < 500 then
+    send_command('input /ja "Jump" <t>; wait 1; input /ja "High Jump" <t>')
+    jaName1 = "Jump"
+    jaName2 = "High Jump"
+else
+    send_command('input /ja "Jump" <t>')
+    jaName1 = "Jump"
+end
+elseif HighJumpCD < 1 and playerTP < 800 then
+send_command('input /ja "High Jump" <t>')
+jaName1 = "High Jump"
+elseif JumpCD < 1 and playerTP < 800 then
+send_command('input /ja "Jump" <t>')
+jaName1 = "Jump" ]]
+
 -- Function to handle the Jump ability
 function jump()
-    -- Retrieve ability recasts and TP
-    local JaRecasts = windower.ffxi.get_ability_recasts()
-    local JumpCD = JaRecasts[158]
-    local HighJumpCD = JaRecasts[159]
-    local playerTP = player.tp
-    -- Check if Jump and High Jump can be used
-    if JumpCD < 1 and HighJumpCD < 1 then
-        -- Check if TP is below 500 for using Jump and High Jump together
-        if playerTP < 500 then
-            send_command('input /ja "Jump" <t>; wait 1; input /ja "High Jump" <t>')
+    -- Initialize variables
+    local messages = {}  -- Stores messages to display
+    local jaName1 = 'Jump'  -- Name of the first jump ability
+    local jaName2 = 'High Jump'  -- Name of the second jump ability
+    local JaRecasts = windower.ffxi.get_ability_recasts()  -- Retrieves ability recast times
+    local jumpId = 158  -- ID of the first jump ability
+    local highJumpId = 159  -- ID of the second jump ability
+    local playerTP = player.tp  -- Retrieves player's TP
+
+    if playerTP < 1000 then
+        -- Check if Jump and High Jump can be used
+        if JaRecasts[jumpId] < 1 and JaRecasts[highJumpId] < 1 and playerTP < 500 then
+            -- Execute command to use both jump abilities
+            send_command(
+                string.format('input /ja "%s" <t>; wait 1; input /ja "%s" <t>', jaName1, jaName2)
+            )
+        elseif JaRecasts[jumpId] < 1 and JaRecasts[highJumpId] < 1 and playerTP > 500 and playerTP < 1000 then
+            -- Execute command to use the first jump ability
+            send_command(
+                string.format('input /ja "%s" <t>', jaName1)
+            )
+        elseif JaRecasts[jumpId] < 1 and JaRecasts[highJumpId] > 1 then
+            -- Execute command to use the first jump ability
+            send_command(
+                string.format('input /ja "%s" <t>', jaName1)
+            )
+        elseif JaRecasts[jumpId] > 1 and JaRecasts[highJumpId] < 1 then
+            -- Execute command to use the second jump ability
+            send_command(
+                string.format('input /ja "%s" <t>', jaName2)
+            )
         else
-            send_command('input /ja "Jump" <t>')
+            -- Create messages for both jump abilities and store them in the messages table
+            local message1 = createFormatMsg(nil, jaName1, JaRecasts[jumpId], nil)
+            table.insert(messages, {spell = jaName1, recast = JaRecasts[jumpId], message = message1})
+            local message2 = createFormatMsg(nil, jaName2, JaRecasts[highJumpId], nil)
+            table.insert(messages, {spell = jaName2, recast = JaRecasts[highJumpId], message = message2})
         end
-    elseif HighJumpCD < 1 and playerTP < 800 then
-        send_command('input /ja "High Jump" <t>')
-    elseif JumpCD < 1 and playerTP < 800 then
-        send_command('input /ja "Jump" <t>')
     else
-        windower.add_to_chat(123, 'You have enough TP!')
+        -- Create a message indicating that the player has enough TP and display it
+        local message = createFormatMsg('TP:', playerTP, nil, 'You have enough TP !!!')
+        add_to_chat(057, message)
     end
+    -- Check if there are messages in the table and display them
+    checkAndDisplayMessages(messages)
+end
+
+------------------------------------------------------------
+-- Function qui change le idleSet sous certaines conditions.
+------------------------------------------------------------
+function customize_idle_set(idleSet)
+    if state.HybridMode.value == 'PDT' then
+        idleSet = sets.idle.PDT
+    end
+    if state.HybridMode.value == 'Normal' then
+        idleSet = set_combine(sets.idle, sets.engaged)
+    end
+    if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
+        idleSet = sets.idle.Town
+    end
+    return idleSet
+end
+
+------------------------------------------------------------
+-- Function qui change le melee sous certaines conditions.
+------------------------------------------------------------
+function customize_melee_set(meleeSet)
+    if state.HybridMode.value == 'PDT' then
+        meleeSet = sets.engaged.PDT
+    end
+    if state.HybridMode.value == 'Normal' then
+        meleeSet = set_combine(sets.idle, sets.engaged)
+    end
+    return meleeSet
+end
+
+-- Function to handle job-specific self commands
+function job_self_command(cmdParams)
+    -- Check the input command parameters
+    if cmdParams[1] == 'Berserk' then
+        local buffDefender = buffactive['Defender']
+        -- Handle HybridMode if necessary
+        if state.HybridMode.value == 'PDT' then
+            send_command('gs c set HybridMode Normal')
+        end
+        -- Cancel Defender if active
+        if buffDefender then
+            send_command('cancel defender')
+        end
+        -- Call buffSelf with the appropriate parameter
+        buffSelf('Berserk')
+    elseif cmdParams[1] == 'Defender' then
+        local buffBerserk = buffactive['Berserk']
+        -- Handle HybridMode if necessary
+        if state.HybridMode.value == 'Normal' then
+            send_command('gs c set HybridMode PDT')
+        end
+        -- Cancel Berserk if active
+        if buffBerserk then
+            send_command('cancel berserk')
+        end
+        -- Call buffSelf with the appropriate parameter
+        buffSelf('Defender')
+    elseif cmdParams[1] == 'ThirdEye' then
+        -- Call ThirdEye function
+        ThirdEye()
+    elseif cmdParams[1] == 'Jump' then
+        -- Call Jump function
+        jump()
+    end
+end
+
+-- Handles actions to be performed when a spell is interrupted.
+-- Parameters:
+--   spell (table): The interrupted spell.
+--   eventArgs (table): Additional event arguments.
+function handleInterruptedSpell(spell, eventArgs)
+    equip(sets.idle)
+    eventArgs.handled = true
+    local message = createFormatMsg('Spell interrupted:', spell.name)
+    add_to_chat(123, message)
 end
