@@ -32,6 +32,30 @@ function user_setup()
     send_command('bind F10 gs c cycle WeaponSet')
     -- Binds F11 to cycle through sub weapon sets
     send_command('bind F11 gs c cycle SubSet')
+
+    -- OTHER SELF COMMAND Parameters to put in your in-game Macro or bind a key with it.
+    --===================================================================================
+        -- [gs c Berserk] Cast job ability with logic from WAR_FUNCTION.lua:
+            -- state.HybridMode: Normal
+            -- Berserk
+            -- Aggressor
+            -- Retaliation
+            -- Restraint
+            -- Warcry or Blood Rage
+    --===================================================================================
+        -- [gs c Defender] Cast job ability with logic from WAR_FUNCTION.lua:
+            -- state.HybridMode: PDT
+            -- Defender
+            -- Aggressor
+            -- Retaliation
+            -- Restraint
+            -- Warcry or Blood Rage
+    --===================================================================================
+        -- [gs c ThirdEye] Cast Third Eye with logic from WAR_FUNCTION.lua:
+            -- with state.HybridMode: Normal
+                -- Hasso + Third Eye
+            -- with state.HybridMode: PDT
+                -- Seigan + Third Eye
 end
 
 -- Handles the unload event when changing job or reloading the file.

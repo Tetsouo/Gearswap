@@ -66,38 +66,52 @@ end
 -- Function to handle the Third Eye ability
 function ThirdEye()
     -- Retrieve ability recasts and buff statuses
-    local allRecasts = windower.ffxi.get_ability_recasts()
-    local SeiganCD = allRecasts[139]
-    local HassoCD = allRecasts[138]
-    local ThirdEyeCD = allRecasts[133]
-    local SeiganActive = buffactive['Seigan']
-    local HassoActive = buffactive['Hasso']
-    local ThirdEyeActive = buffactive['Third Eye']
+    local messages = {}  -- Table to store messages for display
+    local allRecasts = windower.ffxi.get_ability_recasts()  -- Get all ability recasts
+    local SeiganCD = allRecasts[139]  -- Get the recast time for Seigan ability
+    local HassoCD = allRecasts[138]  -- Get the recast time for Hasso ability
+    local ThirdEyeCD = allRecasts[133]  -- Get the recast time for Third Eye ability
+    local SeiganActive = buffactive['Seigan']  -- Check if Seigan buff is active
+    local HassoActive = buffactive['Hasso']  -- Check if Hasso buff is active
+    local ThirdEyeActive = buffactive['Third Eye']  -- Check if Third Eye buff is active
 
-    -- Check if the subjob is SAM
+    -- Check if the subjob is SAM (Samurai)
     if player.sub_job == 'SAM' then
-        local isPDTMode = state.HybridMode.value == 'PDT'
+        local isPDTMode = state.HybridMode.value == 'PDT'  -- Check if HybridMode is set to PDT mode
         -- Function to activate Third Eye if conditions are met
         local function activateThirdEye()
-            if not ThirdEyeActive and ThirdEyeCD < 1 then
-                send_command('wait 1; input /ja "Third Eye" <me>')
+            if not ThirdEyeActive and ThirdEyeCD == 0 then
+                send_command('wait 1; input /ja "Third Eye" <me>')  -- Activate Third Eye ability
+            else
+                local message = createFormatMsg(nil, 'Third Eye', ThirdEyeCD)  -- Create message for Third Eye recast time
+                table.insert(messages, {spell = 'Third Eye', recast = ThirdEyeCD, message = message})  -- Insert message into messages table
+                checkAndDisplayMessages(messages)  -- Check and display messages
             end
         end
+
+        -- If in PDT mode, check if Seigan should be activated
         if isPDTMode then
-            -- Check if Seigan should be activated
-            if not SeiganActive and SeiganCD < 1 then
-                send_command('input /ja "Seigan" <me>')
-                activateThirdEye()
+            if not SeiganActive and SeiganCD == 0 then
+                send_command('input /ja "Seigan" <me>')  -- Activate Seigan ability
+                activateThirdEye()  -- Call activateThirdEye function
+            elseif SeiganActive and SeiganCD > 0 then
+                local message = createFormatMsg(nil, 'Seigan', SeiganCD)  -- Create message for Seigan recast time
+                table.insert(messages, {spell = 'Seigan', recast = SeiganCD, message = message})  -- Insert message into messages table
+                activateThirdEye()  -- Call activateThirdEye function
             else
-                activateThirdEye()
+                activateThirdEye()  -- Call activateThirdEye function
             end
         else
-            -- Check if Hasso should be activated
-            if not HassoActive and HassoCD < 1 then
-                send_command('input /ja "Hasso" <me>')
-                activateThirdEye()
+            -- If not in PDT mode, check if Hasso should be activated
+            if not HassoActive and HassoCD == 0 then
+                send_command('input /ja "Hasso" <me>')  -- Activate Hasso ability
+                activateThirdEye()  -- Call activateThirdEye function
+            elseif HassoActive and HassoCD > 0 then
+                local message = createFormatMsg(nil, 'Hasso', HassoCD)  -- Create message for Hasso recast time
+                table.insert(messages, {spell = 'Hasso', recast = HassoCD, message = message})  -- Insert message into messages table
+                activateThirdEye()  -- Call activateThirdEye function
             else
-                activateThirdEye()
+                activateThirdEye()  -- Call activateThirdEye function
             end
         end
     end
