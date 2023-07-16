@@ -102,22 +102,6 @@ function ThirdEye()
     end
 end
 
-
---[[ if playerTP < 500 then
-    send_command('input /ja "Jump" <t>; wait 1; input /ja "High Jump" <t>')
-    jaName1 = "Jump"
-    jaName2 = "High Jump"
-else
-    send_command('input /ja "Jump" <t>')
-    jaName1 = "Jump"
-end
-elseif HighJumpCD < 1 and playerTP < 800 then
-send_command('input /ja "High Jump" <t>')
-jaName1 = "High Jump"
-elseif JumpCD < 1 and playerTP < 800 then
-send_command('input /ja "Jump" <t>')
-jaName1 = "Jump" ]]
-
 -- Function to handle the Jump ability
 function jump()
     -- Initialize variables

@@ -71,15 +71,6 @@ function job_midcast(spell, action, spellMap, eventArgs)
     incapacitated(spell, eventArgs) -- Check for incapacitated state
 end
 
--- Handles actions to perform after the casting of a spell or ability.
--- Parameters:
---   spell (table): The spell that was cast
---   action (table): The action that was performed
---   spellMap (table): The spell mapping table
---   eventArgs (table): Additional event arguments
-function job_aftercast(spell, action, spellMap, eventArgs)
-end
-
 -- Sets the default macro book based on the player's sub job.
 function select_default_macro_book()
     -- If sub job is DRG
