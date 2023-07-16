@@ -11,9 +11,9 @@
 function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2).
-    include('0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management.
-    include('SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions.
-    include('WAR_FUNCTION.lua') -- Includes the WAR_FUNCTION.lua file for advanced functions specific to Warrior.
+    include('/Misc/0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management.
+    include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions.
+    include('/WAR/WAR_FUNCTION.lua') -- Includes the WAR_FUNCTION.lua file for advanced functions specific to Warrior.
 end
 
 -- Handles user-specific configuration and setup.
@@ -68,7 +68,7 @@ end
 
 -- Loads the gear sets from the PLD_SET.lua file.
 function init_gear_sets()
-    include('WAR_SET.lua')
+    include('/WAR/WAR_SET.lua')
 end
 
 -- Handles actions and checks to perform before casting a spell or ability.
