@@ -166,34 +166,37 @@ function jump()
     checkAndDisplayMessages(messages)
 end
 
-------------------------------------------------------------
--- Function qui change le idleSet sous certaines conditions.
-------------------------------------------------------------
-function customize_idle_set(idleSet)
-    if state.HybridMode.value == 'PDT' then
-        idleSet = sets.idle.PDT
+-- Customize idle_set based on the current HybridMode and the current area.
+    function customize_idle_set(idleSet)
+        -- If the HybridMode is set to 'PDT' (Physical Damage Taken), assign the 'sets.idle.PDT' equipment set to idleSet.
+        if state.HybridMode.value == 'PDT' then
+            idleSet = sets.idle.PDT
+        end
+        -- If the HybridMode is set to 'Normal', combine the 'sets.idle' and 'sets.engaged' equipment sets and assign them to idleSet.
+        if state.HybridMode.value == 'Normal' then
+            idleSet = set_combine(sets.idle, sets.engaged)
+        end
+        -- If the character is in a city area (excluding Dynamis), assign the 'sets.idle.Town' equipment set to idleSet.
+        if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
+            idleSet = sets.idle.Town
+        end
+        -- Return the modified equipment set.
+        return idleSet
     end
-    if state.HybridMode.value == 'Normal' then
-        idleSet = set_combine(sets.idle, sets.engaged)
-    end
-    if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
-        idleSet = sets.idle.Town
-    end
-    return idleSet
-end
 
-------------------------------------------------------------
--- Function qui change le melee sous certaines conditions.
-------------------------------------------------------------
-function customize_melee_set(meleeSet)
-    if state.HybridMode.value == 'PDT' then
-        meleeSet = sets.engaged.PDT
+-- -- Customize melee_set based on the current HybridMode and the current area.
+    function customize_melee_set(meleeSet)
+        -- If the HybridMode is set to 'PDT' (Physical Damage Taken), assign the 'sets.engaged.PDT' equipment set to meleeSet.
+        if state.HybridMode.value == 'PDT' then
+            meleeSet = sets.engaged.PDT
+        end
+        -- If the HybridMode is set to 'Normal', combine the 'sets.idle' and 'sets.engaged' equipment sets and assign them to meleeSet.
+        if state.HybridMode.value == 'Normal' then
+            meleeSet = set_combine(sets.idle, sets.engaged)
+        end
+        -- Return the modified equipment set.
+        return meleeSet
     end
-    if state.HybridMode.value == 'Normal' then
-        meleeSet = set_combine(sets.idle, sets.engaged)
-    end
-    return meleeSet
-end
 
 -- Function to handle job-specific self commands
 function job_self_command(cmdParams)
