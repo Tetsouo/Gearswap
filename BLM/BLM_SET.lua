@@ -8,7 +8,7 @@ StikiRing2 = {
     bag = 'wardrobe 7'
 }
 
--- Precast sets to enhance JAs
+-- Precast sets to enhance JAs.
 sets.precast.JA['Mana Wall'] = {
     feet = 'Wicce Sabots +3',
     back = "Taranus's Cape"
@@ -16,11 +16,10 @@ sets.precast.JA['Mana Wall'] = {
 
 sets.precast.JA.Manafont = {body = "Archmage's Coat +1"}
 
--- equip to maximize HP (for Tarus) and minimize MP loss before using convert
+-- equip to maximize HP (for Tarus) and minimize MP loss before using convert.
 sets.precast.JA.Convert = {}
 
--- Fast cast sets for spells
-
+-- Fast cast sets for spells.
 sets.precast.FC = {
     main = {name = 'Malevolence', augments = {'INT+7', 'Mag. Acc.+3', '"Mag.Atk.Bns."+5', '"Fast Cast"+2'}},
     sub = 'Culminus',
@@ -45,8 +44,8 @@ sets.precast.FC['Elemental Magic'] =
     set_combine(
     sets.precast.FC,
     {
-        head = 'Wicce Petasos +2',
-        body = 'Wicce Coat +2'
+        head = 'Wicce Petasos +3',
+        body = 'Wicce Coat +3'
     }
 )
 
@@ -274,7 +273,6 @@ sets.precast.WS['Spiral Hell'] = {
     }
 }
 ---- Midcast Sets ----
-
 sets.midcast.FastRecast = {
     head = 'Amalric Coif +1',
     ammo = 'Impatiens',
@@ -467,8 +465,8 @@ sets.midcast.Sleep = {
     sub = 'Ammurapi Shield',
     ammo = 'Ghastly Tathlum +1',
     head = 'C. Palug Crown',
-    body = 'Wicce Coat +2',
-    legs = 'Wicce Chausses +2',
+    body = 'Wicce Coat +3',
+    legs = 'Wicce Chausses +3',
     hands = {name = 'Amalric Gages +1', augments = {'INT+12', 'Mag. Acc.+20', '"Mag.Atk.Bns."+20'}},
     feet = {name = 'Amalric Nails +1', augments = {'Mag. Acc.+20', '"Mag.Atk.Bns."+20', '"Conserve MP"+7'}},
     neck = 'Src. Stole +2',
@@ -532,7 +530,7 @@ sets.midcast['Dark Magic'] = {
     },
     waist = 'Windbuffet Belt +1',
     legs = "Spaekona's Tonban +3",
-    feet = 'Wicce Sabots +1'
+    feet = 'Wicce Sabots +3'
 }
 
 sets.midcast.Drain = {
@@ -548,7 +546,7 @@ sets.midcast.Drain = {
         augments = {'"Mag.Atk.Bns."+30', '"Drain" and "Aspir" potency +11', 'INT+3', 'Mag. Acc.+4'}
     },
     hands = {name = 'Merlinic Dastanas', augments = {'"Drain" and "Aspir" potency +10', '"Mag.Atk.Bns."+14'}},
-    legs = 'Wicce Chausses +2',
+    legs = 'Wicce Chausses +3',
     feet = {name = 'Merlinic Crackows', augments = {'"Drain" and "Aspir" potency +10', 'INT+2'}},
     neck = 'Erra Pendant',
     waist = {name = 'Acuity Belt +1', augments = {'Path: A'}},
@@ -578,9 +576,9 @@ sets.midcast['Elemental Magic'] = {
     sub = 'Ammurapi Shield',
     ammo = 'Ghastly Tathlum +1',
     head = 'Wicce Petasos +3',
-    body = 'Wicce Coat +2',
+    body = 'Wicce Coat +3',
     hands = 'wicce gloves +3',
-    legs = 'Wicce Chausses +2',
+    legs = 'Wicce Chausses +3',
     feet = 'Wicce Sabots +3',
     neck = 'Src. Stole +2',
     waist = 'Acuity Belt +1',
@@ -665,9 +663,9 @@ sets.idle = {
     sub = 'Enki Strap',
     ammo = 'Ghastly Tathlum +1',
     head = 'Wicce Petasos +3',
-    body = 'Wicce Coat +2',
+    body = 'Wicce Coat +3',
     hands = 'wicce gloves +3',
-    legs = 'Wicce Chausses +2',
+    legs = 'Wicce Chausses +3',
     feet = 'Wicce Sabots +3',
     neck = {name = 'Loricate Torque +1', augments = {'Path: A'}},
     waist = 'Acuity Belt +1',
@@ -705,7 +703,7 @@ sets.defense.MDT = {}
 -- Buff sets: Gear that needs to be worn to actively enhance a current player buff.
 
 sets.buff['Mana Wall'] = {
-    feet = 'Wicce Sabots +1',
+    feet = 'Wicce Sabots +3',
     back = {
         name = "Taranus's Cape",
         augments = {'INT+20', 'Mag. Acc+20 /Mag. Dmg.+20', 'INT+10', '"Mag.Atk.Bns."+10', 'Damage taken-5%'}
@@ -730,9 +728,9 @@ sets.engaged = {
     sub = 'Ammurapi Shield',
     ammo = 'Ghastly Tathlum +1',
     head = 'Wicce Petasos +3',
-    body = 'Wicce Coat +2',
+    body = 'Wicce Coat +3',
     hands = 'wicce gloves +3',
-    legs = 'Wicce Chausses +2',
+    legs = 'Wicce Chausses +3',
     feet = 'Wicce Sabots +3',
     neck = 'Sanctity Necklace',
     waist = 'Windbuffet Belt +1',
