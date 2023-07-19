@@ -1,348 +1,203 @@
---test
-function BuffSelf(spell, eventArgs)
-    local allRecasts = windower.ffxi.get_spell_recasts()
-    local PhalanxCD = allRecasts[106]
-    -- PHALANX EST PRET
-    if spell.name == 'Phalanx' and (PhalanxCD < 1 and not buffactive['Phalanx']) then
-        -- PHALANX N'EST PAS PRET
-        -- STONESKIN EST PRET
-        local StoneskinCD = allRecasts[54]
-        if StoneskinCD < 1 and not buffactive['Stoneskin'] then
-            send_command('wait 4; input /ma "Stoneskin" <me>')
-            -- BLINK EST PRET
-            local BlinkCD = allRecasts[53]
-            if BlinkCD < 1 and not buffactive['Blink'] then
-                send_command('wait 9; input /ma "Blink" <me>')
-                -- AQUAVEIL EST PRET
-                local AquaveilCD = allRecasts[55]
-                if AquaveilCD < 1 and not buffactive['Aquaveil'] then
-                    send_command('wait 14; input /ma "Aquaveil" <me>')
-                    -- SHOCK SPIKES EST PRET
-                    local ShockSpikeCD = allRecasts[251]
-                    if ShockSpikeCD < 1 and not buffactive['Shock Spikes'] then
-                        send_command('wait 19; input /ma "Shock Spikes" <me>')
-                    end
+--============================================================--
+--=                    BLM_FUNCTION                          =--
+--============================================================--
+--=                    Author: Tetsouo                       =--
+--=                     Version: 1.0                         =--
+--=                  Created: 2023-07-10                     =--
+--=               Last Modified: 2023-07-18                  =--
+--============================================================--
+
+
+-- This function buffs the player with certain spells based on their recast time and current buffs.
+    local function BuffSelf()
+        -- Retrieve the spell recast times.
+        local SpellRecasts = windower.ffxi.get_spell_recasts()
+        -- Define an array of spells with their respective recasts and delays.
+        local spells = {
+            {name = 'Phalanx', recast = SpellRecasts[106], delay = 0},
+            {name = 'Stoneskin', recast = SpellRecasts[54], delay = 5},
+            {name = 'Blink', recast = SpellRecasts[53], delay = 5},
+            {name = 'Aquaveil', recast = SpellRecasts[55], delay = 5},
+            {name = 'Shock Spikes', recast = SpellRecasts[251], delay = 5}
+        }
+        -- Initialize variables for spell delay, ready spell, and delayed spells.
+        local spellDelay = 0
+        local readySpell = nil
+        local delayedSpells = {}
+
+        -- Iterate over the spells array.
+        for _, spell in ipairs(spells) do
+            -- Check if the buff is currently active.
+            local buffActive = buffactive[spell.name]
+            -- Retrieve the spell recast time.
+            local spellRecast = spell.recast
+            -- Set the spell delay.
+            spellDelay = spell.delay
+            -- Check if the buff is not active and the spell is off recast.
+            if not buffActive and spellRecast < 1 then
+                -- If there is no ready spell, set the current spell as the ready spell.
+                if not readySpell then
+                    readySpell = spell
+                else
+                    -- Otherwise, add the current spell to the delayed spells.
+                    table.insert(delayedSpells, spell)
                 end
             end
         end
-    elseif spell.name == 'Phalanx' and (PhalanxCD > 1 or buffactive['Phalanx']) then
-        cancel_spell()
-        eventArgs.handled = true
-        local StoneskinCD = allRecasts[54]
-        if StoneskinCD < 1 and not buffactive['Stoneskin'] then
-            send_command('input /ma "Stoneskin" <me>')
-            -- BLINK EST PRET
-            local BlinkCD = allRecasts[53]
-            if BlinkCD < 1 and not buffactive['Blink'] then
-                send_command('wait 5; input /ma "Blink" <me>')
-                -- AQUAVEIL EST PRET
-                local AquaveilCD = allRecasts[55]
-                if AquaveilCD < 1 and not buffactive['Aquaveil'] then
-                    send_command('wait 10; input /ma "Aquaveil" <me>')
-                    -- SHOCK SPIKES EST PRET
-                    local ShockSpikeCD = allRecasts[251]
-                    if ShockSpikeCD < 1 and not buffactive['Shock Spikes'] then
-                        send_command('wait 15; input /ma "Shock Spikes" <me>')
-                    end
-                end
-            end
-        elseif StoneskinCD > 1 or buffactive['Stoneskin'] then
-            cancel_spell()
-            -- BLINK EST PRET
-            local BlinkCD = allRecasts[53]
-            if BlinkCD < 1 and not buffactive['Blink'] then
-                send_command('input /ma "Blink" <me>')
-                -- AQUAVEIL EST PRET
-                local AquaveilCD = allRecasts[55]
-                if AquaveilCD < 1 and not buffactive['Aquaveil'] then
-                    send_command('wait 5; input /ma "Aquaveil" <me>')
-                    -- SHOCK SPIKES EST PRET
-                    local ShockSpikeCD = allRecasts[251]
-                    if ShockSpikeCD < 1 and not buffactive['Shock Spikes'] then
-                        send_command('wait 10; input /ma "Shock Spikes" <me>')
-                    end
-                end
-            elseif BlinkCD > 1 or buffactive['Blink'] then
-                cancel_spell()
-                -- AQUAVEIL EST PRET
-                local AquaveilCD = allRecasts[55]
-                if AquaveilCD < 1 and not buffactive['Aquaveil'] then
-                    send_command('input /ma "Aquaveil" <me>')
-                    -- SHOCK SPIKES EST PRET
-                    local ShockSpikeCD = allRecasts[251]
-                    if ShockSpikeCD < 1 and not buffactive['Shock Spikes'] then
-                        send_command('wait 5; input /ma "Shock Spikes" <me>')
-                    end
-                elseif AquaveilCD > 1 or buffactive['Aquaveil'] then
-                    cancel_spell()
-                    -- SHOCK SPIKES EST PRET
-                    local ShockSpikeCD = allRecasts[251]
-                    if ShockSpikeCD < 1 and not buffactive['Shock Spikes'] then
-                        send_command('input /ma "Shock Spikes" <me>')
-                    elseif ShockSpikeCD > 1 or buffactive['Shock Spikes'] then
-                        cancel_spell()
-                    end
-                end
-            end
+
+        -- If there is a ready spell, cast it on the player.
+        if readySpell then
+            send_command('input /ma "' .. readySpell.name .. '" <me>')
         end
-    end
-end
 
-function refine_various_spells(spell, action, spellMap, eventArgs)
-    aspirs = S {'Aspir', 'Aspir II', 'Aspir III'}
-    breakgas = {'Breakga', 'Break'}
-    sleeps = S {'Sleep II', 'Sleep'}
-    banish = S {'Banish II', 'Banish'}
-    sleepgas = S {'Sleepga II', 'Sleepga'}
-    nukes = S {'Fire','Blizzard','Aero','Stone','Thunder','Water',
-        'Fire II','Blizzard II','Aero II','Stone II','Thunder II','Water II',
-        'Fire III','Blizzard III','Aero III','Stone III','Thunder III','Water III',
-        'Fire IV','Blizzard IV','Aero IV','Stone IV','Thunder IV','Water IV',
-        'Fire V','Blizzard V','Aero V','Stone V','Thunder V','Water V',
-        'Fire VI','Blizzard VI','Aero VI','Stone VI','Thunder VI','Water VI',
-        'Firaga','Blizzaga','Aeroga','Stonega','Thundaga','Waterga',
-        'Firaga II','Blizzaga II','Aeroga II','Stonega II','Thundaga II','Waterga II',
-        'Firaga III','Blizzaga III','Aeroga III','Stonega III','Thundaga III','Waterga III',
-        'Firaja','Blizzaja','Aeroja','Stoneja','Thundaja','Waterja'}
+        -- Iterate over the delayed spells.
+        for _, spell in ipairs(delayedSpells) do
+            -- Wait for the spell delay, then cast the spell on the player.
+            send_command('wait ' .. spellDelay .. '; input /ma "' .. spell.name .. '" <me>')
+            -- Update the spell delay for the next delayed spell.
+            spellDelay = spellDelay + spell.delay
+        end
+    end    
 
-    if
-        not sleepgas:contains(spell.english) and not banish:contains(spell.english) and
-            not sleeps:contains(spell.english) and
-            not aspirs:contains(spell.english) and
-            not nukes:contains(spell.english)
-    then
-        return
-    end
-
+-- Refines various spells based on certain conditions.
+-- Parameters:
+--   spell (table): The original spell.
+--   eventArgs (table): Additional event arguments.
+function refine_various_spells(spell, eventArgs)
+    -- Copy the English name of the spell to a new variable.
     local newSpell = spell.english
+    -- Retrieve the spell recasts and player's MP.
     local spell_recasts = windower.ffxi.get_spell_recasts()
-    local cancelling = 'All ' .. spell.english .. ' spells are on cooldown. Cancelling spell casting.'
+    local player_mp = player.mp
+    -- Define a table that maps spell categories and levels to replacement spells.
+    local spellCorrespondence = {
+        Fire = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
+        Blizzard = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
+        Aero = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
+        Stone = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
+        Thunder = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
+        Water = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
+        Sleepga = {['II'] = {replace = ''}},
+        Sleep = {['II'] = {replace = ''}},
+        Aspir = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}}
+    }
 
-    if spell.name == 'Fire VI' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 400 then
-            newSpell = 'Fire V'
+    -- Determines if the spell should be replaced.
+    -- It takes the spell's name as a parameter and returns a boolean value.
+    local function shouldReplaceSpell(spellName)
+        -- Extract the spell category and level from the spell name using pattern matching.
+        local spellCategory, spellLevel = spellName:match('(%a+)%s*(%a*)')
+
+        -- Check if the spell category has corresponding replacements.
+        local correspondence = spellCorrespondence[spellCategory]
+        if correspondence then
+            -- Check if the spell level has a replacement.
+            local replacement = correspondence[spellLevel]
+            if replacement then
+                -- Check if the spell is on recast or if the player has insufficient MP.
+                if spell_recasts[spell.recast_id] > 0 then
+                    return true
+                elseif player_mp < spell.mp_cost then
+                    return true
+                end
+            end
         end
-    elseif spell.name == 'Fire V' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 300 then
-            newSpell = 'Fire IV'
-        end
-    elseif spell.name == 'Fire IV' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 200 then
-            newSpell = 'Fire III'
-        end
-    elseif spell.name == 'Fire III' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 100 then
-            newSpell = 'Fire II'
-        end
-    elseif spell.name == 'Fire II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 50 then
-            newSpell = 'Fire'
+        return false
+    end
+
+    -- Displays a message indicating that the spell cannot be cast.
+    -- It takes the name of the spell as a parameter.
+    local function recastMessage(nameSpell)
+        -- Construct the message with special characters and variables.
+        local message =
+            string.char(0x1F, 161) .. 'Cannot cast spell: [' ..
+            string.char(0x1F, 057) .. nameSpell ..
+            string.char(0x1F, 161) .. ']' ..
+            ' Not enough Mana: ' .. '('..
+            string.char(0x1F, 057) .. player_mp .. 'MP' ..
+            string.char(0x1F, 161) ..')'..
+            '\n' ..
+            string.char(0x1F, SEPARATOR) .. '================================================='
+        -- Display the message in the chat window.
+        windower.add_to_chat(123, message)
+    end
+
+    -- Check if the spell should be replaced.
+    if shouldReplaceSpell(spell.name) then
+        -- Extract the spell category and level from the spell name.
+        local spellCategory, spellLevel = spell.name:match('(%a+)%s*(%a*)')
+        -- Retrieve the replacement spell from the correspondence table.
+        local correspondence = spellCorrespondence[spellCategory]
+        local replacement = correspondence[spellLevel].replace
+        if replacement == '' then
+            -- If there is no replacement, set the new spell to the spell category.
+            newSpell = spellCategory
+            if newSpell ~= 'Aspir' then
+                -- For spells other than 'Aspir', check if the player has sufficient MP to cast.
+                if player_mp < 9 then
+                    -- Cancel the spell, display the recast message, and return.
+                    cancel_spell()
+                    recastMessage(newSpell)
+                    return
+                end
+            else
+                -- For 'Aspir', check if the player has sufficient MP to cast.
+                if player_mp < 10 then
+                    -- Cancel the spell, display the recast message, and return.
+                    cancel_spell()
+                    recastMessage(newSpell)
+                    return
+                end
+            end
+        else
+            -- If there is a replacement, set the new spell to the category and replacement level.
+            newSpell = spellCategory .. ' ' .. replacement
         end
     end
 
-    if spell.name == 'Blizzard VI' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 400 then
-            newSpell = 'Blizzard V'
-        end
-    elseif spell.name == 'Blizzard V' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 300 then
-            newSpell = 'Blizzard IV'
-        end
-    elseif spell.name == 'Blizzard IV' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 200 then
-            newSpell = 'Blizzard III'
-        end
-    elseif spell.name == 'Blizzard III' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 100 then
-            newSpell = 'Blizzard II'
-        end
-    elseif spell.name == 'Blizzard II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 50 then
-            newSpell = 'Blizzard'
-        end
-    end
-
-    if spell.name == 'Aero VI' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 400 then
-            newSpell = 'Aero V'
-        end
-    elseif spell.name == 'Aero V' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 300 then
-            newSpell = 'Aero IV'
-        end
-    elseif spell.name == 'Aero IV' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 200 then
-            newSpell = 'Aero III'
-        end
-    elseif spell.name == 'Aero III' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 100 then
-            newSpell = 'Aero II'
-        end
-    elseif spell.name == 'Aero II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 50 then
-            newSpell = 'Aero'
-        end
-    end
-
-    if spell.name == 'Stone VI' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 400 then
-            newSpell = 'Stone V'
-        end
-    elseif spell.name == 'Stone V' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 300 then
-            newSpell = 'Stone IV'
-        end
-    elseif spell.name == 'Stone IV' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 200 then
-            newSpell = 'Stone III'
-        end
-    elseif spell.name == 'Stone III' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 100 then
-            newSpell = 'Stone II'
-        end
-    elseif spell.name == 'Stone II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 50 then
-            newSpell = 'Stone'
-        end
-    end
-
-    if spell.name == 'Thunder VI' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 400 then
-            newSpell = 'Thunder V'
-        end
-    elseif spell.name == 'Thunder V' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 300 then
-            newSpell = 'Thunder IV'
-        end
-    elseif spell.name == 'Thunder IV' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 200 then
-            newSpell = 'Thunder III'
-        end
-    elseif spell.name == 'Thunder III' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 100 then
-            newSpell = 'Thunder II'
-        end
-    elseif spell.name == 'Thunder II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 50 then
-            newSpell = 'Thunder'
-        end
-    end
-
-    if spell.name == 'Water VI' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 400 then
-            newSpell = 'Water V'
-        end
-    elseif spell.name == 'Water V' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 300 then
-            newSpell = 'Water IV'
-        end
-    elseif spell.name == 'Water IV' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 200 then
-            newSpell = 'Water III'
-        end
-    elseif spell.name == 'Water III' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 100 then
-            newSpell = 'Water II'
-        end
-    elseif spell.name == 'Water II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 50 then
-            newSpell = 'Water'
-        end
-    end
-
-    if spell.name == 'Sleepga II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 58 then
-            newSpell = 'Sleepga'
-        end
-    end
-
-    if spell.name == 'Sleep II' then
-        if spell_recasts[spell.recast_id] > 0 or player.mp < 29 then
-            newSpell = 'Sleep'
-        end
-    end
-
-    if spell.name == 'Aspir III' then
-        if spell_recasts[spell.recast_id] > 0 then
-            newSpell = 'Aspir II'
-        end
-    elseif spell.name == 'Aspir II' then
-        if spell_recasts[spell.recast_id] > 0 then
-            newSpell = 'Aspir'
-        end
-    end
-
+    -- If the new spell is different from the original English name, cast the new spell.
     if newSpell ~= spell.english then
+        -- Construct the command to cast the new spell with the appropriate target.
         send_command('@input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
+        -- Cancel the event to prevent the original spell from being cast.
         eventArgs.cancel = true
-        return
     end
 end
 
+-- Customizes the idle gear set based on specific conditions.
+-- Parameters:
+--   idleSet (table): The base idle gear set to be customized.
 function customize_idle_set(idleSet)
-    if player.tp > 2950 then
-        idleSet = set_combine(idleSet, sets.TPdown)
-    end
-    if player.mpp < 51 then
-        idleSet = set_combine(idleSet, sets.latent_refresh)
-    end
-    state.Buff['Mana Wall'] = buffactive['Mana Wall'] or false
-    if state.Buff['Mana Wall'] then
+    -- Check if the "Manawall" condition is true.
+    if Manawall then
+        -- If "Manawall" is true, combine the base idle set with the "PDT" (Physical Damage Taken) idle set.
         idleSet = set_combine(idleSet, sets.idle.PDT)
     end
+    -- Return the customized idle gear set.
     return idleSet
 end
 
-function job_precast(spell, action, spellMap, eventArgs)
-    BuffSelf(spell, eventArgs)
-    refine_various_spells(spell, action, spellMap, eventArgs)
+-- Handles actions to be performed when a spell is interrupted.
+-- Parameters:
+--   spell (table): The interrupted spell.
+--   eventArgs (table): Additional event arguments.
+function handleInterruptedSpell(spell, eventArgs)
+    -- Equip the idle gear set.
+    equip(sets.idle)
+    -- Set the "handled" field of eventArgs to true.
+    eventArgs.handled = true
+    -- Create a formatted message indicating that the spell was interrupted.
+    local message = createFormatMsg('Spell interrupted:', spell.name)
+    -- Add the message to the chat log.
+    add_to_chat(123, message)
 end
 
--- Met eventArgs.handled sur true si on ne veut pas que l'equipement soit changé automatiquement.
-function job_midcast(spell, action, spellMap, eventArgs)
-end
-
--- Ce lance après que midcast normal soit terminé.
--- eventArgs est le même que que celui utilisé dans le job_midcast, dans le cas ou l'on voudrait que l'information soit persisté.
-function job_post_midcast(spell, action, spellMap, eventArgs)
-    if spell.action_type == 'Magic' then
-        if buffactive.silence then -- Annule la magie ou le Ninjutsu si on est Silence ou trop loin.
-            cancel_spell()
-            add_to_chat(123, spell.name .. ' Canceled: [Silenced]')
-            return
-        else
-            if player.tp > 200 or buffactive['Aftermath: Lv.2'] then
-                disable('main', 'sub')
-            end
-        end
-    end
-
-    function job_aftercast(spell, action, spellMap, eventArgs)
-    end
-
-    if spellMap == 'Cure' and spell.target.type == 'SELF' and sets.self_healing then
-        equip(sets.self_healing)
-    end
-
-    if spell.skill == 'Elemental Magic' then
-        if gearswap.res.weather[world.weather_id].intensity == 2 and not string.find(spell.english, 'helix') then
-            equip({waist = 'Hachirin-No-Obi'})
-            add_to_chat(8, '----- Obi Equipped. -----')
-        end
-        if player.target.distance then
-            target_distance = math.floor(player.target.distance * 10) / 10
-        else
-            target_distance = 0
-        end
-        if target_distance > 13 then
-            equip({waist = 'Acuity Belt +1'})
-        end
-    end
-
-    if spell.skill == 'Elemental Magic' then
-        if spell.english == 'Impact' then
-            equip({body = 'Twilight Cloak'})
-        else
-        end
+-- Handles custom commands specific to the job.
+-- Parameters:
+--   cmdParams (table): The command parameters
+--   eventArgs (table): Additional event arguments
+function job_self_command(cmdParams)
+    if cmdParams[1]:lower() == 'buffself' then
+        BuffSelf()
     end
 end

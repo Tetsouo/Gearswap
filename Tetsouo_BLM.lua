@@ -20,7 +20,8 @@ end
 -- Handles user-specific configuration and setup.
 function user_setup()
     -- Hybrid mode options: 'MagicBurst', 'Normal'
-    state.CastingMode:options('MagicBurst', 'Normal') -- Command to change Casting mode: /console gs c cycle CastmingMode
+    state.CastingMode:options('MagicBurst', 'Normal') -- Command to change Casting mode: /console gs c cycle CastingMode
+    Manawall = buffactive['Mana Wall'] or false
     select_default_macro_book()
     -- Binds F9 to cycle through Casting Mode
     send_command('bind F9 gs c cycle CastmingMode')
@@ -47,6 +48,7 @@ function job_precast(spell, action, spellMap, eventArgs)
     if incapacitated(spell, eventArgs, true) then
         -- Spell cannot be cast due to incapacitation, no further actions needed
     else
+        refine_various_spells(spell, eventArgs)
         checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
     end
 end
@@ -73,17 +75,9 @@ end
 
 -- Sets the default macro book based on the player's sub job.
 function select_default_macro_book()
-    -- If sub job is WHM
-    if player.sub_job == 'WHM' then
-        set_macro_page(1, 9)
-        send_command('wait 25;input /lockstyleset 14')
     -- If sub job is RDM
-    elseif player.sub_job == 'RDM' then
-        set_macro_page(1, 10)
-        send_command('wait 25;input /lockstyleset 14')
-    -- If sub job is SCH
-    elseif player.sub_job == 'SCH' then
-        set_macro_page(1, 11)
+    if player.sub_job == 'RDM' then
+        set_macro_page(10, 9)
         send_command('wait 25;input /lockstyleset 14')
     -- For other sub jobs
     else

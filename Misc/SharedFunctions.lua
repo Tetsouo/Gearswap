@@ -120,30 +120,29 @@ function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     end
 end
 
--- Handles the recast cooldown for spells and abilities and displays appropriate messages.
--- Parameters:
---   spell (table): The spell or ability being used.
---   eventArgs (table): Additional event arguments.
 function checkDisplayCooldown(spell, eventArgs)
-    -- Check if the action type is not "Weapon Skill"
-    if spell.action_type ~= 'Weapon Skill' then
-        -- Retrieve the recast time of the spell or ability
-        local recast = 0
-        if spell.action_type == 'Magic' then
-            recast = windower.ffxi.get_spell_recasts()[spell.id] / 60 -- Convert milliseconds to seconds
-        elseif spell.action_type == 'Ability' then
-            recast = windower.ffxi.get_ability_recasts()[spell.recast_id] -- Recasts are already in seconds
-        end
-        -- Check if the recast value is not nil
-        if recast and recast > 0 then
-            cancel_spell()
-            eventArgs.handled = true
-            -- Format and display the recast message
-            local message = createFormatMsg(nil, spell.name, recast, nil)
-            add_to_chat(123, message)
+    if not spell.skill == 'Elemental Magic' then
+        -- Check if the action type is not "Weapon Skill" and is not elemental
+        if spell.action_type ~= 'Weapon Skill'then
+            -- Retrieve the recast time of the spell or ability
+            local recast = 0
+            if spell.action_type == 'Magic' then
+                recast = windower.ffxi.get_spell_recasts()[spell.id] / 60 -- Convert milliseconds to seconds
+            elseif spell.action_type == 'Ability' then
+                recast = windower.ffxi.get_ability_recasts()[spell.recast_id] -- Recasts are already in seconds
+            end
+            -- Check if the recast value is not nil
+            if recast and recast > 0 then
+                cancel_spell()
+                eventArgs.handled = true
+                -- Format and display the recast message
+                local message = createFormatMsg(nil, spell.name, recast, nil)
+                add_to_chat(123, message)
+            end
         end
     end
 end
+
 
 -- Function to handle a command for gearswap Lua script
 function handleCommand(spellTable)
@@ -305,7 +304,9 @@ end
 -- Checks the current main weapon set and equips the corresponding gear.
 local function check_weaponset()
     -- Equip the gear set based on the current state of the WeaponSet
-    equip(sets[state.WeaponSet.current])
+    if player.main_job ~= 'BLM' then
+        equip(sets[state.WeaponSet.current])
+    end
 end
 
 -- Checks the current sub weapon set and equips the corresponding gear.
@@ -365,7 +366,6 @@ end
 --   spell (table): The completed spell.
 function handleCompletedSpell(spell, eventArgs)
     -- Perform appropriate actions after the spell is completed normally
-    eventArgs.handled = true
 end
 
 -- Handles equipment and actions based on changes in buffs.

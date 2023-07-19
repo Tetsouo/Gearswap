@@ -710,10 +710,6 @@ sets.buff['Mana Wall'] = {
     }
 }
 
-sets.TPdown = {neck = 'Chrysopoeia torque'}
-
-sets.latent_refresh = {waist = 'Fucho-no-obi'}
-
 -- Resting sets
 sets.resting = set_combine(sets.idle, {})
 

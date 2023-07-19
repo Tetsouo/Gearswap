@@ -77,7 +77,7 @@ function ThirdEye()
 
     -- Check if the subjob is SAM (Samurai)
     if player.sub_job == 'SAM' then
-        local isPDTMode = state.HybridMode.value == 'PDT'  -- Check if HybridMode is set to PDT mode
+        local isPDTMode = state.HybridMode.value == 'Normal'  -- Check if HybridMode is set to PDT mode
         -- Function to activate Third Eye if conditions are met
         local function activateThirdEye()
             if not ThirdEyeActive and ThirdEyeCD == 0 then
@@ -205,7 +205,7 @@ function job_self_command(cmdParams)
         local buffDefender = buffactive['Defender']
         -- Handle HybridMode if necessary
         if state.HybridMode.value == 'PDT' then
-            send_command('gs c set HybridMode Normal')
+            send_command('gs c set HybridMode PDT')
         end
         -- Cancel Defender if active
         if buffDefender then

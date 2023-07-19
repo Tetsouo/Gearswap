@@ -1,10 +1,10 @@
 --============================================================--
---=                    PALADIN_FUNCTION                      =--
+--=                    PLD_FUNCTION                          =--
 --============================================================--
 --=                    Author: Tetsouo                       =--
 --=                     Version: 1.0                         =--
 --=                  Created: 2023-07-10                     =--
---=               Last Modified: 2023-07-13                  =--
+--=               Last Modified: 2023-07-18                  =--
 --============================================================--
 
 -- A table containing the spell IDs and names for single target spells.
