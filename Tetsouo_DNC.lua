@@ -63,7 +63,7 @@ function init_gear_sets()
     sets['Centovente'] = {sub = 'Centovente'}
     sets['Blurred'] = {sub = 'Blurred Knife +1'}
     sets['Gleti'] = {sub = "Gleti's Knife"}
-    include('DncSet')
+    include('DNC_SET.lua')
 end
 
 -------------------------------------------------------------------------------------------------------------------

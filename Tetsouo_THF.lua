@@ -80,7 +80,7 @@ function init_gear_sets()
     sets['Blurred'] = {sub = 'Blurred Knife +1'}
     sets['Gleti'] = {sub = "Gleti's Knife"}
     sets['Sickle'] = {main = 'Lost Sickle'}
-    include('ThfSet.lua')
+    include('THF_SET.lua')
 end
 
 -- *******************************************************************************************************************************************
