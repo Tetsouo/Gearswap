@@ -297,7 +297,7 @@ function incapacitated(spell, eventArgs, cancel)
             cancel_spell()
             eventArgs.handled = true
             equip(sets.idle)
-            local message = createFormatMsg('Cannot Use: ', spell.name, nil, value)
+            local message = createFormatMsg('Cannot Use:', spell.name, nil, value)
             add_to_chat(167, message)
             return true, value
         end
