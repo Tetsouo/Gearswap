@@ -7,10 +7,8 @@
 --=               Last Modified: 2023-07-13                  =--
 --============================================================--
 
--- Shared Variables
-spellLanded = ''
-
 -- List of colors for objects in messages
+-- Color can be found in directory Misc/Color.png
 PUNCTUATION = 161 -- Color for punctuation marks
 SPELLANDRECAST = 057 -- Color for spell names and recast timers
 SEPARATOR = 161 -- Color for separators
