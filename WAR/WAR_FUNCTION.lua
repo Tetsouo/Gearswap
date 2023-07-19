@@ -1,3 +1,12 @@
+--============================================================--
+--=                    WAR_FUNCTION                          =--
+--============================================================--
+--=                    Author: Tetsouo                       =--
+--=                     Version: 1.0                         =--
+--=                  Created: 2023-07-10                     =--
+--=               Last Modified: 2023-07-18                  =--
+--============================================================--
+
 -- Table containing the equipment sets for each Job Ability
 local abilityEquipment = {
     Berserk = {body = 'Pumm. Lorica +3', feet = 'Agoge Calligae +3'},
