@@ -102,9 +102,9 @@ end
 function select_default_macro_book()
     -- If sub job is WAR
     if player.sub_job == 'WAR' then
-        -- If sub job is BLU
         set_macro_page(1, 21) -- Set macro book page 1, macro 21 for sub job WAR
         send_command('wait 20; input /lockstyleset 4') -- Lockstyle command for sub job WAR
+        -- If sub job is BLU
     elseif player.sub_job == 'BLU' then
         set_macro_page(1, 23) -- Set macro book page 1, macro 22 for sub job BLU
         send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
