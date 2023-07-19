@@ -143,23 +143,11 @@ function checkDisplayCooldown(spell, eventArgs)
             cancel_spell()
             eventArgs.handled = true
             -- Format and display the recast message
-            local message = createFormattedCooldownMessage(spell.name, recast)
+            local message = createFormatMsg(nil,spell.name, recast)
             add_to_chat(123, message)
         end
     end
 end
-
--- Formats a cooldown message.
--- Parameters:
---   spellName (string): The name of the spell or ability.
---   recastTime (number): The recast time in seconds.
--- Returns:
---   The formatted cooldown message.
-function createFormattedCooldownMessage(spellName, recastTime)
-    local message = string.format("Spell/Ability: %s\nRecast Time: %.1f seconds", spellName, recastTime)
-    return message
-end
-
 
 -- Function to handle a command for gearswap Lua script
 function handleCommand(spellTable)
