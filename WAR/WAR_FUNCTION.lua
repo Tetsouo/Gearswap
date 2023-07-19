@@ -74,10 +74,11 @@ function ThirdEye()
     local SeiganActive = buffactive['Seigan']  -- Check if Seigan buff is active
     local HassoActive = buffactive['Hasso']  -- Check if Hasso buff is active
     local ThirdEyeActive = buffactive['Third Eye']  -- Check if Third Eye buff is active
-
+    local BerserkActive = buffactive['Berserk']  -- Check if Third Eye buff is active
+    local DefenderActive = buffactive['Defender']  -- Check if Third Eye buff is active
+    
     -- Check if the subjob is SAM (Samurai)
     if player.sub_job == 'SAM' then
-        local isPDTMode = state.HybridMode.value == 'Normal'  -- Check if HybridMode is set to PDT mode
         -- Function to activate Third Eye if conditions are met
         local function activateThirdEye()
             if not ThirdEyeActive and ThirdEyeCD == 0 then
@@ -89,30 +90,27 @@ function ThirdEye()
             end
         end
 
-        -- If in PDT mode, check if Seigan should be activated
-        if isPDTMode then
-            if not SeiganActive and SeiganCD == 0 then
-                send_command('input /ja "Seigan" <me>')  -- Activate Seigan ability
-                activateThirdEye()  -- Call activateThirdEye function
-            elseif SeiganActive and SeiganCD > 0 then
-                local message = createFormatMsg(nil, 'Seigan', SeiganCD)  -- Create message for Seigan recast time
-                table.insert(messages, {spell = 'Seigan', recast = SeiganCD, message = message})  -- Insert message into messages table
-                activateThirdEye()  -- Call activateThirdEye function
-            else
-                activateThirdEye()  -- Call activateThirdEye function
-            end
+    local function checkSeiganOrHasso(active, CD, ability)
+        if not active and CD == 0 then
+            send_command('input /ja ' .. ability .. ' <me>')  -- Activate Seigan ability
+            activateThirdEye()  -- Call activateThirdEye function
+        elseif SeiganActive and SeiganCD > 0 then
+            local message = createFormatMsg(nil, ability, CD)  -- Create message for Seigan recast time
+            table.insert(messages, {spell = ability, recast = CD, message = message})  -- Insert message into messages table
+            activateThirdEye()  -- Call activateThirdEye function
         else
-            -- If not in PDT mode, check if Hasso should be activated
-            if not HassoActive and HassoCD == 0 then
-                send_command('input /ja "Hasso" <me>')  -- Activate Hasso ability
-                activateThirdEye()  -- Call activateThirdEye function
-            elseif HassoActive and HassoCD > 0 then
-                local message = createFormatMsg(nil, 'Hasso', HassoCD)  -- Create message for Hasso recast time
-                table.insert(messages, {spell = 'Hasso', recast = HassoCD, message = message})  -- Insert message into messages table
-                activateThirdEye()  -- Call activateThirdEye function
-            else
-                activateThirdEye()  -- Call activateThirdEye function
-            end
+            activateThirdEye()  -- Call activateThirdEye function
+        end
+    end
+
+
+        -- If in Defender, check if Seigan should be activated
+        if DefenderActive then
+            checkSeiganOrHasso(SeiganActive, SeiganCD, "Seigan")
+        elseif BerserkActive then
+            checkSeiganOrHasso(HassoActive, HassoCD, "Hasso")
+        else
+            checkSeiganOrHasso(HassoActive, HassoCD, "Hasso")
         end
     end
 end
@@ -203,10 +201,6 @@ function job_self_command(cmdParams)
     -- Check the input command parameters
     if cmdParams[1] == 'Berserk' then
         local buffDefender = buffactive['Defender']
-        -- Handle HybridMode if necessary
-        if state.HybridMode.value == 'PDT' then
-            send_command('gs c set HybridMode PDT')
-        end
         -- Cancel Defender if active
         if buffDefender then
             send_command('cancel defender')

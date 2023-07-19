@@ -120,27 +120,44 @@ function createFormatMsg(startMsg, spellName, recast, endMsg, isLast)
     end
 end
 
+-- Checks and displays the cooldown for a spell or ability.
+-- Parameters:
+--   spell (table): The spell or ability being checked.
+--   eventArgs (table): Additional event arguments.
 function checkDisplayCooldown(spell, eventArgs)
-    if not spell.skill == 'Elemental Magic' then
-        -- Check if the action type is not "Weapon Skill" and is not elemental
-        if spell.action_type ~= 'Weapon Skill'then
-            -- Retrieve the recast time of the spell or ability
-            local recast = 0
-            if spell.action_type == 'Magic' then
-                recast = windower.ffxi.get_spell_recasts()[spell.id] / 60 -- Convert milliseconds to seconds
-            elseif spell.action_type == 'Ability' then
-                recast = windower.ffxi.get_ability_recasts()[spell.recast_id] -- Recasts are already in seconds
-            end
-            -- Check if the recast value is not nil
-            if recast and recast > 0 then
-                cancel_spell()
-                eventArgs.handled = true
-                -- Format and display the recast message
-                local message = createFormatMsg(nil, spell.name, recast, nil)
-                add_to_chat(123, message)
-            end
+    -- Check if the skill is Elemental Magic
+    if spell.skill == 'Elemental Magic' then
+        return  -- Skip cooldown check for Elemental Magic spells
+    end
+    -- Check if the action type is not "Weapon Skill" and is not elemental
+    if spell.action_type ~= 'Weapon Skill' then
+        -- Retrieve the recast time of the spell or ability
+        local recast = 0
+        if spell.action_type == 'Magic' then
+            recast = windower.ffxi.get_spell_recasts()[spell.id] / 60  -- Convert milliseconds to seconds
+        elseif spell.action_type == 'Ability' then
+            recast = windower.ffxi.get_ability_recasts()[spell.recast_id]  -- Recasts are already in seconds
+        end
+        -- Check if the recast value is not nil and greater than 0
+        if recast and recast > 0 then
+            cancel_spell()
+            eventArgs.handled = true
+            -- Format and display the recast message
+            local message = createFormattedCooldownMessage(spell.name, recast)
+            add_to_chat(123, message)
         end
     end
+end
+
+-- Formats a cooldown message.
+-- Parameters:
+--   spellName (string): The name of the spell or ability.
+--   recastTime (number): The recast time in seconds.
+-- Returns:
+--   The formatted cooldown message.
+function createFormattedCooldownMessage(spellName, recastTime)
+    local message = string.format("Spell/Ability: %s\nRecast Time: %.1f seconds", spellName, recastTime)
+    return message
 end
 
 
