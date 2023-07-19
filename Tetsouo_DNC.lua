@@ -14,17 +14,6 @@ end
 function job_setup()
     include('0_AutoMove.lua')
     include('Mote-TreasureHunter')
-    state.CapacityMode = M(false, 'Capacity Point Mantle')
-    state.Buff['Climactic Flourish'] = buffactive['climactic flourish'] or false
-    state.Buff['Building Flourish'] = buffactive['building flourish'] or false
-    state.Buff['Ternary Flourish'] = buffactive['ternary flourish'] or false
-    state.MainStep = M {['description'] = 'Main Step', 'Box Step', 'Quickstep', 'Stutter Step', 'Feather Step'}
-    state.AltStep = M {['description'] = 'Alt Step', 'Feather Step', 'Quickstep', 'Stutter Step', 'Box Step'}
-    state.UseAltStep = M(true, 'Use Alt Step')
-    state.SelectStepTarget = M(true, 'Select Step Target')
-    state.CurrentStep = M {['description'] = 'Current Step', 'Main', 'Alt'}
-    state.SkillchainPending = M(false, 'Skillchain Pending')
-
     determine_haste_group()
 
     --______________________________________________________________________________________
@@ -47,7 +36,15 @@ function user_setup()
     state.TreasureMode:set('none')
     state.WeaponSet = M {['description'] = 'Main Weapon', 'Twashtar', 'Tauret'} --gs c cycle WeaponSet
     state.SubSet = M {['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti'} --gs c cycle SubSet
-
+    climactic = buffactive['climactic flourish'] or false
+    building = buffactive['building flourish'] or false
+    ternary = buffactive['ternary flourish'] or false
+    state.MainStep = M {['description'] = 'Main Step', 'Box Step', 'Quickstep', 'Stutter Step', 'Feather Step'}
+    state.AltStep = M {['description'] = 'Alt Step', 'Feather Step', 'Quickstep', 'Stutter Step', 'Box Step'}
+    state.UseAltStep = M(true, 'Use Alt Step')
+    state.SelectStepTarget = M(true, 'Select Step Target')
+    state.CurrentStep = M {['description'] = 'Current Step', 'Main', 'Alt'}
+    state.SkillchainPending = M(false, 'Skillchain Pending')
     select_default_macro_book()
 end
 
@@ -114,33 +111,15 @@ function auto_WS_flourish(spell)
             (buffactive['Finishing Move 3'] or buffactive['Finishing Move 4'] or buffactive['Finishing Move 5'] or
                 buffactive['Finishing Move (6+)']) and
                 (player.tp > 1000 and player.target.hpp > 25)
-         then
-            if ClimCD < 1 and state.Buff['Climactic Flourish'] == false then
+        then
+            if ClimCD < 1 and climactic == false then
                 cancel_spell()
-                cast_delay(1.1)
                 send_command(
-                    'input /ja "Climactic Flourish" <me>; wait 1.8; input /ws "' .. spell.name .. '"' .. spell.target.id
+                    'input /ja "Climactic Flourish" <me>; wait 1; input /ws "' .. spell.name .. '"' .. spell.target.id
                 )
-            --[[ elseif ClimCD > 2 and BuilCD < 1 and state.Buff['Building Flourish'] == false and state.Buff['Climactic Flourish'] == false  then
-                cancel_spell()
-                cast_delay(1.1)
-                send_command('input /ja "Building Flourish" <me>; wait 1.8; input /ws "'..spell.name..'"' ..spell.target.id) ]]
             end
         end
     end
-
-    --[[ if spell.name == "Evisceration" or spell.name == "Pyrrhic Kleos" then
-        local allRecasts = windower.ffxi.get_ability_recasts()
-        local ClimCD = allRecasts[226]
-        local BuilCD = allRecasts[222]
-        if buffactive['Finishing Move 3'] or buffactive['Finishing Move 4'] or buffactive['Finishing Move 5'] or buffactive['Finishing Move (6+)'] then
-            if ClimCD < 1 and player.tp > 1000 and state.Buff['Ternary Flourish'] == false and player.target.hpp > 25 then
-                cancel_spell()
-                cast_delay(1.1)
-                send_command('input /ja "Ternary Flourish" <me>; wait 1.8; input /ws "'..spell.name..'"')
-            end
-        end
-    end ]]
 end
 
 function refine_Utsusemi(spell, eventArgs)
