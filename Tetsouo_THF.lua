@@ -41,7 +41,7 @@ function user_setup()
     ---------------------------------------------------------------------------------------------------------
     -- Hybrid mode options: 'Normal' and 'PDT'.
     -- Command to change hybrid mode: /console gs c cycle HybridMode
-    state.HybridMode:options('Normal', 'PDT')
+    state.HybridMode:options('PDT', 'Normal')
     ---------------------------------------------------------------------------------------------------------
     -- Offense mode options: 'Normal' and 'Acc'.
     -- Command to change offense mode: /console gs c cycle OffenseMode
