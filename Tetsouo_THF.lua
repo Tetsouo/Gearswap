@@ -1,4 +1,4 @@
- --============================================================--
+--============================================================--
 --=                        THIEF                             =--
 --============================================================--
 --=                    Author: Tetsouo                       =--
@@ -27,21 +27,41 @@ end
 function user_setup()
     -- Include the Mote-TreasureHunter.lua file for handling Treasure Hunter.
     include('Mote-TreasureHunter.lua')
+    ---------------------------------------------------------------------------------------------------------
     -- Initialize the treasureHunter state variable from TreasureMode.
     treasureHunter = state.TreasureMode.value
+    ---------------------------------------------------------------------------------------------------------
     -- Set up state variables for buffs, modes, and gear sets.
     state.Buff['Sneak Attack'] = buffactive['sneak attack'] or false
     state.Buff['Trick Attack'] = buffactive['trick attack'] or false
     state.Buff['Feint'] = buffactive['feint'] or false
-    state.TreasureMode:set('tag') -- Set default treasure mode to 'tag'.
-    state.HybridMode:options('Normal', 'PDT') -- Hybrid mode options: 'Normal' and 'PDT'.
-    state.OffenseMode:options('Normal', 'Acc') -- Offense mode options: 'Normal' and 'Acc'.
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Naegling'} -- Gear set for main weapon options.
-    state.SubSet = M {['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti', 'Crepu'} -- Gear set for sub weapon options.
+    ---------------------------------------------------------------------------------------------------------
+    -- Set default treasure mode to 'tag'.
+    state.TreasureMode:set('tag')
+    ---------------------------------------------------------------------------------------------------------
+    -- Hybrid mode options: 'Normal' and 'PDT'.
+    -- Command to change hybrid mode: /console gs c cycle HybridMode
+    state.HybridMode:options('Normal', 'PDT')
+    ---------------------------------------------------------------------------------------------------------
+    -- Offense mode options: 'Normal' and 'Acc'.
+    -- Command to change offense mode: /console gs c cycle OffenseMode
+    state.OffenseMode:options('Normal', 'Acc')
+    ---------------------------------------------------------------------------------------------------------
+    -- Gear set for main weapon options.
+    -- Command to cycle main weapon set: /console gs c cycle WeaponSet
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Naegling'}
+    ---------------------------------------------------------------------------------------------------------
+    -- Gear set for sub weapon options.
+    -- Command to cycle sub weapon set: /console gs c cycle SubSet
+    state.SubSet = M {['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti', 'Crepu'}
+    ---------------------------------------------------------------------------------------------------------
     -- Set up default job ability IDs for actions that always have Treasure Hunter.
+    -- [35] = Provoke, [204] Animated Flourish
     info.default_ja_ids = S {35, 204}
     -- Set up job ability IDs for actions that don't blink and always have Treasure Hunter.
-    info.default_u_ja_ids = S {201, 202, 203, 205, 207}
+    -- [201] Quickstep, [202] Boxstep, [203] Stutterstep, [205] Desperate Flourish, [207] Violent Flourish.
+    info.default_u_ja_ids = S {201, 202, 203, 205, 207} 
+    ---------------------------------------------------------------------------------------------------------
     -- Select the default macro book based on sub-job.
     select_default_macro_book()
 end
