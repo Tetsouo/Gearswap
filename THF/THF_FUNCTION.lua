@@ -135,11 +135,3 @@ function th_action_check(category, param)
         return true
     end
 end
-
-function check_weaponset()
-        equip(sets[state.WeaponSet.current])
-end
-
-function check_subset()
-    equip(sets[state.SubSet.current])
-end
