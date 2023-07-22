@@ -21,7 +21,7 @@ function user_setup()
     -- Hybrid mode options: 'PDT' (Defense physical), 'Normal (Damage Dealer)'
     state.HybridMode:options('PDT', 'Normal')
     -- Main weapon choice: 'Lycurgos', 'Naegling', 'Shining', 'Loxotic'
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'Lycurgos', 'Shining', 'Naegling', 'Loxotic'} --gs c cycle WeaponSet
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'Naegling', 'Lycurgos', 'Shining', 'Loxotic'} --gs c cycle WeaponSet
     -- Sub weapon choice: 'Utu Grip', 'Blurred Shield +1'
     --[[ state.SubSet = M {['description'] = 'Sub Weapon', 'Utu', 'Blurred'} --gs c cycle SubSet ]]
     -- Calls the function to select the default macro book
@@ -100,10 +100,12 @@ function select_default_macro_book()
     -- If sub job is DRG
     if player.sub_job == 'DRG' then
         set_macro_page(1, 25)
-        send_command('wait 20; input /lockstyleset 13')
         -- If sub job is SAM
     elseif player.sub_job == 'SAM' then
         set_macro_page(1, 27)
-        send_command('wait 20; input /lockstyleset 13')
+    -- Others Sub-Job    
+    else
+        set_macro_page(1, 25)
     end
+    send_command('wait 20; input /lockstyleset 13')
 end

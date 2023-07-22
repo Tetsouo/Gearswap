@@ -78,10 +78,9 @@ function select_default_macro_book()
     -- If sub job is RDM
     if player.sub_job == 'RDM' then
         set_macro_page(10, 9)
-        send_command('wait 25;input /lockstyleset 14')
     -- For other sub jobs
     else
         set_macro_page(1, 9)
-        send_command('wait 25;input /lockstyleset 14')
     end
+    send_command('wait 25;input /lockstyleset 14')
 end

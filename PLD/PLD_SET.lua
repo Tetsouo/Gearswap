@@ -114,30 +114,21 @@ sets.idle.Town =
     }
 )
 
-sets.idle.Ody =
-    set_combine(
-    sets.idle,
-    {
-        head = 'Chev. Armet +3',
-        body = "Sakpata's Plate",
-        hands = "Sakpata's Gauntlets",
-        legs = "Sakpata's Cuisses",
-        feet = "Sakpata's Leggings",
-        neck = 'Loricate Torque +1',
-        waist = 'Plat. Mog. Belt',
-        left_ear = 'Ethereal Earring',
-        right_ear = {
-            name = 'Chev. Earring +1',
-            augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', 'Damage taken-4%'}
-        },
-        left_ring = 'Supershear Ring',
-        right_ring = 'Provocare Ring',
-        back = {
-            name = "Rudianos's Mantle",
-            augments = {'HP+60', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Damage taken-5%'}
-        }
-    }
-)
+sets.idle.Ody ={
+    ammo="Aurgelmir Orb +1",
+    head="Chev. Armet +3",
+    body="Sakpata's Plate",
+    hands="Sakpata's Gauntlets",
+    legs="Chev. Cuisses +3",
+    feet="Chev. Sabatons +3",
+    neck={ name="Loricate Torque +1", augments={'Path: A',}},
+    waist="Plat. Mog. Belt",
+    left_ear="Tuisto Earring",
+    right_ear={ name="Chev. Earring +1", augments={'System: 1 ID: 1676 Val: 0','Accuracy+12','Mag. Acc.+12','Damage taken-4%',}},
+    left_ring={ name="Gelatinous Ring +1", augments={'Path: A',}},
+    right_ring="Provocare Ring",
+    back={ name="Rudianos's Mantle", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Damage taken-5%',}},
+}
 --=======================================================================================================
 --                                              REFRESH                                                 =
 --=======================================================================================================

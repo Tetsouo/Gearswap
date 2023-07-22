@@ -95,7 +95,7 @@ function customize_idle_set(idleSet)
     -- Set the default idle gear set based on HybridMode.
     if state.HybridMode.value == 'PDT' then
         idleSet = sets.idle -- Use the default idle gear set 'sets.idle'
-    elseif state.HybridMode.value == 'Ody' then
+    elseif state.HybridMode.value == 'Odyssey' then
         idleSet = sets.idle.Ody -- Use the 'sets.idle.Ody' idle gear set specific to 'Ody'
     elseif state.HybridMode.value == 'MDT' then
         idleSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
@@ -123,7 +123,7 @@ function customize_melee_set(meleeSet)
     if state.HybridMode.value == 'PDT' then
         meleeSet = sets.idle -- Use the default idle gear set 'sets.idle'
     elseif state.HybridMode.value == 'Ody' then
-        meleeSet = sets.idle.Ody -- Use the 'sets.idle.Ody' idle gear set specific to 'Ody'
+        meleeSet = sets.idle.Odyssey -- Use the 'sets.idle.Ody' idle gear set specific to 'Ody'
     elseif state.HybridMode.value == 'MDT' then
         meleeSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
     elseif state.HybridMode.value == 'Normal' then

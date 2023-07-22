@@ -305,7 +305,7 @@ function incapacitated(spell, eventArgs, cancel)
 end
 
 -- Checks the current main weapon set and equips the corresponding gear.
-local function check_weaponset()
+function check_weaponset()
     -- Equip the gear set based on the current state of the WeaponSet
     if player.main_job ~= 'BLM' then
         equip(sets[state.WeaponSet.current])
@@ -313,9 +313,9 @@ local function check_weaponset()
 end
 
 -- Checks the current sub weapon set and equips the corresponding gear.
-local function check_subset()
+function check_subset()
     -- Equip the gear set based on the current state of the SubSet
-    if state.Subset then
+    if state.SubSet then
         equip(sets[state.SubSet.current])
     end
 end
@@ -369,6 +369,10 @@ end
 --   spell (table): The completed spell.
 function handleCompletedSpell(spell, eventArgs)
     -- Perform appropriate actions after the spell is completed normally
+    if state.Moving.value == 'true' then
+        -- Equip the MoveSpeed gear set
+        send_command('gs equip sets.MoveSpeed')
+    end
 end
 
 -- Handles equipment and actions based on changes in buffs.

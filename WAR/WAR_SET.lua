@@ -217,8 +217,8 @@ sets.precast.WS = {
     legs = 'Valorous Hose',
     feet = 'Sulev. Leggings +2',
     neck = {name = 'War. Beads +2', augments = {'Path: A'}},
-    waist = 'Fotia Belt',
-    left_ear = 'Schere Earring',
+    waist = 'Sailfi Belt +1',
+    left_ear = 'Thrud Earring',
     right_ear = {
         name = 'Boii Earring +1',
         augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Crit.hit rate+4'}
