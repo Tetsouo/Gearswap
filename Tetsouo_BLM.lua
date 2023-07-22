@@ -13,7 +13,7 @@ function get_sets()
     include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2)
     include('/Misc/0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management
     include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions
-    include('/BLM/BLM_FUNCTION.lua') -- Includes the PLD_FUNCTION.lua file for advanced functions specific to Paladin
+    include('/BLM/BLM_FUNCTION.lua') -- Includes the PLD_FUNCTION.lua file for advanced functions specific to Black Mage
 end
 -------------------------------------------------------------------------------------------------------------
 

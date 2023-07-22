@@ -19,7 +19,7 @@ function get_sets()
     include('/Misc/0_AutoMove.lua')
     -- Include the SharedFunctions.lua file for shared functions.
     include('/Misc/SharedFunctions.lua')
-    -- Include the THF_FUNCTION.lua file for advanced functions specific to Paladin (possibly a typo, should be Thief).
+    -- Include the THF_FUNCTION.lua file for advanced functions specific to Thief.
     include('/THF/THF_FUNCTION.lua')
 end
 
