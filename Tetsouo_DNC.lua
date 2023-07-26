@@ -12,7 +12,7 @@ end
 
 -- Setup vars that are user-independent.  state.Buff vars initialized here will automatically be tracked.
 function job_setup()
-    include('0_AutoMove.lua')
+    include('/Misc/0_AutoMove.lua')
     include('Mote-TreasureHunter')
     determine_haste_group()
 
@@ -60,7 +60,7 @@ function init_gear_sets()
     sets['Centovente'] = {sub = 'Centovente'}
     sets['Blurred'] = {sub = 'Blurred Knife +1'}
     sets['Gleti'] = {sub = "Gleti's Knife"}
-    include('DNC_SET.lua')
+    include('/DNC/DNC_SET.lua')
 end
 
 -------------------------------------------------------------------------------------------------------------------
@@ -80,23 +80,14 @@ function auto_presto(spell)
     end
 end
 
--- Automatically use Presto for steps when it's available and we have less than 3 finishing moves
+-- Automatically use Contradance for steps when it's available and we have less than 3 finishing moves
 function auto_contradance(spell)
     if spell.name == 'Divine Waltz II' then
         local allRecasts = windower.ffxi.get_ability_recasts()
         local contradanceCd = allRecasts[229]
-        --[[ local under3FMs = not buffactive['Finishing Move 3'] and not buffactive['Finishing Move 4'] and not buffactive['Finishing Move 5'] ]]
         if contradanceCd < 1 and player.tp > 800 then
             cast_delay(1.1)
-            send_command('input /ja "Contradance" <me>; wait 0.7; input /ja "Divine Waltz II" <me>')
-        elseif contradanceCd < 1 and player.tp < 800 then
-            cancel_spell()
-        elseif contradanceCd > 1 and player.tp > 800 then
-            send_command('input /ja "Divine Waltz II" <me>')
-        elseif contradanceCd > 1 and player.tp < 800 then
-            cancel_spell()
-        else
-            cancel_spell()
+            send_command('input /ja "Contradance" <me>; wait 2; input /ja "Divine Waltz II" <me>')
         end
     end
 end
@@ -147,9 +138,6 @@ function job_precast(spell, action, spellMap, eventArgs)
     auto_presto(spell)
     auto_contradance(spell)
     auto_WS_flourish(spell)
-    if spell.type == 'Step' then
-        cast_delay(1)
-    end
 end
 
 function job_post_precast(spell, action, spellMap, eventArgs)

@@ -7,7 +7,6 @@
 --=               Last Modified: 2023-07-18                  =--
 --============================================================--
 
-
 -- This function buffs the player with certain spells based on their recast time and current buffs.
     local function BuffSelf()
         -- Retrieve the spell recast times.

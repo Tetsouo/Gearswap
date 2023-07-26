@@ -387,12 +387,20 @@ function buff_change(buff, gain)
             disable('neck')
             local message = createFormatMsg('WARNING:', 'Doom', nil, 'is active!')
             add_to_chat(123, message)
+            if state.Moving.value == 'true' then
+                -- Equip the MoveSpeed gear set
+                send_command('gs equip sets.MoveSpeed')
+            end
         else
             -- Buff is lost, update sets and display a message
             enable('neck')
             send_command('gs c update')
             local message = createFormatMsg(nil, 'Doom', nil, 'is no longer active!')
             add_to_chat(123, message)
+            if state.Moving.value == 'true' then
+                -- Equip the MoveSpeed gear set
+                send_command('gs equip sets.MoveSpeed')
+            end
         end
     end
 end

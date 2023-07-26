@@ -49,7 +49,11 @@ function user_setup()
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for main weapon options.
     -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Naegling'}
+    --[[ state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Naegling'} ]]
+    ---------------------------------------------------------------------------------------------------------
+    -- Gear set for  alt main weapon options.
+    -- Command to cycle main weapon set: /console gs c cycle WeaponSet
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Qutrub', 'Excalipoor', 'Lament', 'Iapetus', 'Chac', 'Ram', 'Sickle'}
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for sub weapon options.
     -- Command to cycle sub weapon set: /console gs c cycle SubSet

@@ -607,7 +607,7 @@ sets.midcast['Elemental Magic'] = {
     }
 }
 
-sets.midcast['Elemental Magic'].MagicBurst =
+--[[ sets.midcast['Elemental Magic'].MagicBurst =
     set_combine(
     sets.midcast['Elemental Magic'],
     {
@@ -617,6 +617,26 @@ sets.midcast['Elemental Magic'].MagicBurst =
         hands = {name = 'Amalric Gages +1', augments = {'INT+12', 'Mag. Acc.+20', '"Mag.Atk.Bns."+20'}},
         legs = 'Ea Slops',
         feet = {name = 'Amalric Nails +1', augments = {'Mag. Acc.+20', '"Mag.Atk.Bns."+20', '"Conserve MP"+7'}}
+    }
+) ]]
+
+sets.midcast['Elemental Magic'].MagicBurst = 
+set_combine(
+    sets.midcast['Elemental Magic'],
+    {
+        ammo="Sroda Tathlum",
+        head="Wicce Petasos +3",
+        body="Wicce Coat +3",
+        hands="Wicce Gloves +3",
+        legs="Wicce Chausses +3",
+        feet="Wicce Sabots +3",
+        neck={ name="Src. Stole +2", augments={'Path: A',}},
+        waist={ name="Acuity Belt +1", augments={'Path: A',}},
+        left_ear="Malignance Earring",
+        right_ear={ name="Wicce Earring +1", augments={'System: 1 ID: 1676 Val: 0','Mag. Acc.+14','Enmity-4',}},
+        left_ring="Freke Ring",
+        right_ring={ name="Metamor. Ring +1", augments={'Path: A',}},
+        back={ name="Taranus's Cape", augments={'INT+20','Mag. Acc+20 /Mag. Dmg.+20','Mag. Acc.+10','"Mag.Atk.Bns."+10','Spell interruption rate down-10%',}},
     }
 )
 

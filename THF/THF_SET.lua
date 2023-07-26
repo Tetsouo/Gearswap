@@ -142,18 +142,17 @@ sets.MoveSpeed = {
     right_ring = 'Defending Ring'
 }
 
-
 -- Equipment sets for different weapons.
 sets['TwashtarM'] = {main = 'Twashtar'}
 sets['TwashtarS'] = {sub = 'Twashtar'}
 sets['Tauret'] = {main = 'Tauret'}
 sets['Malevolence'] = {main = 'Malevolence'}
 sets['Naegling'] = {main = 'Naegling'}
-sets['Qutrub'] = {main = 'Qutrub Knife'}
-sets['Excalipoor'] = {main = 'Excalipoor'}
+sets['Qutrub'] = {main = 'Qutrub Knife', sub = 'Chac-Chacs'}
+sets['Excalipoor'] = {main = 'Excalipoor', sub = 'Qutrub Knife'}
 sets['Lament'] = {main = 'Lament'}
 sets['Iapetus'] = {main = 'Iapetus'}
-sets['Chac'] = {main = 'Chac-Chacs'}
+sets['Chac'] = {main = 'Chac-Chacs', sub = 'Qutrub Knife'}
 sets['Ram'] = {main = 'Ram staff'}
 sets['Crepu'] = {main = 'Crepuscular Knife'}
 sets['Centovente'] = {sub = 'Centovente'}
