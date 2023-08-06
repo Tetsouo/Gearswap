@@ -117,7 +117,7 @@ end
 function customize_melee_set(meleeSet)
     -- Set the default melee gear set based on HybridMode
     if state.HybridMode.value == 'PDT' then
-        meleeSet = sets.idle -- Use the default idle gear set 'sets.idle'
+        meleeSet = sets.engaged.PDT -- Use the default idle gear set 'sets.idle'
     elseif state.HybridMode.value == 'MDT' then
         meleeSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
     end

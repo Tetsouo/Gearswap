@@ -99,62 +99,25 @@ sets['Blurred'] = {sub = 'Blurred Shield +1'}
 --                                              IDLE                                                 =
 --====================================================================================================
 sets.idle = {
-    Main = "Burtgang",                                                  --Enmity 18       |       PDTII  18
-    Sub = "Duban",                                                      --Enmity  0       |        DT     0
-    ammo = {name = 'staunch Tathlum +1', priority = 1},                 --Enmity  0       |        DT     2
-    head = {name = 'Chev. Armet +3', priority = 13},                    --Enmity 24       |        DT    20
-    neck = {name = 'Unmoving Collar +1', priority = 12},                --Enmity  0       |        DT     0
-    --[[ neck={ name="Kgt. Beads +2", augments={'Path: A',}}, ]]
-    left_ear = {name = 'Odnowa Earring +1', priority = 0},              --Enmity  0       |        DT     0
-    right_ear = {name = 'Chev. earring +1', priority = 1},              --Enmity  0       |        DT     3
-    body = {name = "Sakpata's breastplate", priority = 1},              --Enmity  0       |        DT    10
-    hands = {name = "Chev. Gauntlets +3", priority = 11},               --Enmity  0       |        DT     8
-    left_ring = ChirichRing1,                                           --Enmity  5       |        DT     0
-    right_ring = ChirichRing2,                                          --Enmity  9       |        DT     0
-    back = Rudianos.STP,                                               --Enmity 10       |        DT     5
-    waist = {name = 'Kentarch belt +1', priority = 1},                  --Enmity  0       |        DT     3
-    legs = {name = 'Chev. Cuisses +3', priority = 10},                  --Enmity  0       |        DT    13
-    feet = {name = 'Chev. Sabatons +3', priority = 9}                   --Enmity 15       |        DT     0
+    ammo="Staunch Tathlum +1",
+    head = {name = 'Chev. Armet +3', priority = 16},
+    body = {name = "Sakpata's Plate", priority = 0},
+    hands = {name = "Chev. Gauntlets +3", priority = 0},
+    legs = {name = 'Chev. Cuisses +3', priority = 15},
+    feet = {name = 'Chev. Sabatons +3', priority = 14},
+    neck = {name = 'Unmoving Collar +1', priority = 12},
+    waist = {name = 'Kentarch Belt +1', priority = 0},
+    left_ear = {name = 'Odnowa Earring +1', priority =  17},
+    right_ear = {name = 'Chev. Earring +1', priority = 0},
+    left_ring={name = "Supershear Ring", priority = 11},
+    right_ring="Provocare Ring",
+    back = Rudianos.tank,
 }
 --                                                            _____________________________________________________
 --                                                             Gear:      Enmity 81             Total PDT   59
 --                                                             Crusade:   Enmity 30             Total MDT   64
 --                                                             Total:     Enmity 111            Total PDTII 77
 --                                                            _____________________________________________________
-
---[[ sets.idle = {
-    main="Burtgang",
-    sub="Duban",
-    ammo = {name = 'Aurgelmir Orb +1', priority = 0},
-    head = {name = 'Loess Barbuta +1', priority = 12},
-    body = {name = "Sakpata's breastplate", priority = 2},
-    hands = {name = "Sakpata's gauntlets", priority = 1},
-    legs = {name = 'Chev. Cuisses +3', priority = 13},
-    feet = {name = 'Chev. Sabatons +3', priority = 14},
-    neck={ name="Loricate Torque +1", augments={'Path: A',}},
-    waist={ name="Kentarch Belt +1", augments={'Path: A',}, priority = 0},
-    left_ear = {name = 'Tuisto earring', priority = 16}, 
-    right_ear = {name = 'Chev. earring +1', priority = 1},
-    left_ring={name = "Provocare Ring", priority = 0},
-    right_ring={ name="Gelatinous Ring +1", priority = 15},
-    back = Rudianos.tank,
-} ]]
-
-sets.idle.Ody ={
-    ammo="Aurgelmir Orb +1",
-    head="Chev. Armet +3",
-    body="Sakpata's Plate",
-    hands="Sakpata's Gauntlets",
-    legs="Chev. Cuisses +3",
-    feet="Chev. Sabatons +3",
-    neck={ name="Loricate Torque +1"},
-    waist={ name="Kentarch Belt +1"},
-    left_ear="Crepuscular Earring",
-    right_ear={ name="Chev. Earring +1"},
-    left_ring={ name="Gelatinous Ring +1"},
-    right_ring="Provocare Ring",
-    back={ name="Rudianos's Mantle"},
-}
 --=======================================================================================================
 --                                              REFRESH                                                 =
 --=======================================================================================================
@@ -344,17 +307,15 @@ sets.midcast['Enhancing Magic'] =
     {
         body = {name = 'Shabti Cuirass', priority = 0},
         hands = {name = 'Regal Gauntlets', priority = 20}
-        --[[ sub={name="Ajax +1", priority=19}, ]]
     }
 )
 
-sets.midcast.Crusade =
+sets.midcast['Crusade'] =
     set_combine(
     sets.midcast.SIRD,
     {
         head = SouvHead,
         body = {name = 'Shabti Cuirass', priority = 0}
-        --[[ sub={name="Ajax +1", priority=19}, ]]
     }
 )
 
@@ -364,7 +325,6 @@ sets.midcast['Reprisal'] =
     {
         body = {name = 'Shabti Cuirass', priority = 0},
         hands = {name = 'Regal Gauntlets', priority = 20}
-        --[[ sub={name="Ajax +1", priority=19}, ]]
     }
 )
 
@@ -374,21 +334,6 @@ sets.midcast.Shell = sets.midcast['Enhancing Magic']
 --                                              PRECAST                                                   =
 --                                            WEAPON SKILL                                                =
 --=========================================================================================================
---[[ sets.precast.WS = {
-    ammo="Oshasha's Treatise",
-    head="Hjarrandi Helm",
-    body="Rev. Surcoat +3",
-    hands={name="Odyssean Gauntlets"},
-    legs={name="Cab. Breeches +3"},
-    feet="Sulev. Leggings +2",
-    neck="Fotia Gorget",
-    waist="Fotia Belt",
-    left_ear="Thrud Earring",
-    right_ear="Ishvara Earring",
-    left_ring="Cornelia's Ring",
-    right_ring="Regal Ring",
-    back="Moonbeam Cape",
-} ]]
 sets.precast.WS = {
     ammo={name = "Aurgelmir Orb +1", priority = 1},
     head={name = "Hjarrandi Helm", priority = 10},
@@ -463,33 +408,23 @@ sets.defense.MDT = {
 --=========================================================================================================
 --                                              ENGAGED                                                   =
 --=========================================================================================================
-sets.engaged = {
-    --[[ Main = 'Burtgang',
-    sub = 'Blurred Shield +1', ]]
-    ammo = {name = 'Aurgelmir Orb +1', priority = 12},
-    head = {name = 'Chev. Armet +3', priority = 16},
-    body = {name = "Sakpata's Plate", priority = 0},
-    hands = {name = "Sakpata's Gauntlets", priority = 0},
-    legs = {name = 'Chev. Cuisses +3', priority = 15},
-    feet = {name = 'Chev. Sabatons +3', priority = 14},
-    neck = {name = 'Unmoving Collar +1', priority = 12}, 
-    --[[ neck={ name="Kgt. Beads +2", augments={'Path: A',}}, ]]
-    waist = {name = 'Plat. Mog. Belt', priority = 17},
-    left_ear = {name = 'Crep. Earring', priority = 0},
-    right_ear = {name = 'Chev. Earring +1', priority = 0},
+sets.engaged =
+    set_combine(
+    sets.idle,
+    {
     left_ring = ChirichRing1,
     right_ring = ChirichRing2,
-    back = Rudianos.tank
-}
+    back = Rudianos.STP,
+    })
 
 sets.engaged.PDT =
     set_combine(
     sets.idle,
     {
-        main = 'Burtgang',
-        sub = 'Duban'
-    }
-)
+    left_ring = ChirichRing1,
+    right_ring = ChirichRing2,
+    back = Rudianos.STP,
+    })
 --=========================================================================================================
 --                                              MOVESPEED                                                 =
 --=========================================================================================================
