@@ -191,37 +191,6 @@ function handleInterruptedSpell(spell, eventArgs)
     add_to_chat(123, message)
 end
 
--- Handles custom commands specific to the job.
--- Parameters:
---   cmdParams (table): The command parameters
---   eventArgs (table): Additional event arguments
-function job_self_command(cmdParams)
-    local tierSpell = state.TierSpell.value
-    local mainLight = state.MainLightSpell.value
-    local subLight = state.SubLightSpell.value
-    local mainDark = state.MainDarkSpell.value
-    local subDark = state.SubDarkSpell.value
-    local ajaSpell = state.Aja.value
-    if cmdParams[1]:lower() == 'buffself' then
-        BuffSelf()
-    elseif cmdParams[1]:lower() == 'mainlight' then
-        local spellToCast = mainLight .. tierSpell
-        send_command('input /ma "' .. spellToCast .. '" <stnpc>')
-    elseif cmdParams[1]:lower() == 'sublight' then
-        local spellToCast = subLight .. tierSpell
-        send_command('input /ma "' .. spellToCast .. '" <stnpc>')
-    elseif cmdParams[1]:lower() == 'maindark' then
-        local spellToCast = mainDark .. tierSpell
-        send_command('input /ma "' .. spellToCast .. '" <stnpc>')
-    elseif cmdParams[1]:lower() == 'subdark' then
-        local spellToCast = subDark .. tierSpell
-        send_command('input /ma "' .. spellToCast .. '" <stnpc>')
-    elseif cmdParams[1]:lower() == 'aja' then
-        local spellToCast = ajaSpell
-        send_command('input /ma "' .. spellToCast .. '" <stnpc>')
-    end
-end
-
 -- This function is called SaveMP and appears to be related to setting a specific gear based on the player's current MP value.
     function SaveMP()
         -- Check if the player's MP is less than 1000.

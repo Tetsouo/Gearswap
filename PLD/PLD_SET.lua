@@ -53,6 +53,21 @@ Rudianos.FCSIRD = {
     augments = {'HP+60', 'HP+18', '"Fast Cast"+10', 'Spell interruption rate down-10%'},
     priority = 8
 }
+Rudianos.STP = {
+    name="Rudianos's Mantle", 
+    augments={'DEX+20','Accuracy+20 Attack+20','Accuracy+10','"Store TP"+10','Occ. inc. resist. to stat. ailments+10',},
+    priority = 0
+}
+Rudianos.WS = {
+    name="Rudianos's Mantle", 
+    augments={'STR+20','Accuracy+20 Attack+20','STR+5','Weapon skill damage +10%',},
+    priority = 0
+}
+Rudianos.cure = {
+    name="Rudianos's Mantle", 
+    augments={'MND+20','Eva.+20 /Mag. Eva.+20','MND+5','"Cure" potency +10%','Damage taken-5%',},
+    priority = 0
+}
 
 JumalikHead = {
     name = 'Jumalik Helm',
@@ -86,19 +101,20 @@ sets['Blurred'] = {sub = 'Blurred Shield +1'}
 sets.idle = {
     Main = "Burtgang",                                                  --Enmity 18       |       PDTII  18
     Sub = "Duban",                                                      --Enmity  0       |        DT     0
-    ammo = {name = 'Staunch tathlum', priority = 0},                    --Enmity  0       |        DT     2
-    head = {name = 'Loess Barbuta +1', priority = 12},                  --Enmity 24       |        DT    20
-    neck = {name = 'Creed Collar', priority = 7},                       --Enmity  0       |        DT     0
-    left_ear = {name = 'Tuisto earring', priority = 16},                --Enmity  0       |        DT     0
+    ammo = {name = 'staunch Tathlum +1', priority = 1},                 --Enmity  0       |        DT     2
+    head = {name = 'Chev. Armet +3', priority = 13},                    --Enmity 24       |        DT    20
+    neck = {name = 'Unmoving Collar +1', priority = 12},                --Enmity  0       |        DT     0
+    --[[ neck={ name="Kgt. Beads +2", augments={'Path: A',}}, ]]
+    left_ear = {name = 'Odnowa Earring +1', priority = 0},              --Enmity  0       |        DT     0
     right_ear = {name = 'Chev. earring +1', priority = 1},              --Enmity  0       |        DT     3
-    body = {name = "Sakpata's breastplate", priority = 2},              --Enmity  0       |        DT    10
-    hands = {name = "Sakpata's gauntlets", priority = 1},               --Enmity  0       |        DT     8
-    left_ring = {name = 'Supershear Ring', priority = 1},               --Enmity  5       |        DT     0
-    right_ring = {name = 'Apeile Ring +1', priority = 1},               --Enmity  9       |        DT     0
-    back = Rudianos.tank,                                               --Enmity 10       |        DT     5
-    waist = {name = 'Platinum Moogle belt', priority = 17},             --Enmity  0       |        DT     3
-    legs = {name = 'Chev. Cuisses +3', priority = 13},                  --Enmity  0       |        DT    13
-    feet = {name = 'Chev. Sabatons +3', priority = 14}                  --Enmity 15       |        DT     0
+    body = {name = "Sakpata's breastplate", priority = 1},              --Enmity  0       |        DT    10
+    hands = {name = "Chev. Gauntlets +3", priority = 11},               --Enmity  0       |        DT     8
+    left_ring = ChirichRing1,                                           --Enmity  5       |        DT     0
+    right_ring = ChirichRing2,                                          --Enmity  9       |        DT     0
+    back = Rudianos.STP,                                               --Enmity 10       |        DT     5
+    waist = {name = 'Kentarch belt +1', priority = 1},                  --Enmity  0       |        DT     3
+    legs = {name = 'Chev. Cuisses +3', priority = 10},                  --Enmity  0       |        DT    13
+    feet = {name = 'Chev. Sabatons +3', priority = 9}                   --Enmity 15       |        DT     0
 }
 --                                                            _____________________________________________________
 --                                                             Gear:      Enmity 81             Total PDT   59
@@ -106,13 +122,23 @@ sets.idle = {
 --                                                             Total:     Enmity 111            Total PDTII 77
 --                                                            _____________________________________________________
 
-sets.idle.Town =
-    set_combine(
-    sets.idle,
-    {
-        neck = 'Elite royal collar'
-    }
-)
+--[[ sets.idle = {
+    main="Burtgang",
+    sub="Duban",
+    ammo = {name = 'Aurgelmir Orb +1', priority = 0},
+    head = {name = 'Loess Barbuta +1', priority = 12},
+    body = {name = "Sakpata's breastplate", priority = 2},
+    hands = {name = "Sakpata's gauntlets", priority = 1},
+    legs = {name = 'Chev. Cuisses +3', priority = 13},
+    feet = {name = 'Chev. Sabatons +3', priority = 14},
+    neck={ name="Loricate Torque +1", augments={'Path: A',}},
+    waist={ name="Kentarch Belt +1", augments={'Path: A',}, priority = 0},
+    left_ear = {name = 'Tuisto earring', priority = 16}, 
+    right_ear = {name = 'Chev. earring +1', priority = 1},
+    left_ring={name = "Provocare Ring", priority = 0},
+    right_ring={ name="Gelatinous Ring +1", priority = 15},
+    back = Rudianos.tank,
+} ]]
 
 sets.idle.Ody ={
     ammo="Aurgelmir Orb +1",
@@ -121,23 +147,23 @@ sets.idle.Ody ={
     hands="Sakpata's Gauntlets",
     legs="Chev. Cuisses +3",
     feet="Chev. Sabatons +3",
-    neck={ name="Loricate Torque +1", augments={'Path: A',}},
-    waist="Plat. Mog. Belt",
-    left_ear="Tuisto Earring",
-    right_ear={ name="Chev. Earring +1", augments={'System: 1 ID: 1676 Val: 0','Accuracy+12','Mag. Acc.+12','Damage taken-4%',}},
-    left_ring={ name="Gelatinous Ring +1", augments={'Path: A',}},
+    neck={ name="Loricate Torque +1"},
+    waist={ name="Kentarch Belt +1"},
+    left_ear="Crepuscular Earring",
+    right_ear={ name="Chev. Earring +1"},
+    left_ring={ name="Gelatinous Ring +1"},
     right_ring="Provocare Ring",
-    back={ name="Rudianos's Mantle", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Damage taken-5%',}},
+    back={ name="Rudianos's Mantle"},
 }
 --=======================================================================================================
 --                                              REFRESH                                                 =
 --=======================================================================================================
 sets.latent_refresh = {
-    ammo = {name = 'Staunch tathlum', priority = 0},
+    ammo = {name = 'staunch Tathlum +1', priority = 0},
     head = JumalikHead, --Refresh 1
     neck = 'Coatl gorget +1', --Refresh 1
-    left_ear = {name = 'Tuisto earring', priority = 16},
-    right_ear = {name = 'Odnowa earring +1', priority = 15},
+    left_ear = {name = 'Odnowa earring +1', priority = 15},
+    right_ear = {name = 'Tuisto earring', priority = 16},
     body = JumalikBody, --Refresh 2
     hands = 'Regal Gauntlets', --Refresh 1
     left_ring = {name = 'Stikini Ring +1', wardrobe = 5},
@@ -156,17 +182,17 @@ sets.FullEnmity = {
     -- main={name="Burtgang", priority=2},                                             --Enmity  23
     -- sub={name="Ajax +1", priority=15},                                              --Enmity  11
     ammo = {name = 'Sapience Orb', priority = 0},                                      --Enmity  02
-    head = {name = 'Loess Barbuta +1', augments = {'Path: A'}, priority = 14},         --Enmity  24
-    neck = {name = 'Moonlight Necklace', priority = 4},                                --Enmity  15
-    right_ear = {name = 'Cryptic Earring', priority = 12},                             --Enmity  04
-    left_ear = {name = 'Friomisi earring', priority = 5},                              --Enmity  02
-    body = SouvBody,                                                                   --Enmity  20
-    hands = SouvHands,                                                                 --Enmity  09
-    left_ring = {name = 'Apeile ring', priority = 1},                                  --Enmity  09
-    right_ring = {name = 'Apeile ring +1', priority = 1},                              --Enmity  09
+    head = {name = 'Loess Barbuta +1', augments = {'Path: A'}, priority = 12},         --Enmity  24
+    neck = {name = 'Moonlight Necklace', priority = 1},                                --Enmity  15
+    left_ear = {name = 'Friomisi earring', priority = 0},                             --Enmity  02
+    right_ear = {name = 'Cryptic Earring', priority = 2},                             --Enmity  04
+    body = {name =  'Souv. Cuirass +1', priority = 3},                                 --Enmity  20
+    hands = {name =  'Souv. Handsch. +1', priority = 11},                                --Enmity  09
+    left_ring = {name = 'Apeile ring', priority = 0},                                  --Enmity  09
+    right_ring = {name = 'Apeile ring +1', priority = 0},                              --Enmity  09
     back = Rudianos.tank,                                                              --Enmity  10
-    waist = {name = 'Creed Baudrier', priority = 1},                                   --Enmity  05
-    legs = SouvLegs,                                                                   --Enmity  09
+    waist = {name = 'Platinum Moogle Belt', priority = 13},                            --Enmity  05
+    legs = {name =  'Souv. Diechlings +1', priority = 10},                              --Enmity  09
     feet = {name = "Chevalier's Sabatons +3", priority = 0}                            --Enmity  15
     --                                                                                Gear Enmity 156
     --                                                                               Crusade Enmity 186
@@ -175,12 +201,12 @@ sets.FullEnmity = {
 sets.precast.JA = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Divine Emblem'] = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Palisade'] = set_combine(sets.FullEnmity, {})
-sets.precast.JA['Fealty'] = set_combine(sets.FullEnmity, {body = 'Cab. Surcoat'})
 sets.precast.JA['Cover'] = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Provoke'] = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Majesty'] = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Chivalry'] = set_combine(sets.FullEnmity, {})
-sets.precast.JA['Invincible'] = set_combine(sets.FullEnmity, {legs = 'Caballarius Breeches +2'})
+sets.precast.JA['Fealty'] = set_combine(sets.FullEnmity, {body = 'Cab. Surcoat'})
+sets.precast.JA['Invincible'] = set_combine(sets.FullEnmity, {legs = 'Caballarius Breeches +3'})
 sets.precast.JA['Holy Circle'] = set_combine(sets.FullEnmity, {feet = 'Rev. Leggings'})
 sets.precast.JA['Shield Bash'] = set_combine(sets.FullEnmity, {hands = {name = 'Cab. Gauntlets +3', priority = 0}})
 sets.precast.JA['Sentinel'] = set_combine(sets.FullEnmity, {feet = 'Cab. Leggings +3'})
@@ -192,23 +218,21 @@ sets.precast.JA['Rampart'] = set_combine(sets.FullEnmity, {head = 'Cab. Coronet'
 sets.precast.FC = {
     --[[ main={name="Sakpata's Sword", priority=15},
     sub={name="Priwen", priority=14}, ]]
-    ammo = {name = 'Sapience Orb', priority = 0},
+    ammo = {name = 'Sapience Orb', priority = 5},
     head = {name = 'Carmine Mask +1', priority = 0},
-    neck = {name = 'Voltsurge Torque', priority = 6},
-    left_ear = {name = "Enchanter's earring +1", priority = 0},
-    right_ear = {name = 'Loquac. Earring', priority = 0},
-    body = {name = 'Reverence surcoat +3', priority = 0},
-    hands = {name = 'Leyline Gloves', priority = 0},
-    left_ring = {name = 'Gelatinous Ring +1', priority = 13},
-    right_ring = {name = 'Moonbeam Ring', priority = 12, bag = 'wardrobe 3'},
+    neck = {name = 'Voltsurge Torque', priority = 11},
+    left_ear = {name = "Enchanter's earring +1", priority = 3},
+    right_ear = {name = 'Loquac. Earring', priority = 4},
+    body = {name = 'Reverence surcoat +3', priority = 13},
+    hands = {name = 'Leyline Gloves', priority = 1},
+    left_ring = {name = 'Gelatinous Ring +1', priority = 10},
+    right_ring = {name = 'Moonbeam Ring', priority = 9, bag = 'wardrobe 3'},
     back = Rudianos.FCSIRD,
-    waist = {name = 'Platinum Moogle Belt', priority = 16},
-    legs = {name = 'Odyssean Cuisses', priority = 0},
+    waist = {name = 'Platinum Moogle Belt', priority = 12},
+    legs = {name = 'Odyssean Cuisses', priority = 2},
     feet = {name = "Chevalier's Sabatons +3", priority = 0}
 }
 
-sets.precast.FC.Cocoon = sets.precast.FC
-sets.precast.FC.Crusade = sets.precast.FC
 sets.precast.FC['Healing Magic'] = sets.precast.FC
 sets.precast.FC['Enhancing Magic'] = sets.precast.FC
 sets.precast.FC['Phalanx'] = sets.precast.FC
@@ -251,10 +275,10 @@ sets.midcast.Phalanx = {
 sets.midcast.SIRD = {
     --[[ main={name="Burtgang", priority=0},
     sub={name="Ajax +1", priority=16}, ]]
-    ammo = {name = 'Staunch Tathlum', priority = 6},
+    ammo = {name = 'staunch Tathlum +1', priority = 0},
     head = {name = 'Loess barbuta +1', priority = 0},
     neck = {name = 'Moonlight Necklace', priority = 8},
-    left_ear = {name = 'Tuisto earring', priority = 10},
+    left_ear = {name = 'Etiolation Earring', priority = 10},
     right_ear = {name = 'Cryptic Earring', priority = 11},
     body = {name = 'Reverence surcoat +3', priority = 14},
     hands = {name = 'Regal Gauntlets', priority = 15},
@@ -271,16 +295,16 @@ sets.midcast.SIRD = {
 sets.midcast.Cure = {
     --[[ main={name="Burtgang", priority=0},
     sub={ name="Ajax +1" , priority=13}, ]]
-    ammo = {name = 'Staunch Tathlum', priority = 1},
-    head = {name = 'Loess Barbuta +1', priority = 12},
-    neck = {name = 'Moonlight Necklace', priority = 3},
-    left_ear = {name = 'Tuisto Earring', priority = 11},
-    right_ear = {name = 'Odnowa Earring +1', priority = 10},
+    ammo = {name = 'staunch Tathlum +1', priority = 1},
+    head = SouvHead,
+    neck = {name = 'Unmoving Collar +1', priority = 16},
+    left_ear = {name = 'tuisto Earring', priority = 15},
+    right_ear = {name = 'Chev. Earring +1', priority = 0},
     body = {name = 'Rev. Surcoat +3', priority = 2},
     hands = {name = 'Regal Gauntlets', priority = 14},
-    left_ring = {name = 'Gelatinous Ring +1', priority = 5},
-    right_ring = {name = 'Moonbeam Ring', priority = 6, bag = 'wardrobe 3'},
-    back = Rudianos.tank,
+    left_ring = {name = 'Supershear Ring', priority = 5},
+    right_ring = {name = 'Defending Ring', priority = 6},
+    back = Rudianos.cure,
     waist = {name = 'Plat. Mog. Belt', priority = 4},
     legs = {name = "Founder's Hose", priority = 8},
     feet = {name = 'Odyssean Greaves', priority = 9}
@@ -290,12 +314,14 @@ sets.midcast.Cure = {
 --=========================================================================================================
 sets.midcast['Enlight'] =
     set_combine(
-    sets.idle,
+        sets.midcast.SIRD,
     {
-        --[[ main="Brilliance", ]]
         head = JumalikHead,
-        body = 'Shabti Cuirass',
-        hands = 'Regal Gauntlets'
+        body = 'Reverence surcoat +3',
+        hands = 'Eschite Gauntlets',
+        waist = 'Asklepian belt',
+        back = {name = "Moonbeam Cape", priority = 16},
+        left_ear = "Knight's Earring",
     }
 )
 --=========================================================================================================
@@ -303,14 +329,14 @@ sets.midcast['Enlight'] =
 --=========================================================================================================
 sets.midcast.FastRecast = {}
 
-sets.midcast.Flash = sets.midcast.Enmity
+sets.midcast['Flash'] = sets.FullEnmity
 sets.midcast['Phalanx'] = sets.midcast.Phalanx
-sets.midcast['Cocoon'] = set_combine(sets.midcast.Enmity, sets.midcast.SIRD)
-sets.midcast['Jettatura'] = sets.midcast.Enmity
-sets.midcast['Geist Wall'] = set_combine(sets.midcast.Enmity, sets.midcast.SIRD)
-sets.midcast['Sheep Song'] = set_combine(sets.midcast.Enmity, sets.midcast.SIRD)
-sets.midcast['Blank Gaze'] = sets.midcast.Enmity
-sets.midcast['Banishga'] = sets.midcast.Enmity
+sets.midcast['Cocoon'] = set_combine(sets.FullEnmity, sets.midcast.SIRD)
+sets.midcast['Jettatura'] = sets.FullEnmity
+sets.midcast['Geist Wall'] = set_combine(sets.FullEnmity, sets.midcast.SIRD)
+sets.midcast['Sheep Song'] = set_combine(sets.FullEnmity, sets.midcast.SIRD)
+sets.midcast['Blank Gaze'] = sets.FullEnmity
+sets.midcast['Banishga'] = sets.FullEnmity
 
 sets.midcast['Enhancing Magic'] =
     set_combine(
@@ -348,20 +374,35 @@ sets.midcast.Shell = sets.midcast['Enhancing Magic']
 --                                              PRECAST                                                   =
 --                                            WEAPON SKILL                                                =
 --=========================================================================================================
+--[[ sets.precast.WS = {
+    ammo="Oshasha's Treatise",
+    head="Hjarrandi Helm",
+    body="Rev. Surcoat +3",
+    hands={name="Odyssean Gauntlets"},
+    legs={name="Cab. Breeches +3"},
+    feet="Sulev. Leggings +2",
+    neck="Fotia Gorget",
+    waist="Fotia Belt",
+    left_ear="Thrud Earring",
+    right_ear="Ishvara Earring",
+    left_ring="Cornelia's Ring",
+    right_ring="Regal Ring",
+    back="Moonbeam Cape",
+} ]]
 sets.precast.WS = {
-    ammo = "Oshasha's Treatise",
-    head = "Sakpata's Helm",
-    body = "Sakpata's Plate",
-    hands = "Sakpata's Gauntlets",
-    legs = "Sakpata's Cuisses",
-    feet = "Sulevia's leggings +2",
-    neck = 'Fotia Gorget',
-    waist = 'Fotia Belt',
-    left_ear = {name = 'Moonshade Earring', augments = {'Accuracy+4', 'TP Bonus +250'}},
-    right_ear = 'Ishvara Earring',
-    left_ring = "Cornelia's Ring",
-    right_ring = 'Regal Ring',
-    back = Rudianos.tank
+    ammo={name = "Aurgelmir Orb +1", priority = 1},
+    head={name = "Hjarrandi Helm", priority = 10},
+    body={name = "Rev. Surcoat +3", priority = 13},
+    hands={ name="Odyssean Gauntlets", priority = 9},
+    legs={name = "Chev. Cuisses +3", priority = 2},
+    feet={name = "Sulev. Leggings +2", priority = 8},
+    neck={name = "Fotia Gorget", priority = 0},
+    waist={name = "Sailfi Belt +1", priority = 3},
+    left_ear={ name="Odnowa Earring +1", priority = 12},
+    right_ear={name = "Thrud Earring", priority = 4},
+    left_ring={name = "Cornelia's Ring", priority = 5},
+    right_ring={name = "Regal Ring", priority = 11},
+    back= Rudianos.WS,
 }
 
 sets.precast.WS.Acc = set_combine(sets.precast.WS, {})
@@ -390,7 +431,7 @@ sets.precast.WS['Sanguine Blade'] =
     }
 )
 
-sets.precast.WS['Atonement'] = set_combine(sets.precast.WS, sets.midcast.Enmity)
+sets.precast.WS['Atonement'] = set_combine(sets.precast.WS, sets.FullEnmity)
 
 sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {})
 --=========================================================================================================
@@ -399,7 +440,7 @@ sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {})
 sets.defense.MDT = {
     main = 'Burtgang',
     sub = 'Aegis',
-    ammo = 'Staunch Tathlum',
+    ammo = 'staunch Tathlum +1',
     head = "Sakpata's Helm",
     body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
@@ -423,15 +464,16 @@ sets.defense.MDT = {
 --                                              ENGAGED                                                   =
 --=========================================================================================================
 sets.engaged = {
-    --Main = 'Burtgang',
-    sub = 'Blurred Shield +1',
+    --[[ Main = 'Burtgang',
+    sub = 'Blurred Shield +1', ]]
     ammo = {name = 'Aurgelmir Orb +1', priority = 12},
     head = {name = 'Chev. Armet +3', priority = 16},
     body = {name = "Sakpata's Plate", priority = 0},
     hands = {name = "Sakpata's Gauntlets", priority = 0},
     legs = {name = 'Chev. Cuisses +3', priority = 15},
     feet = {name = 'Chev. Sabatons +3', priority = 14},
-    neck = {name = 'Sanctity Necklace', priority = 13},
+    neck = {name = 'Unmoving Collar +1', priority = 12}, 
+    --[[ neck={ name="Kgt. Beads +2", augments={'Path: A',}}, ]]
     waist = {name = 'Plat. Mog. Belt', priority = 17},
     left_ear = {name = 'Crep. Earring', priority = 0},
     right_ear = {name = 'Chev. Earring +1', priority = 0},
@@ -452,7 +494,9 @@ sets.engaged.PDT =
 --                                              MOVESPEED                                                 =
 --=========================================================================================================
 sets.MoveSpeed = {
-    legs = {name = 'Carmine Cuisses +1', priority = 3}
+    legs = {name = 'Carmine Cuisses +1', priority = 2},
+    waist = {name = "Audumbla sash", priority = 3},
+    right_ring = {name = "Defending Ring", priority = 1}
 }
 --=========================================================================================================
 --                                              CUSTOM BUFF                                               =

@@ -18,8 +18,8 @@ end
 
 -- Handles user-specific configuration and setup.
 function user_setup()
-    -- Hybrid mode options: 'PDT' (physical), 'MDT' (magical), 'Normal'
-    state.HybridMode:options('PDT', 'MDT', 'Odyssey', 'Normal') -- Command to change hybrid mode: /console gs c cycle HybridMode
+    -- Hybrid mode options: 'PDT' (physical), 'MDT' (magical)
+    state.HybridMode:options('PDT', 'MDT') -- Command to change hybrid mode: /console gs c cycle HybridMode
     -- Main weapon choice: 'Burtgang', 'Naegling'
     state.WeaponSet = M {['description'] = 'Main Weapon', 'Burtgang', 'Naegling'} -- Command to cycle main weapon set: /console gs c cycle WeaponSet
     -- Sub weapon choice: 'Duban', 'Aegis', 'Ochain', 'Blurred'

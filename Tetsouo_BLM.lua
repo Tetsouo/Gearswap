@@ -23,7 +23,7 @@ function user_setup()
     -- Command to change Casting mode: /console gs c cycle CastingMode
     state.CastingMode:options('MagicBurst', 'Normal')
     -- Command to change Casting mode: /console gs c cycle mainLightSpell
-    state.MainLightSpell = M('Fire', 'Thunder', 'Areo')
+    state.MainLightSpell = M('Fire', 'Thunder', 'Aero')
     -- Command to change Casting mode: /console gs c cycle subLightSpell
     state.SubLightSpell = M('Thunder', 'Fire', 'Aero')
     -- Command to change Casting mode: /console gs c cycle mainDarkSpell

@@ -455,3 +455,56 @@ function checkAndDisplayMessages(msgTable)
         createFormatMsg(nil, msgData.spell, msgData.recast, nil, isLast)) -- Output the spell message
     end
 end
+
+-- Handles custom commands specific to the job.
+-- Parameters:
+--   cmdParams (table): The command parameters
+--   eventArgs (table): Additional event arguments
+function job_self_command(cmdParams, eventArgs)
+    if cmdParams[1]:lower() == 'btank' then
+        local targetid = windower.ffxi.get_mob_by_target('lastst').id
+        send_command('send Kaories haste2 ' .. targetid .. '; wait 4; send Kaories refresh3 ' .. targetid .. '; wait 5; send Kaories phalanx2 ' .. targetid .. '; wait 5; send Kaories regen2 ' .. targetid)
+    elseif cmdParams[1]:lower() == 'bdd' then
+        local targetid = windower.ffxi.get_mob_by_target('lastst').id
+        send_command('send Kaories haste2 ' .. targetid .. '; wait 4; send Kaories phalanx2 ' .. targetid .. '; wait 4; send Kaories regen2 ' .. targetid)
+    elseif cmdParams[1]:lower() == 'curaga' then
+        local targetid = windower.ffxi.get_mob_by_target('lastst').id
+        send_command('send Kaories curaga3 ' .. targetid)
+    elseif cmdParams[1]:lower() == 'debuff' then
+        local targetid = windower.ffxi.get_mob_by_target('lastst').id
+        send_command('send Kaories distract3 ' .. targetid .. '; wait 6; send Kaories dia3 ' .. targetid .. '; wait 4; send Kaories slow2 ' .. targetid .. '; wait 5; send Kaories Blind2 ' .. targetid .. '; wait 5; send Kaories paralyze2 ' .. targetid)
+    end
+    if player.main_job == 'PLD' and player.sub_job == 'BLU' then
+        if cmdParams[1]:lower() == 'single' then
+            handleSingleCommand() -- Handle the "single" command
+        elseif cmdParams[1]:lower() == 'aoe' then
+            handleAoeCommand() -- Handle the "aoe" command
+        end
+    end
+    if player.main_job == 'BLM' then
+        local tierSpell = state.TierSpell.value
+        local mainLight = state.MainLightSpell.value
+        local subLight = state.SubLightSpell.value
+        local mainDark = state.MainDarkSpell.value
+        local subDark = state.SubDarkSpell.value
+        local ajaSpell = state.Aja.value
+        if cmdParams[1]:lower() == 'buffself' then
+            BuffSelf()
+        elseif cmdParams[1]:lower() == 'mainlight' then
+            local spellToCast = mainLight .. tierSpell
+            send_command('input /ma "' .. spellToCast .. '" <stnpc>')
+        elseif cmdParams[1]:lower() == 'sublight' then
+            local spellToCast = subLight .. tierSpell
+            send_command('input /ma "' .. spellToCast .. '" <stnpc>')
+        elseif cmdParams[1]:lower() == 'maindark' then
+            local spellToCast = mainDark .. tierSpell
+            send_command('input /ma "' .. spellToCast .. '" <stnpc>')
+        elseif cmdParams[1]:lower() == 'subdark' then
+            local spellToCast = subDark .. tierSpell
+            send_command('input /ma "' .. spellToCast .. '" <stnpc>')
+        elseif cmdParams[1]:lower() == 'aja' then
+            local spellToCast = ajaSpell
+            send_command('input /ma "' .. spellToCast .. '" <stnpc>')
+        end
+    end
+end
