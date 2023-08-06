@@ -20,11 +20,23 @@ end
 -- Handles user-specific configuration and setup.
 function user_setup()
     -- Hybrid mode options: 'MagicBurst', 'Normal'
-    state.CastingMode:options('MagicBurst', 'Normal') -- Command to change Casting mode: /console gs c cycle CastingMode
+    -- Command to change Casting mode: /console gs c cycle CastingMode
+    state.CastingMode:options('MagicBurst', 'Normal')
+    -- Command to change Casting mode: /console gs c cycle mainLightSpell
+    state.MainLightSpell = M('Fire', 'Thunder', 'Areo')
+    -- Command to change Casting mode: /console gs c cycle subLightSpell
+    state.SubLightSpell = M('Thunder', 'Fire', 'Aero')
+    -- Command to change Casting mode: /console gs c cycle mainDarkSpell
+    state.MainDarkSpell = M('Blizzard', 'Stone', 'Water')
+    -- Command to change Casting mode: /console gs c cycle subDarkSpell
+    state.SubDarkSpell = M('Stone', 'Blizzard', 'Water')
+    -- Command to change Casting mode: /console gs c cycle tierSpell
+    state.TierSpell = M('VI', 'V', 'IV', 'III', 'II', '')
+    state.Aja = M('Firaja', 'Blizzaja', 'Aeroja', 'Stoneja', 'Thundaja', 'Waterja')
     Manawall = buffactive['Mana Wall'] or false
     select_default_macro_book()
     -- Binds F9 to cycle through Casting Mode
-    send_command('bind F9 gs c cycle CastmingMode')
+    send_command('bind F9 gs c cycle CastingMode')
 end
 
 -- Handles the unload event when changing job or reloading the file.
@@ -61,6 +73,7 @@ end
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
     incapacitated(spell, eventArgs) -- Check for incapacitated state
+    SaveMP()
 end
 
 -- Handles actions to perform after the casting of a spell or ability.
@@ -77,7 +90,7 @@ end
 function select_default_macro_book()
     -- If sub job is RDM
     if player.sub_job == 'RDM' then
-        set_macro_page(10, 9)
+        set_macro_page(1, 9)
     -- For other sub jobs
     else
         set_macro_page(1, 9)

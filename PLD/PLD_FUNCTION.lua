@@ -16,10 +16,10 @@ spellsSingle = {
 
 -- A table containing the spell IDs and names for area of effect spells.
 spellsAoe = {
-    {name = 'Frightful Roar', id = 561, step = "Aftercast"}, -- Spell ID for the "Frightful Roar" spell
     {name = 'Geist Wall', id = 605, step = "Aftercast"}, -- Spell ID for the "Geist Wall" spell
     {name = 'Sheep Song', id = 584, step = "Aftercast"}, -- Spell ID for the "Sheep Song" spell
     {name = 'Jettatura', id = 575, step = "Aftercast"}, -- Spell ID for the "Jettatura" spell
+    {name = 'Frightful Roar', id = 561, step = "Aftercast"}, -- Spell ID for the "Frightful Roar" spell
 }
 
 -- Calls the handleCommand function with the spellsSingle table.

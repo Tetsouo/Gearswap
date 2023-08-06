@@ -62,11 +62,11 @@ end
 
 -- Function to handle gear setup upon status change (buff gain or loss).
 function job_handle_equipping_gear(playerStatus, eventArgs)
-    check_buff('Sneak Attack', eventArgs) -- Check if Sneak Attack buff is active and equip corresponding gear.
-    check_buff('Trick Attack', eventArgs) -- Check if Trick Attack buff is active and equip corresponding gear.
     check_range_lock() -- Check if a ranged weapon is equipped and handle gear setup accordingly.
     check_weaponset() -- Check and handle main weapon gear set changes.
     check_subset() -- Check and handle sub weapon gear set changes.
+    check_buff('Sneak Attack', eventArgs) -- Check if Sneak Attack buff is active and equip corresponding gear.
+    check_buff('Trick Attack', eventArgs) -- Check if Trick Attack buff is active and equip corresponding gear.
 end
 
 -- Function to customize the idle gear set based on player's HP and HybridMode.
@@ -95,21 +95,6 @@ function customize_melee_set(meleeSet)
         melee = set_combine(meleeSet, sets.engaged.Acc) -- If OffenseMode is Acc, equip Acc gear for melee.
     end
     return meleeSet -- Return the customized melee gear set.
-end
-
--- Function to handle changes in job-related buffs (e.g., haste, marches).
-function job_buff_change(buff, gain)
-    if S {'haste', 'march', 'mighty guard', 'embrava', 'haste samba', 'geo-haste', 'indi-haste'}:contains(buff:lower()) then
-        if not midaction() then
-            handle_equipping_gear(player.status) -- Handle gear setup when haste or other relevant buffs change.
-        end
-    end
-    if state.Buff[buff] ~= nil then
-        state.Buff[buff] = gain
-        if not midaction() then
-            handle_equipping_gear(player.status) -- Handle gear setup when specific buffs change.
-        end
-    end
 end
 
 -- Function to update treasure hunter information.

@@ -625,7 +625,7 @@ set_combine(
     sets.midcast['Elemental Magic'],
     {
         ammo="Sroda Tathlum",
-        head="Wicce Petasos +3",
+        head="Ea hat",
         body="Wicce Coat +3",
         hands="Wicce Gloves +3",
         legs="Wicce Chausses +3",
@@ -640,21 +640,15 @@ set_combine(
     }
 )
 
-sets.midcast['Elemental Magic'].HighTierNuke = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
+sets.midcast['Burn'] = set_combine(sets.midcast['Elemental Magic'], {})
 
-sets.midcast['Elemental Magic'].HighTierNuke.TPNuke = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
+sets.midcast['Rasp'] = sets.midcast['Burn']
+sets.midcast['Shock'] = sets.midcast['Burn']
+sets.midcast['Drown'] = sets.midcast['Burn']
+sets.midcast['Choke'] = sets.midcast['Burn']
+sets.midcast['Frost'] = sets.midcast['Burn']
 
-sets.midcast['Elemental Magic'].HighTierNuke.MagicBurst = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
-
-sets.midcast.Burn = set_combine(sets.midcast['Elemental Magic'], {})
-
-sets.midcast.Rasp = sets.midcast.Burn
-sets.midcast.Shock = sets.midcast.Burn
-sets.midcast.Drown = sets.midcast.Burn
-sets.midcast.Choke = sets.midcast.Burn
-sets.midcast.Frost = sets.midcast.Burn
-
-sets.midcast.Impact =
+sets.midcast['Impact'] =
     set_combine(
     sets.midcast['Elemental Magic'],
     {
@@ -663,7 +657,7 @@ sets.midcast.Impact =
     }
 )
 
-sets.midcast.Impact.MagicBurst =
+sets.midcast['Impact'].MagicBurst =
     set_combine(
     sets.midcast['Elemental Magic'].MagicBurst,
     {
@@ -672,15 +666,15 @@ sets.midcast.Impact.MagicBurst =
     }
 )
 
-sets.midcast.Meteor = set_combine(sets.midcast['Elemental Magic'], {})
+sets.midcast['Meteor'] = set_combine(sets.midcast['Elemental Magic'], {})
 
-sets.midcast.Comet = set_combine(sets.midcast['Elemental Magic'], {})
+sets.midcast['Comet'] = set_combine(sets.midcast['Elemental Magic'], {})
 
-sets.midcast.Comet.MagicBurst = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
+sets.midcast['Comet'].MagicBurst = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
 
-sets.midcast.Death = set_combine(sets.midcast['Elemental Magic'], {})
+sets.midcast['Death'] = set_combine(sets.midcast['Elemental Magic'], {})
 
-sets.midcast.Death.MagicBurst = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
+sets.midcast['Death'].MagicBurst = set_combine(sets.midcast['Elemental Magic'].MagicBurst, {})
 
 -- Sets to return to when not performing an action.
 

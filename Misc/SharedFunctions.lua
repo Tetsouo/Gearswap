@@ -403,6 +403,27 @@ function buff_change(buff, gain)
             end
         end
     end
+    if player.main_job == 'THF' then
+        if state.Buff[buff] ~= nil then
+            state.Buff[buff] = gain
+            if not midaction() then
+                handle_equipping_gear(player.status) -- Handle gear setup when specific buffs change.
+            end
+        end
+    end
+    if player.main_job == 'BLM' then
+        if buff == 'Manawall' then
+            if gain then
+                equip({
+                    back == "Taranus's Cape",
+                    feet == "Wicce sabot +3",
+                })
+                disable(back, feet)
+            else
+                enable(back, feet)
+            end
+        end
+    end
 end
 
 -- update the table with actual Step Cast of spell

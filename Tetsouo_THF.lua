@@ -49,11 +49,11 @@ function user_setup()
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for main weapon options.
     -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    --[[ state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Naegling'} ]]
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Naegling'}
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for  alt main weapon options.
     -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Qutrub', 'Excalipoor', 'Lament', 'Iapetus', 'Chac', 'Ram', 'Sickle'}
+    --[[ state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Qutrub', 'Excalipoor', 'Lament', 'Iapetus', 'Chac', 'Ram', 'Sickle'} ]]
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for sub weapon options.
     -- Command to cycle sub weapon set: /console gs c cycle SubSet
@@ -98,7 +98,7 @@ function job_post_precast(spell, action, spellMap, eventArgs)
         equip(sets.AeolianTH)
     -- Equip the TreasureHunter gear set for Sneak Attack, Trick Attack, or WeaponSkills if applicable.
     elseif spell.english == 'Sneak Attack' or spell.english == 'Trick Attack' or spell.type == 'WeaponSkill' then
-        if treasureHunter == 'SATA' or treasureHunter == 'Fulltime' then
+        if state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime' then
             equip(sets.TreasureHunter)
         end
     end
@@ -109,7 +109,7 @@ function job_post_midcast(spell, action, spellMap, eventArgs)
     -- Check for incapacitated state.
     incapacitated(spell, eventArgs)
     -- Equip Ranged Attack gear with Treasure Hunter if it's active.
-    if treasureHunter ~= 'None' and spell.action_type == 'Ranged Attack' then
+    if state.TreasureMode.value ~= 'None' and spell.action_type == 'Ranged Attack' then
         equip(sets.precast.RATH)
     end
 end
