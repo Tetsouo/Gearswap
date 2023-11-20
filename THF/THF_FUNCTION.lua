@@ -121,14 +121,6 @@ function th_action_check(category, param)
     end
 end
 
---[[ function wsTp(spell)
-    if spell.type == "WeaponSkill" then
-        if (player.tp >= 1750 and player.tp < 2000) then
-            sets.precast.WS = set_combine(sets.precast.WS, {left_ear = MoonShadeEarring})
-        end
-    end
-end ]]
-
 function wsTp(spell)
     if spell.type == "WeaponSkill" then
         if player.tp >= 1750 and player.tp < 2000 then
