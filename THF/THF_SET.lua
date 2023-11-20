@@ -147,12 +147,12 @@ sets['TwashtarM'] = {main = 'Twashtar'}
 sets['TwashtarS'] = {sub = 'Twashtar'}
 sets['Tauret'] = {main = 'Tauret'}
 sets['Malevolence'] = {main = 'Malevolence'}
+sets['Qutrub'] = {main = 'Qutrub Knife'}
 sets['Naegling'] = {main = 'Naegling'}
-sets['Qutrub'] = {main = 'Qutrub Knife', sub = 'Chac-Chacs'}
-sets['Excalipoor'] = {main = 'Excalipoor', sub = 'Qutrub Knife'}
+sets['Excalipoor'] = {main = 'Excalipoor'}
 sets['Lament'] = {main = 'Lament'}
 sets['Iapetus'] = {main = 'Iapetus'}
-sets['Chac'] = {main = 'Chac-Chacs', sub = 'Qutrub Knife'}
+sets['Chac'] = {main = 'Chac-Chacs'}
 sets['Ram'] = {main = 'Ram staff'}
 sets['Crepu'] = {main = 'Crepuscular Knife'}
 sets['Centovente'] = {sub = 'Centovente'}
@@ -259,28 +259,26 @@ sets.defense.MDT =
 --                                           ENGAGED                                                      =
 --=========================================================================================================
 sets.engaged = {
-    ammo = 'Aurgelmir Orb +1',
-    head = "skulker's Bonnet +3",
-    body = "Pillager's Vest +3",
-    hands = AdhemarWrist,
-    legs = SamnuhaTights,
-    feet = PlundererPoulaines,
-    neck = 'Asn. Gorget +2',
-    waist = 'Windbuffet Belt +1',
-    left_ear = 'Sherida Earring',
-    right_ear = "Skulker's earring +1",
-    left_ring = 'Hetairoi Ring',
-    right_ring = "Epona's Ring",
-    back = Toutatis.STP
+    ammo="Aurgelmir Orb +1",
+    head="Skulker's Bonnet +3",
+    body="Pillager's Vest +3",
+    hands="Malignance Gloves",
+    legs="Pill. Culottes +3",
+    feet="Plun. Poulaines +3",
+    neck="Asn. Gorget +2",
+    waist="Windbuffet Belt +1",
+    left_ear="Sherida Earring",
+    right_ear="Skulk. Earring +1",
+    left_ring="Hetairoi Ring",
+    right_ring="Epona's Ring",
+    back= Toutatis.STP
 }
 
 sets.engaged.Acc =
     set_combine(
     sets.engaged.Mid,
     {
-        legs = 'Pill. Culottes +3',
         waist = 'Kentarch belt +1',
-        right_ear = "Skulker's Earring +1",
         left_ring = ChirichRing1,
         right_ring = ChirichRing2
     }
@@ -290,19 +288,16 @@ sets.engaged.PDT =
     set_combine(
     sets.engaged,
     {
-        ammo = 'Aurgelmir Orb +1',
-        head = "skulker's Bonnet +3",
-        body = 'Malignance Tabard',
-        hands = "Skulker's Armlets +3",
-        legs = "Skulker's culottes +3",
-        feet = "Skulker's Poulaines +3",
-        neck = 'Asn. Gorget +2',
-        waist = 'Windbuffet Belt +1',
-        left_ear = 'Sherida Earring',
-        right_ear = 'Skulk. Earring +1',
-        left_ring = ChirichRing1,
-        right_ring = ChirichRing2,
-        back = Toutatis.STP
+    ammo="Aurgelmir Orb +1",
+    head="Malignance Chapeau",
+    body="Malignance Tabard",
+    hands="Malignance Gloves",
+    legs="Malignance Tights",
+    feet="Skulk. Poulaines +3",
+    neck="Asn. Gorget +2",
+    waist="Kentarch Belt +1",
+    left_ring="Chirich Ring +1",
+    right_ring="Defending Ring",
     }
 )
 
@@ -459,7 +454,7 @@ sets.precast.JA['Perfect Dodge'] = {
 }
 
 sets.precast.JA['Feint'] = {
-    legs = PlundererCulotte
+    legs = "Plun. Culottes +3"
 }
 
 sets.precast.JA['Sneak Attack'] = sets.buff['Sneak Attack']
@@ -607,6 +602,8 @@ sets.precast.WS['Evisceration'] =
     set_combine(
     sets.precast.WS,
     {
+        Hands = "Gleti's Gauntlets",
+        Feet = "Gleti's boots",
         left_ring = 'Mummu Ring'
     }
 )
@@ -642,7 +639,7 @@ sets.precast.WS['Savage Blade'] =
         head = 'Pill. Bonnet +3',
         body = "skulker's Vest +3",
         hands = 'Meg. Gloves +2',
-        legs = PlundererCulotte,
+        legs = "Plun. Culottes +3",
         neck = 'Asn. Gorget +2',
         waist = 'Kentarch belt +1',
         back = Toutatis.WS2,
@@ -657,7 +654,7 @@ sets.precast.WS["Rudra's Storm"] =
         head = 'Pill. Bonnet +3',
         body = "skulker's Vest +3",
         hands = 'Meg. Gloves +2',
-        legs = PlundererCulotte,
+        legs = "Plun. Culottes +3",
         neck = 'Asn. Gorget +2',
         waist = 'Kentarch belt +1',
         back = Toutatis.WS2,
@@ -696,7 +693,7 @@ sets.precast.WS['Mandalic Stab'] =
         head = 'Pill. Bonnet +3',
         body = "skulker's Vest +3",
         hands = 'Meg. Gloves +2',
-        legs = PlundererCulotte,
+        legs = "Plun. Culottes +3",
         neck = 'Asn. Gorget +2',
         waist = 'Kentarch belt +1',
         back = Toutatis.WS2,
@@ -765,7 +762,7 @@ sets.precast.WS['Aeolian Edge'] = {
     right_ear = 'Friomisi Earring',
     left_ring = "Cornelia's Ring",
     right_ring = 'Dingir Ring',
-    waist = 'Skrymir cord',
+    waist = "Orpheus's Sash",
     back = Toutatis.WS2
 }
 

@@ -12,16 +12,16 @@ function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2).
     include('/Misc/0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management.
-    include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions.
     include('/WAR/WAR_FUNCTION.lua') -- Includes the WAR_FUNCTION.lua file for advanced functions specific to Warrior.
+    include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions
 end
 
 -- Handles user-specific configuration and setup.
-function user_setup()
+function job_setup()
     -- Hybrid mode options: 'PDT' (Defense physical), 'Normal (Damage Dealer)'
     state.HybridMode:options('PDT', 'Normal')
     -- Main weapon choice: 'Lycurgos', 'Naegling', 'Shining', 'Loxotic'
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'Naegling', 'Lycurgos', 'Shining', 'Loxotic'} --gs c cycle WeaponSet
+    state.WeaponSet = M {['description'] = 'Main Weapon','Ukonvasara', 'Naegling', 'Shining', 'Loxotic'} --gs c cycle WeaponSet
     -- Sub weapon choice: 'Utu Grip', 'Blurred Shield +1'
     --[[ state.SubSet = M {['description'] = 'Sub Weapon', 'Utu', 'Blurred'} --gs c cycle SubSet ]]
     -- Calls the function to select the default macro book
@@ -81,6 +81,7 @@ function job_precast(spell, action, spellMap, eventArgs)
     if incapacitated(spell, eventArgs, true) then
         -- Spell cannot be cast due to incapacitation, no further actions needed
     else
+        TPWS(spell)
         checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
     end
 end

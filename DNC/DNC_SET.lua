@@ -249,10 +249,7 @@ sets.precast.Flourish1['Violent Flourish'] = {
     neck = 'Voltsurge Torque',
     waist = 'Skrymir Cord',
     left_ear = 'Enchntr. Earring +1',
-    right_ear = {
-        name = 'Macu. Earring +1',
-        augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', '"Store TP"+4'}
-    },
+    right_ear = 'Macu. Earring +1',
     left_ring = 'Mummu Ring',
     right_ring = 'Crepuscular Ring'
 }
@@ -532,10 +529,7 @@ sets.precast.Skillchain =
     {
         hands = 'Maculele Bangles +3',
         legs = 'maxixi tights + 2',
-        right_ear = {
-            name = 'Macu. Earring +1',
-            augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', '"Store TP"+4'}
-        }
+        right_ear = 'Macu. Earring +1',
     }
 )
 
@@ -573,10 +567,7 @@ sets.idle = {
     neck = 'Elite Royal Collar',
     waist = 'Svelt. Gouriz +1',
     left_ear = 'Sherida Earring',
-    right_ear = {
-        name = 'Macu. Earring +1',
-        augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', '"Store TP"+4'}
-    },
+    right_ear = 'Macu. Earring +1',
     left_ring = ChirichRing1,
     right_ring = ChirichRing2,
     back = Senuna.STP

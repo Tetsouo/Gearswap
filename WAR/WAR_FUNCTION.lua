@@ -7,32 +7,22 @@
 --=               Last Modified: 2023-07-18                  =--
 --============================================================--
 
--- Table containing the equipment sets for each Job Ability
-local abilityEquipment = {
-    Berserk = {body = 'Pumm. Lorica +3', feet = 'Agoge Calligae +3'},
-    Defender = {hands = 'Agoge Mufflers +3'},
-    Aggressor = {body = 'Agoge Lorica +3'},
-    Warcry = {head = 'Agoge Mask +3'},
-    Retaliation = {feet = 'Boii Calligae +3'},
-    Restraint = {feet = 'Boii Mufflers +3'}
-}
 
 -- Function to buff self with Job Abilities
-local function buffSelf(param)
+function buffSelf(param)
     -- Retrieve the ability recasts and buff status
     local AbilityRecasts = windower.ffxi.get_ability_recasts()
     local buffWarcry = buffactive['Warcry']
     -- Define the abilities and their recasts
     local abilities = {
-        {name = 'Berserk', recast = AbilityRecasts[1], equip = abilityEquipment['Berserk']},
-        {name = 'Defender', recast = AbilityRecasts[3], equip = abilityEquipment['Defender']},
-        {name = 'Aggressor', recast = AbilityRecasts[4], equip = abilityEquipment['Aggressor']},
-        {name = 'Retaliation', recast = AbilityRecasts[8], equip = abilityEquipment['Retaliation']},
-        {name = 'Restraint', recast = AbilityRecasts[9], equip = abilityEquipment['Restraint']},
+        {name = 'Berserk', recast = AbilityRecasts[1]},
+        {name = 'Defender', recast = AbilityRecasts[3]},
+        {name = 'Aggressor', recast = AbilityRecasts[4]},
+        {name = 'Retaliation', recast = AbilityRecasts[8]},
+        {name = 'Restraint', recast = AbilityRecasts[9]},
         {
             name = (AbilityRecasts[2] > 1 and not buffWarcry) and 'Blood Rage' or 'Warcry',
-            recast = (AbilityRecasts[2] > 1 and not buffWarcry) and AbilityRecasts[11] or AbilityRecasts[2],
-            equip = {}
+            recast = (AbilityRecasts[2] > 1 and not buffWarcry) and AbilityRecasts[11] or AbilityRecasts[2]
         }
     }
     -- Initialize variables
@@ -61,14 +51,14 @@ local function buffSelf(param)
     end
     -- Use the ready ability immediately
     if readyAbility then
-        equip(abilityEquipment[readyAbility.name])
         send_command('input /ja "' .. readyAbility.name .. '" <me>')
+        delay = delay + 1
     end
     -- Use delayed abilities with a delay between each usage
     for _, ability in ipairs(delayedAbilities) do
-        equip(abilityEquipment[readyAbility.name])
         send_command('wait ' .. delay .. '; input /ja "' .. ability.name .. '" <me>')
-        delay = delay + 1
+        delay = delay + 2
+        job_handle_equipping_gear()
     end
 end
 
@@ -166,6 +156,7 @@ function jump()
         end
     else
         -- Create a message indicating that the player has enough TP and display it
+        add_to_chat(057, "You dont have Enough TP !!!")
         local message = createFormatMsg('TP:', playerTP, nil, 'You have enough TP !!!')
         add_to_chat(057, message)
     end
@@ -205,38 +196,6 @@ end
         return meleeSet
     end
 
--- Function to handle job-specific self commands
-function job_self_command(cmdParams)
-    -- Check the input command parameters
-    if cmdParams[1] == 'Berserk' then
-        local buffDefender = buffactive['Defender']
-        -- Cancel Defender if active
-        if buffDefender then
-            send_command('cancel defender')
-        end
-        -- Call buffSelf with the appropriate parameter
-        buffSelf('Berserk')
-    elseif cmdParams[1] == 'Defender' then
-        local buffBerserk = buffactive['Berserk']
-        -- Handle HybridMode if necessary
-        if state.HybridMode.value == 'Normal' then
-            send_command('gs c set HybridMode PDT')
-        end
-        -- Cancel Berserk if active
-        if buffBerserk then
-            send_command('cancel berserk')
-        end
-        -- Call buffSelf with the appropriate parameter
-        buffSelf('Defender')
-    elseif cmdParams[1] == 'ThirdEye' then
-        -- Call ThirdEye function
-        ThirdEye()
-    elseif cmdParams[1] == 'Jump' then
-        -- Call Jump function
-        jump()
-    end
-end
-
 -- Handles actions to be performed when a spell is interrupted.
 -- Parameters:
 --   spell (table): The interrupted spell.
@@ -246,4 +205,78 @@ function handleInterruptedSpell(spell, eventArgs)
     eventArgs.handled = true
     local message = createFormatMsg('Spell interrupted:', spell.name)
     add_to_chat(123, message)
+end
+
+-- ***************************************************************************
+-- * Appelé à chaque changement de stuffs automatique (ex: Engaged ou Idle). *
+-- ***************************************************************************
+function job_handle_equipping_gear(playerStatus, eventArgs)
+    check_weaponset()
+    check_subset()
+    if state.Moving.value == 'true' then
+        send_command('gs equip sets.MoveSpeed')
+    end
+end
+
+function TPWS(spell)
+    if 
+    (player.tp >= 1650 and player.tp < 2000) or 
+    (player.tp >= 2650 and player.tp < 3000) and
+    spell.type == 'WeaponSkill' then
+        sets.precast.WS = {
+            ammo = 'Knobkierrie',
+            head = 'Agoge Mask +3',
+            body = 'Pumm. Lorica +3',
+            hands = 'Boii Mufflers +3',
+            legs = 'Boii Cuisses +3',
+            feet = 'Sulev. Leggings +2',
+            neck = {name = 'War. Beads +2', augments = {'Path: A'}},
+            waist = 'Sailfi Belt +1',
+            left_ear = 'Thrud Earring',
+            right_ear = 'MoonShade Earring',
+            left_ring = 'Regal Ring',
+            right_ring = "Cornelia's Ring",
+            back = Cichol.ws1
+        }
+    elseif (player.tp >= 1900 and player.tp < 2000) or 
+    (player.tp >= 2900 and player.tp < 3000) and
+    spell.type == 'WeaponSkill' then
+        sets.precast.WS = {
+            ammo = 'Knobkierrie',
+            head = 'Agoge Mask +3',
+            body = 'Pumm. Lorica +3',
+            hands = 'Boii Mufflers +3',
+            legs = 'Boii Cuisses +3',
+            feet = 'Sulev. Leggings +2',
+            neck = {name = 'War. Beads +2', augments = {'Path: A'}},
+            waist = 'Sailfi Belt +1',
+            left_ear = 'Thrud Earring',
+            right_ear = {
+                name = 'Boii Earring +1',
+                augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Crit.hit rate+4'}
+            },
+            left_ring = 'Regal Ring',
+            right_ring = "Cornelia's Ring",
+            back = Cichol.ws1
+        }
+    else
+        sets.precast.WS = {
+            ammo = 'Knobkierrie',
+            head = 'Agoge Mask +3',
+            body = 'Pumm. Lorica +3',
+            hands = 'Boii Mufflers +3',
+            legs = 'Valorous Hose',
+            feet = 'Sulev. Leggings +2',
+            neck = {name = 'War. Beads +2', augments = {'Path: A'}},
+            waist = 'Sailfi Belt +1',
+            left_ear = 'Thrud Earring',
+            right_ear = {
+                name = 'Boii Earring +1',
+                augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Crit.hit rate+4'}
+            },
+            left_ring = 'Regal Ring',
+            right_ring = "Cornelia's Ring",
+            back = Cichol.ws1
+        }
+    end
 end

@@ -13,6 +13,7 @@ PUNCTUATION = 161 -- Color for punctuation marks
 SPELLANDRECAST = 057 -- Color for spell names and recast timers
 SEPARATOR = 161 -- Color for separators
 INCAP = 167 -- Color for incapacitated state
+local strat_charge_time = {240,120,80,60,48}
 
 -- List of incapacitated states
 local incapacitated_states =
@@ -127,6 +128,9 @@ function checkDisplayCooldown(spell, eventArgs)
     if spell.skill == 'Elemental Magic' then
         return  -- Skip cooldown check for Elemental Magic spells
     end
+    if spell.type == "Scholar" then
+        return  -- Skip cooldown check for Stratagems Magic spells
+    end
     -- Check if the action type is not "Weapon Skill" and is not elemental
     if spell.action_type ~= 'Weapon Skill' then
         -- Retrieve the recast time of the spell or ability
@@ -170,7 +174,6 @@ function handleCommand(spellTable)
                 break
             else
                 spellToTest = spellData
-
                 if i < #spellTable then
                     spellToTest = spellData
                     spellToCast = spellTable[i + 1]
@@ -188,7 +191,6 @@ function handleCommand(spellTable)
             table.insert(messages, {spell = spellData.name, recast = spellRecast, message = message})
         end
     end
-
     -- If there is a spell ready to be cast
     if spellRecast == 0 then
         -- Check if there is a spell to test
@@ -271,7 +273,6 @@ function handleCommand(spellTable)
                 )
             end
         end
-
         -- Check if there are messages in the table
         checkAndDisplayMessages(messages)
     end
@@ -467,6 +468,9 @@ function job_self_command(cmdParams, eventArgs)
     elseif cmdParams[1]:lower() == 'bdd' then
         local targetid = windower.ffxi.get_mob_by_target('lastst').id
         send_command('send Kaories haste2 ' .. targetid .. '; wait 4; send Kaories phalanx2 ' .. targetid .. '; wait 4; send Kaories regen2 ' .. targetid)
+    elseif cmdParams[1]:lower() == 'bddrng' then
+        local targetid = windower.ffxi.get_mob_by_target('lastst').id
+        send_command('send Kaories flurry2 ' .. targetid .. '; wait 4; send Kaories phalanx2 ' .. targetid .. '; wait 4; send Kaories regen2 ' .. targetid)
     elseif cmdParams[1]:lower() == 'curaga' then
         local targetid = windower.ffxi.get_mob_by_target('lastst').id
         send_command('send Kaories curaga3 ' .. targetid)
@@ -488,6 +492,7 @@ function job_self_command(cmdParams, eventArgs)
         local mainDark = state.MainDarkSpell.value
         local subDark = state.SubDarkSpell.value
         local ajaSpell = state.Aja.value
+        local StormSpell = state.Storm.value
         if cmdParams[1]:lower() == 'buffself' then
             BuffSelf()
         elseif cmdParams[1]:lower() == 'mainlight' then
@@ -505,6 +510,298 @@ function job_self_command(cmdParams, eventArgs)
         elseif cmdParams[1]:lower() == 'aja' then
             local spellToCast = ajaSpell
             send_command('input /ma "' .. spellToCast .. '" <stnpc>')
+        elseif cmdParams[1]:lower() == 'lightarts' then
+            if not buffactive['Light Arts'] then
+                send_command('input /ja "Light Arts" <me>')
+            else
+                send_command('input /ja "Addendum: White" <me>')
+            end
+        elseif cmdParams[1]:lower() == 'darkarts' then
+            if not buffactive['Dark Arts'] then
+                send_command('input /ja "Dark Arts" <me>')
+            else
+                send_command('input /ja "Addendum: Black" <me>')
+            end
+        elseif cmdParams[1]:lower() == 'storm' then
+            local spellToCast = StormSpell
+            if not buffactive['Klimaform'] then
+                send_command('input /ma "Klimaform" <me>; wait 4; input /ma "' .. spellToCast .. '" <me>')
+            else
+                send_command('input /ma "' .. spellToCast .. '" <me>')
+            end
         end
+        if player.sub_job == 'SCH' then
+            if cmdParams[1]:lower() == 'blindna' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Blindna" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Blindna" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Blindna" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'poisona' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Poisona" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Poisona" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Poisona" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'viruna' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Viruna" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Viruna" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Viruna" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'stona' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Stona" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Stona" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Stona" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'silena' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Silena" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Silena" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Silena" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'paralyna' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Paralyna" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Paralyna" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Paralyna" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'cursna' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Cursna" <stal>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Cursna" <stal>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Cursna" <stal>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'erase' then
+                if buffactive['addendum: white'] then
+                    send_command('input /ma "Erase" <stpc>')
+                    return
+                elseif buffactive['white arts'] and not buffactive['addendum: white'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: White" <me>; wait 1; input /ma "Erase" <stpc>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Addendum: White" <me>; wait 1; input /ma "Erase" <stpc>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'dispel' then
+                if buffactive['addendum: black'] then
+                    send_command('input /ma "Dispel" <stnpc>')
+                    return
+                elseif buffactive['dark arts'] and not buffactive['addendum: black'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Addendum: Black" <me>; wait 1; input /ma "Dispel" <stnpc>')
+                    end
+                else
+                    if stratagems_available() then
+                        send_command('input /ja "Dark Arts" <me>; wait 2; input /ja "Addendum: Black" <me>; wait 1; input /ma "Dispel" <stnpc>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'sneak' then
+                if buffactive['Light Arts'] or buffactive['Addendum: White'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Accession" <me>; wait 1; input /ma "Sneak" <stpt>')
+                    else
+                        send_command('input /ma "Sneak" <stpt>')
+                    end
+                else
+                    if stratagems_available() then
+                    send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Accession" <me>; wait 1; input /ma "Sneak" <stpt>')
+                else
+                    send_command('input /ja "Light Arts" <me>; wait 1; input /ma "Sneak" <stpt>')
+                    end
+                end
+            end
+            if cmdParams[1]:lower() == 'invi' then
+                if buffactive['Light Arts'] or buffactive['Addendum: White'] then
+                    if stratagems_available() then
+                        send_command('input /ja "Accession" <me>; wait 1; input /ma "Invisible" <stpt>')
+                    else
+                        send_command('input /ma "Invisible" <stpt>')
+                    end
+                else
+                    if stratagems_available() then
+                    send_command('input /ja "Light Arts" <me>; wait 2; input /ja "Accession" <me>; wait 1; input /ma "Invisible" <stpt>')
+                else
+                    send_command('input /ja "Light Arts" <me>; wait 1; input /ma "Invisible" <stpt>')
+                    end
+                end
+            end
+        end
+    end
+    if player.main_job == 'WAR' then
+    -- Check the input command parameters
+        if cmdParams[1] == 'Berserk' then
+            local buffDefender = buffactive['Defender']
+            -- Cancel Defender if active
+            if buffDefender then
+                send_command('cancel defender')
+            end
+            -- Call buffSelf with the appropriate parameter
+            buffSelf('Berserk')
+        elseif cmdParams[1] == 'Defender' then
+            local buffBerserk = buffactive['Berserk']
+            -- Handle HybridMode if necessary
+            if state.HybridMode.value == 'Normal' then
+                send_command('gs c set HybridMode PDT')
+            end
+            -- Cancel Berserk if active
+            if buffBerserk then
+                send_command('cancel berserk')
+            end
+            -- Call buffSelf with the appropriate parameter
+            buffSelf('Defender')
+        elseif cmdParams[1] == 'ThirdEye' then
+            -- Call ThirdEye function
+            ThirdEye()
+        elseif cmdParams[1] == 'Jump' then
+            -- Call Jump function
+            jump()
+        end
+    end
+    if player.main_job == 'DNC' then
+        if cmdParams[1] == 'step' then
+            if cmdParams[2] == 't' then
+                local doStep = ''
+                if state.UseAltStep.value == true then
+                    doStep = state[state.CurrentStep.current .. 'Step'].current
+                    state.CurrentStep:cycle()
+                else
+                    doStep = state.MainStep.current
+                end
+                if player.target.name ~= nil and player.target.hpp > 5 and player.tp >= 100 then
+                    send_command('@input /ja "' .. doStep .. '" <t>')
+                else
+                    send_command('@input /echo Unable to cast ' .. doStep .. '')
+                end
+            end
+        end
+    end
+end
+
+
+-- Calculates and returns the maximum number of SCH stratagems available for use.
+function get_max_stratagem_count()
+    if S{player.main_job, player.sub_job}:contains('SCH') then
+        local lvl = player.main_job == 'SCH' and player.main_job_level or player.sub_job_level
+        return math.floor(((lvl  - 10) / 20) + 1)
+    else
+        return 0
+    end
+end
+
+--[[ Calculates the number of SCH stratagems that are currently available for use.
+    Calculated from the combined recast timer for stratagems and the maximum number of stratagems
+    that are available.  The recast time for each stratagem charge corresponds directly with the
+    maximum number of stratagems that can be used.  The table that links these is strat_charge_time,
+    and is defined in mappings.lua. ]]
+function get_available_stratagem_count()
+    local recastTime = windower.ffxi.get_ability_recasts()[231] or 0
+    local maxStrats = get_max_stratagem_count()
+    if maxStrats == 0 then return 0 end
+    local stratsUsed = (recastTime/strat_charge_time[maxStrats]):ceil()
+    return maxStrats - stratsUsed
+end
+
+function stratagems_available()
+    return get_available_stratagem_count() > 0
+end
+
+-- Function to handle the Jump ability
+function jump()
+    -- Initialize variables
+    local messages = {}  -- Stores messages to display
+    local jaName1 = 'Jump'  -- Name of the first jump ability
+    local jaName2 = 'High Jump'  -- Name of the second jump ability
+    local JaRecasts = windower.ffxi.get_ability_recasts()  -- Retrieves ability recast times
+    local jumpId = 158  -- ID of the first jump ability
+    local highJumpId = 159  -- ID of the second jump ability
+    local playerTP = player.tp  -- Retrieves player's TP
+    
+    if playerTP < 1000 then
+        -- Check if Jump and High Jump can be used
+        if JaRecasts[jumpId] < 1 and JaRecasts[highJumpId] < 1 and playerTP < 500 then
+            -- Execute command to use both jump abilities
+            send_command(
+                string.format('input /ja "%s" <t>; wait 1; input /ja "%s" <t>', jaName1, jaName2)
+            )
+        elseif JaRecasts[jumpId] < 1 and JaRecasts[highJumpId] < 1 and playerTP > 500 and playerTP < 1000 then
+            -- Execute command to use the first jump ability
+            send_command(
+                string.format('input /ja "%s" <t>', jaName1)
+            )
+        elseif JaRecasts[jumpId] < 1 and JaRecasts[highJumpId] > 1 then
+            -- Execute command to use the first jump ability
+            send_command(
+                string.format('input /ja "%s" <t>', jaName1)
+            )
+        elseif JaRecasts[jumpId] > 1 and JaRecasts[highJumpId] < 1 then
+            -- Execute command to use the second jump ability
+            send_command(
+                string.format('input /ja "%s" <t>', jaName2)
+            )
+        end
+    else
+            add_to_chat(057, "You have Enough TP !!!")
     end
 end

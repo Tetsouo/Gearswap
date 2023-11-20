@@ -9,24 +9,11 @@
 
 -- This script is for the Thief job in Gearswap.
 
--- Sets up the necessary libraries and files for Gearswap.
-function get_sets()
-    -- Set the Mote-Include version to 2.
-    mote_include_version = 2
-    -- Include the Mote-Include.lua library (Version 2) for common functions.
-    include('Mote-Include.lua')
-    -- Include the AutoMove.lua file for movement speed gear management.
-    include('/Misc/0_AutoMove.lua')
-    -- Include the SharedFunctions.lua file for shared functions.
-    include('/Misc/SharedFunctions.lua')
-    -- Include the THF_FUNCTION.lua file for advanced functions specific to Thief.
-    include('/THF/THF_FUNCTION.lua')
-end
-
 -- Handles user-specific configuration and setup.
 function job_setup()
     -- Include the Mote-TreasureHunter.lua file for handling Treasure Hunter.
     include('Mote-TreasureHunter.lua')
+    ---------------------------------------------------------------------------------------------------------
     -- Initialize the treasureHunter state variable from TreasureMode.
     treasureHunter = state.TreasureMode.value
     -- Set default treasure mode to 'tag'.
@@ -47,11 +34,11 @@ function job_setup()
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for main weapon options.
     -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Qutrub', 'Naegling'}
+    --[[ state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Qutrub', 'Naegling'} ]]
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for  alt main weapon options.
     -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    --[[ state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Qutrub', 'Excalipoor', 'Lament', 'Iapetus', 'Chac', 'Ram', 'Sickle'} ]]
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Qutrub', 'Excalipoor', 'Lament', 'Iapetus', 'Chac', 'Ram', 'Sickle'}
     ---------------------------------------------------------------------------------------------------------
     -- Gear set for sub weapon options.
     -- Command to cycle sub weapon set: /console gs c cycle SubSet
@@ -68,6 +55,22 @@ function job_setup()
     select_default_macro_book()
 end
 
+-- Sets up the necessary libraries and files for Gearswap.
+function get_sets()
+    -- Set the Mote-Include version to 2.
+    mote_include_version = 2
+    -- Include the Mote-Include.lua library (Version 2) for common functions.
+    include('Mote-Include.lua')
+    -- Include the AutoMove.lua file for movement speed gear management.
+    include('/Misc/0_AutoMove.lua')
+    -- Include the SharedFunctions.lua file for shared functions.
+    include('/Misc/SharedFunctions.lua')
+    -- Include the THF_FUNCTION.lua file for advanced functions specific to Thief.
+    include('/THF/THF_FUNCTION.lua')
+end
+
+
+
 -- Initialize gear sets.
 function init_gear_sets()
     -- Include the gear sets for Thief.
@@ -76,13 +79,13 @@ end
 
 -- Actions to perform before a spell is cast.
 function job_precast(spell, action, spellMap, eventArgs)
-    wsTp(spell)
     -- Check if the player is incapacitated (unable to act) before casting the spell.
     if not incapacitated(spell, eventArgs, true) then
         -- Check for display cooldowns for actions.
         checkDisplayCooldown(spell, eventArgs)
         -- Refine Utsusemi spell.
         refine_Utsusemi(spell, eventArgs)
+        wsTp(spell)
         -- Set the state for the buff corresponding to the spell being cast to true.
         if state.Buff[spell.english] ~= nil then
             state.Buff[spell.english] = true
@@ -96,7 +99,7 @@ function job_post_precast(spell, action, spellMap, eventArgs)
     if spell.english == 'Aeolian Edge' and treasureHunter ~= 'None' then
         equip(sets.AeolianTH)
     -- Equip the TreasureHunter gear set for Sneak Attack, Trick Attack, or WeaponSkills if applicable.
-    elseif spell.english == 'Sneak Attack' or spell.english == 'Trick Attack' then
+    elseif spell.english == 'Sneak Attack' or spell.english == 'Trick Attack' or spell.type == 'WeaponSkill' then
         if state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime' then
             equip(sets.TreasureHunter)
         end

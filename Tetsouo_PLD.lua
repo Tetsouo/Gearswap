@@ -11,19 +11,21 @@
 function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2)
+    include('/PLD/PLD_SET.lua')
     include('/Misc/0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management
     include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions
     include('/PLD/PLD_FUNCTION.lua') -- Includes the PLD_FUNCTION.lua file for advanced functions specific to Paladin
 end
 
 -- Handles user-specific configuration and setup.
-function user_setup()
+function job_setup()
     -- Hybrid mode options: 'PDT' (physical), 'MDT' (magical)
     state.HybridMode:options('PDT', 'MDT') -- Command to change hybrid mode: /console gs c cycle HybridMode
     -- Main weapon choice: 'Burtgang', 'Naegling'
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'Burtgang', 'Naegling'} -- Command to cycle main weapon set: /console gs c cycle WeaponSet
+    state.WeaponSet = M {['description'] = 'Main Weapon', 'Burtgang', 'Naegling', 'Malevo'} -- Command to cycle main weapon set: /console gs c cycle WeaponSet
     -- Sub weapon choice: 'Duban', 'Aegis', 'Ochain', 'Blurred'
     state.SubSet = M {['description'] = 'Sub Weapon', 'Duban', 'Aegis', 'Ochain', 'Blurred'} -- Command to cycle sub weapon set: /console gs c cycle SubSet
+    state.Xp = M {['description'] = 'XP', 'False', 'True'}
     -- Calls the function to select the default macro book
     select_default_macro_book()
     -- Binds F9 to cycle through hybrid modes
@@ -53,7 +55,6 @@ end
 
 -- Loads the gear sets from the PLD_SET.lua file.
 function init_gear_sets()
-    include('/PLD/PLD_SET.lua')
 end
 
 -- Handles actions and checks to perform before casting a spell or ability.
@@ -63,11 +64,11 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    updateTable(spellsSingle, spell.name, 'Precast')
-    updateTable(spellsAoe, spell.name, 'Precast')
     if incapacitated(spell, eventArgs, true) then
         -- Spell cannot be cast due to incapacitation, no further actions needed
     else
+        PhalanXp(spell, eventArgs)
+        customize_cure_set(spell)
         auto_majesty(spell, eventArgs) -- Automatically cast Majesty ability before certain spells
         auto_divineEmblem(spell, eventArgs) -- Automatically use Divine Emblem ability
         checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
@@ -107,6 +108,10 @@ function select_default_macro_book()
         -- If sub job is BLU
     elseif player.sub_job == 'BLU' then
         set_macro_page(1, 23) -- Set macro book page 1, macro 22 for sub job BLU
+        send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
+    -- For other sub jobs
+    elseif player.sub_job == 'RDM' then
+        set_macro_page(1, 32) -- Set macro book page 1, macro 22 for sub job BLU
         send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
     -- For other sub jobs
     else

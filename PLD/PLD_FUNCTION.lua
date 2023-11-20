@@ -46,7 +46,7 @@ function auto_divineEmblem(spell, eventArgs)
                     cancel_spell()
                     send_command(
                         string.format(
-                            'input /ja "Divine Emblem" <me>; wait 1.5; input /ma %s %s',
+                            'input /ja "Divine Emblem" <me>; wait 1; input /ma %s %s',
                             spell.name,
                             spell.target.id
                         )
@@ -74,7 +74,7 @@ function auto_majesty(spell, eventArgs)
                     cancel_spell()
                     send_command(
                         string.format(
-                            'input /ja "Majesty" <me>; wait 1.5; input /ma %s %s',
+                            'input /ja "Majesty" <me>; wait 1; input /ma %s %s',
                             spell.name,
                             spell.target.id
                         )
@@ -88,6 +88,44 @@ function auto_majesty(spell, eventArgs)
     end
 end
 
+function customize_cure_set(spell)
+    if spell.name == 'Cure III' or spell.name == 'Cure IV' then
+        if player.target.type == 'SELF' then
+            sets.midcast.Cure = {
+                ammo = {name = 'staunch Tathlum +1', priority = 1},
+                head = SouvHead,
+                neck = {name = 'Unmoving Collar +1', priority = 16},
+                left_ear = {name = 'tuisto Earring', priority = 15},
+                right_ear = {name = 'Chev. Earring +1', priority = 0},
+                body = {name = 'Rev. Surcoat +3', priority = 2},
+                hands = {name = 'Regal Gauntlets', priority = 14},
+                left_ring = {name = 'Supershear Ring', priority = 5},
+                right_ring = {name = 'Defending Ring', priority = 6},
+                back = Rudianos.cure,
+                waist = {name = 'Plat. Mog. Belt', priority = 17},
+                legs = {name = "Founder's Hose", priority = 8},
+                feet = {name = 'Odyssean Greaves', priority = 9}
+            }
+        else
+            sets.midcast.Cure = {
+                ammo = {name = 'staunch Tathlum +1', priority = 1},
+                head = SouvHead,
+                neck = {name = 'Sacro Gorget', priority = 10},
+                left_ear = {name = 'tuisto Earring', priority = 15},
+                right_ear = {name = 'Chev. Earring +1', priority = 0},
+                body = SouvBody,
+                hands = {name = 'Regal Gauntlets', priority = 14},
+                left_ring = {name = 'Apeile Ring +1', priority = 0},
+                right_ring = {name = 'Defending Ring', priority = 0},
+                back = Rudianos.cure,
+                waist = {name = 'Creed Baudrier', priority = 4},
+                legs = {name = "Founder's Hose", priority = 8},
+                feet = {name = 'Odyssean Greaves', priority = 9}
+            }
+        end
+    end
+end
+
 -- Modifies the default idle gear set to customize it based on the current conditions and modes.
 -- Parameters:
 --   idleSet (table): The default idle gear set.
@@ -95,8 +133,10 @@ end
 --   idleSet (table): The customized idle gear set.
 function customize_idle_set(idleSet)
     -- Set the default idle gear set based on HybridMode.
-    if state.HybridMode.value == 'PDT' then
-        idleSet = sets.idle -- Use the default idle gear set 'sets.idle'
+    if state.HybridMode.value == 'PDT' and state.Xp.value == 'True' then
+        idleSet = sets.idleXp
+    elseif state.HybridMode.value == 'PDT' and state.Xp.value == 'False' then
+        idleSet = sets.idleNormal
     elseif state.HybridMode.value == 'MDT' then
         idleSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
     end
@@ -105,6 +145,7 @@ function customize_idle_set(idleSet)
         if player.mp < 500 then
             idleSet = set_combine(idleSet, sets.latent_refresh) -- Combine the idle gear set with 'sets.latent_refresh'
         end
+        idleSet = set_combine(idleSet, {neck = "Elite Royal Collar"})
     end
     return idleSet -- Return the customized idle gear set
 end
@@ -116,8 +157,10 @@ end
 --   meleeSet (table): The customized melee gear set
 function customize_melee_set(meleeSet)
     -- Set the default melee gear set based on HybridMode
-    if state.HybridMode.value == 'PDT' then
-        meleeSet = sets.engaged.PDT -- Use the default idle gear set 'sets.idle'
+    if state.HybridMode.value == 'PDT' and state.Xp.value == 'True' then
+        meleeSet = sets.meleeXp
+    elseif state.HybridMode.value == 'PDT' and state.Xp.value == 'False' then
+        meleeSet = sets.engaged.PDT -- Use the default idle gear set 'sets.idleNormal'
     elseif state.HybridMode.value == 'MDT' then
         meleeSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
     end
@@ -129,18 +172,36 @@ end
 --   spell (table): The interrupted spell.
 --   eventArgs (table): Additional event arguments.
 function handleInterruptedSpell(spell, eventArgs)
-    for _, spellTest in ipairs(spellsSingle) do
-        if spellTest.name == spell.name then
-            spellTest.step = 'Midcast'
-        end
-    end
-    for _, spellTest in ipairs(spellsAoe) do
-        if spellTest.name == spell.name then
-            spellTest.step = 'Midcast'
-        end
-    end
-    equip(sets.idle)
+    equip(sets.idleNormal)
     eventArgs.handled = true
     local message = createFormatMsg('Spell interrupted:', spell.name)
     add_to_chat(123, message)
+end
+
+function PhalanXp(spell, eventArgs)
+    if spell.name == 'Phalanx' and buffactive['Silence'] then
+        cancel_spell()
+        eventArgs.handled = true
+        equip(sets.idle)
+        local message = createFormatMsg('Cannot Use:', spell.name, nil, value)
+        add_to_chat(167, message)
+        return true, value
+    else
+        if state.Xp.value == 'True' then
+            sets.midcast['Phalanx'] = sets.midcast.SIRDPhalanx
+        else
+            sets.midcast['Phalanx'] = sets.midcast.PhalanxPotency
+        end
+    end
+end
+
+-- ***************************************************************************
+-- * Appelé à chaque changement de stuffs automatique (ex: Engaged ou Idle). *
+-- ***************************************************************************
+function job_handle_equipping_gear(playerStatus, eventArgs)
+    check_weaponset()
+    check_subset()
+    if state.Moving.value == 'true' then
+        send_command('gs equip sets.MoveSpeed')
+    end
 end

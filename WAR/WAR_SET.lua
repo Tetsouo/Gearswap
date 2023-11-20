@@ -83,6 +83,7 @@ ChirichRing2 = {
 
 -- Equipment sets for different weapons and shields
 sets['Lycurgos'] = {main = 'Lycurgos', sub = 'Utu Grip'}
+sets['Ukonvasara'] = {main = 'Ukonvasara', sub = 'Utu Grip'}
 sets['Shining'] = {main = 'Shining one', sub = 'Utu Grip'}
 sets['Naegling'] = {main = 'Naegling', sub = 'Blurred Shield +1'}
 sets['Loxotic'] = {main = 'Loxotic Mace +1', sub = 'Blurred Shield +1'}
@@ -135,9 +136,62 @@ sets.idle.Town =
     sets.idle,
     {
         neck = 'Elite royal collar',
-        feet = 'Hermes Sandals'
+        feet = "Hermes' Sandals"
     }
 )
+
+--=========================================================================================================
+--                                              ENGAGED                                                   =
+--=========================================================================================================
+sets.engaged = {
+    ammo = 'Coiste Bodhar',
+    head= "Boii Mask +3",
+    body = 'Hjarrandi Breast.',
+    hands = "Sakpata's Gauntlets",
+    legs = {name = 'Agoge Cuisses +3', augments = {"Enhances \"Warrior's Charge\" effect"}},
+    feet = 'Pumm. Calligae +3',
+    neck = {name = 'War. Beads +2', augments = {'Path: A'}},
+    waist = 'Ioskeha Belt +1',
+    left_ear = 'Schere Earring',
+    right_ear = {
+        name = 'Boii Earring +1',
+        augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Crit.hit rate+4'}
+    },
+    left_ring = 'Chirich Ring +1',
+    right_ring = 'Niqmaddu Ring',
+    back = {name = "Cichol's Mantle", augments = {'STR+20', 'Accuracy+20 Attack+20', '"Dbl.Atk."+10'}}
+}
+
+sets.engaged.DW = {}
+
+sets.engaged.DW.Acc = {}
+
+sets.engaged.PDT =
+    set_combine(
+    sets.idle,
+    {
+        ammo="Coiste Bodhar",
+        head="Boii Mask +3",
+        body="Boii Lorica +3",
+        hands="Sakpata's Gauntlets",
+        legs="Sakpata's Cuisses",
+        feet="Boii Calligae +3",
+        neck={ name="War. Beads +2", augments={'Path: A',}},
+        waist="Ioskeha Belt +1",
+        left_ear="Telos Earring",
+        right_ear={ name="Boii Earring +1", augments={'System: 1 ID: 1676 Val: 0','Accuracy+13','Mag. Acc.+13','Crit.hit rate+4',}},
+        left_ring="Chirich Ring +1",
+        right_ring="Chirich Ring +1",
+        back={ name="Cichol's Mantle", augments={'STR+20','Accuracy+20 Attack+20','"Dbl.Atk."+10',}},
+    }
+)
+
+--=========================================================================================================
+--                                              MOVESPEED                                                 =
+--=========================================================================================================
+sets.MoveSpeed = {
+    feet = {name = "Hermes' Sandals", priority = 3}
+}
 
 --=========================================================================================================
 --                                              PRECAST                                                   =
@@ -193,6 +247,7 @@ sets.precast.JA['Aggressor'] =
     set_combine(
     sets.engaged,
     {
+        head = "Pummeler's Mask +2",
         body = 'Agoge Lorica +3'
     }
 )
@@ -227,67 +282,26 @@ sets.precast.WS = {
     right_ring = "Cornelia's Ring",
     back = Cichol.ws1
 }
+--[[ sets.precast.WS = {
+    ammo="Knobkierrie",
+    head={ name="Agoge Mask +3", augments={'Enhances "Savagery" effect',}},
+    body="Pumm. Lorica +3",
+    hands="Boii Mufflers +3",
+    legs="Boii Cuisses +3",
+    feet="Boii Calligae +3",
+    neck={ name="War. Beads +2", augments={'Path: A',}},
+    waist={ name="Sailfi Belt +1", augments={'Path: A',}},
+    left_ear="Thrud Earring",
+    right_ear={ name="Boii Earring +1", augments={'System: 1 ID: 1676 Val: 0','Accuracy+13','Mag. Acc.+13','Crit.hit rate+4',}},
+    left_ring="Regal Ring",
+    right_ring="Cornelia's Ring",
+    back={ name="Cichol's Mantle", augments={'STR+20','Accuracy+20 Attack+20','Weapon skill damage +10%',}},
+} ]]
 
 --=========================================================================================================
 --                                              DEFENSE                                                   =
 --=========================================================================================================
 sets.defense.MDT = {}
-
---=========================================================================================================
---                                              ENGAGED                                                   =
---=========================================================================================================
-sets.engaged = {
-    ammo = 'Coiste Bodhar',
-    head = 'Hjarrandi Helm',
-    body = 'Hjarrandi Breast.',
-    hands = "Sakpata's Gauntlets",
-    legs = {name = 'Agoge Cuisses +3', augments = {"Enhances \"Warrior's Charge\" effect"}},
-    feet = 'Pumm. Calligae +3',
-    neck = {name = 'War. Beads +2', augments = {'Path: A'}},
-    waist = 'Ioskeha Belt +1',
-    left_ear = 'Schere Earring',
-    right_ear = {
-        name = 'Boii Earring +1',
-        augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Crit.hit rate+4'}
-    },
-    left_ring = 'Chirich Ring +1',
-    right_ring = 'Niqmaddu Ring',
-    back = {name = "Cichol's Mantle", augments = {'STR+20', 'Accuracy+20 Attack+20', '"Dbl.Atk."+10'}}
-}
-
-sets.engaged.DW = {}
-
-sets.engaged.DW.Acc = {}
-
-sets.engaged.PDT =
-    set_combine(
-    sets.idle,
-    {
-        ammo = 'Coiste Bodhar',
-        head = 'Hjarrandi Helm',
-        body = 'Hjarrandi Breast.',
-        hands = "Sakpata's Gauntlets",
-        legs = "Sakpata's Cuisses",
-        feet = "Sakpata's Leggings",
-        neck = {name = 'War. Beads +2', augments = {'Path: A'}},
-        waist = 'Ioskeha Belt +1',
-        left_ear = 'Crep. Earring',
-        right_ear = {
-            name = 'Boii Earring +1',
-            augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Crit.hit rate+4'}
-        },
-        left_ring = 'Chirich Ring +1',
-        right_ring = 'Defending Ring',
-        back = {name = "Cichol's Mantle", augments = {'STR+20', 'Accuracy+20 Attack+20', '"Dbl.Atk."+10'}}
-    }
-)
-
---=========================================================================================================
---                                              MOVESPEED                                                 =
---=========================================================================================================
-sets.MoveSpeed = {
-    feet = {name = "Hermes' Sandals", priority = 3}
-}
 
 --=========================================================================================================
 --                                              CUSTOM BUFF                                               =

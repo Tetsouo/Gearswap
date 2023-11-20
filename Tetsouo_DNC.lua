@@ -14,23 +14,7 @@ end
 function job_setup()
     include('/Misc/0_AutoMove.lua')
     include('Mote-TreasureHunter')
-    determine_haste_group()
-
-    --______________________________________________________________________________________
-    -- Pour la Fonction th_action_check():
-    -- IDs des Job ability pour les actions qui ont toujours TH: Provoke, Animated Flourish.
-    info.default_ja_ids = S {35, 204}
-    -- IDs des Job ability qui ne Blink pas Pour les actions qui ont toujours TH: =>
-    -- Quick/Box/Stutter Step, Desperate/Violent Flourish.
-    info.default_u_ja_ids = S {201, 202, 203, 205, 207}
-end
-
--------------------------------------------------------------------------------------------------------------------
--- User setup functions for this job.  Recommend that these be overridden in a sidecar file.
--------------------------------------------------------------------------------------------------------------------
-
--- Setup vars that are user-dependent.  Can override this function in a sidecar file.
-function user_setup()
+    include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions
     state.HybridMode:options('PDT', 'Normal', 'Evasion')
     state.OffenseMode:options('Normal', 'Acc')
     state.TreasureMode:set('none')
@@ -46,11 +30,19 @@ function user_setup()
     state.CurrentStep = M {['description'] = 'Current Step', 'Main', 'Alt'}
     state.SkillchainPending = M(false, 'Skillchain Pending')
     select_default_macro_book()
+    --[[ determine_haste_group() ]]
+    --______________________________________________________________________________________
+    -- Pour la Fonction th_action_check():
+    -- IDs des Job ability pour les actions qui ont toujours TH: Provoke, Animated Flourish.
+    info.default_ja_ids = S {35, 204}
+    -- IDs des Job ability qui ne Blink pas Pour les actions qui ont toujours TH: =>
+    -- Quick/Box/Stutter Step, Desperate/Violent Flourish.
+    info.default_u_ja_ids = S {201, 202, 203, 205, 207}
 end
 
--- Called when this job file is unloaded (eg: job change)
-function user_unload()
-end
+-------------------------------------------------------------------------------------------------------------------
+-- User setup functions for this job.  Recommend that these be overridden in a sidecar file.
+-------------------------------------------------------------------------------------------------------------------
 
 -- Define sets and vars used by this job file.
 function init_gear_sets()
@@ -345,34 +337,10 @@ function display_current_job_state(eventArgs)
 end
 
 -------------------------------------------------------------------------------------------------------------------
--- User self-commands.
--------------------------------------------------------------------------------------------------------------------
-
--- Called for custom player commands.
-function job_self_command(cmdParams, eventArgs)
-    if cmdParams[1] == 'step' then
-        if cmdParams[2] == 't' then
-            local doStep = ''
-            if state.UseAltStep.value == true then
-                doStep = state[state.CurrentStep.current .. 'Step'].current
-                state.CurrentStep:cycle()
-            else
-                doStep = state.MainStep.current
-            end
-            if player.target.name ~= nil and player.target.hpp > 5 and player.tp >= 100 then
-                send_command('@input /ja "' .. doStep .. '" <t>')
-            else
-                send_command('@input /echo Unable to cast ' .. doStep .. '')
-            end
-        end
-    end
-end
-
--------------------------------------------------------------------------------------------------------------------
 -- Utility functions specific to this job.
 -------------------------------------------------------------------------------------------------------------------
 
-function determine_haste_group()
+--[[ function determine_haste_group()
     -- We have three groups of DW in gear: Charis body, Charis neck + DW earrings, and Patentia Sash.
 
     -- For high haste, we want to be able to drop one of the 10% groups (body, preferably).
@@ -389,7 +357,7 @@ function determine_haste_group()
 
     classes.CustomMeleeGroups:clear()
 
-    --[[ if buffactive.embrava and (buffactive.haste or buffactive.march) and buffactive['haste samba'] then
+    if buffactive.embrava and (buffactive.haste or buffactive.march) and buffactive['haste samba'] then
         classes.CustomMeleeGroups:append('MaxHaste')
     elseif buffactive.march == 2 and buffactive.haste and buffactive['haste samba'] then
         classes.CustomMeleeGroups:append('MaxHaste')
@@ -399,8 +367,8 @@ function determine_haste_group()
         classes.CustomMeleeGroups:append('HighHaste')
     elseif buffactive.march == 2 and (buffactive.haste or buffactive['haste samba']) then
         classes.CustomMeleeGroups:append('HighHaste')
-    end ]]
-end
+    end
+end ]]
 
 -- ************************************************************************************
 -- * Vérifie diverse actions que l'on a spécifié dans le code qui utilise le sets TH. *
@@ -414,7 +382,7 @@ function th_action_check(category, param)
             (category == 3 and param == 30) or -- Aeolian Edge
             (category == 6 and info.default_ja_ids:contains(param)) or -- Provoke, Animated Flourish
             (category == 14 and info.default_u_ja_ids:contains(param))
-     then -- Quick/Box/Stutter Step, Desperate/Violent Flourish
+    then -- Quick/Box/Stutter Step, Desperate/Violent Flourish
         return true
     end
 end
@@ -424,11 +392,15 @@ function select_default_macro_book()
     -- Default macro set/book
     if player.sub_job == 'WAR' then
         set_macro_page(1, 5)
-        send_command('wait 25;input /lockstyleset 2')
+        send_command('lua unload dressup')
+        send_command('wait 15;input /lockstyleset 2; wait 5; lua load dressup')
     elseif player.sub_job == 'NIN' then
         set_macro_page(1, 6)
-        send_command('wait 25;input /lockstyleset 2')
+        send_command('lua unload dressup')
+        send_command('wait 15;input /lockstyleset 2; wait 5; lua load dressup')
     else
         set_macro_page(1, 5)
+        send_command('lua unload dressup')
+        send_command('wait 15;input /lockstyleset 2; wait 5; lua load dressup')
     end
 end

@@ -120,3 +120,35 @@ function th_action_check(category, param)
         return true
     end
 end
+
+--[[ function wsTp(spell)
+    if spell.type == "WeaponSkill" then
+        if (player.tp >= 1750 and player.tp < 2000) then
+            sets.precast.WS = set_combine(sets.precast.WS, {left_ear = MoonShadeEarring})
+        end
+    end
+end ]]
+
+function wsTp(spell)
+    if spell.type == "WeaponSkill" then
+        if player.tp >= 1750 and player.tp < 2000 then
+            if spell.name == 'Aeolian Edge' and treasureHunter ~= 'None' then
+                sets.AeolianTH.left_ear = "MoonShade Earring"
+            elseif spell.name == 'Aeolian Edge' and treasureHunter == 'None' then
+                sets.precast.WS[spell.name].left_ear = "MoonShade Earring"
+            else
+                sets.precast.WS[spell.name].left_ear = "MoonShade Earring"
+            end
+        else
+            if spell.name == "Exenterator" then
+                sets.precast.WS[spell.name].left_ear = "Dawn Earring"
+            elseif spell.name == 'Aeolian Edge' and treasureHunter ~= 'None' then
+                sets.AeolianTH.left_ear = "Sortiarius Earring"
+            elseif spell.name == 'Aeolian Edge' and treasureHunter == 'None' then
+                sets.precast.WS[spell.name].left_ear = "Sortiarius Earring"
+            else
+                sets.precast.WS[spell.name].left_ear = "Sherida Earring"
+            end
+        end
+    end
+end
