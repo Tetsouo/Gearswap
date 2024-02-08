@@ -4,152 +4,150 @@
 --=                    Author: Tetsouo                       =--
 --=                     Version: 1.0                         =--
 --=                  Created: 2023-07-10                     =--
---=               Last Modified: 2023-07-22                  =--
+--=               Last Modified: 2024/02/03                  =--
 --============================================================--
 
--- This script is for the Thief job in Gearswap.
-
--- Sets up the necessary libraries and files for Gearswap.
+-- Initializes GearSwap for the Thief job by setting up the necessary libraries and files.
+-- This function is called once when the script is loaded.
 function get_sets()
-    -- Set the Mote-Include version to 2.
-    mote_include_version = 2
-    -- Include the Mote-Include.lua library (Version 2) for common functions.
-    include('Mote-Include.lua')
-    -- Include the AutoMove.lua file for movement speed gear management.
-    include('/Misc/0_AutoMove.lua')
-    -- Include the SharedFunctions.lua file for shared functions.
-    include('/Misc/SharedFunctions.lua')
-    -- Include the THF_FUNCTION.lua file for advanced functions specific to Thief.
-    include('/THF/THF_FUNCTION.lua')
+    mote_include_version = 2             -- Specifies the version of the Mote library to use
+    include('Mote-Include.lua')          -- Mote library for GearSwap
+    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
+    include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
+    include('THF/THF_SET.lua')           -- Thief specific gear sets
+    include('/THF/THF_FUNCTION.lua')     -- Advanced functions specific to Thief
 end
 
--- Handles user-specific configuration and setup.
+-- Initializes gear sets for the Thief job.
+-- This function is called once when the script is loaded.
+function init_gear_sets()
+end
+
+-- Sets up user-specific configurations and binds keys for the Thief job.
+function user_setup()
+    select_default_macro_book() -- Selects the default macro book based on sub-job
+end
+
+-- Sets up user-specific configurations and binds keys for the Thief job.
+-- This function is called once when the script is loaded.
 function job_setup()
-    -- Include the Mote-TreasureHunter.lua file for handling Treasure Hunter.
-    include('Mote-TreasureHunter.lua')
-    -- Initialize the treasureHunter state variable from TreasureMode.
+    include('Mote-TreasureHunter.lua') -- Includes the file for handling Treasure Hunter.
+    -- Initializes the treasureHunter state variable from TreasureMode and sets default treasure mode
     treasureHunter = state.TreasureMode.value
-    -- Set default treasure mode to 'tag'.
     state.TreasureMode:set('tag')
-    ---------------------------------------------------------------------------------------------------------
-    -- Set up state variables for buffs, modes, and gear sets.
+    -- Sets up state variables for buffs
     state.Buff['Sneak Attack'] = buffactive['sneak attack'] or false
     state.Buff['Trick Attack'] = buffactive['trick attack'] or false
     state.Buff['Feint'] = buffactive['feint'] or false
-    ---------------------------------------------------------------------------------------------------------
-    -- Hybrid mode options: 'Normal' and 'PDT'.
-    -- Command to change hybrid mode: /console gs c cycle HybridMode
+    -- Configures hybrid and offense mode options
     state.HybridMode:options('PDT', 'Normal')
-    ---------------------------------------------------------------------------------------------------------
-    -- Offense mode options: 'Normal' and 'Acc'.
-    -- Command to change offense mode: /console gs c cycle OffenseMode
     state.OffenseMode:options('Normal', 'Acc')
-    ---------------------------------------------------------------------------------------------------------
-    -- Gear set for main weapon options.
-    -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Tauret', 'Malevolence', 'Qutrub', 'Naegling'}
-    ---------------------------------------------------------------------------------------------------------
-    -- Gear set for  alt main weapon options.
-    -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    --[[ state.WeaponSet = M {['description'] = 'Main Weapon', 'TwashtarM', 'Qutrub', 'Excalipoor', 'Lament', 'Iapetus', 'Chac', 'Ram', 'Sickle'} ]]
-    ---------------------------------------------------------------------------------------------------------
-    -- Gear set for sub weapon options.
-    -- Command to cycle sub weapon set: /console gs c cycle SubSet
-    state.SubSet = M {['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti', 'Crepu'}
-    ---------------------------------------------------------------------------------------------------------
-    -- Set up default job ability IDs for actions that always have Treasure Hunter.
-    -- [35] = Provoke, [204] Animated Flourish
-    info.default_ja_ids = S {35, 204}
-    -- Set up job ability IDs for actions that don't blink and always have Treasure Hunter.
-    -- [201] Quickstep, [202] Boxstep, [203] Stutterstep, [205] Desperate Flourish, [207] Violent Flourish.
-    info.default_u_ja_ids = S {201, 202, 203, 205, 207} 
-    ---------------------------------------------------------------------------------------------------------
-    -- Select the default macro book based on sub-job.
-    select_default_macro_book()
+    -- Define options for AbysseaProc mode
+    state.AbysseaProc = M(false, 'Abyssea Proc')
+    -- Configures gear sets for main and sub weapons
+    state.WeaponSet1 = M { ['description'] = 'Main Weapon', 'Vajra', 'Malevolence' }
+    state.WeaponSet2 = M { ['description'] = 'Main Weapon', 'Dagger', 'Sword', 'Great Sword', 'Polearm', 'Club', 'Staff', 'Scythe' }
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Gleti', 'Centovente', 'TwashtarS' }
+    -- Sets up default job ability IDs for actions that always have Treasure Hunter
+    info.default_ja_ids = S { 35, 204 }
+    info.default_u_ja_ids = S { 201, 202, 203, 205, 207 }
+    -- Defines options for alternative player state
+    state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
+    state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
+    state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
+    state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
+    state.altPlayerGeo = M('Geo-Fury', 'Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
+    state.altPlayerIndi =
+        M('Indi-Frailty', 'Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Fury', 'Indi-Acumen', 'Indi-Precision',
+            'Indi-Haste')
+    state.altPlayerEntrust = M('Indi-Haste', 'Indi-Refresh', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 end
 
--- Initialize gear sets.
-function init_gear_sets()
-    -- Include the gear sets for Thief.
-    include('THF/THF_SET.lua')
-end
 
--- Actions to perform before a spell is cast.
-function job_precast(spell, action, spellMap, eventArgs)
-    wsTp(spell)
-    -- Check if the player is incapacitated (unable to act) before casting the spell.
-    if not incapacitated(spell, eventArgs, true) then
-        -- Check for display cooldowns for actions.
-        checkDisplayCooldown(spell, eventArgs)
-        -- Refine Utsusemi spell.
-        refine_Utsusemi(spell, eventArgs)
-        -- Set the state for the buff corresponding to the spell being cast to true.
-        if state.Buff[spell.english] ~= nil then
-            state.Buff[spell.english] = true
-        end
-    end
-end
-
--- Actions to perform after precast but before the action is sent to the server.
+-- Adjusts gear sets based on the action being performed.
+-- @param {table} spell - The spell or ability being used.
+-- @param {table} action - The action being performed.
+-- @param {string} spellMap - The type of the spell or ability.
+-- @param {table} eventArgs - Additional arguments for the event.
 function job_post_precast(spell, action, spellMap, eventArgs)
-    -- Equip the AeolianTH gear set for Aeolian Edge if Treasure Hunter is active.
+    -- Equip AeolianTH gear set if 'Aeolian Edge' is being used and Treasure Hunter is active.
     if spell.english == 'Aeolian Edge' and treasureHunter ~= 'None' then
+        -- Equip TreasureHunter gear set if 'Sneak Attack' or 'Trick Attack' is being used and Treasure Mode is 'SATA' or 'Fulltime'.
         equip(sets.AeolianTH)
-    -- Equip the TreasureHunter gear set for Sneak Attack, Trick Attack, or WeaponSkills if applicable.
     elseif spell.english == 'Sneak Attack' or spell.english == 'Trick Attack' then
         if state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime' then
             equip(sets.TreasureHunter)
         end
     end
+    check_range_lock()
 end
 
--- Actions to perform after midcast but before the action is sent to the server.
+-- Prepares for a spell cast by performing several actions.
+-- @param {table} spell - The spell or ability being used.
+-- @param {table} action - The action being performed.
+-- @param {string} spellMap - The type of the spell or ability.
+-- @param {table} eventArgs - Additional arguments for the event.
+function job_precast(spell, action, spellMap, eventArgs)
+    handle_spell(spell, eventArgs, auto_abilities) -- Handles the spell based on its type and the current state.
+    checkDisplayCooldown(spell, eventArgs)         -- Checks and displays the cooldown for the spell.
+    refine_Utsusemi(spell, eventArgs)              -- Refines the Utsusemi spell if it's being cast.
+    adjust_Gear_Based_On_TP_For_WeaponSkill(spell) -- Selects the earrings based on the weapon and TP.
+    -- Sets the state for the buff corresponding to the spell being cast to true, if it exists.
+    if state.Buff[spell.english] ~= nil then
+        state.Buff[spell.english] = true
+    end
+end
+
+-- Adjusts gear sets for ranged attacks when Treasure Mode is active.
+-- @param {table} spell - The spell or ability being used.
+-- @param {table} action - The action being performed.
+-- @param {string} spellMap - The type of the spell or ability.
+-- @param {table} eventArgs - Additional arguments for the event.
 function job_post_midcast(spell, action, spellMap, eventArgs)
-    -- Check for incapacitated state.
-    incapacitated(spell, eventArgs)
-    -- Equip Ranged Attack gear with Treasure Hunter if it's active.
+    -- If Treasure Mode is active and a ranged attack is being performed, equip the RATH gear set.
     if state.TreasureMode.value ~= 'None' and spell.action_type == 'Ranged Attack' then
         equip(sets.precast.RATH)
     end
 end
 
--- Actions to perform after a spell or ability is used.
+-- Performs actions after a spell or ability is used.
+-- @param {table} spell - The spell or ability that was used.
+-- @param {table} action - The action that was performed.
+-- @param {string} spellMap - The type of the spell or ability.
+-- @param {table} eventArgs - Additional arguments for the event.
 function job_aftercast(spell, action, spellMap, eventArgs)
-    -- Update the state of the buff based on whether the spell was interrupted or buff is active.
+    -- If a buff corresponding to the spell exists, update its state based on whether the spell was interrupted or the buff is active.
     if state.Buff[spell.english] ~= nil then
         state.Buff[spell.english] = not spell.interrupted or buffactive[spell.english]
     end
 
-    -- Reset the state of certain buffs after a successful WeaponSkill.
+    -- If a WeaponSkill was successfully used, reset the state of 'Sneak Attack', 'Trick Attack', and 'Feint' buffs.
     if spell.type == 'WeaponSkill' and not spell.interrupted then
         state.Buff['Sneak Attack'] = false
         state.Buff['Trick Attack'] = false
         state.Buff['Feint'] = false
     end
 
-    -- Perform actions after the spell is cast.
+    -- Perform additional actions after the spell is cast.
     handleSpellAftercast(spell, eventArgs)
 end
 
--- Actions to perform after aftercast but before the action is sent to the server.
-function job_post_aftercast(spell, action, spellMap, eventArgs)
-    -- Check for the Feint buff.
-    check_buff('Feint', eventArgs)
-end
-
--- Select the default macro book based on sub-job.
+-- Sets the default macro book based on the player's sub job.
+-- This function is called once when the script is loaded.
 function select_default_macro_book()
+    -- Unloads the 'dressup' Lua script.
+    send_command('lua unload dressup')
+    -- If the player's sub-job is 'DNC', 'WAR', or 'NIN', selects the corresponding macro page. Otherwise, selects the first macro page.
     if player.sub_job == 'DNC' then
         set_macro_page(1, 1)
-        send_command('wait 25;input /lockstyleset 1')
     elseif player.sub_job == 'WAR' then
         set_macro_page(1, 2)
-        send_command('wait 25;input /lockstyleset 1')
     elseif player.sub_job == 'NIN' then
         set_macro_page(1, 3)
-        send_command('wait 25;input /lockstyleset 1')
     else
         set_macro_page(1, 1)
-        send_command('wait 25;input /lockstyleset 1')
     end
+
+    -- Waits for 15 seconds, locks the style set to 1, waits for another 5 seconds, and then loads the 'dressup' Lua script.
+    send_command('wait 15;input /lockstyleset 1; wait 5; lua load dressup')
 end

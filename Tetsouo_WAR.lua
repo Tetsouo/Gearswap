@@ -7,106 +7,110 @@
 --=               Last Modified: 2023-07-16                  =--
 --============================================================--
 
--- Sets up the necessary libraries and files for Gearswap.
+-- Initializes GearSwap for the Warrior job by setting up the necessary libraries and files.
+-- This function is called once when the script is loaded.
 function get_sets()
-    mote_include_version = 2
-    include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2).
-    include('/Misc/0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management.
-    include('/WAR/WAR_FUNCTION.lua') -- Includes the WAR_FUNCTION.lua file for advanced functions specific to Warrior.
-    include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions
+    mote_include_version = 2             -- Specifies the version of the Mote library to use
+    -- Include necessary libraries and modules
+    include('Mote-Include.lua')          -- Mote library for GearSwap
+    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
+    include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
+    include('/WAR/WAR_SET.lua')          -- Warrior specific gear sets
+    include('/WAR/WAR_FUNCTION.lua')     -- Advanced functions specific to Warrior
 end
 
--- Handles user-specific configuration and setup.
+-- Initialize gear sets.
+function init_gear_sets()
+end
+
+-- Initializes the Warrior job script.
+-- This function is called once when the script is loaded.
 function job_setup()
-    -- Hybrid mode options: 'PDT' (Defense physical), 'Normal (Damage Dealer)'
+    -- Sets the options for the hybrid mode.
     state.HybridMode:options('PDT', 'Normal')
-    -- Main weapon choice: 'Lycurgos', 'Naegling', 'Shining', 'Loxotic'
-    state.WeaponSet = M {['description'] = 'Main Weapon','Ukonvasara', 'Naegling', 'Shining', 'Loxotic'} --gs c cycle WeaponSet
-    -- Sub weapon choice: 'Utu Grip', 'Blurred Shield +1'
-    --[[ state.SubSet = M {['description'] = 'Sub Weapon', 'Utu', 'Blurred'} --gs c cycle SubSet ]]
-    -- Calls the function to select the default macro book
-    select_default_macro_book()
-    -- Binds F9 to cycle through hybrid modes
+
+    -- Sets the options for the main weapon set.
+    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Ukonvasara', 'Naegling', 'Shining', 'Loxotic' }
+
+    -- Binds keys to cycle through hybrid modes and weapon sets.
     send_command('bind F9 gs c cycle HybridMode')
-    -- Binds F10 to cycle through main weapon sets
     send_command('bind F10 gs c cycle WeaponSet')
-    -- Binds F11 to cycle through sub weapon sets
     send_command('bind F11 gs c cycle SubSet')
 
-    -- OTHER SELF COMMAND Parameters to put in your in-game Macro or bind a key with it.
-    --===================================================================================
-        -- [gs c Berserk] Cast job ability with logic from WAR_FUNCTION.lua:
-            -- state.HybridMode: Normal
-            -- Berserk
-            -- Aggressor
-            -- Retaliation
-            -- Restraint
-            -- Warcry or Blood Rage
-    --===================================================================================
-        -- [gs c Defender] Cast job ability with logic from WAR_FUNCTION.lua:
-            -- state.HybridMode: PDT
-            -- Defender
-            -- Aggressor
-            -- Retaliation
-            -- Restraint
-            -- Warcry or Blood Rage
-    --===================================================================================
-        -- [gs c ThirdEye] Cast Third Eye with logic from WAR_FUNCTION.lua:
-            -- with state.HybridMode: Normal
-                -- Hasso + Third Eye
-            -- with state.HybridMode: PDT
-                -- Seigan + Third Eye
+    -- Sets the options for the alternative player state.
+    state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
+    state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
+    state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
+    state.altPlayera = M('Fira III', 'Stonera III', 'Blizzara III', 'Aera III', 'Thundara III', 'Watera III')
+    state.altPlayerGeo = M('Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
+    state.altPlayerIndi = M('Indi-Fury', 'Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Acumen', 'Indi-Precision',
+        'Indi-Haste')
+    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 end
 
--- Handles the unload event when changing job or reloading the file.
+function user_setup()
+    select_default_macro_book() -- Selects the default macro book based on sub-job
+end
+
+-- Cleans up the Warrior job script.
+-- This function is called once when the script is unloaded.
 function file_unload()
-    -- Unbinds the keys associated with the states.
+    -- Unbinds the keys previously bound to cycle through states.
     send_command('unbind F9')
     send_command('unbind F10')
     send_command('unbind F11')
 end
 
--- Loads the gear sets from the PLD_SET.lua file.
-function init_gear_sets()
-    include('/WAR/WAR_SET.lua')
-end
-
--- Handles actions and checks to perform before casting a spell or ability.
+-- Prepares for the casting of a spell or ability.
+-- This function is called before each spell or ability is cast.
 -- Parameters:
 --   spell (table): The spell being cast
 --   action (table): The action being performed
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    if incapacitated(spell, eventArgs, true) then
-        -- Spell cannot be cast due to incapacitation, no further actions needed
-    else
-        TPWS(spell)
-        checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
-    end
+    -- Handle the spell casting
+    handle_spell(spell, eventArgs, auto_abilities)
+    -- Check and display the recast cooldown
+    checkDisplayCooldown(spell, eventArgs)
 end
 
--- Handles actions to perform during the casting of a spell or ability.
+-- Manages actions during the casting of a spell or ability.
+-- This function is called during each spell or ability cast.
 -- Parameters:
 --   spell (table): The spell being cast
 --   action (table): The action being performed
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
-    incapacitated(spell, eventArgs) -- Check for incapacitated state
+end
+
+-- Manages actions after a spell or ability has been cast.
+-- This function is called after each spell or ability cast.
+-- Parameters:
+--   spell (table): The spell that was cast
+--   action (table): The action that was performed
+--   spellMap (table): The spell mapping table
+--   eventArgs (table): Additional event arguments
+function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Handles actions to be performed after the spell is cast.
+    handleSpellAftercast(spell, eventArgs)
 end
 
 -- Sets the default macro book based on the player's sub job.
 function select_default_macro_book()
-    -- If sub job is DRG
+    -- Unloads the dressup plugin.
+    send_command('lua unload dressup')
+    -- Sets the macro page and style set based on the sub job.
     if player.sub_job == 'DRG' then
-        set_macro_page(1, 25)
-        -- If sub job is SAM
+        set_macro_page(1, 32)
     elseif player.sub_job == 'SAM' then
-        set_macro_page(1, 27)
-    -- Others Sub-Job    
+        set_macro_page(1, 30)
     else
-        set_macro_page(1, 25)
+        set_macro_page(1, 30)
     end
-    send_command('wait 20; input /lockstyleset 13')
+    -- Locks the style set.
+    send_command('input /lockstyleset 5')
+    -- Waits for 15 seconds before loading the dressup plugin.
+    send_command('wait 15; lua load dressup')
 end

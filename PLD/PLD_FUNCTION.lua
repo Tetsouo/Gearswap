@@ -4,204 +4,184 @@
 --=                    Author: Tetsouo                       =--
 --=                     Version: 1.0                         =--
 --=                  Created: 2023-07-10                     =--
---=               Last Modified: 2023-07-18                  =--
+--=               Last Modified: 2024-01-28                  =--
 --============================================================--
 
--- A table containing the spell IDs and names for single target spells.
-spellsSingle = {
-    {name = 'Flash', id = 112, step = "Aftercast"}, -- Spell ID for the "Flash" spell
-    {name = 'Blank Gaze', id = 592, step = "Aftercast"}, -- Spell ID for the "Blank Gaze" spell
-    
+-- Constants used throughout the script
+local constants = {
+    ACTION_TYPE_MAGIC = 'Magic',               -- Action type for magic spells
+    SKILL_HEALING_MAGIC = 'Healing Magic',     -- Skill type for healing spells
+    SKILL_ENHANCING_MAGIC = 'Enhancing Magic', -- Skill type for enhancing spells
+    ABILITY_IDS = {
+        -- IDs for specific abilities
+        DIVINE_EMBLEM = 80, -- ID for the "Divine Emblem" ability
+        MAJESTY = 150       -- ID for the "Majesty" ability
+    },
+    SPELL_NAMES = {
+        -- Names of specific spells
+        FLASH = 'Flash',         -- Name of the "Flash" spell
+        PROTECT_V = 'Protect V', -- Name of the "Protect V" spell
+        CURE_III = 'Cure III',   -- Name of the "Cure III" spell
+        CURE_IV = 'Cure IV',     -- Name of the "Cure IV" spell
+        PHALANX = 'Phalanx'      -- Name of the "Phalanx" spell
+    }
 }
 
--- A table containing the spell IDs and names for area of effect spells.
-spellsAoe = {
-    {name = 'Jettatura', id = 575, step = "Aftercast"}, -- Spell ID for the "Jettatura" spell
-    {name = 'Sheep Song', id = 584, step = "Aftercast"}, -- Spell ID for the "Sheep Song" spell
-    {name = 'Geist Wall', id = 605, step = "Aftercast"}, -- Spell ID for the "Geist Wall" spell
-    {name = 'Frightful Roar', id = 561, step = "Aftercast"}, -- Spell ID for the "Frightful Roar" spell
-}
+-- This function automatically uses the 'Majesty' ability for spells that are magic actions and have 'Healing Magic' or 'Enhancing Magic' as their skill.
+-- It also equips the appropriate cure set for 'Cure III' and 'Cure IV' spells.
+-- @param spell The spell object to attempt to cast. It should be a table with `action_type` and `skill` fields.
+-- @param eventArgs The event arguments object. It should have a `handled` field.
+function handle_majesty_and_cure_sets(spell, eventArgs)
+    -- Try to cast the spell
+    if try_cast_spell(spell, eventArgs) then
+        -- If the spell is a magic action and its skill is either 'Healing Magic' or 'Enhancing Magic'
+        if
+            spell.action_type == constants.ACTION_TYPE_MAGIC and
+            (spell.skill == constants.SKILL_HEALING_MAGIC or spell.skill == constants.SKILL_ENHANCING_MAGIC)
+        then
+            -- Use the 'Majesty' ability
+            auto_ability(spell, eventArgs, constants.ABILITY_IDS.MAJESTY, 'Majesty')
+        end
 
--- Calls the handleCommand function with the spellsSingle table.
-function handleSingleCommand()
-    handleCommand(spellsSingle)
-end
-
--- Calls the handleCommand function with the spellsAoe table.
-function handleAoeCommand()
-    handleCommand(spellsAoe)
-end
-
--- Automatically uses the "Divine Emblem" ability before casting the "Flash" spell if conditions are met.
--- Parameters:
---   spell (table): The spell being cast.
---   eventArgs (table): Additional event arguments.
-function auto_divineEmblem(spell, eventArgs)
-    local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
-    local divineEmblemCD = windower.ffxi.get_ability_recasts()[80]
-    if spell.name == 'Flash' then
-        if spellRecast == 0 then
-            if not (buffactive['Amnesia'] or buffactive['Silence']) then
-                if divineEmblemCD < 1 and not buffactive['Divine Emblem'] then
-                    cancel_spell()
-                    send_command(
-                        string.format(
-                            'input /ja "Divine Emblem" <me>; wait 1; input /ma %s %s',
-                            spell.name,
-                            spell.target.id
-                        )
-                    )
-                end
-            end
-        else
-            cancel_spell()
-            eventArgs.handled = true
+        -- If the spell is 'Cure III' or 'Cure IV'
+        if spell.name == constants.SPELL_NAMES.CURE_III or spell.name == constants.SPELL_NAMES.CURE_IV then
+            -- Determine the target type
+            local target_type = spell.target.type == 'SELF' and 'SELF' or 'OTHER'
+            -- Generate the appropriate cure set
+            local cure_set = generate_cure_set(spell, target_type)
+            -- Equip the cure set
+            equip(cure_set)
         end
     end
 end
 
--- Automatically triggers the use of the 'Majesty' ability before casting certain spells
--- Parameters:
---   spell (table): The spell being cast
---   eventArgs (table): Additional event arguments
-function auto_majesty(spell, eventArgs)
-    local spellRecast = windower.ffxi.get_spell_recasts()[spell.id]
-    local majestyCD = windower.ffxi.get_ability_recasts()[150]
-    if (spell.action_type == 'Magic' and spell.skill == 'Healing Magic') or spell.name == 'Protect V' then
-        if spellRecast == 0 then
-            if not (buffactive['Amnesia'] or buffactive['Silence']) then
-                if majestyCD < 1 and not buffactive['Majesty'] then
-                    cancel_spell()
-                    send_command(
-                        string.format(
-                            'input /ja "Majesty" <me>; wait 1; input /ma %s %s',
-                            spell.name,
-                            spell.target.id
-                        )
-                    )
-                end
-            end
-        else
-            cancel_spell()
-            eventArgs.handled = true
-        end
-    end
-end
+--- Maps spells to their corresponding automatic abilities.
+-- @table auto_abilities
+auto_abilities = {
+    -- Uses 'Divine Emblem' ability for 'Flash' spell.
+    [constants.SPELL_NAMES.FLASH] = function(spell, eventArgs)
+        auto_ability(spell, eventArgs, constants.ABILITY_IDS.DIVINE_EMBLEM, 'Divine Emblem')
+    end,
+    -- Uses 'handle_majesty_and_cure_sets_wrapper' for 'Protect V', 'Cure III', and 'Cure IV' spells.
+    [constants.SPELL_NAMES.PROTECT_V] = handle_majesty_and_cure_sets_wrapper,
+    [constants.SPELL_NAMES.CURE_III] = handle_majesty_and_cure_sets_wrapper,
+    [constants.SPELL_NAMES.CURE_IV] = handle_majesty_and_cure_sets_wrapper,
+}
 
-function customize_cure_set(spell)
-    if spell.name == 'Cure III' or spell.name == 'Cure IV' then
-        if player.target.type == 'SELF' then
-            sets.midcast.Cure = {
-                ammo = {name = 'staunch Tathlum +1', priority = 1},
-                head = SouvHead,
-                neck = {name = 'Unmoving Collar +1', priority = 16},
-                left_ear = {name = 'tuisto Earring', priority = 15},
-                right_ear = {name = 'Chev. Earring +1', priority = 0},
-                body = {name = 'Rev. Surcoat +3', priority = 2},
-                hands = {name = 'Regal Gauntlets', priority = 14},
-                left_ring = {name = 'Supershear Ring', priority = 5},
-                right_ring = {name = 'Defending Ring', priority = 6},
-                back = Rudianos.cure,
-                waist = {name = 'Plat. Mog. Belt', priority = 17},
-                legs = {name = "Founder's Hose", priority = 8},
-                feet = {name = 'Odyssean Greaves', priority = 9}
-            }
-        else
-            sets.midcast.Cure = {
-                ammo = {name = 'staunch Tathlum +1', priority = 1},
-                head = SouvHead,
-                neck = {name = 'Sacro Gorget', priority = 10},
-                left_ear = {name = 'tuisto Earring', priority = 15},
-                right_ear = {name = 'Chev. Earring +1', priority = 0},
+-- This function generates a cure set for 'Cure III' or 'Cure IV' spells.
+-- The cure set is different depending on whether the target is the caster or another player.
+-- The generated set is assigned to `sets.midcast.Cure`.
+-- @param spell The spell object. It should be a table with a `name` field.
+-- @param target_type The type of the target. It should be either 'SELF' or 'OTHER'.
+-- @return The generated cure set.
+function generate_cure_set(spell, target_type)
+    -- If the spell is not 'Cure III' or 'Cure IV', return nil
+    if spell.name ~= 'Cure III' and spell.name ~= 'Cure IV' then
+        return nil
+    end
+
+    -- Define the base set of equipment
+    local base_set = sets.Cure
+
+    -- Define the cure sets for self and other targets
+    local cure_sets = {
+        CureSelf = set_combine(
+            base_set,
+            {
+                neck = 'Unmoving Collar +1',
+                16,
+                body = 'Rev. Surcoat +3',
+                2,
+                left_ring = 'Supershear Ring',
+                5,
+                right_ring = 'Defending Ring',
+                6,
+                waist = 'Plat. Mog. Belt',
+                17
+            })
+        ,
+        CureOther = set_combine(
+            base_set,
+            {
+                neck = 'Sacro Gorget',
+                10,
                 body = SouvBody,
-                hands = {name = 'Regal Gauntlets', priority = 14},
-                left_ring = {name = 'Apeile Ring +1', priority = 0},
-                right_ring = {name = 'Defending Ring', priority = 0},
-                back = Rudianos.cure,
-                waist = {name = 'Creed Baudrier', priority = 4},
-                legs = {name = "Founder's Hose", priority = 8},
-                feet = {name = 'Odyssean Greaves', priority = 9}
+                left_ring = 'Apeile Ring +1',
+                right_ring = 'Defending Ring',
+                waist = 'Creed Baudrier',
+                4
             }
-        end
-    end
+        )
+    }
+
+    -- Select the appropriate cure set based on the target type
+    local selected_set = target_type == 'SELF' and cure_sets.CureSelf or cure_sets.CureOther
+
+    -- Assign the selected set to `sets.midcast.Cure`
+    sets.midcast.Cure = selected_set
+
+    -- Return the selected set
+    return sets.midcast.Cure
 end
 
--- Modifies the default idle gear set to customize it based on the current conditions and modes.
--- Parameters:
---   idleSet (table): The default idle gear set.
--- Returns:
---   idleSet (table): The customized idle gear set.
+-- This function customizes the idle set based on the current state.
+-- It uses the `customize_set_based_on_state` function to select the appropriate set.
+-- @param idleSet The base idle set. It should be a table.
+-- @return The customized idle set.
 function customize_idle_set(idleSet)
-    -- Set the default idle gear set based on HybridMode.
-    if state.HybridMode.value == 'PDT' and state.Xp.value == 'True' then
-        idleSet = sets.idleXp
-    elseif state.HybridMode.value == 'PDT' and state.Xp.value == 'False' then
-        idleSet = sets.idleNormal
-    elseif state.HybridMode.value == 'MDT' then
-        idleSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
-    end
-    -- Check if in a city area and adjust idle gear set accordingly.
-    if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
-        if player.mp < 500 then
-            idleSet = set_combine(idleSet, sets.latent_refresh) -- Combine the idle gear set with 'sets.latent_refresh'
-        end
-        idleSet = set_combine(idleSet, {neck = "Elite Royal Collar"})
-    end
-    return idleSet -- Return the customized idle gear set
+    -- Call `customize_set_based_on_state` with the base idle set, the XP idle set, the normal idle set, and the MDT defense set
+    -- The function will select the appropriate set based on the current state
+    return customize_set_based_on_state(idleSet, sets.idleXp, sets.idle, sets.idle.MDT)
 end
 
--- Customizes the gear set for melee based on different conditions and modes
--- Parameters:
---   meleeSet (table): The default melee gear set
--- Returns:
---   meleeSet (table): The customized melee gear set
+-- This function customizes the melee set based on the current state.
+-- It uses the `customize_set_based_on_state` function to select the appropriate set.
+-- @param meleeSet The base melee set. It should be a table.
+-- @return The customized melee set.
 function customize_melee_set(meleeSet)
-    -- Set the default melee gear set based on HybridMode
-    if state.HybridMode.value == 'PDT' and state.Xp.value == 'True' then
-        meleeSet = sets.meleeXp
-    elseif state.HybridMode.value == 'PDT' and state.Xp.value == 'False' then
-        meleeSet = sets.engaged.PDT -- Use the default idle gear set 'sets.idleNormal'
-    elseif state.HybridMode.value == 'MDT' then
-        meleeSet = sets.defense.MDT -- Use the magical defense gear set 'sets.defense.MDT'
+    -- Call `customize_set_based_on_state` with the base melee set, the XP melee set, the PDT engaged set, and the MDT defense set
+    -- The function will select the appropriate set based on the current state
+    return customize_set_based_on_state(meleeSet, sets.meleeXp, sets.engaged.PDT, sets.engaged.MDT)
+end
+
+-- This function manages the casting of the 'Phalanx' spell.
+-- It attempts to cast the spell using `try_cast_spell`. If the spell can't be cast, it handles the failure using `handle_unable_to_cast`.
+-- If the spell can be cast, it adjusts the midcast set based on `state.Xp`.
+-- @param spell The spell to be cast.
+-- @param eventArgs The event arguments.
+-- @return A boolean indicating whether the spell was cast successfully, and the value returned by `try_cast_spell` or `handle_unable_to_cast`.
+function handle_phalanx_while_xp(spell, eventArgs)
+    -- If the spell was cast and `state.Xp` is true, adjust the midcast set
+    if state.Xp and state.Xp.value then
+        sets.midcast['Phalanx'] = state.Xp.value == 'True' and sets.midcast.SIRDPhalanx or sets.midcast.PhalanxPotency
     end
-    return meleeSet -- Return the customized melee gear set
+
+    -- Return that the spell was cast successfully
+    return true, value
 end
 
--- Handles actions to be performed when a spell is interrupted.
--- Parameters:
---   spell (table): The interrupted spell.
---   eventArgs (table): Additional event arguments.
-function handleInterruptedSpell(spell, eventArgs)
-    equip(sets.idleNormal)
-    eventArgs.handled = true
-    local message = createFormatMsg('Spell interrupted:', spell.name)
-    add_to_chat(123, message)
-end
+-- ===========================================================================================================
+--                                   Job-Specific Command Handling Functions
+-- ===========================================================================================================
+-- Handles custom commands specific to the job.
+-- It updates the altState object, handles a set of predefined commands, and handles job-specific and subjob-specific commands.
+-- @param cmdParams (table): The command parameters. The first element is expected to be the command name.
+-- @param eventArgs (table): Additional event arguments.
+-- @param spell (table): The spell currently being cast.
+function job_self_command(cmdParams, eventArgs, spell)
+    -- Update the altState object
+    update_altState()
+    local command = cmdParams[1]:lower()
 
-function PhalanXp(spell, eventArgs)
-    if spell.name == 'Phalanx' and buffactive['Silence'] then
-        cancel_spell()
-        eventArgs.handled = true
-        equip(sets.idle)
-        local message = createFormatMsg('Cannot Use:', spell.name, nil, value)
-        add_to_chat(167, message)
-        return true, value
+    -- If the command is defined, execute it
+    if commandFunctions[command] then
+        commandFunctions[command](altPlayerName, mainPlayerName)
     else
-        if state.Xp.value == 'True' then
-            sets.midcast['Phalanx'] = sets.midcast.SIRDPhalanx
-        else
-            sets.midcast['Phalanx'] = sets.midcast.PhalanxPotency
-        end
-    end
-end
+        -- Handle PLD-specific commands
 
--- ***************************************************************************
--- * Appelé à chaque changement de stuffs automatique (ex: Engaged ou Idle). *
--- ***************************************************************************
-function job_handle_equipping_gear(playerStatus, eventArgs)
-    check_weaponset()
-    check_subset()
-    if state.Moving.value == 'true' then
-        send_command('gs equip sets.MoveSpeed')
+        -- Handle subjob-specific commands
+        if player.sub_job == 'SCH' then
+            handle_sch_subjob_commands(cmdParams)
+        end
     end
 end

@@ -7,247 +7,171 @@
 --=               Last Modified: 2023-07-18                  =--
 --============================================================--
 
--- This function buffs the player with certain spells based on their recast time and current buffs.
-    function BuffSelf()
-        -- Retrieve the spell recast times.
-        local SpellRecasts = windower.ffxi.get_spell_recasts()
-        local spells = {}
-        if player.sub_job == 'RDM' then
-            spells = {
-                -- Define an array of spells with their respective recasts and delays.
-                {name = 'Phalanx', recast = SpellRecasts[106], delay = 0},
-                {name = 'Stoneskin', recast = SpellRecasts[54], delay = 5},
-                {name = 'Blink', recast = SpellRecasts[53], delay = 5},
-                {name = 'Aquaveil', recast = SpellRecasts[55], delay = 5},
-                {name = 'Ice Spikes', recast = SpellRecasts[251], delay = 5}
-            }
-        else
-            spells = {
-                -- Define an array of spells with their respective recasts and delays.
-                {name = 'Stoneskin', recast = SpellRecasts[54], delay = 0},
-                {name = 'Blink', recast = SpellRecasts[53], delay = 5},
-                {name = 'Aquaveil', recast = SpellRecasts[55], delay = 5},
-                {name = 'Ice Spikes', recast = SpellRecasts[251], delay = 5}
-            }
-        end
-        -- Initialize variables for spell delay, ready spell, and delayed spells.
-        local spellDelay = 0
-        local readySpell = nil
-        local delayedSpells = {}
+-- Stores the last cast times for each spell
+-- lastCastTimes: A table where the keys are spell names and the values are timestamps of the last cast time
+local lastCastTimes = {}
 
-        -- Iterate over the spells array.
-        for _, spell in ipairs(spells) do
-            -- Check if the buff is currently active.
-            local buffActive = buffactive[spell.name]
-            -- Retrieve the spell recast time.
-            local spellRecast = spell.recast
-            -- Set the spell delay.
-            spellDelay = spell.delay
-            -- Check if the buff is not active and the spell is off recast.
-            if not buffActive and spellRecast < 1 then
-                -- If there is no ready spell, set the current spell as the ready spell.
-                if not readySpell then
-                    readySpell = spell
-                else
-                    -- Otherwise, add the current spell to the delayed spells.
-                    table.insert(delayedSpells, spell)
-                end
+-- spellCorrespondence maps spell names to their downgrade versions.
+-- For example, 'Fire' spell can be downgraded from 'VI' to 'V', 'V' to 'IV', etc.
+-- This table is used when the current spell version cannot be cast.
+spellCorrespondence = {
+    Fire = { ['VI'] = { replace = 'V' }, ['V'] = { replace = 'IV' }, ['IV'] = { replace = 'III' }, ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Blizzard = { ['VI'] = { replace = 'V' }, ['V'] = { replace = 'IV' }, ['IV'] = { replace = 'III' }, ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Aero = { ['VI'] = { replace = 'V' }, ['V'] = { replace = 'IV' }, ['IV'] = { replace = 'III' }, ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Stone = { ['VI'] = { replace = 'V' }, ['V'] = { replace = 'IV' }, ['IV'] = { replace = 'III' }, ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Thunder = { ['VI'] = { replace = 'V' }, ['V'] = { replace = 'IV' }, ['IV'] = { replace = 'III' }, ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Water = { ['VI'] = { replace = 'V' }, ['V'] = { replace = 'IV' }, ['IV'] = { replace = 'III' }, ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Sleepga = { ['II'] = { replace = '' } },
+    Sleep = { ['II'] = { replace = '' } },
+    Aspir = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Firaga = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Blizzaga = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Aeroga = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Stonega = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Thundaga = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Waterga = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Firaja = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Blizzaja = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Aeroja = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Stoneja = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Thundaja = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } },
+    Waterja = { ['III'] = { replace = 'II' }, ['II'] = { replace = '' } }
+}
+
+-- This function manages self-buff spells in the game Final Fantasy XI.
+-- It checks the recast time of each spell and if the buff is active.
+-- If the buff is not active or is about to expire, it queues the spell to be cast.
+function BuffSelf()
+    -- Get the current time
+    local currentTime = os.time()
+    -- Get the recast times for all spells
+    local SpellRecasts = windower.ffxi.get_spell_recasts()
+
+    -- Define the spells to manage
+    local spells = {
+        { name = 'Stoneskin',  recast = 54,  delay = 0, buffName = 'Stoneskin',  duration = 488 },
+        { name = 'Blink',      recast = 53,  delay = 5, buffName = 'Blink',      duration = 488 },
+        { name = 'Aquaveil',   recast = 55,  delay = 5, buffName = 'Aquaveil',   duration = 914 },
+        { name = 'Ice Spikes', recast = 251, delay = 5, buffName = 'Ice Spikes', duration = 274 }
+    }
+
+    -- Initialize the list of spells ready to be cast
+    local readySpells = {}
+    -- Initialize the total delay for casting spells
+    local totalDelay = 0
+
+    -- For each spell
+    for _, spell in ipairs(spells) do
+        -- Get the recast time for the spell
+        spell.recast = SpellRecasts[spell.recast]
+        -- Calculate the remaining time for the spell
+        local remainingTime = spell.duration - (currentTime - (lastCastTimes[spell.name] or 0))
+
+        -- If the spell duration is greater than 0 and the buff is not active or is about to expire
+        if spell.duration > 0 and (not buffactive[spell.buffName] or (buffactive[spell.buffName] and spell.recast < 1 and remainingTime <= 30)) then
+            if #readySpells > 0 then
+                -- Increase the total delay
+                totalDelay = totalDelay + spell.delay
             end
+            -- Add the spell to the list of spells ready to be cast
+            table.insert(readySpells, { spell = spell, delay = totalDelay })
         end
+    end
 
-        -- If there is a ready spell, cast it on the player.
-        if readySpell then
-            send_command('input /ma "' .. readySpell.name .. '" <me>')
-        end
+    -- For each spell ready to be cast
+    for _, readySpell in ipairs(readySpells) do
+        -- Send the command to cast the spell after the delay
+        send_command('wait ' .. readySpell.delay .. '; input /ma "' .. readySpell.spell.name .. '" <me>')
+        -- Update the last cast time for the spell
+        lastCastTimes[readySpell.spell.name] = currentTime
+    end
+end
 
-        -- Iterate over the delayed spells.
-        for _, spell in ipairs(delayedSpells) do
-            -- Wait for the spell delay, then cast the spell on the player.
-            send_command('wait ' .. spellDelay .. '; input /ma "' .. spell.name .. '" <me>')
-            -- Update the spell delay for the next delayed spell.
-            spellDelay = spellDelay + spell.delay
-        end
-    end    
-
--- Refines various spells based on certain conditions.
--- Parameters:
---   spell (table): The original spell.
---   eventArgs (table): Additional event arguments.
-function refine_various_spells(spell, eventArgs)
-    -- Copy the English name of the spell to a new variable.
+-- This function refines various spells based on certain conditions.
+-- @param spell: The spell to be refined.
+-- @param eventArgs: The event arguments.
+-- @param spellCorrespondence: The correspondence table for spells.
+function refine_various_spells(spell, eventArgs, spellCorrespondence)
+    -- Store the original spell name
     local newSpell = spell.english
-    -- Retrieve the spell recasts and player's MP.
+    -- Get the current spell recasts
     local spell_recasts = windower.ffxi.get_spell_recasts()
+    -- Get the player's current mana points
     local player_mp = player.mp
-    -- Define a table that maps spell categories and levels to replacement spells.
-    local spellCorrespondence = {}
-    if state.TierSpell.value == 'VI' then
-        spellCorrespondence = {
-            Fire = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}},
-            Blizzard = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}},
-            Aero = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}},
-            Stone = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}},
-            Thunder = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}},
-            Water = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}},
-            Sleepga = {['II'] = {replace = ''}},
-            Sleep = {['II'] = {replace = ''}},
-            Aspir = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Firaga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Blizzaga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Aeroga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Stonega = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Thundaga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Waterga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Firaja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Blizzaja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Aeroja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Stoneja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Thundaja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Waterja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-        }
-    else
-        spellCorrespondence = {
-            Fire = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Blizzard = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Aero = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Stone = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Thunder = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Water = {['VI'] = {replace = 'V'}, ['V'] = {replace = 'IV'}, ['IV'] = {replace = 'III'}, ['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Sleepga = {['II'] = {replace = ''}},
-            Sleep = {['II'] = {replace = ''}},
-            Aspir = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Firaga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Blizzaga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Aeroga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Stonega = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Thundaga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Waterga = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Firaja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Blizzaja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Aeroja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Stoneja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Thundaja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-            Waterja = {['III'] = {replace = 'II'}, ['II'] = {replace = ''}},
-        }
-    end
 
-    -- Determines if the spell should be replaced.
-    -- It takes the spell's name as a parameter and returns a boolean value.
-    local function shouldReplaceSpell(spellName)
-        -- Extract the spell category and level from the spell name using pattern matching.
-        local spellCategory, spellLevel = spellName:match('(%a+)%s*(%a*)')
-        local correspondence
-        local replacement
-        correspondence = spellCorrespondence[spellCategory]
-        -- Check if the spell category has corresponding replacements.
-        if correspondence then
-            if spellLevel ~= '' then
-                replacement = correspondence[spellLevel]
-            else
-                replacement = correspondence
-            end
-            -- Check if the spell level has a replacement.
-            if replacement then
-                -- Check if the spell is on recast or if the player has insufficient MP.
-                if spell_recasts[spell.recast_id] > 0 or player.mp < spell.mp_cost then
-                    return true
-                end
-            end
+    -- Extract the spell category and level from the spell name
+    local spellCategory, spellLevel = spell.name:match('(%a+)%s*(%a*)')
+    -- Get the correspondence for the spell category
+    local correspondence = spellCorrespondence[spellCategory]
+    -- Get the replacement for the spell if it exists
+    local replacement = correspondence and (spellLevel ~= '' and correspondence[spellLevel] or correspondence)
+
+    -- If a replacement exists and the spell is on cooldown or the player doesn't have enough mana
+    if replacement and (spell_recasts[spell.recast_id] > 0 or player.mp < spell.mp_cost) then
+        -- Get the replacement spell name
+        replacement = correspondence[spellLevel] and correspondence[spellLevel].replace or ''
+        -- Set the new spell name
+        newSpell = replacement == '' and spellCategory or spellCategory .. ' ' .. replacement
+
+        -- If the spell is a 'ja' spell, replace it with a 'ga' spell
+        if spell.name:find('ja') then
+            newSpell = string.gsub(spell.name, 'ja', 'ga') .. ' III'
         end
-        return false
-    end
 
-    -- Displays a message indicating that the spell cannot be cast.
-    -- It takes the name of the spell as a parameter.
-    local function recastMessage(nameSpell)
-        -- Construct the message with special characters and variables.
-        local message =
-            string.char(0x1F, 161) .. 'Cannot cast spell: [' ..
-            string.char(0x1F, 057) .. nameSpell ..
-            string.char(0x1F, 161) .. ']' ..
-            ' Not enough Mana: ' .. '('..
-            string.char(0x1F, 057) .. player_mp .. 'MP' ..
-            string.char(0x1F, 161) ..')'..
-            '\n' ..
-            string.char(0x1F, SEPARATOR) .. '================================================='
-        -- Display the message in the chat window.
-        windower.add_to_chat(123, message)
-    end
-
-    -- Check if the spell should be replaced.
-    if shouldReplaceSpell(spell.name) then
-        -- Extract the spell category and level from the spell name.
-        local spellCategory, spellLevel = spell.name:match('(%a+)%s*(%a*)')
-        -- Retrieve the replacement spell from the correspondence table.
-        local correspondence = spellCorrespondence[spellCategory]
-        if 
-            spell.name == 'Firaja' or 
-            spell.name == 'Blizzaja' or 
-            spell.name == 'Aeroja' or 
-            spell.name == 'Stoneja' or 
-            spell.name == 'Thundaja' or
-            spell.name == 'Waterja' then
-                replacement = string.gsub(spell.name, "ja", "ga")
-                replacement = replacement.." III"
-        else
-            if correspondence then
-                if spellLevel ~= '' then
-                    replacement = correspondence[spellLevel].replace
-                else
-                    replacement = ''
-                end
-            end
-    end
-        if replacement == '' then
-            -- If there is no replacement, set the new spell to the spell category.
-            newSpell = spellCategory
-            if newSpell ~= 'Aspir' then
-                -- For spells other than 'Aspir', check if the player has sufficient MP to cast.
-                if player_mp < 9 then
-                    -- Cancel the spell, display the recast message, and return.
-                    cancel_spell()
-                    recastMessage(newSpell)
-                    return
-                end
-            else
-                -- For 'Aspir', check if the player has sufficient MP to cast.
-                if player_mp < 10 then
-                    -- Cancel the spell, display the recast message, and return.
-                    cancel_spell()
-                    recastMessage(newSpell)
-                    return
-                end
-            end
-        else
-            -- If there is a replacement, set the new spell to the category and replacement level.
-            if 
-            spell.name == 'Firaja' or 
-            spell.name == 'Blizzaja' or 
-            spell.name == 'Aeroja' or 
-            spell.name == 'Stoneja' or 
-            spell.name == 'Thundaja' or
-            spell.name == 'Waterja' then
-                newSpell = replacement
-            else
-                newSpell = spellCategory .. ' ' .. replacement
-            end
+        -- If the replacement doesn't exist and the new spell isn't 'Aspir' and the player doesn't have enough mana
+        if replacement == '' and newSpell ~= 'Aspir' and player_mp < (newSpell == 'Aspir' and 10 or 9) then
+            -- Cancel the spell
+            cancel_spell()
+            -- Display a message to the player
+            windower.add_to_chat(123, createFormattedMessage(
+                'Cannot cast spell:',
+                newSpell,
+                nil,
+                'Not enough Mana: (' .. player_mp .. 'MP)',
+                true,
+                true
+            ))
+            -- Exit the function
+            return
         end
     end
 
-    -- If the new spell is different from the original English name, cast the new spell.
+    -- If the new spell is different from the original spell
     if newSpell ~= spell.english then
-        -- Construct the command to cast the new spell with the appropriate target.
+        -- Cast the new spell
         send_command('@input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
-        -- Cancel the event to prevent the original spell from being cast.
+        -- Cancel the original event
         eventArgs.cancel = true
-    else
-        spellCategory, spellLevel = spell.name:match('(%a+)%s*(%a*)')
-        if state.CastingMode.value == 'MagicBurst' and spell.skill == 'Elemental Magic' then
-            if spellLevel == 'VI' then
-                send_command('wait 2; input /p Casting => '..spellCategory..':'..spellLevel..' [Nuke]')
-            else
-                send_command('input /p Casting => '..spellCategory..' '..spellLevel..' [Nuke]')
-            end
+        -- If the casting mode is 'MagicBurst' and the spell skill is 'Elemental Magic'
+    elseif state.CastingMode.value == 'MagicBurst' and spell.skill == 'Elemental Magic' then
+        -- Send a message to the party
+        send_command((spellLevel == 'VI' and 'wait 2; ' or '') ..
+            'input /p Casting: [' .. spellCategory .. ' ' .. spellLevel .. '] => Nuke')
+    end
+
+    -- If the spell is 'Breakga' and it's on cooldown
+    if spell.english == 'Breakga' and spell_recasts[spell.recast_id] > 0 then
+        -- Cancel the spell
+        cancel_spell()
+        -- Set the new spell to 'Break'
+        newSpell = 'Break'
+        -- If 'Break' is also on cooldown
+        if spell_recasts[255] > 0 then
+            -- Cancel the spell
+            cancel_spell()
+            -- Cancel the original event
+            eventArgs.cancel = true
+            -- Calculate the recast time
+            local recastTime = spell_recasts[255] / 60
+            -- Create a message
+            local msg = createFormattedMessage(nil, newSpell, recastTime)
+            -- Display the message to the player
+            add_to_chat(123, msg)
+        else
+            -- Cast the new spell
+            send_command('@input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
+            -- Cancel the original event
+            eventArgs.cancel = true
         end
     end
 end
@@ -256,205 +180,148 @@ end
 -- Parameters:
 --   idleSet (table): The base idle gear set to be customized.
 function customize_idle_set(idleSet)
-    -- Check if the "Manawall" condition is true.
-    if Manawall then
-        -- If "Manawall" is true, combine the base idle set with the "PDT" (Physical Damage Taken) idle set.
-        idleSet = set_combine(idleSet, sets.idle.PDT)
+    -- Define the conditions and the corresponding sets
+    local conditions = { Manawall = Manawall }
+    local setTable = { Manawall = sets.buff['Mana Wall'] }
+
+    -- Use the customize_set function to customize the idleSet
+    return customize_set(idleSet, conditions, setTable)
+end
+
+-- Function: mergeTables
+-- This function merges two tables together.
+function mergeTables(t1, t2)
+    local result = {}
+    for k, v in pairs(t1) do
+        result[k] = v
     end
-    -- Return the customized idle gear set.
-    return idleSet
+    for k, v in pairs(t2) do
+        result[k] = v
+    end
+    return result
 end
 
--- Handles actions to be performed when a spell is interrupted.
--- Parameters:
---   spell (table): The interrupted spell.
---   eventArgs (table): Additional event arguments.
-function handleInterruptedSpell(spell, eventArgs)
-    -- Equip the idle gear set.
-    equip(sets.idle)
-    -- Set the "handled" field of eventArgs to true.
-    eventArgs.handled = true
-    -- Create a formatted message indicating that the spell was interrupted.
-    local message = createFormatMsg('Spell interrupted:', spell.name)
-    -- Add the message to the chat log.
-    add_to_chat(123, message)
-end
+-- Base equipment set
+local baseSet = {
+    main = "Bunzi's Rod",
+    sub = "Ammurapi Shield",
+    ammo = { name = "Ghastly Tathlum +1", augments = { 'Path: A', } },
+    head = "Wicce Petasos +3",
+    body = "Spaekona's Coat +3",
+    hands = "Wicce Gloves +3",
+    legs = "Wicce Chausses +3",
+    feet = "Wicce Sabots +3",
+    neck = { name = "Src. Stole +2", augments = { 'Path: A', } },
+    waist = { name = "Acuity Belt +1", augments = { 'Path: A', } },
+    left_ear = "Malignance Earring",
+    right_ear = "Regal Earring",
+    left_ring = "Freke Ring",
+    right_ring = { name = "Metamor. Ring +1", augments = { 'Path: A', } },
+    back = "Taranus's cape"
+}
 
--- This function is called SaveMP and appears to be related to setting a specific gear based on the player's current MP value.
-    function SaveMP()
-        if state.Xp.value == 'True' then
-            sets.midcast['Dark Magic'] = {
-                main = 'Malignance Pole',
-                sub = 'Enki Strap',
-                ammo = 'Ghastly Tathlum +1',
-                head = 'Wicce Petasos +3',
-                body = 'Wicce Coat +3',
-                hands = 'wicce gloves +3',
-                legs = 'Wicce Chausses +3',
-                feet = 'Wicce Sabots +3',
-                neck = 'Loricate Torque +1',
-                waist = 'Acuity Belt +1',
-                left_ear = 'Ethereal Earring',
-                right_ear = 'Lugalbanda Earring',
-                left_ring = StikiRing1,
-                right_ring = StikiRing2,
-                back = "Taranus's Cape",
-            }
-            sets.midcast.Aspir = {
-                main = 'Malignance Pole',
-                sub = 'Enki Strap',
-                ammo = 'Ghastly Tathlum +1',
-                head = 'Wicce Petasos +3',
-                body = 'Wicce Coat +3',
-                hands = 'wicce gloves +3',
-                legs = 'Wicce Chausses +3',
-                feet = 'Wicce Sabots +3',
-                neck = 'Loricate Torque +1',
-                waist = 'Acuity Belt +1',
-                left_ear = 'Ethereal Earring',
-                right_ear = 'Lugalbanda Earring',
-                left_ring = StikiRing1,
-                right_ring = StikiRing2,
-                back = "Taranus's Cape",
-            }
-            sets.midcast['Elemental Magic'] = {
-                main = "Bunzi's rod",
-                sub = 'Ammurapi Shield',
-                ammo = 'Ghastly tathlum +1',
-                head = 'Wicce Petasos +3',
-                body = "Spaekona's Coat +3",
-                hands = 'wicce gloves +3',
-                legs = 'Wicce Chausses +3',
-                feet = 'Wicce Sabots +3',
-                neck = 'Src. Stole +2',
-                waist = "Orpheus's Sash",
-                left_ear = 'Malignance Earring',
-                right_ear= "Regal Earring",
-                left_ring = 'Freke Ring',
-                right_ring = 'Defending Ring',
-                back = "Taranus's Cape",
-            }
+-- Equipment set for 'Elemental Magic' in 'Normal' mode when MP < 1000
+-- This set merges the base set with an additional body piece.
+local normalSetLowMP = mergeTables(baseSet, {
+    body = "Spaekona's Coat +3",
+    waist = "Orpheus's Sash"
+})
+
+-- Equipment set for 'Elemental Magic' in 'Normal' mode when MP >= 1000
+-- This set merges the base set with a different body piece.
+local normalSetHighMP = mergeTables(baseSet, {
+    body = 'Wicce Coat +3',
+    waist = "Orpheus's Sash"
+})
+
+-- Equipment set for 'Elemental Magic' in 'MagicBurst' mode when MP < 1000
+-- This set merges the base set with additional pieces for body, ammo, feet, and waist.
+local magicBurstSetLowMP = mergeTables(baseSet, {
+    body = "Spaekona's Coat +3",
+    ammo = 'Ghastly tathlum +1',
+    feet = "Agwu's Pigaches",
+    waist = 'Hachirin-no-obi'
+})
+
+-- Equipment set for 'Elemental Magic' in 'MagicBurst' mode when MP >= 1000
+-- This set merges the base set with different pieces for body, and additional pieces for ammo, feet, and waist.
+local magicBurstSetHighMP = mergeTables(baseSet, {
+    body = 'Wicce Coat +3',
+    ammo = 'Ghastly tathlum +1',
+    feet = "Agwu's Pigaches",
+    waist = 'Hachirin-no-obi'
+})
+
+-- Function: SaveMP
+-- Adjusts player's gear based on current MP and casting mode.
+function SaveMP()
+    -- If MP is less than 1000, adjust gear based on casting mode.
+    if player.mp < 1000 then
+        -- If casting mode is 'Normal', use normalSetLowMP. Otherwise, use magicBurstSetLowMP.
+        if state.CastingMode.value == 'Normal' then
+            sets.midcast['Elemental Magic'] = normalSetLowMP
         else
-            sets.midcast['Dark Magic'] = {
-                main={ name="Rubicundity", augments={'Mag. Acc.+6','"Mag.Atk.Bns."+7','Dark magic skill +7',}},
-                sub="Ammurapi Shield",
-                ammo={ name="Ghastly Tathlum +1", augments={'Path: A',}},
-                head={ name="Merlinic Hood", augments={'Mag. Acc.+6','"Drain" and "Aspir" potency +10','INT+6','"Mag.Atk.Bns."+2',}},
-                body={ name="Merlinic Jubbah", augments={'"Mag.Atk.Bns."+30','"Drain" and "Aspir" potency +11','INT+3','Mag. Acc.+4',}},
-                hands={ name="Merlinic Dastanas", augments={'"Drain" and "Aspir" potency +10','"Mag.Atk.Bns."+14',}},
-                legs="Wicce Chausses +3",
-                feet="Agwu's Pigaches",
-                neck="Erra Pendant",
-                waist="Fucho-no-Obi",
-                left_ear="Malignance Earring",
-                right_ear="Wicce Earring +1",
-                left_ring="Metamor. Ring +1",
-                right_ring="Evanescence Ring",
-                back= "Taranus's Cape",
-            }
-            sets.midcast.Aspir = {
-                main={ name="Rubicundity", augments={'Mag. Acc.+6','"Mag.Atk.Bns."+7','Dark magic skill +7',}},
-                sub="Ammurapi Shield",
-                ammo={ name="Ghastly Tathlum +1", augments={'Path: A',}},
-                head={ name="Merlinic Hood", augments={'Mag. Acc.+6','"Drain" and "Aspir" potency +10','INT+6','"Mag.Atk.Bns."+2',}},
-                body={ name="Merlinic Jubbah", augments={'"Mag.Atk.Bns."+30','"Drain" and "Aspir" potency +11','INT+3','Mag. Acc.+4',}},
-                hands={ name="Merlinic Dastanas", augments={'"Drain" and "Aspir" potency +10','"Mag.Atk.Bns."+14',}},
-                legs="Wicce Chausses +3",
-                feet="Agwu's Pigaches",
-                neck="Erra Pendant",
-                waist="Fucho-no-Obi",
-                left_ear="Malignance Earring",
-                right_ear="Wicce Earring +1",
-                left_ring="Metamor. Ring +1",
-                right_ring="Evanescence Ring",
-                back= "Taranus's Cape",
-            }
-            -- Check if the player's MP is less than 1000.
-            if player.mp < 1000 then
-                if state.CastingMode.value == 'Normal' then
-                    -- If the MP is below 1000, update the gear set for 'Elemental Magic' to include the body piece "Spaekona's Coat +3".
-                    sets.midcast['Elemental Magic'] = {
-                        main = "Bunzi's rod",
-                        sub = 'Ammurapi Shield',
-                        ammo = 'Sroda tathlum',
-                        head = 'Wicce Petasos +3',
-                        body = "Spaekona's Coat +3",
-                        hands = 'wicce gloves +3',
-                        legs = 'Wicce Chausses +3',
-                        feet = 'Wicce Sabots +3',
-                        neck = 'Src. Stole +2',
-                        waist = "Orpheus's Sash",
-                        left_ear = 'Malignance Earring',
-                        right_ear= "Regal Earring",
-                        left_ring = 'Freke Ring',
-                        right_ring = 'Metamor. Ring +1',
-                        back = "Taranus's Cape",
-                        }
-                else
-                    sets.midcast['Elemental Magic'].MagicBurst = {
-                        main = "Bunzi's rod",
-                        sub = 'Ammurapi Shield',
-                        ammo = 'Ghastly tathlum',
-                        head="Wicce Petasos +3",
-                        body="Spaekona's Coat +3",
-                        hands="Wicce Gloves +3",
-                        legs="Wicce Chausses +3",
-                        feet = "Wicce sabots +3",
-                        neck="Src. Stole +2",
-                        waist = "Hachirin-no-obi",
-                        left_ear="Malignance Earring",
-                        right_ear= "Regal Earring",
-                        left_ring="Freke Ring",
-                        right_ring="Metamor. Ring +1",
-                        back="Taranus's Cape",
-                }
-                end
-            else
-                if state.CastingMode.value == 'Normal' then
-                    -- If the MP is 1000 or higher, update the gear set for 'Elemental Magic' to include the body piece "Wicce Coat +3".
-                    sets.midcast['Elemental Magic'] = {
-                        main = "Bunzi's rod",
-                        sub = 'Ammurapi Shield',
-                        ammo = 'Sroda tathlum',
-                        head = 'Wicce Petasos +3',
-                        body = 'Wicce Coat +3',
-                        hands = 'wicce gloves +3',
-                        legs = 'Wicce Chausses +3',
-                        feet = 'Wicce Sabots +3',
-                        neck = 'Src. Stole +2',
-                        waist = "Orpheus's Sash",
-                        left_ear = 'Malignance Earring',
-                        right_ear= "Regal Earring",
-                        left_ring = 'Freke Ring',
-                        right_ring = 'Metamor. Ring +1',
-                        back = "Taranus's Cape",
-                    }
-                else
-                    sets.midcast['Elemental Magic'].MagicBurst = {
-                        main = "Bunzi's rod",
-                        sub = 'Ammurapi Shield',
-                        ammo = 'Ghastly tathlum',
-                        head="Wicce Petasos +3",
-                        body="Wicce Coat +3",
-                        hands="Wicce Gloves +3",
-                        legs="Wicce Chausses +3",
-                        feet = "Wicce sabots +3",
-                        neck="Src. Stole +2",
-                        waist = "Hachirin-no-obi",
-                        left_ear="Malignance Earring",
-                        right_ear= "Regal Earring",
-                        left_ring="Freke Ring",
-                        right_ring="Metamor. Ring +1",
-                        back="Taranus's Cape",
-                }
-                end
-            end
+            sets.midcast['Elemental Magic'].MagicBurst = magicBurstSetLowMP
+        end
+    else
+        -- If MP is 1000 or more, adjust gear based on casting mode.
+        -- If casting mode is 'Normal', use normalSetHighMP. Otherwise, use magicBurstSetHighMP.
+        if state.CastingMode.value == 'Normal' then
+            sets.midcast['Elemental Magic'] = normalSetHighMP
+        else
+            sets.midcast['Elemental Magic'].MagicBurst = magicBurstSetHighMP
         end
     end
+end
 
-    function checkArts(spell, eventArgs)
-        if spell.skill == 'Elemental Magic' and not (buffactive['Dark Arts'] or buffactive['Addendum: Black']) then
+-- Function: checkArts
+-- This function checks if the player's sub-job is Scholar (SCH) and if the 'Dark Arts' ability is available.
+-- If these conditions are met and the player is casting an 'Elemental Magic' spell without 'Dark Arts' or 'Addendum: Black' active,
+-- it cancels the current spell, activates 'Dark Arts', and then recasts the original spell.
+-- Parameters:
+--   spell (table): The spell being cast.
+--   eventArgs (table): Additional event arguments.
+function checkArts(spell, eventArgs)
+    -- Check if the player's sub-job is Scholar (SCH).
+    if player.sub_job == 'SCH' then
+        -- Get the recast time for the 'Dark Arts' ability.
+        local darkArtsRecast = windower.ffxi.get_ability_recasts()[232]
+        -- Check if the player is casting an 'Elemental Magic' spell and doesn't have 'Dark Arts' or 'Addendum: Black' active,
+        -- and if the 'Dark Arts' ability is available (recast time is less than 1).
+        if
+            spell.skill == 'Elemental Magic' and not (buffactive['Dark Arts'] or buffactive['Addendum: Black']) and
+            darkArtsRecast < 1
+        then
+            -- Cancel the current spell.
             cancel_spell()
-            send_command('input /ja "Dark Arts" <me>; wait 3; input /ma '.. spell.name ..' <stnpc>')
+            -- Activate 'Dark Arts' and recast the original spell after a 2-second delay.
+            send_command('input /ja "Dark Arts" <me>; wait 2; input /ma ' .. spell.name .. ' <t>')
         end
     end
+end
+
+-- ===========================================================================================================
+--                                   Job-Specific Command Handling Functions
+-- ===========================================================================================================
+-- Handles custom commands specific to the job.
+-- It updates the altState object, handles a set of predefined commands, and handles job-specific and subjob-specific commands.
+-- @param cmdParams (table): The command parameters. The first element is expected to be the command name.
+-- @param eventArgs (table): Additional event arguments.
+-- @param spell (table): The spell currently being cast.
+function job_self_command(cmdParams, eventArgs, spell)
+    -- Update the altState object
+    update_altState()
+    local command = cmdParams[1]:lower()
+
+    -- If the command is defined, execute it
+    if commandFunctions[command] then
+        commandFunctions[command](altPlayerName, mainPlayerName)
+    else
+        handle_blm_commands(cmdParams)
+
+        -- Handle subjob-specific commands
+        if player.sub_job == 'SCH' then
+            handle_sch_subjob_commands(cmdParams)
+        end
+    end
+end

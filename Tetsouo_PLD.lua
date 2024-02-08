@@ -4,57 +4,71 @@
 --=                    Author: Tetsouo                       =--
 --=                     Version: 1.0                         =--
 --=                  Created: 2023-07-10                     =--
---=               Last Modified: 2023-07-13                  =--
+--=               Last Modified: 07/02/2024                  =--
 --============================================================--
 
--- Sets up the necessary libraries and files for Gearswap.
+-- Initializes GearSwap for the Paladin job by setting up the necessary libraries and files.
+-- This function is called once when the script is loaded.
 function get_sets()
-    mote_include_version = 2
-    include('Mote-Include.lua') -- Includes the Mote-Include.lua library (Version 2)
-    include('/PLD/PLD_SET.lua')
-    include('/Misc/0_AutoMove.lua') -- Includes the AutoMove.lua file for movement speed gear management
-    include('/Misc/SharedFunctions.lua') -- Includes the SharedFunctions.lua file for shared functions
-    include('/PLD/PLD_FUNCTION.lua') -- Includes the PLD_FUNCTION.lua file for advanced functions specific to Paladin
+    mote_include_version = 2             -- Specifies the version of the Mote library to use
+    -- Include necessary libraries and modules
+    include('Mote-Include.lua')          -- Mote library for GearSwap
+    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
+    include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
+    include('/PLD/PLD_SET.lua')          -- Paladin specific gear sets
+    include('/PLD/PLD_FUNCTION.lua')     -- Advanced functions specific to Paladin
 end
 
--- Handles user-specific configuration and setup.
+-- Initializes gear sets for the Paladin job.
+-- This function is called once when the script is loaded.
+function init_gear_sets()
+end
+
+-- Sets up user-specific configurations and binds keys for the Paladin job.
+function user_setup()
+    select_default_macro_book() -- Selects the default macro book based on sub-job
+end
+
+-- Sets up user-specific configurations and binds keys for the Paladin job.
+-- This function is called once when the script is loaded.
 function job_setup()
-    -- Hybrid mode options: 'PDT' (physical), 'MDT' (magical)
-    state.HybridMode:options('PDT', 'MDT') -- Command to change hybrid mode: /console gs c cycle HybridMode
-    -- Main weapon choice: 'Burtgang', 'Naegling'
-    state.WeaponSet = M {['description'] = 'Main Weapon', 'Burtgang', 'Naegling', 'Malevo'} -- Command to cycle main weapon set: /console gs c cycle WeaponSet
-    -- Sub weapon choice: 'Duban', 'Aegis', 'Ochain', 'Blurred'
-    state.SubSet = M {['description'] = 'Sub Weapon', 'Duban', 'Aegis', 'Ochain', 'Blurred'} -- Command to cycle sub weapon set: /console gs c cycle SubSet
-    state.Xp = M {['description'] = 'XP', 'False', 'True'}
-    -- Calls the function to select the default macro book
-    select_default_macro_book()
-    -- Binds F9 to cycle through hybrid modes
+    -- Define options for hybrid mode
+    state.HybridMode:options('PDT', 'MDT')
+    -- Define options for main weapon set
+    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Burtgang', 'Naegling', 'Malevo' }
+    -- Define options for sub weapon set
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Duban', 'Aegis', 'Ochain', 'Blurred' }
+    -- Define options for XP mode
+    state.Xp = M { ['description'] = 'XP', 'False', 'True' }
+    -- Bind keys to cycle through modes and sets
     send_command('bind F9 gs c cycle HybridMode')
-    -- Binds F10 to cycle through main weapon sets
     send_command('bind F10 gs c cycle WeaponSet')
-    -- Binds F11 to cycle through sub weapon sets
     send_command('bind F11 gs c cycle SubSet')
 
-    -- [gs c Single] subjob/Blu cast spell from PLD_FUNCTION.lua table spellsSingle:
-    -- Flash
-    -- Blank Gaze
-
-    -- [gs c Aoe] subjob/Blu cast spell from PLD_FUNCTION.lua table spellsAoe:
-    -- Jettatura
-    -- Sheep Song
-    -- Geist Wall
+    -- Define options for alternative player state
+    state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
+    state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
+    state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
+    state.altPlayera = M('Fira III', 'Stonera III', 'Blizzara III', 'Aera III', 'Thundara III', 'Watera III')
+    state.altPlayerGeo = M('Geo-Fury', 'Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
+    state.altPlayerIndi =
+        M('Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Fury', 'Indi-Acumen', 'Indi-Precision', 'Indi-Haste')
+    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 end
 
--- Handles the unload event when changing job or reloading the file.
+-- Handles the unload event when changing job or reloading the script.
+-- This function is called once when the script is unloaded.
 function file_unload()
-    -- Unbinds the keys associated with the states.
-    send_command('unbind F9')
-    send_command('unbind F10')
-    send_command('unbind F11')
+    -- Unbind the keys associated with the hybrid mode, weapon set, and sub weapon set.
+    send_command('unbind F9')  -- Unbind key for cycling hybrid mode
+    send_command('unbind F10') -- Unbind key for cycling main weapon set
+    send_command('unbind F11') -- Unbind key for cycling sub weapon set
 end
 
--- Loads the gear sets from the PLD_SET.lua file.
+-- Initializes the gear sets for the Paladin job.
+-- This function is called once when the script is loaded.
 function init_gear_sets()
+    -- The actual gear sets are defined in the PLD_SET.lua file.
 end
 
 -- Handles actions and checks to perform before casting a spell or ability.
@@ -64,58 +78,61 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    if incapacitated(spell, eventArgs, true) then
-        -- Spell cannot be cast due to incapacitation, no further actions needed
-    else
-        PhalanXp(spell, eventArgs)
-        customize_cure_set(spell)
-        auto_majesty(spell, eventArgs) -- Automatically cast Majesty ability before certain spells
-        auto_divineEmblem(spell, eventArgs) -- Automatically use Divine Emblem ability
-        checkDisplayCooldown(spell, eventArgs) -- Handle recast cooldown and display messages
+    -- If the spell is Phalanx, call the handle_phalanx_while_xp function
+    if spell.name == 'Phalanx' then
+        handle_phalanx_while_xp(spell, eventArgs)
     end
+    -- Handle the spell casting
+    handle_spell(spell, eventArgs, auto_abilities)
+    -- Check and display the recast cooldown
+    checkDisplayCooldown(spell, eventArgs)
 end
 
 -- Handles actions to perform during the casting of a spell or ability.
+-- This function is called after the precast phase and before the aftercast phase.
 -- Parameters:
 --   spell (table): The spell being cast
 --   action (table): The action being performed
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
-    updateTable(spellsSingle, spell.name, 'Midcast')
-    updateTable(spellsAoe, spell.name, 'Midcast')
-    incapacitated(spell, eventArgs) -- Check for incapacitated state
+    -- Check if the player is incapacitated
+    --[[ incapacitated(spell, eventArgs) ]]
 end
 
 -- Handles actions to perform after the casting of a spell or ability.
+-- This function is called after the spell or ability has been cast.
 -- Parameters:
 --   spell (table): The spell that was cast
 --   action (table): The action that was performed
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_aftercast(spell, action, spellMap, eventArgs)
-        updateTable(spellsSingle, spell.name, 'Aftercast')
-        updateTable(spellsAoe, spell.name, 'Aftercast')
-        handleSpellAftercast(spell, eventArgs) -- Perform actions after the spell is cast
+    -- Perform actions specific to the spell that was cast
+    handleSpellAftercast(spell, eventArgs)
 end
 
 -- Sets the default macro book based on the player's sub job.
+-- This function is called once when the script is loaded.
 function select_default_macro_book()
-    -- If sub job is WAR
-    if player.sub_job == 'WAR' then
-        set_macro_page(1, 21) -- Set macro book page 1, macro 21 for sub job WAR
-        send_command('wait 20; input /lockstyleset 4') -- Lockstyle command for sub job WAR
-        -- If sub job is BLU
-    elseif player.sub_job == 'BLU' then
-        set_macro_page(1, 23) -- Set macro book page 1, macro 22 for sub job BLU
-        send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
-    -- For other sub jobs
+    -- Unloads the 'dressup' Lua script.
+    send_command('lua unload dressup')
+
+    -- Set macro book and lockstyle based on sub job
+    if player.sub_job == 'BLU' then
+        set_macro_page(1, 23)     -- BLU sub job
+        send_command('input /lockstyleset 3')
+    elseif player.sub_job == 'WAR' then
+        set_macro_page(1, 21)     -- WAR sub job
+        send_command('input /lockstyleset 4')
     elseif player.sub_job == 'RDM' then
-        set_macro_page(1, 32) -- Set macro book page 1, macro 22 for sub job BLU
-        send_command('wait 20; input /lockstyleset 3') -- Lockstyle command for sub job BLU
-    -- For other sub jobs
+        set_macro_page(1, 28)     -- RDM sub job
+        send_command('input /lockstyleset 3')
     else
-        set_macro_page(1, 21) -- Set macro book page 1, macro 21 for other sub jobs
-        send_command('wait 20;input /lockstyleset 4') -- Default lockstyle command
+        set_macro_page(1, 23)     -- Default for other sub jobs
+        send_command('input /lockstyleset 3')
     end
+
+    -- Waits for 15 seconds, locks the style set to 1, waits for another 5 seconds, and then loads the 'dressup' Lua script.
+    send_command('wait 15; lua load dressup')
 end

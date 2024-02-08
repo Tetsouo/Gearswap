@@ -12,14 +12,15 @@
 	Maintenant, il faut mettre vos equip idle dans votre sets.Idle
 	Puis mettre votre equipment movement speed dans le sets.MoveSpeed
 	
-	]] -- Ne rien toucher passé cette ligne.
+	]]
+    -- Ne rien toucher passé cette ligne.
 
-sets.Adoulin = set_combine(sets.MoveSpeed, {body = "Councilor's Garb"})
+sets.Adoulin = set_combine(sets.MoveSpeed, { body = "Councilor's Garb" })
 
 state.Moving = M('false', 'true')
 state.EngagedMoving = M('Disabled', 'Enabled')
 
-mov = {counter = 0}
+mov = { counter = 0 }
 if player and player.index and windower.ffxi.get_mob_by_index(player.index) then
     mov.x = windower.ffxi.get_mob_by_index(player.index).x
     mov.y = windower.ffxi.get_mob_by_index(player.index).y

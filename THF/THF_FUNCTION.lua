@@ -1,146 +1,156 @@
--- Function to handle interrupted spells.
-function handleInterruptedSpell(spell, eventArgs)
-    equip(sets.engaged.PDT) -- Equip PDT (Physical Damage Taken) gear to reduce damage taken.
-    eventArgs.handled = true -- Mark the event as handled to prevent further processing.
-    local message = createFormatMsg('Spell interrupted:', spell.name) -- Create a formatted message indicating the interrupted spell.
-    add_to_chat(123, message) -- Display the message in the chat log.
-end
+--============================================================--
+--=                    THF_FUNCTION                          =--
+--============================================================--
+--=                    Author: Tetsouo                       =--
+--=                     Version: 1.0                         =--
+--=                  Created: 2023-07-10                     =--
+--=               Last Modified: 2024/02/08                  =--
+--============================================================--
 
--- Function to refine Utsusemi spells.
-function refine_Utsusemi(spell, eventArgs)
-    local spell_recasts = windower.ffxi.get_spell_recasts() -- Get spell recast times.
-    local NiCD = spell_recasts[339] -- Utsusemi: Ni recast time.
-    local IchiCD = spell_recasts[338] -- Utsusemi: Ichi recast time.
+-- Initialize an empty table to store automatic abilities mappings
+local auto_abilities = {}
 
-    if spell.name == 'Utsusemi: Ni' then -- If the spell is Utsusemi: Ni.
-        if NiCD > 1 then -- If Utsusemi: Ni is not ready (recast > 1 second).
-            eventArgs.cancel = true -- Cancel the spell activation.
-            if IchiCD < 1 then -- If Utsusemi: Ichi is ready (recast < 1 second).
-                cancel_spell() -- Cancel the current spell cast.
-                cast_delay(1.1) -- Delay casting for 1.1 seconds.
-                send_command('input /ma "Utsusemi: Ichi" <me>') -- Cast Utsusemi: Ichi on self.
+-- Buffs the player with specific abilities if the provided parameter is 'thfBuff'.
+-- @param {string} param - The parameter to determine if the function should run.
+function buffSelf(param)
+    -- Get the current ability recast times.
+    local AbilityRecasts = windower.ffxi.get_ability_recasts()
+
+    -- Define the abilities to use and their corresponding recast times.
+    local abilities = {
+        { name = 'Feint',       recast = AbilityRecasts[68] },
+        { name = 'Bully',       recast = AbilityRecasts[240] },
+        { name = 'Conspirator', recast = AbilityRecasts[40] }
+    }
+
+    -- Initialize variables.
+    local delay = 1             -- The delay in seconds between each ability usage.
+    local readyAbility = nil    -- The next ability to be used.
+    local delayedAbilities = {} -- The list of abilities to be used after the delay.
+
+    -- Iterate over the abilities.
+    for _, ability in ipairs(abilities) do
+        -- Check if the ability is ready to use, not active, and the param is 'thfBuff'.
+        if not buffactive[ability.name] and ability.recast < 1 and param == 'thfBuff' then
+            -- If no ability is ready, set the current ability as the ready ability.
+            if not readyAbility then
+                readyAbility = ability
             else
-                add_to_chat(123, "Neither Utsusemi spell is ready!") -- Display a message indicating that neither Utsusemi spell is ready.
+                -- If an ability is already ready, add the current ability to the delayed abilities list.
+                table.insert(delayedAbilities, ability)
             end
         end
     end
+
+    -- Use the ready ability immediately.
+    if readyAbility then
+        send_command('input /ja "' .. readyAbility.name .. '" ' .. (readyAbility.name == 'Bully' and '<t>' or '<me>'))
+        delay = delay + 1
+    end
+
+    -- Use delayed abilities with a delay between each usage.
+    for _, ability in ipairs(delayedAbilities) do
+        send_command(
+            'wait ' .. delay .. '; input /ja "' .. ability.name .. '" ' .. (ability.name == 'Bully' and '<t>' or '<me>')
+        )
+        delay = delay + 2
+    end
 end
 
--- Function to get custom weapon skill mode.
+-- Determines the custom weapon skill mode based on active buffs.
+-- @param {table} spell - The spell being cast.
+-- @param {string} spellMap - The map of the spell.
+-- @param {string} default_wsmode - The default weapon skill mode.
+-- @return {string} The custom weapon skill mode if 'Sneak Attack' or 'Trick Attack' buffs are active.
 function get_custom_wsmode(spell, spellMap, default_wsmode)
     local wsmode
 
+    -- Check if 'Sneak Attack' buff is active. If so, set the weapon skill mode to 'SA'.
     if state.Buff['Sneak Attack'] then
-        wsmode = 'SA' -- Weapon skill mode with Sneak Attack.
+        wsmode = 'SA'
     end
+
+    -- Check if 'Trick Attack' buff is active. If so, append 'TA' to the weapon skill mode.
     if state.Buff['Trick Attack'] then
-        wsmode = (wsmode or '') .. 'TA' -- Weapon skill mode with Trick Attack.
+        wsmode = (wsmode or '') .. 'TA'
     end
 
-    return wsmode -- Return the custom weapon skill mode if any buffs are active.
+    -- Return the custom weapon skill mode. If no buffs are active, this will be nil.
+    return wsmode
 end
 
--- Function to check if a specific buff is active and equip the corresponding gear.
-function check_buff(buff_name, eventArgs)
-    if state.Buff[buff_name] then
-        equip(sets.buff[buff_name] or {}) -- Equip specific gear for the buff if defined in the sets table.
-        if state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime' then
-            equip(sets.TreasureHunter) -- Equip TreasureHunter gear if SATA or Fulltime treasure mode is active.
-        end
-        eventArgs.handled = true -- Mark the event as handled to prevent further processing.
-    end
-end
-
--- Function to check if a ranged weapon is equipped and disable/enable the corresponding slots.
-function check_range_lock()
-    if player.equipment.range ~= 'empty' then
-        disable('range', 'ammo') -- Disable the range and ammo slots if a ranged weapon is equipped.
-    else
-        enable('range', 'ammo') -- Enable the range and ammo slots if no ranged weapon is equipped.
-    end
-end
-
--- Function to handle gear setup upon status change (buff gain or loss).
-function job_handle_equipping_gear(playerStatus, eventArgs)
-    check_range_lock() -- Check if a ranged weapon is equipped and handle gear setup accordingly.
-    check_weaponset() -- Check and handle main weapon gear set changes.
-    check_subset() -- Check and handle sub weapon gear set changes.
-    check_buff('Sneak Attack', eventArgs) -- Check if Sneak Attack buff is active and equip corresponding gear.
-    check_buff('Trick Attack', eventArgs) -- Check if Trick Attack buff is active and equip corresponding gear.
-end
-
--- Function to customize the idle gear set based on player's HP and HybridMode.
+-- Customizes the idle set based on the current state.
+-- @param {table} idleSet - The base idle set.
+-- @return {table} The customized idle set.
 function customize_idle_set(idleSet)
-    if player.hp < 1500 then
-        idleSet = set_combine(idleSet, sets.idle.Regen) -- If HP is less than 1500, equip Regen gear.
+    -- If player's HP is less than 2000, add the Regen set to the idle set.
+    if player.hp < 2000 then
+        idleSet = set_combine(idleSet, sets.idle.Regen)
     end
-    if state.HybridMode.value == 'PDT' then
-        idleSet = set_combine(idleSet, sets.idle.PDT) -- If HybridMode is PDT, equip PDT gear.
-    end
-    return idleSet -- Return the customized idle gear set.
+
+    -- Get the conditions and sets for customizing the idle set.
+    local conditions, setTable = get_conditions_and_sets(sets.idle.PDT, sets.idle.PDT, sets.defense.MDT)
+
+    -- Customize the idle set based on the conditions and sets.
+    return customize_set(idleSet, conditions, setTable)
 end
 
--- Function to customize the melee gear set based on player's HP, TreasureMode, and HybridMode.
+-- Customizes the melee set based on the current state.
+-- @param {table} meleeSet - The base melee set.
+-- @return {table} The customized melee set.
 function customize_melee_set(meleeSet)
+    -- If Treasure Mode is set to 'Fulltime', add the Treasure Hunter set to the melee set.
     if state.TreasureMode.value == 'Fulltime' then
-        meleeSet = set_combine(meleeSet, sets.TreasureHunter) -- If Fulltime treasure mode is active, equip TreasureHunter gear.
+        meleeSet = set_combine(meleeSet, sets.TreasureHunter)
     end
-    if player.hp <= 800 then
-        meleeSet = sets.engaged.PDT -- If HP is less than or equal to 800, equip PDT gear.
+
+    -- If player's HP is less than or equal to 2000, switch to the PDT engaged set.
+    if player.hp <= 2000 then
+        meleeSet = sets.engaged.PDT
     end
-    if state.HybridMode.value == 'PDT' then
-        meleeSet = set_combine(idleSet, sets.engaged.PDT) -- If HybridMode is PDT, equip PDT gear.
-    end
+
+    -- If Offense Mode is set to 'Acc', add the Accuracy engaged set to the melee set.
     if state.OffenseMode.current == 'Acc' then
-        melee = set_combine(meleeSet, sets.engaged.Acc) -- If OffenseMode is Acc, equip Acc gear for melee.
+        meleeSet = set_combine(meleeSet, sets.engaged.Acc)
     end
-    return meleeSet -- Return the customized melee gear set.
+
+    -- Get the conditions and sets for customizing the melee set.
+    local conditions, setTable = get_conditions_and_sets(sets.engaged.PDT, sets.engaged.PDT, sets.defense.MDT)
+
+    -- Customize the melee set based on the conditions and sets.
+    return customize_set(meleeSet, conditions, setTable)
 end
 
--- Function to update treasure hunter information.
+--- Handles job updates by refreshing the Treasure Hunter status.
+-- @param {table} cmdParams - The parameters of the command triggering the job update.
+-- @param {table} eventArgs - Additional arguments associated with the event.
 function job_update(cmdParams, eventArgs)
+    -- Delegate the update to the Treasure Hunter specific function.
     th_update(cmdParams, eventArgs)
 end
 
--- Function to handle state changes.
-function job_state_change(stateField, newValue, oldValue)
-    check_weaponset() -- Check and handle main weapon gear set changes.
-    check_subset() -- Check and handle sub weapon gear set changes.
-end
+-- ===========================================================================================================
+--                                   Job-Specific Command Handling Functions
+-- ===========================================================================================================
+--- Executes custom job-specific commands.
+-- @param {table} cmdParams - The command parameters, with the command name expected as the first element.
+-- @param {table} eventArgs - Additional event arguments.
+-- @param {table} spell - The spell currently being cast.
+function job_self_command(cmdParams, eventArgs, spell)
+    -- Update the alternate state.
+    update_altState()
+    local command = cmdParams[1]:lower()
 
--- Function to check if certain actions have inherent Treasure Hunter and return true if so.
-function th_action_check(category, param)
-    if
-        category == 2 or -- Any ranged attack
-        category == 4 or -- Any magic action
-        (category == 3 and param == 30) or -- Aeolian Edge
-        (category == 6 and info.default_ja_ids:contains(param)) or -- Provoke, Animated Flourish
-        (category == 14 and info.default_u_ja_ids:contains(param))
-    then -- Quick/Box/Stutter Step, Desperate/Violent Flourish
-        return true
-    end
-end
+    -- If the command is predefined, execute it.
+    if commandFunctions[command] then
+        commandFunctions[command](altPlayerName, mainPlayerName)
+    else
+        -- If the command is not predefined, handle it as a Thief-specific command.
+        handle_thf_commands(cmdParams)
 
-function wsTp(spell)
-    if spell.type == "WeaponSkill" then
-        if player.tp >= 1750 and player.tp < 2000 then
-            if spell.name == 'Aeolian Edge' and treasureHunter ~= 'None' then
-                sets.AeolianTH.left_ear = "MoonShade Earring"
-            elseif spell.name == 'Aeolian Edge' and treasureHunter == 'None' then
-                sets.precast.WS[spell.name].left_ear = "MoonShade Earring"
-            else
-                sets.precast.WS[spell.name].left_ear = "MoonShade Earring"
-            end
-        else
-            if spell.name == "Exenterator" then
-                sets.precast.WS[spell.name].left_ear = "Dawn Earring"
-            elseif spell.name == 'Aeolian Edge' and treasureHunter ~= 'None' then
-                sets.AeolianTH.left_ear = "Sortiarius Earring"
-            elseif spell.name == 'Aeolian Edge' and treasureHunter == 'None' then
-                sets.precast.WS[spell.name].left_ear = "Sortiarius Earring"
-            else
-                sets.precast.WS[spell.name].left_ear = "Sherida Earring"
-            end
+        -- If the subjob is Scholar, handle it as a Scholar-specific command.
+        if player.sub_job == 'SCH' then
+            handle_sch_subjob_commands(cmdParams)
         end
     end
 end
