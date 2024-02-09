@@ -76,7 +76,7 @@ sets.idle.MDT = {
     hands = createEquipment("Sakpata's Gauntlets"),
     legs = createEquipment("Sakpata's Cuisses"),
     feet = createEquipment("Sakpata's Leggings"),
-    neck = createEquipment('Unmoving Collar +1', 0, { 'Path: A' }),
+    neck = createEquipment('Unmoving Collar +1', 0),
     waist = createEquipment('Asklepian Belt'),
     left_ear = createEquipment('Eabani Earring'),
     right_ear = createEquipment('Chev. Earring +1', 0,
@@ -97,6 +97,7 @@ sets.idleNormal = set_combine(sets.idle, {
 })
 
 sets.idleXp = set_combine(sets.idle, {
+    main = "Burtgang",
     body = createEquipment('Chev. Cuirass +3', 16),
     waist = createEquipment('Kentarch Belt +1'),
     left_ring = createEquipment("Supershear Ring", 11),

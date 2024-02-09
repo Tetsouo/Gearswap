@@ -473,7 +473,7 @@ function bufferRoleForAltRdm(altPlayerName, mainPlayerName, commandType)
         { name = 'phalanx2', delay = 4.5 },
         { name = 'regen2',   delay = 9.2 }
     }
-    
+
     local spells = {}
 
     if commandType == 'bufftank' then
@@ -912,14 +912,17 @@ end
 -- This function determines the base equipment set based on whether the player is engaged or idle.
 -- If the player's HybridMode state is set, it equips the corresponding Physical Damage Taken (PDT) or Magical Damage Taken (MDT) set.
 -- If the HybridMode state is not set or does not match 'PDT' or 'MDT', it equips the base set.
+-- If the Xp state is set, it equips the XP set.
 function reset_to_default_equipment()
     -- Determine the base equipment set based on the player's status
     local baseSet = player.status == 'Engaged' and sets.engaged or sets.idle
 
     -- Check the HybridMode state
     if state.HybridMode then
-        if state.HybridMode.value == 'PDT' then
+        if state.HybridMode.value == 'PDT' and state.Xp and state.Xp.value == 'False' then
             equip(baseSet.PDT)
+        elseif state.HybridMode.value == 'PDT' and state.Xp and state.Xp.value == 'True' then
+            equip(baseSet.PDT_XP)
         elseif state.HybridMode.value == 'MDT' then
             equip(baseSet.MDT)
         else
@@ -934,15 +937,19 @@ end
 -- @param playerStatus (string) : The current status of the player.
 -- @param eventArgs (table) : Additional event arguments.
 function job_handle_equipping_gear(playerStatus, eventArgs)
-    -- Check and handle main weapon gear set changes.
-    check_weaponset('main')
-    -- Check and handle sub weapon gear set changes.
-    check_weaponset('sub')
-    reset_to_default_equipment() -- Reset to default equipment
-    -- Only proceed if the player's main job is THF.
-    if player.main_job == 'THF' then
-        -- Check if a ranged weapon is equipped and handle gear setup accordingly.
-        check_range_lock()
+    if state.Xp and state.Xp.value == 'True' then
+        reset_to_default_equipment() -- Reset to default equipment
+    else
+        -- Check and handle main weapon gear set changes.
+        check_weaponset('main')
+        -- Check and handle sub weapon gear set changes.
+        check_weaponset('sub')
+        reset_to_default_equipment() -- Reset to default equipment
+        -- Only proceed if the player's main job is THF.
+        if player.main_job == 'THF' then
+            -- Check if a ranged weapon is equipped and handle gear setup accordingly.
+            check_range_lock()
+        end
     end
 end
 
