@@ -15,7 +15,7 @@ To get these scripts up and running:
 1. Ensure you have the GearSwap addon installed for Final Fantasy XI.
 2. Clone this repo or download the Lua files.
 3. Transfer the Lua files into your GearSwap installation's 'data' directory.
-4. Rename the Lua files following the format: `[character_name]_JOB.lua`. For example, if your character's name is Tetsouo and you want to use the script for the Paladin job, rename the file to `Tetsouo_PLD.lua`.
+4. Rename the Lua files following the format: `PlayerName_JOB.lua`.
 
 ## Usage
 

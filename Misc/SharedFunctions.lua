@@ -473,6 +473,7 @@ function bufferRoleForAltRdm(altPlayerName, mainPlayerName, commandType)
         { name = 'phalanx2', delay = 4.5 },
         { name = 'regen2',   delay = 9.2 }
     }
+    
     local spells = {}
 
     if commandType == 'bufftank' then
