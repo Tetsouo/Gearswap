@@ -47,7 +47,7 @@ function job_setup()
     -- Configures gear sets for main and sub weapons
     state.WeaponSet1 = M { ['description'] = 'Main Weapon', 'Vajra', 'Malevolence' }
     state.WeaponSet2 = M { ['description'] = 'Main Weapon', 'Dagger', 'Sword', 'Great Sword', 'Polearm', 'Club', 'Staff', 'Scythe' }
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Gleti', 'Centovente', 'TwashtarS' }
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'TwashtarS', 'Gleti', 'Centovente' }
     -- Sets up default job ability IDs for actions that always have Treasure Hunter
     info.default_ja_ids = S { 35, 204 }
     info.default_u_ja_ids = S { 201, 202, 203, 205, 207 }
@@ -62,7 +62,6 @@ function job_setup()
             'Indi-Haste')
     state.altPlayerEntrust = M('Indi-Haste', 'Indi-Refresh', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 end
-
 
 -- Adjusts gear sets based on the action being performed.
 -- @param {table} spell - The spell or ability being used.
@@ -95,6 +94,14 @@ function job_precast(spell, action, spellMap, eventArgs)
     -- Sets the state for the buff corresponding to the spell being cast to true, if it exists.
     if state.Buff[spell.english] ~= nil then
         state.Buff[spell.english] = true
+    end
+    if spell.type == "WeaponSkill" then
+        mult = 1.55
+        if (spell.target.model_size + spell.range * mult) < spell.target.distance then
+            cancel_spell()
+            return
+                add_to_chat(057, "Out of Range! /cancel")
+        end
     end
 end
 

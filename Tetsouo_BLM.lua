@@ -54,7 +54,7 @@ function job_setup()
     -- Command to change Aja mode: /console gs c cycle altPlayera
     state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
     -- Command to change Aja mode: /console gs c cycle altPlayerGeo
-    state.altPlayerGeo = M('Geo-Malaise', 'Geo-Refresh', 'Geo-Languor')
+    state.altPlayerGeo = M('Geo-Precision', 'Geo-Malaise', 'Geo-Refresh', 'Geo-Languor')
     -- Command to change Aja mode: /console gs c cycle altPlayerGeo
     state.altPlayerIndi = M('Indi-Acumen', 'Indi-Refresh',
         'Indi-Haste')
@@ -96,10 +96,10 @@ function job_precast(spell, action, spellMap, eventArgs)
         return
     end
 
-    handle_spell(spell, eventArgs, auto_abilities) -- Handle the spell casting
+    --[[ handle_spell(spell, eventArgs, auto_abilities) -- Handle the spell casting
     checkDisplayCooldown(spell, eventArgs)         -- Check and display the recast cooldown
-    refine_various_spells(spell, eventArgs, spellCorrespondence)
-    checkArts(spell, eventArgs)
+    refine_various_spells(spell, eventArgs, spellCorrespondence) ]]
+    --[[ checkArts(spell, eventArgs) ]]
 end
 
 -- Handles actions to perform during the casting of a spell or ability.
@@ -109,7 +109,7 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
-    SaveMP()
+    --[[ SaveMP() ]]
 end
 
 -- Handles actions to perform after the casting of a spell or ability.
@@ -126,8 +126,8 @@ function job_aftercast(spell, action, spellMap, eventArgs)
         return
     end
 
-    lastSpell = spell.name
-    handleSpellAftercast(spell, eventArgs)
+    --[[ lastSpell = spell.name
+    handleSpellAftercast(spell, eventArgs) ]]
 end
 
 -- Sets the default macro book based on the player's sub job.
@@ -135,11 +135,11 @@ function select_default_macro_book()
     send_command('lua unload dressup')
     -- If sub job is SCH
     if player.sub_job == 'SCH' then
-        set_macro_page(10, 14)
-        send_command('wait 15;input /lockstyleset 6; wait 5; lua load dressup')
+        set_macro_page(1, 14)
+        send_command('wait 5;input /lockstyleset 6')
         -- For other sub jobs
     else
-        set_macro_page(10, 14)
+        set_macro_page(1, 14)
     end
     send_command('wait 15; lua load dressup')
 end

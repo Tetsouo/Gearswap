@@ -49,11 +49,11 @@ function job_setup()
     state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
     state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
     state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
-    state.altPlayera = M('Fira III', 'Stonera III', 'Blizzara III', 'Aera III', 'Thundara III', 'Watera III')
-    state.altPlayerGeo = M('Geo-Fury', 'Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
-    state.altPlayerIndi =
-        M('Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Fury', 'Indi-Acumen', 'Indi-Precision', 'Indi-Haste')
-    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
+    state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
+    state.altPlayerGeo = M('Geo-Haste', 'Geo-Malaise', 'Geo-Frailty',
+        'Geo-Torpor')
+    state.altPlayerIndi = M('Indi-Refresh', 'Indi-Acumen', 'Indi-Fury')
+    state.altPlayerEntrust = M('Indi-Fury', 'Indi-Refresh', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 end
 
 -- Handles the unload event when changing job or reloading the script.
@@ -120,17 +120,17 @@ function select_default_macro_book()
 
     -- Set macro book and lockstyle based on sub job
     if player.sub_job == 'BLU' then
-        set_macro_page(1, 23)     -- BLU sub job
-        send_command('input /lockstyleset 3')
+        set_macro_page(1, 23) -- BLU sub job
+        send_command('wait 5; input /lockstyleset 3')
     elseif player.sub_job == 'WAR' then
-        set_macro_page(1, 21)     -- WAR sub job
-        send_command('input /lockstyleset 4')
+        set_macro_page(1, 21) -- WAR sub job
+        send_command('wait 5; input /lockstyleset 4')
     elseif player.sub_job == 'RDM' then
-        set_macro_page(1, 28)     -- RDM sub job
-        send_command('input /lockstyleset 3')
+        set_macro_page(1, 28) -- RDM sub job
+        send_command('wait 5; input /lockstyleset 3')
     else
-        set_macro_page(1, 23)     -- Default for other sub jobs
-        send_command('input /lockstyleset 3')
+        set_macro_page(1, 23) -- Default for other sub jobs
+        send_command('wait 5; input /lockstyleset 3')
     end
 
     -- Waits for 15 seconds, locks the style set to 1, waits for another 5 seconds, and then loads the 'dressup' Lua script.

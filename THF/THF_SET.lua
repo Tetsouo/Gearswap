@@ -8,7 +8,7 @@
 -- ============================================================--
 
 -- =========================================================================================================
---                                           Equipments - Unique Items                                   
+--                                           Equipments - Unique Items
 -- =========================================================================================================
 AdhemarBonnet = createEquipment('Adhemar Bonnet +1', nil, nil, { 'STR+12', 'DEX+12', 'Attack+20' })
 PlundererVest = createEquipment("Plunderer's Vest +3", nil, nil, { 'Enhances "Ambush" effect' })
@@ -31,8 +31,8 @@ PlundererPoulaines = createEquipment('Plun. Poulaines +3', nil, nil, { "Enhances
 HerculeanHelm = createEquipment('Herculean Helm', nil, nil, { 'MND+1', 'Attack+23', '"Treasure Hunter"+2' })
 HerculeanLegs = createEquipment('Herculean Trousers', nil, nil,
     { 'Rng.Acc.+13', 'Attack+9', '"Treasure Hunter"+2', 'Mag. Acc.+6 "Mag.Atk.Bns."+6' })
-ChirichRing1 = createEquipment('Chirich Ring +1',nil, 'wardrobe 1')
-ChirichRing2 = createEquipment('Chirich Ring +1',nil, 'wardrobe 2')
+ChirichRing1 = createEquipment('Chirich Ring +1', nil, 'wardrobe 1')
+ChirichRing2 = createEquipment('Chirich Ring +1', nil, 'wardrobe 2')
 ShivaRing1 = createEquipment('Shiva Ring', 'wardrobe 1')
 ShivaRing2 = createEquipment('Shiva Ring', 'wardrobe 2')
 HercAeoHead = createEquipment('Herculean Helm', nil, nil,
@@ -46,11 +46,11 @@ HercAeoLegs = createEquipment('Herculean Trousers', nil, nil,
 HercAeoFeet = createEquipment('Herculean Boots', nil, nil, { '"Mag.Atk.Bns."+25', 'Weapon skill damage +4%', 'STR+9' })
 sets.MoveSpeed = {
     feet = createEquipment('Pill. Poulaines +3'),
-    right_ring = createEquipment('Defending Ring')
+    left_ring = createEquipment('Defending Ring')
 }
 
 -- =========================================================================================================
---                                           Equipments - Weapon Sets                                  
+--                                           Equipments - Weapon Sets
 -- =========================================================================================================
 sets['TwashtarM'] = {
     main = createEquipment('Twashtar')
@@ -137,13 +137,12 @@ sets.idle.Regen = set_combine(sets.idle, {
     right_ring = ChirichRing2
 })
 sets.idle.PDT = set_combine(sets.idle, {
-    left_ring = ChirichRing1,
-    right_ring = createEquipment('Defending Ring'),
+    left_ring = createEquipment('Defending Ring'),
+    right_ring = ChirichRing2,
     left_ear = createEquipment('Sherida Earring')
 })
-sets.idle.Weak = sets.idle
-sets.defense.PDT = set_combine(sets.idle, {
-    ammo = createEquipment('Staunch Tathlum'),
+sets.idle.MDT = set_combine(sets.idle, {
+    ammo = createEquipment('Staunch Tathlum +1'),
     head = createEquipment('Nyame Helm'),
     body = createEquipment('Nyame Mail'),
     hands = createEquipment("Skulker's Armlets +3"),
@@ -151,27 +150,13 @@ sets.defense.PDT = set_combine(sets.idle, {
     feet = createEquipment("Skulker's Poulaines +3"),
     neck = createEquipment('Elite Royal Collar'),
     waist = createEquipment('Flume Belt'),
-    left_ear = createEquipment('Impreg. Earring'),
-    right_ear = createEquipment('Eabani Earring'),
-    left_ring = createEquipment('Succor Ring'),
-    right_ring = createEquipment('Defending Ring'),
-    back = createEquipment('Solemnity Cape')
-})
-sets.defense.MDT = set_combine(sets.idle, {
-    ammo = createEquipment('Staunch Tathlum'),
-    head = createEquipment('Malignance Chapeau'),
-    body = createEquipment('Malignance tabard'),
-    hands = createEquipment('Nyame gauntlets'),
-    legs = createEquipment('Malignance tights'),
-    feet = createEquipment('Malignance boots'),
-    neck = createEquipment('Elite Royal Collar'),
-    waist = createEquipment('Flume Belt'),
-    left_ear = createEquipment('Impreg. Earring'),
+    left_ear = createEquipment("handler's Earring"),
     right_ear = createEquipment('Eabani Earring'),
     left_ring = createEquipment('Defending Ring'),
-    right_ring = createEquipment('Succor Ring'),
+    right_ring = ChirichRing2,
     back = createEquipment('Solemnity Cape')
 })
+sets.idle.Weak = sets.idle
 
 -- =========================================================================================================
 --                                           Equipments - Engagement Sets
@@ -205,8 +190,8 @@ sets.engaged.PDT = set_combine(sets.engaged, {
     feet = createEquipment('Skulk. Poulaines +3'),
     neck = createEquipment('Asn. Gorget +2'),
     waist = createEquipment('Kentarch Belt +1'),
-    left_ring = createEquipment('Gere Ring'),
-    right_ring = createEquipment('Defending Ring')
+    left_ring = createEquipment('Defending Ring'),
+    right_ring = createEquipment('Gere Ring'),
 })
 sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     ammo = createEquipment('Aurgelmir Orb +1'),
@@ -215,19 +200,12 @@ sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     hands = createEquipment('Skulk. Armlets +3'),
     legs = createEquipment('Pill. Culottes +3'),
     feet = createEquipment('Skulk. Poulaines +3'),
-    neck = createEquipment({
-        name = "Assassin's Gorget",
-    }),
-    waist = createEquipment({
-        name = 'Kentarch Belt +1',
-    }),
+    neck = createEquipment("Assassin's Gorget +2"),
+    waist = createEquipment('Kentarch Belt +1'),
     left_ear = createEquipment('Crep. Earring'),
-    right_ear = createEquipment({
-        name = 'Skulk. Earring +1',
-        augments = { 'System: 1 ID: 1676 Val: 0', 'Accuracy+11', 'Mag. Acc.+11', '"Store TP"+3' }
-    }),
-    left_ring = createEquipment('Gere Ring'),
-    right_ring = ChirichRing2,
+    right_ear = createEquipment('Skulk. Earring +1'),
+    left_ring = ChirichRing1,
+    right_ring = createEquipment('Gere Ring'),
     back = Toutatis.STP
 })
 
@@ -262,7 +240,7 @@ sets.midcast.RA.Acc = sets.midcast.RA
 sets.buff['Sneak Attack'] = {
     ammo = createEquipment('Yetshila +1'),
     head = AdhemarBonnet,
-    body = createEquipment('Pill. Vest +3'),
+    body = createEquipment("Pillager's Vest +3"),
     hands = createEquipment("Skulker's Armlets +3"),
     legs = createEquipment('Pill. Culottes +3'),
     feet = LustraLeggings,
@@ -274,6 +252,7 @@ sets.buff['Sneak Attack'] = {
     right_ring = createEquipment('Ilabrat Ring'),
     back = Toutatis.STP
 }
+
 sets.buff['Trick Attack'] = {
     ammo = createEquipment('Yetshila +1'),
     head = createEquipment("skulker's Bonnet +3"),
@@ -289,6 +268,7 @@ sets.buff['Trick Attack'] = {
     right_ring = createEquipment('Ilabrat Ring'),
     back = CannyCape
 }
+
 sets.precast.JA['Collaborator'] = {
     head = createEquipment("Skulker's bonnet +3"),
     body = PlundererVest,
@@ -296,28 +276,18 @@ sets.precast.JA['Collaborator'] = {
     left_ear = createEquipment('Friomisi Earring'),
     left_ring = createEquipment('Cacoethic Ring')
 }
-sets.precast.JA['Accomplice'] = {
-    head = createEquipment("Skulker's bonnet +3"),
-    body = PlundererVest,
-    hands = PlundererArmlets,
-    left_ear = createEquipment('Friomisi Earring'),
-    left_ring = createEquipment('Cacoethic Ring')
-}
-sets.precast.JA['Conspirator'] = {
-    body = createEquipment("skulker's Vest +3")
-}
+sets.precast.JA['Accomplice'] = sets.precast.JA['Collaborator']
+
+sets.precast.JA['Conspirator'] = {body = createEquipment("skulker's Vest +3")}
+
 sets.precast.JA['Animated Flourish'] = {
     ammo = createEquipment('Sapience Orb'),
     head = createEquipment("Skulker's Bonnet +3"),
-    body = createEquipment({
-        name = "Plunderer's Vest +3",
-    }),
+    body = createEquipment("Plunderer's Vest +3"),
     hands = createEquipment("Skulker's Armlets +3"),
     legs = createEquipment("Skulker's culottes +3"),
     feet = createEquipment("Skulker's Poulaines +3"),
-    neck = createEquipment({
-        name = 'Unmoving Collar +1',
-    }),
+    neck = createEquipment('Unmoving Collar +1'),
     waist = createEquipment('Svelt. Gouriz +1'),
     left_ear = createEquipment('Friomisi Earring'),
     right_ear = createEquipment('Eabani Earring'),
@@ -325,12 +295,10 @@ sets.precast.JA['Animated Flourish'] = {
     right_ring = createEquipment('Supershear Ring'),
     back = createEquipment('Solemnity Cape')
 }
-sets.precast.JA['Flee'] = {
-    feet = createEquipment('Pill. Poulaines +3')
-}
-sets.precast.JA['Hide'] = {
-    body = createEquipment('Pill. Vest +3')
-}
+sets.precast.JA['Flee'] = {feet = createEquipment('Pill. Poulaines +3')}
+
+sets.precast.JA['Hide'] = {body = createEquipment('Pill. Vest +3')}
+
 sets.precast.JA['Steal'] = {
     neck = createEquipment('Pentalagus Charm'),
     hands = createEquipment("Thief's Kote"),
@@ -340,6 +308,7 @@ sets.precast.JA['Despoil'] = {
     legs = createEquipment("Skulker's culottes +3"),
     feet = createEquipment("Skulker's poulaines +3")
 }
+
 sets.precast.JA['Perfect Dodge'] = {
     hands = PlundererArmlets
 }
@@ -348,8 +317,9 @@ sets.precast.JA['Feint'] = {
 }
 sets.precast.JA['Sneak Attack'] = sets.buff['Sneak Attack']
 sets.precast.JA['Trick Attack'] = sets.buff['Trick Attack']
+
 sets.precast.Waltz = {
-    ammo = createEquipment('Staunch Tathlum'),
+    ammo = createEquipment('Staunch Tathlum +1'),
     head = createEquipment('Mummu Bonnet +2'),
     body = createEquipment('Turms Harness'),
     hands = createEquipment('Slither Gloves +1'),
@@ -414,7 +384,7 @@ sets.precast.FC = {
     right_ear = createEquipment('Loquac. Earring'),
     right_ring = createEquipment('Prolix Ring')
 }
-sets.precast.FC.Utsusemi = set_combine(sets.precast.FC, {})
+sets.precast.FC.Utsusemi = sets.precast.FC
 
 -- =========================================================================================================
 --                                           Equipments - Weapon Skill Sets
@@ -614,8 +584,8 @@ sets.midcast.FastRecast = {
     waist = createEquipment('Svelt. Gouriz +1'),
     left_ear = createEquipment('Sherida Earring'),
     right_ear = createEquipment('Eabani Earring'),
-    left_ring = ChirichRing1,
-    right_ring = createEquipment('Defending Ring'),
+    left_ring = createEquipment('Defending Ring'),
+    right_ring = ChirichRing2,
     back = createEquipment('Solemnity Cape')
 }
 sets.midcast.Utsusemi = sets.midcast.FastRecast

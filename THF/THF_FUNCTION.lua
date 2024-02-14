@@ -89,7 +89,7 @@ function customize_idle_set(idleSet)
     end
 
     -- Get the conditions and sets for customizing the idle set.
-    local conditions, setTable = get_conditions_and_sets(sets.idle.PDT, sets.idle.PDT, sets.defense.MDT)
+    local conditions, setTable = get_conditions_and_sets(nil, sets.idle.PDT, nil, sets.defense.MDT)
 
     -- Customize the idle set based on the conditions and sets.
     return customize_set(idleSet, conditions, setTable)
@@ -115,7 +115,8 @@ function customize_melee_set(meleeSet)
     end
 
     -- Get the conditions and sets for customizing the melee set.
-    local conditions, setTable = get_conditions_and_sets(sets.engaged.PDT, sets.engaged.PDT, sets.defense.MDT)
+    local conditions, setTable = get_conditions_and_sets(sets.engaged.PDT, sets.engaged.PDT, sets.engaged.Acc.PDT,
+        sets.idle.MDT)
 
     -- Customize the melee set based on the conditions and sets.
     return customize_set(meleeSet, conditions, setTable)

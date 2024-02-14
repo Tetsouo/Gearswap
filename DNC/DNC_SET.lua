@@ -106,7 +106,7 @@ sets.precast.JA['Fan Dance'] = {
 }
 
 sets.precast.Waltz = {
-    ammo = createEquipment('Staunch Tathlum'),
+    ammo = createEquipment('Staunch Tathlum +1'),
     head = createEquipment('Anwig Salade'),
     body = createEquipment('Maxixi Casaque +3'),
     hands = createEquipment('Macu. Bangles +3'),
@@ -317,7 +317,7 @@ sets.precast.WS['Pyrrhic Kleos'] =
 sets.precast.WS['Aeolian Edge'] = {
     ammo = createEquipment("Oshasha's Treatise"),
     head = createEquipment('Herculean Helm', nil, nil,
-        { 'Mag. Acc.+14 "Mag.Atk.Bns."+14', 'Weapon skill damage +3%', 'Mag. Acc.+13', '"Mag.Atk.Bns."+15' }),
+    {'"Mag.Atk.Bns."+20','Weapon skill damage +5%','INT+8','Mag. Acc.+1',}),
     body = createEquipment('Herculean Vest', nil, nil, { '"Mag.Atk.Bns."+21', 'Weapon skill damage +5%', 'MND+9' }),
     hands = createEquipment('Herculean Gloves', nil, nil,
         { 'Rng.Acc.+25', 'Pet: Mag. Acc.+18', 'Weapon skill damage +7%', 'Mag. Acc.+20 "Mag.Atk.Bns."+20' }),
@@ -328,8 +328,8 @@ sets.precast.WS['Aeolian Edge'] = {
     waist = createEquipment("Orpheus's Sash"),
     left_ear = createEquipment('Sortiarius Earring'),
     right_ear = createEquipment('Friomisi Earring'),
-    left_ring = createEquipment('Crepuscular Ring'),
-    right_ring = createEquipment('Shiva Ring'),
+    left_ring = createEquipment('Metamor. Ring +1'),
+    right_ring = createEquipment("Cornelia's Ring"),
     back = Senuna.WS1
 }
 

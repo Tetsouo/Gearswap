@@ -12,6 +12,7 @@ local constants = {
     ABILITY_IDS = {
         -- ID for the "Contradance" ability
         CONTRADANCE = 229,
+        PRESTO = 236,
     },
     SPELL_NAMES = {
         -- Name of the "Divine Waltz II" spell
@@ -28,7 +29,7 @@ function handle_presto_and_step(spell, eventArgs)
         -- If the spell type is 'Step'
         if spell.type == 'Step' then
             -- Use the 'Presto' ability
-            auto_ability(spell, eventArgs, 236, 'Presto')
+            auto_ability(spell, eventArgs, constants.ABILITY_IDS.PRESTO, "2", 'Presto')
         end
     end
 end
@@ -46,7 +47,7 @@ auto_abilities = {
             add_to_chat(057, message)
         else
             -- Otherwise, use the 'Contradance' ability.
-            auto_ability(spell, eventArgs, constants.ABILITY_IDS.CONTRADANCE, 'Contradance')
+            auto_ability(spell, eventArgs, constants.ABILITY_IDS.CONTRADANCE, "2", 'Contradance')
         end
     end
 }

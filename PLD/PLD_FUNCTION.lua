@@ -40,7 +40,7 @@ function handle_majesty_and_cure_sets(spell, eventArgs)
             (spell.skill == constants.SKILL_HEALING_MAGIC or spell.skill == constants.SKILL_ENHANCING_MAGIC)
         then
             -- Use the 'Majesty' ability
-            auto_ability(spell, eventArgs, constants.ABILITY_IDS.MAJESTY, 'Majesty')
+            auto_ability(spell, eventArgs, constants.ABILITY_IDS.MAJESTY, "2", 'Majesty')
         end
 
         -- If the spell is 'Cure III' or 'Cure IV'
@@ -60,7 +60,7 @@ end
 auto_abilities = {
     -- Uses 'Divine Emblem' ability for 'Flash' spell.
     [constants.SPELL_NAMES.FLASH] = function(spell, eventArgs)
-        auto_ability(spell, eventArgs, constants.ABILITY_IDS.DIVINE_EMBLEM, 'Divine Emblem')
+        auto_ability(spell, eventArgs, constants.ABILITY_IDS.DIVINE_EMBLEM, "2", 'Divine Emblem')
     end,
     -- Uses 'handle_majesty_and_cure_sets_wrapper' for 'Protect V', 'Cure III', and 'Cure IV' spells.
     [constants.SPELL_NAMES.PROTECT_V] = handle_majesty_and_cure_sets_wrapper,
@@ -88,6 +88,7 @@ function generate_cure_set(spell, target_type)
         CureSelf = set_combine(
             base_set,
             {
+                sub = 'Srivatsa', 14,
                 neck = 'Unmoving Collar +1',
                 16,
                 body = 'Rev. Surcoat +3',

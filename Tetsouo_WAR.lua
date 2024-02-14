@@ -41,7 +41,7 @@ function job_setup()
     state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
     state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
     state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
-    state.altPlayera = M('Fira III', 'Stonera III', 'Blizzara III', 'Aera III', 'Thundara III', 'Watera III')
+    state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
     state.altPlayerGeo = M('Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
     state.altPlayerIndi = M('Indi-Fury', 'Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Acumen', 'Indi-Precision',
         'Indi-Haste')

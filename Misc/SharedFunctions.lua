@@ -348,7 +348,7 @@ end
 -- @param eventArgs The event arguments object. It should have a `handled` field.
 -- @param abilityId The ID of the ability to use before the spell.
 -- @param abilityName The name of the ability to use before the spell.
-function auto_ability(spell, eventArgs, abilityId, abilityName)
+function auto_ability(spell, eventArgs, abilityId, waitTime, abilityName)
     if try_cast_spell(spell, eventArgs) then
         local abilityCooldown = windower.ffxi.get_ability_recasts()[abilityId]
         if abilityCooldown < 1 and not buffactive[abilityName] then
@@ -357,7 +357,7 @@ function auto_ability(spell, eventArgs, abilityId, abilityName)
                 string.format(
                     'input /ja "%s" <me>; wait %f; input /ma %s %s',
                     abilityName,
-                    WAIT_TIME,
+                    waitTime,
                     spell.name,
                     spell.target.id
                 )
@@ -917,12 +917,21 @@ function reset_to_default_equipment()
     -- Determine the base equipment set based on the player's status
     local baseSet = player.status == 'Engaged' and sets.engaged or sets.idle
 
+    -- Check the Moving state and adjust the baseSet if necessary
+    if state.Moving.value == 'true' and player.status ~= 'Engaged' then
+        baseSet = set_combine(baseSet, sets.MoveSpeed)
+    end
+
     -- Check the HybridMode state
     if state.HybridMode then
-        if state.HybridMode.value == 'PDT' and state.Xp and state.Xp.value == 'False' then
-            equip(baseSet.PDT)
-        elseif state.HybridMode.value == 'PDT' and state.Xp and state.Xp.value == 'True' then
-            equip(baseSet.PDT_XP)
+        if state.HybridMode.value == 'PDT' then
+            if state.Xp and state.Xp.value == 'True' then
+                equip(baseSet.PDT_XP)
+            elseif state.OffenseMode.value == 'Acc' then
+                equip(baseSet.PDT_ACC)
+            else
+                equip(baseSet.PDT)
+            end
         elseif state.HybridMode.value == 'MDT' then
             equip(baseSet.MDT)
         else
@@ -1009,14 +1018,14 @@ function buff_change(buff, gain)
             handle_equipping_gear(player.status)
         end
         -- If the player is a 'BLM' and the 'Manawall' buff has changed, handle it
-        if player.main_job == 'BLM' and buff == 'Manawall' then
+        if player.main_job == 'BLM' and buff == 'Mana Wall' then
             if gain then
                 -- If 'Manawall' is gained, equip the 'Mana Wall' set and disable the 'back' and 'feet' slots
                 equip_set = sets.precast.JA['Mana Wall']
-                disable(back, feet)
+                disable('back', 'feet')
             else
                 -- If 'Manawall' is lost, enable the 'back' and 'feet' slots
-                enable(back, feet)
+                enable('back', 'feet')
             end
         end
     end
@@ -1079,18 +1088,20 @@ end
 -- @param setPDT The set to use when the `HybridMode` is 'PDT' and `Xp` is 'False'.
 -- @param setMDT The set to use when the `HybridMode` is 'MDT'.
 -- @return The conditions and the set table.
-function get_conditions_and_sets(setPDT_XP, setPDT, setMDT)
+function get_conditions_and_sets(setPDT_XP, setPDT, setPDT_ACC, setMDT)
     local xpValue = state.Xp and state.Xp.value or 'False'
 
     local conditions = {
         ['PDT_XP'] = state.HybridMode.value == 'PDT' and xpValue == 'True',
         ['PDT'] = state.HybridMode.value == 'PDT' and xpValue == 'False',
+        ['PDT_ACC'] = state.HybridMode.value == 'PDT' and state.OffenseMode.value == 'Acc',
         ['MDT'] = state.HybridMode.value == 'MDT'
     }
 
     local setTable = {
         ['PDT_XP'] = setPDT_XP,
         ['PDT'] = setPDT,
+        ['PDT_ACC'] = setPDT_ACC,
         ['MDT'] = setMDT
     }
 
