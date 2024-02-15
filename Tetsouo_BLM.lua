@@ -96,10 +96,10 @@ function job_precast(spell, action, spellMap, eventArgs)
         return
     end
 
-    --[[ handle_spell(spell, eventArgs, auto_abilities) -- Handle the spell casting
+    handle_spell(spell, eventArgs, auto_abilities) -- Handle the spell casting
     checkDisplayCooldown(spell, eventArgs)         -- Check and display the recast cooldown
-    refine_various_spells(spell, eventArgs, spellCorrespondence) ]]
-    --[[ checkArts(spell, eventArgs) ]]
+    refine_various_spells(spell, eventArgs, spellCorrespondence)
+    checkArts(spell, eventArgs)
 end
 
 -- Handles actions to perform during the casting of a spell or ability.
@@ -109,7 +109,7 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
-    --[[ SaveMP() ]]
+    SaveMP()
 end
 
 -- Handles actions to perform after the casting of a spell or ability.
@@ -126,8 +126,8 @@ function job_aftercast(spell, action, spellMap, eventArgs)
         return
     end
 
-    --[[ lastSpell = spell.name
-    handleSpellAftercast(spell, eventArgs) ]]
+    lastSpell = spell.name
+    handleSpellAftercast(spell, eventArgs)
 end
 
 -- Sets the default macro book based on the player's sub job.

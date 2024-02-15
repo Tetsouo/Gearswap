@@ -1034,7 +1034,7 @@ function buff_change(buff, gain)
     if state.Buff[buff] then
         equip_set = set_combine(equip_set, sets.buff[buff] or {})
         -- If the 'TreasureMode' is 'SATA' or 'Fulltime', combine the 'TreasureHunter' set with the current equipment set
-        if state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime' then
+        if state.TreasureMode and (state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime') then
             equip_set = set_combine(equip_set, sets.TreasureHunter)
         end
     end
