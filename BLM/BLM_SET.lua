@@ -14,6 +14,70 @@ StikiRing1 = createEquipment('Stikini Ring +1', nil, 'wardrobe 6')
 StikiRing2 = createEquipment('Stikini Ring +1', nil, 'wardrobe 7')
 
 -- =========================================================================================================
+--                                           Equipments - Idle and Defense Sets
+-- =========================================================================================================
+sets.idle = {
+    main = createEquipment('Malignance Pole'),
+    sub = createEquipment('Enki Strap'),
+    ammo = createEquipment('Ghastly Tathlum +1'),
+    head = createEquipment('Wicce Petasos +3'),
+    body = createEquipment('Wicce Coat +3'),
+    hands = createEquipment('Wicce Gloves +3'),
+    legs = createEquipment('Wicce Chausses +3'),
+    feet = createEquipment('Wicce Sabots +3'),
+    neck = createEquipment('Loricate Torque +1'),
+    waist = createEquipment('Acuity Belt +1'),
+    left_ear = createEquipment('Ethereal Earring'),
+    right_ear = createEquipment('Lugalbanda Earring'),
+    left_ring = StikiRing1,
+    right_ring = StikiRing2,
+    back = createEquipment("Taranus's Cape"),
+}
+sets.idle.PDT = set_combine(sets.idle, {})
+sets.idle.Town = set_combine(sets.idle, {})
+sets.defense.PDT = {}
+sets.defense.MDT = {}
+sets.resting = set_combine(sets.idle, {})
+
+-- =========================================================================================================
+--                                           Equipments - Engaged Sets
+-- =========================================================================================================
+sets.engaged = {
+    main = createEquipment("Malignance Pole"),
+    sub = createEquipment("Enki Strap"),
+    ammo = createEquipment("Ghastly Tathlum +1"),
+    head = createEquipment("Wicce Petasos +3"),
+    body = createEquipment("Wicce Coat +3"),
+    hands = createEquipment("Wicce Gloves +3"),
+    legs = createEquipment("Wicce Chausses +3"),
+    feet = createEquipment("Wicce Sabots +3"),
+    neck = createEquipment("Sanctity Necklace"),
+    waist = createEquipment("Windbuffet Belt +1"),
+    left_ear = createEquipment("Crep. Earring"),
+    right_ear = createEquipment("Telos Earring"),
+    left_ring = createEquipment("Chirich Ring +1"),
+    right_ring = createEquipment("Chirich Ring +1"),
+    back = createEquipment("Taranus's Cape"),
+}
+sets.engaged.PDT = {
+    main = createEquipment("Malignance Pole"),
+    sub = createEquipment("Enki Strap"),
+    ammo = createEquipment("Ghastly Tathlum +1"),
+    head = createEquipment("Wicce Petasos +3"),
+    body = createEquipment("Wicce Coat +3"),
+    hands = createEquipment("Wicce Gloves +3"),
+    legs = createEquipment("Wicce Chausses +3"),
+    feet = createEquipment("Wicce Sabots +3"),
+    neck = createEquipment("Sanctity Necklace"),
+    waist = createEquipment("Windbuffet Belt +1"),
+    left_ear = createEquipment("Crep. Earring"),
+    right_ear = createEquipment("Telos Earring"),
+    left_ring = createEquipment("Chirich Ring +1"),
+    right_ring = createEquipment("Chirich Ring +1"),
+    back = createEquipment("Taranus's cape"),
+}
+
+-- =========================================================================================================
 --                                           Equipments - Job Ability Sets
 -- =========================================================================================================
 sets.precast.JA['Mana Wall'] = {
@@ -25,7 +89,6 @@ sets.precast.JA.Manafont = { body = createEquipment("Archmage's Coat +1") }
 -- =========================================================================================================
 --                                           Equipments - Fast Cast Sets
 -- =========================================================================================================
-
 sets.precast.FC = {
     main = createEquipment("Malevolence", nil, nil, { 'INT+10', 'Mag. Acc.+10', '"Mag.Atk.Bns."+8', '"Fast Cast"+5' }),
     sub = createEquipment('Culminus'),
@@ -77,30 +140,6 @@ sets.precast.FC.Stoneskin =
         }
     )
 
--- =========================================================================================================
---                                           Equipments - Weapon Skill Sets
--- =========================================================================================================
-sets.precast.WS = {
-    sub = createEquipment('Ammurapi Shield'),
-    ammo = createEquipment("Oshasha's Treatise"),
-    head = createEquipment('Nyame Helm'),
-    body = createEquipment('Nyame Mail'),
-    hands = createEquipment('Nyame Gauntlets'),
-    legs = createEquipment('Nyame Flanchard'),
-    feet = createEquipment('Nyame Sollerets'),
-    neck = createEquipment('Fotia Gorget'),
-    waist = createEquipment('Fotia Belt'),
-    left_ear = createEquipment('Moonshade Earring'),
-    right_ear = createEquipment('Mache Earring +1'),
-    left_ring = createEquipment("Cornelia's Ring"),
-    right_ring = createEquipment('Chirich Ring +1'),
-    back = createEquipment("Taranus's Cape"),
-}
-
-sets.precast.WS['Myrkr'] = {}
-sets.precast.WS['Vidohunir'] = {}
-sets.precast.WS['Cataclysm'] = {}
-sets.precast.WS['Spiral Hell'] = {}
 -- =========================================================================================================
 --                                           Equipments - Midcast Sets
 -- =========================================================================================================
@@ -345,6 +384,7 @@ sets.midcast['Comet'] = sets.midcast['Elemental Magic']
 sets.midcast['Comet'].MagicBurst = sets.midcast['Elemental Magic'].MagicBurst
 sets.midcast['Death'] = sets.midcast['Elemental Magic']
 sets.midcast['Death'].MagicBurst = sets.midcast['Elemental Magic'].MagicBurst
+
 -- ================================================ Dot Sets ========================================
 sets.midcast['Burn'] = {
     ammo = createEquipment("Ghastly Tathlum +1"),
@@ -369,68 +409,29 @@ sets.midcast['Choke'] = sets.midcast['Burn']
 sets.midcast['Frost'] = sets.midcast['Burn']
 
 -- =========================================================================================================
---                                           Equipments - Idle and Defense Sets
+--                                           Equipments - Weapon Skill Sets
 -- =========================================================================================================
-sets.idle = {
-    main = createEquipment('Malignance Pole'),
-    sub = createEquipment('Enki Strap'),
-    ammo = createEquipment('Ghastly Tathlum +1'),
-    head = createEquipment('Wicce Petasos +3'),
-    body = createEquipment('Wicce Coat +3'),
-    hands = createEquipment('Wicce Gloves +3'),
-    legs = createEquipment('Wicce Chausses +3'),
-    feet = createEquipment('Wicce Sabots +3'),
-    neck = createEquipment('Loricate Torque +1'),
-    waist = createEquipment('Acuity Belt +1'),
-    left_ear = createEquipment('Ethereal Earring'),
-    right_ear = createEquipment('Lugalbanda Earring'),
-    left_ring = StikiRing1,
-    right_ring = StikiRing2,
+sets.precast.WS = {
+    sub = createEquipment('Ammurapi Shield'),
+    ammo = createEquipment("Oshasha's Treatise"),
+    head = createEquipment('Nyame Helm'),
+    body = createEquipment('Nyame Mail'),
+    hands = createEquipment('Nyame Gauntlets'),
+    legs = createEquipment('Nyame Flanchard'),
+    feet = createEquipment('Nyame Sollerets'),
+    neck = createEquipment('Fotia Gorget'),
+    waist = createEquipment('Fotia Belt'),
+    left_ear = createEquipment('Moonshade Earring'),
+    right_ear = createEquipment('Mache Earring +1'),
+    left_ring = createEquipment("Cornelia's Ring"),
+    right_ring = createEquipment('Chirich Ring +1'),
     back = createEquipment("Taranus's Cape"),
 }
-sets.idle.PDT = set_combine(sets.idle, {})
-sets.idle.Town = set_combine(sets.idle, {})
-sets.defense.PDT = {}
-sets.defense.MDT = {}
-sets.resting = set_combine(sets.idle, {})
 
--- =========================================================================================================
---                                           Equipments - Engaged Sets
--- =========================================================================================================
-sets.engaged = {
-    main = createEquipment("Malignance Pole"),
-    sub = createEquipment("Enki Strap"),
-    ammo = createEquipment("Ghastly Tathlum +1"),
-    head = createEquipment("Wicce Petasos +3"),
-    body = createEquipment("Wicce Coat +3"),
-    hands = createEquipment("Wicce Gloves +3"),
-    legs = createEquipment("Wicce Chausses +3"),
-    feet = createEquipment("Wicce Sabots +3"),
-    neck = createEquipment("Sanctity Necklace"),
-    waist = createEquipment("Windbuffet Belt +1"),
-    left_ear = createEquipment("Crep. Earring"),
-    right_ear = createEquipment("Telos Earring"),
-    left_ring = createEquipment("Chirich Ring +1"),
-    right_ring = createEquipment("Chirich Ring +1"),
-    back = createEquipment("Taranus's Cape"),
-}
-sets.engaged.PDT = {
-    main = createEquipment("Malignance Pole"),
-    sub = createEquipment("Enki Strap"),
-    ammo = createEquipment("Ghastly Tathlum +1"),
-    head = createEquipment("Wicce Petasos +3"),
-    body = createEquipment("Wicce Coat +3"),
-    hands = createEquipment("Wicce Gloves +3"),
-    legs = createEquipment("Wicce Chausses +3"),
-    feet = createEquipment("Wicce Sabots +3"),
-    neck = createEquipment("Sanctity Necklace"),
-    waist = createEquipment("Windbuffet Belt +1"),
-    left_ear = createEquipment("Crep. Earring"),
-    right_ear = createEquipment("Telos Earring"),
-    left_ring = createEquipment("Chirich Ring +1"),
-    right_ring = createEquipment("Chirich Ring +1"),
-    back = createEquipment("Taranus's cape"),
-}
+sets.precast.WS['Myrkr'] = {}
+sets.precast.WS['Vidohunir'] = {}
+sets.precast.WS['Cataclysm'] = {}
+sets.precast.WS['Spiral Hell'] = {}
 
 -- =========================================================================================================
 --                                           Equipments - Movement Sets

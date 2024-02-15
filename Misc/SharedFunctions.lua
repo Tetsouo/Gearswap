@@ -492,7 +492,7 @@ function bufferRoleForAltRdm(altPlayerName, mainPlayerName, commandType)
             { name = 'dia3',      delay = 4 },
             { name = 'slow2',     delay = 8 },
             { name = 'Blind2',    delay = 12 },
-            { name = 'paralyze2', delay = 16 }
+            { name = 'paralyze2', delay = 17 }
         }
     end
 
