@@ -190,8 +190,8 @@ sets.engaged.PDT = set_combine(sets.engaged, {
     feet = createEquipment('Skulk. Poulaines +3'),
     neck = createEquipment('Asn. Gorget +2'),
     waist = createEquipment('Kentarch Belt +1'),
-    left_ring = createEquipment('Defending Ring'),
-    right_ring = createEquipment('Gere Ring'),
+    left_ring = createEquipment('Gere Ring'),
+    right_ring = createEquipment('Defending Ring'),
 })
 sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     ammo = createEquipment('Aurgelmir Orb +1'),
@@ -204,8 +204,8 @@ sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     waist = createEquipment('Kentarch Belt +1'),
     left_ear = createEquipment('Crep. Earring'),
     right_ear = createEquipment('Skulk. Earring +1'),
-    left_ring = ChirichRing1,
-    right_ring = createEquipment('Gere Ring'),
+    left_ring = createEquipment('Gere Ring'),
+    right_ring = ChirichRing1,
     back = Toutatis.STP
 })
 
