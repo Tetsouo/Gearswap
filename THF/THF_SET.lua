@@ -555,7 +555,7 @@ sets.precast.WS['Circle Blade'] = set_combine(sets.precast.WS, {
 })
 
 -- =========================================================================================================
---                                           Equipments - Treasure Hunter Sets
+--                                           Equipments - TreasureHunter Sets
 -- =========================================================================================================
 sets.TreasureHunter = {
     feet = createEquipment("Skulker's Poulaines +3")
