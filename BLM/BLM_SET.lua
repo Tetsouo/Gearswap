@@ -160,7 +160,7 @@ sets.midcast.Cure = {
     left_ear = createEquipment("Handler's Earring"),
     right_ear = createEquipment('Wicce Earring +1', nil, nil, { 'System: 1 ID: 1676 Val: 0', 'Mag. Acc.+14', 'Enmity-4' }),
     left_ring = createEquipment('Defending Ring'),
-    right_ring = createEquipment('Stikini Ring +1'),
+    right_ring = StikiRing2,
     back = createEquipment('Solemnity Cape'),
 }
 
@@ -199,8 +199,8 @@ sets.midcast.Stoneskin =
             waist = createEquipment("Siegel Sash"),
             left_ear = createEquipment("Ethereal Earring"),
             right_ear = createEquipment("Lugalbanda Earring"),
-            left_ring = createEquipment("Stikini Ring +1"),
-            right_ring = createEquipment("Stikini Ring +1"),
+            left_ring = StikiRing1,
+            right_ring = StikiRing2,
             back = createEquipment("Fi Follet Cape +1"),
         }
     )
@@ -218,7 +218,7 @@ sets.midcast.Aquaveil = {
     waist = createEquipment("Olympus Sash"),
     left_ear = createEquipment("Andoaa Earring"),
     right_ear = createEquipment("Lugalbanda Earring"),
-    left_ring = createEquipment("Stikini Ring +1"),
+    left_ring = StikiRing1,
     right_ring = createEquipment("Evanescence Ring"),
     back = createEquipment("Fi Follet Cape +1"),
 }
@@ -291,7 +291,7 @@ sets.midcast.IntEnfeebles = {
     left_ear = createEquipment("Malignance Earring"),
     right_ear = createEquipment("Wicce Earring +1"),
     left_ring = createEquipment("Metamor. Ring +1"),
-    right_ring = createEquipment("Stikini Ring +1"),
+    right_ring = StikiRing2,
     back = createEquipment("Taranus's cape")
 }
 sets.midcast.Breakga = sets.midcast.IntEnfeebles
@@ -373,7 +373,7 @@ sets.midcast['Impact'] = {
     waist = createEquipment("Acuity Belt +1"),
     left_ear = createEquipment("Malignance Earring"),
     right_ear = createEquipment("Regal Earring"),
-    left_ring = createEquipment("Stikini Ring +1"),
+    left_ring = StikiRing1,
     right_ring = createEquipment("Metamor. Ring +1"),
     back = createEquipment("Taranus's Cape", nil, nil,
         { 'INT+20', 'Mag. Acc+20 /Mag. Dmg.+20', 'INT+10', '"Mag.Atk.Bns."+10', 'Spell interruption rate down-10%' }),
@@ -397,7 +397,7 @@ sets.midcast['Burn'] = {
     waist = createEquipment("Acuity Belt +1"),
     left_ear = createEquipment("Malignance Earring"),
     right_ear = createEquipment("Regal Earring"),
-    left_ring = createEquipment("Stikini Ring +1"),
+    left_ring = StikiRing1,
     right_ring = createEquipment("Metamor. Ring +1"),
     back = createEquipment("Taranus's Cape", nil, nil,
         { 'INT+20', 'Mag. Acc+20 /Mag. Dmg.+20', 'INT+10', '"Mag.Atk.Bns."+10', 'Spell interruption rate down-10%' }),

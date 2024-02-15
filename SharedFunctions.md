@@ -23,4 +23,3 @@ Voici comment cela fonctionne :
 Pour utiliser cette fonction dans le jeu, Si vous lancer vos sorts depuis votre personnage principal et que votre personnage alternatif est rdm créer une macro 
 - avec comme première ligne `/t <stpc>` ou `/t <stal>`
 - puis sur la deuxième ligne `/con gs c bufftank`.
-
