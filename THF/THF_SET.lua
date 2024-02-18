@@ -7,6 +7,23 @@
 -- =               Last Modified: 2023-07-18                  =--
 -- ============================================================--
 
+-- Creates an equipment item with the given name, priority, bag, and augments.
+-- Parameters:
+--   name (string): The name of the equipment item
+--   priority (number, optional): The priority of the equipment item. Defaults to 0.
+--   bag (number, optional): The bag where the equipment item is located. Defaults to 0.
+--   augments (table, optional): The augments of the equipment item. Defaults to an empty table.
+-- Returns:
+--   A table representing the equipment item
+function createEquipment(name, priority, bag, augments)
+    return {
+        name = name,
+        priority = priority or 0,
+        bag = bag or 0,
+        augments = augments or {}
+    }
+end
+
 -- =========================================================================================================
 --                                           Equipments - Unique Items
 -- =========================================================================================================

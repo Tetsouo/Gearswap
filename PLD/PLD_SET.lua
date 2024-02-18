@@ -141,7 +141,7 @@ sets.FullEnmity = {
     ammo = createEquipment('Sapience Orb'),
     head = createEquipment('Loess Barbuta +1', 13),
     neck = createEquipment('Moonlight Necklace', 1),
-    left_ear = createEquipment('Friomisi Earring'),
+    left_ear = createEquipment("Trux Earring"),
     right_ear = createEquipment('Cryptic Earring', 12),
     body = createEquipment('Souv. Cuirass +1', 16),
     hands = createEquipment('Souv. Handsch. +1', 15),
@@ -151,8 +151,8 @@ sets.FullEnmity = {
     waist = createEquipment('Creed Baudrier', 11),
     legs = createEquipment('Souv. Diechlings +1', 14),
     feet = createEquipment("Chevalier's Sabatons +3", 13)
-    -- Gear Enmity 156
-    -- Crusade Enmity 186
+    -- Gear Enmity 159
+    -- Crusade Enmity 189
 }
 
 -- =========================================================================================================
@@ -220,12 +220,14 @@ sets.midcast.SIRDEnmity = {
     feet = createEquipment('Odyssean greaves', 2),
     neck = createEquipment('Moonlight Necklace', 8),
     waist = createEquipment("Audumbla Sash"),
-    left_ear = createEquipment("Odnowa Earring +1", 16),
-    right_ear = createEquipment('Cryptic Earring', 11),
+    left_ear = createEquipment("Trux Earring"),
+    right_ear = createEquipment('Tuisto Earring', 16),
     left_ring = createEquipment("Apeile ring +1"),
     right_ring = createEquipment('Apeile ring'),
     back = Rudianos.tank
 }
+    -- Gear Enmity 115
+    -- Crusade Enmity 145
 
 -- =========================================================================================================
 --                                           Equipments - Midcast Sets

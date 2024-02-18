@@ -571,15 +571,20 @@ function handle_altNuke(altSpell, altTier, altPlayerName, mainPlayerName, isRaSp
     local targetid, targetname = get_current_target_id_and_name()
 
     if player.status == 'Engaged' then
-        send_command(
-            'send ' ..
-            altPlayerName ..
-            ' /assist <' ..
-            mainPlayerName .. '>; wait 1; send ' .. altPlayerName .. ' ' .. spellToCast .. ' <t>'
-        )
+        if targetid then
+            send_command(
+                'send ' ..
+                altPlayerName ..
+                ' /assist <' ..
+                mainPlayerName .. '>; wait 1; send ' .. altPlayerName .. ' ' .. spellToCast .. ' <t>'
+            )
+        end
     else
-        local targetid = windower.ffxi.get_mob_by_target('lastst').id
-        send_command('send ' .. altPlayerName .. ' ' .. spellToCast .. ' ' .. targetid)
+        local mob = windower.ffxi.get_mob_by_target('lastst')
+        if mob and mob.id then
+            targetid = mob.id
+            send_command('send ' .. altPlayerName .. ' ' .. spellToCast .. ' ' .. targetid)
+        end
     end
 end
 
@@ -814,11 +819,13 @@ function adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
             if player.tp >= 1750 and player.tp < 2000 then
                 sets.precast.WS[spell.name].left_ear = 'MoonShade Earring'
             else
-                -- Adjust earring based on the spell name and Treasure Hunter status
-                sets.precast.WS[spell.name].left_ear =
-                    (spell.name == 'Exenterator') and 'Dawn Earring' or
-                    ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
-                        (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
+                if sets.precast.WS[spell.name] then
+                    -- Adjust earring based on the spell name and Treasure Hunter status
+                    sets.precast.WS[spell.name].left_ear =
+                        (spell.name == 'Exenterator') and 'Dawn Earring' or
+                        ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
+                            (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
+                end
             end
         else
             -- If 'Centovente' is not equipped
@@ -826,11 +833,13 @@ function adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
             if (player.tp >= 1750 and player.tp < 2000) or (player.tp >= 2750 and player.tp < 3000) then
                 sets.precast.WS[spell.name].left_ear = 'MoonShade Earring'
             else
-                -- Adjust earring based on the spell name and Treasure Hunter status
-                sets.precast.WS[spell.name].left_ear =
-                    (spell.name == 'Exenterator') and 'Dawn Earring' or
-                    ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
-                        (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
+                if sets.precast.WS[spell.name] then
+                    -- Adjust earring based on the spell name and Treasure Hunter status
+                    sets.precast.WS[spell.name].left_ear =
+                        (spell.name == 'Exenterator') and 'Dawn Earring' or
+                        ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
+                            (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
+                end
             end
         end
     end
@@ -891,10 +900,12 @@ function check_weaponset(weaponType)
         if state.SubSet then
             equip(sets[state.SubSet.current])
         end
-    elseif weaponType == 'main' and player.main_job ~= 'BLM' then
-        equip(sets[state.WeaponSet.current])
-    elseif weaponType == 'sub' and state.SubSet then
-        equip(sets[state.SubSet.current])
+    elseif player.main_job ~= 'BLM' then
+        if weaponType == 'main' then
+            equip(sets[state.WeaponSet.current])
+        elseif weaponType == 'sub' and state.SubSet then
+            equip(sets[state.SubSet.current])
+        end
     end
 end
 
@@ -1057,12 +1068,25 @@ function buff_change(buff, gain)
                 equip_set = set_combine(equip_set, sets.buff['Trick Attack'])
             else
                 -- If both buffs are lost, revert to the previous gear set
-                job_handle_equipping_gear(playerStatus, eventArgs)
+                if player.status == 'Engaged' then
+                    equip_set = sets.engaged
+                else
+                    equip_set = sets.idle
+                end
             end
         end
+        -- Equip the final gear set only if there is a change in the equip_set
+        if next(equip_set) then
+            equip(equip_set)
+        end
+        -- Do not call job_handle_equipping_gear if 'Sneak Attack' or 'Trick Attack' is active
+        if not state.Buff['Sneak Attack'] and not state.Buff['Trick Attack'] then
+            job_handle_equipping_gear(playerStatus, eventArgs)
+        end
+    else
+        -- For other buffs, call job_handle_equipping_gear as usual
+        job_handle_equipping_gear(playerStatus, eventArgs)
     end
-    -- Equip the final gear set
-    job_handle_equipping_gear(playerStatus, eventArgs)
 end
 
 -- Customizes a set based on given conditions.
