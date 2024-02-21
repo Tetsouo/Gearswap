@@ -319,7 +319,7 @@ sets.precast.JA['Hide'] = {body = createEquipment('Pill. Vest +3')}
 sets.precast.JA['Steal'] = {
     neck = createEquipment('Pentalagus Charm'),
     hands = createEquipment("Thief's Kote"),
-    legs = createEquipment("Assassin's culottes"),
+    legs = createEquipment("Assassin's Culottes"),
     feet = createEquipment('Pill. Poulaines +3')
 }
 sets.precast.JA['Despoil'] = {
