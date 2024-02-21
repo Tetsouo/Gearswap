@@ -813,19 +813,21 @@ end
 function adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
     -- Check if the spell type is a WeaponSkill
     if spell.type == 'WeaponSkill' then
+        -- Initialize sets.precast.WS[spell.name] to sets.precast.WS if it does not exist
+        if not sets.precast.WS[spell.name] then
+            sets.precast.WS[spell.name] = sets.precast.WS
+        end
         -- Check if 'Centovente' is equipped as a sub weapon
         if player.equipment.sub == 'Centovente' then
             -- Check if player's TP is between 1750 and 2000
             if player.tp >= 1750 and player.tp < 2000 then
                 sets.precast.WS[spell.name].left_ear = 'MoonShade Earring'
             else
-                if sets.precast.WS[spell.name] then
-                    -- Adjust earring based on the spell name and Treasure Hunter status
-                    sets.precast.WS[spell.name].left_ear =
-                        (spell.name == 'Exenterator') and 'Dawn Earring' or
-                        ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
-                            (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
-                end
+                -- Adjust earring based on the spell name and Treasure Hunter status
+                sets.precast.WS[spell.name].left_ear =
+                    (spell.name == 'Exenterator') and 'Dawn Earring' or
+                    ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
+                        (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
             end
         else
             -- If 'Centovente' is not equipped
@@ -833,13 +835,11 @@ function adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
             if (player.tp >= 1750 and player.tp < 2000) or (player.tp >= 2750 and player.tp < 3000) then
                 sets.precast.WS[spell.name].left_ear = 'MoonShade Earring'
             else
-                if sets.precast.WS[spell.name] then
-                    -- Adjust earring based on the spell name and Treasure Hunter status
-                    sets.precast.WS[spell.name].left_ear =
-                        (spell.name == 'Exenterator') and 'Dawn Earring' or
-                        ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
-                            (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
-                end
+                -- Adjust earring based on the spell name and Treasure Hunter status
+                sets.precast.WS[spell.name].left_ear =
+                    (spell.name == 'Exenterator') and 'Dawn Earring' or
+                    ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
+                        (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
             end
         end
     end
