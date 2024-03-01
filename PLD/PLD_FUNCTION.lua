@@ -27,6 +27,27 @@ local constants = {
     }
 }
 
+--- Wrapper function for `handle_majesty_and_cure_sets`.
+-- This function checks if `spell` and `eventArgs` are tables, and if so, it calls `handle_majesty_and_cure_sets` in a protected environment using `pcall`.
+-- If `pcall` returns `false`, indicating that an error occurred in `handle_majesty_and_cure_sets`, it asserts `false` and includes the error message in the assertion.
+-- @function handle_majesty_and_cure_sets_wrapper
+-- @tparam table spell The spell to handle. Must be a table.
+-- @tparam table eventArgs The event arguments. Must be a table.
+-- @treturn nil This function does not return a value.
+function handle_majesty_and_cure_sets_wrapper(spell, eventArgs)
+    -- Assert that spell and eventArgs are tables
+    assert(type(spell) == 'table', "Error: spell must be a table")
+    assert(type(eventArgs) == 'table', "Error: eventArgs must be a table")
+
+    -- Use pcall to safely call handle_majesty_and_cure_sets
+    local status, error = pcall(handle_majesty_and_cure_sets, spell, eventArgs)
+
+    -- If pcall returned false, an error occurred in handle_majesty_and_cure_sets
+    if not status then
+        assert(false, "Error in handle_majesty_and_cure_sets: " .. tostring(error))
+    end
+end
+
 -- This function automatically uses the 'Majesty' ability for spells that are magic actions and have 'Healing Magic' or 'Enhancing Magic' as their skill.
 -- It also equips the appropriate cure set for 'Cure III' and 'Cure IV' spells.
 -- @param spell The spell object to attempt to cast. It should be a table with `action_type` and `skill` fields.
@@ -88,7 +109,8 @@ function generate_cure_set(spell, target_type)
         CureSelf = set_combine(
             base_set,
             {
-                sub = 'Srivatsa', 14,
+                sub = 'Srivatsa',
+                14,
                 neck = 'Unmoving Collar +1',
                 16,
                 body = 'Rev. Surcoat +3',
@@ -132,7 +154,9 @@ end
 function customize_idle_set(idleSet)
     -- Call `customize_set_based_on_state` with the base idle set, the XP idle set, the normal idle set, and the MDT defense set
     -- The function will select the appropriate set based on the current state
-    return customize_set_based_on_state(idleSet, sets.idleXp, sets.idle, sets.idle.MDT)
+    -- Get the conditions and sets for customizing the idle set.
+    local conditions, setTable = get_conditions_and_sets(sets.idleXp, sets.idle.PDT, nil, sets.idle.MDT)
+    return customize_set(idleSet, conditions, setTable)
 end
 
 -- This function customizes the melee set based on the current state.
@@ -142,7 +166,8 @@ end
 function customize_melee_set(meleeSet)
     -- Call `customize_set_based_on_state` with the base melee set, the XP melee set, the PDT engaged set, and the MDT defense set
     -- The function will select the appropriate set based on the current state
-    return customize_set_based_on_state(meleeSet, sets.meleeXp, sets.engaged.PDT, sets.engaged.MDT)
+    local conditions, setTable = get_conditions_and_sets(sets.meleeXp, sets.engaged.PDT, nil, sets.engaged.MDT)
+    return customize_set(meleeSet, conditions, setTable)
 end
 
 -- This function manages the casting of the 'Phalanx' spell.

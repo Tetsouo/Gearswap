@@ -30,8 +30,8 @@ JumalikBody = createEquipment('Jumalik Mail', 0, nil, { 'HP+50', 'Attack+15', 'E
 
 ChirichRing1 = createEquipment('Chirich Ring +1', 0, 'wardrobe 1')
 ChirichRing2 = createEquipment('Chirich Ring +1', 0, 'wardrobe 2')
-StikiRing1 = createEquipment('Stikini Ring +1', nil, 'wardrobe 6')
-StikiRing2 = createEquipment('Stikini Ring +1', nil, 'wardrobe 7')
+StikiRing1 = createEquipment('Stikini Ring +1', 0, 'wardrobe 6')
+StikiRing2 = createEquipment('Stikini Ring +1', 0, 'wardrobe 7')
 
 -- =========================================================================================================
 --                                           Equipments - Weapon Sets
@@ -226,8 +226,8 @@ sets.midcast.SIRDEnmity = {
     right_ring = createEquipment('Apeile ring'),
     back = Rudianos.tank
 }
-    -- Gear Enmity 115
-    -- Crusade Enmity 145
+-- Gear Enmity 115
+-- Crusade Enmity 145
 
 -- =========================================================================================================
 --                                           Equipments - Midcast Sets
@@ -409,7 +409,7 @@ sets.defense.MDT = {
     hands = createEquipment("Sakpata's Gauntlets"),
     legs = createEquipment("Sakpata's Cuisses"),
     feet = createEquipment("Sakpata's Leggings"),
-    neck = createEquipment('Unmoving Collar +1', 0, { 'Path: A' }),
+    neck = createEquipment('Unmoving Collar +1', 0, nil, { 'Path: A' }),
     waist = createEquipment('Asklepian Belt'),
     left_ear = createEquipment('Eabani Earring'),
     right_ear = createEquipment('Chev. Earring +1', 0, nil,

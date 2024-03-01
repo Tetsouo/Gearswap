@@ -95,14 +95,7 @@ function job_precast(spell, action, spellMap, eventArgs)
     if state.Buff[spell.english] ~= nil then
         state.Buff[spell.english] = true
     end
-    if spell.type == "WeaponSkill" then
-        mult = 1.55
-        if (spell.target.model_size + spell.range * mult) < spell.target.distance then
-            cancel_spell()
-            return
-                add_to_chat(057, "Out of Range! /cancel")
-        end
-    end
+    Ws_range(spell)
 end
 
 -- Adjusts gear sets for ranged attacks when Treasure Mode is active.

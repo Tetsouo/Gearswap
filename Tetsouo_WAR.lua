@@ -31,6 +31,7 @@ function job_setup()
 
     -- Sets the options for the main weapon set.
     state.WeaponSet = M { ['description'] = 'Main Weapon', 'Ukonvasara', 'Naegling', 'Shining', 'Loxotic' }
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Utu Grip' }
 
     -- Binds keys to cycle through hybrid modes and weapon sets.
     send_command('bind F9 gs c cycle HybridMode')

@@ -31,10 +31,10 @@ JumalikHead = createEquipment('Jumalik Helm', nil, nil,
     { 'MND+10', '"Mag.Atk.Bns."+15', 'Magic burst dmg.+10%', '"Refresh"+1' })
 JumalikBody = createEquipment('Jumalik Mail', nil, nil, { 'HP+50', 'Attack+15', 'Enmity+9', '"Refresh"+2' })
 
-MoonbeamRing1 = createEquipment('Moonbeam Ring', nil, 2)
-MoonbeamRing2 = createEquipment('Moonbeam Ring', nil, 3)
-ChirichRing1 = createEquipment('Chirich Ring +1', nil, 1)
-ChirichRing2 = createEquipment('Chirich Ring +1', nil, 2)
+MoonbeamRing1 = createEquipment('Moonbeam Ring', nil, "wardrobe 2")
+MoonbeamRing2 = createEquipment('Moonbeam Ring', nil, "wardrobe 3")
+ChirichRing1 = createEquipment('Chirich Ring +1', nil, "wardrobe 1")
+ChirichRing2 = createEquipment('Chirich Ring +1', nil, "wardrobe 2")
 
 sets['Lycurgos'] = { main = createEquipment('Lycurgos'), sub = createEquipment('Utu Grip') }
 sets['Ukonvasara'] = { main = createEquipment('Ukonvasara'), sub = createEquipment('Utu Grip') }

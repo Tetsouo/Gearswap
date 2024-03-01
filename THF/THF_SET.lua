@@ -193,11 +193,13 @@ sets.engaged = {
     right_ring = createEquipment("Epona's Ring"),
     back = Toutatis.STP
 }
+
 sets.engaged.Acc = set_combine(sets.engaged, {
     waist = createEquipment('Kentarch belt +1'),
     left_ring = createEquipment('Gere Ring'),
     right_ring = ChirichRing2
 })
+
 sets.engaged.PDT = set_combine(sets.engaged, {
     ammo = createEquipment('Aurgelmir Orb +1'),
     head = createEquipment('Malignance Chapeau'),
@@ -207,9 +209,10 @@ sets.engaged.PDT = set_combine(sets.engaged, {
     feet = createEquipment('Skulk. Poulaines +3'),
     neck = createEquipment('Asn. Gorget +2'),
     waist = createEquipment('Kentarch Belt +1'),
-    left_ring = createEquipment('Gere Ring'),
-    right_ring = createEquipment('Defending Ring'),
+    left_ring = createEquipment('Defending Ring'),
+    right_ring = createEquipment('Gere Ring'),
 })
+
 sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     ammo = createEquipment('Aurgelmir Orb +1'),
     head = createEquipment("Skulker's Bonnet +3"),

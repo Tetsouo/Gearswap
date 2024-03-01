@@ -10,26 +10,27 @@
 -- ===========================================================================================================
 --                                     Constants and Global Variables
 -- ===========================================================================================================
+local SharedFunctions = {}
+
 -- Constants used throughout the script
-GRAY = 160      -- Color code for the gray.
-ORANGE = 057    -- Color code for the orange.
-YELLOW = 050    -- Color code for the green.
-RED = 028       -- Color code for the red.
-WAIT_TIME = 1.2 -- Time to wait between actions, in seconds
+SharedFunctions.GRAY = 160      -- Color code for the gray.
+SharedFunctions.ORANGE = 057    -- Color code for the orange.
+SharedFunctions.YELLOW = 050    -- Color code for the green.
+SharedFunctions.RED = 028       -- Color code for the red.
+SharedFunctions.WAIT_TIME = 1.2 -- Time to wait between actions, in seconds
 -- Array of stratagem charge times.
-strat_charge_time = { 240, 120, 80, 60, 48 }
+SharedFunctions.strat_charge_time = { 240, 120, 80, 60, 48 }
 -- Array of spell names to be ignored. Add more spell names here as needed.
-local ignoredSpells = { 'Breakga', 'Aspir III', 'Aspir II' }
+SharedFunctions.ignoredSpells = { 'Breakga', 'Aspir III', 'Aspir II' }
 -- The name of the main player.
-mainPlayerName = 'Tetsouo'
+SharedFunctions.mainPlayerName = 'Tetsouo'
 -- The name of the alternate player.
-altPlayerName = 'Kaories'
+SharedFunctions.altPlayerName = 'Kaories'
 -- Define an object to store the current state values
-local altState = {}
-isCast = false -- Flag to indicate if a spell is being cast
+SharedFunctions.altState = {}
 
 -- Set of incapacitating buffs. Each buff name is a key with a value of `true`.
-local incapacitating_buffs_set = {
+SharedFunctions.incapacitating_buffs_set = {
     silence = true,
     stun = true,
     petrification = true,
@@ -40,19 +41,33 @@ local incapacitating_buffs_set = {
 -- ===========================================================================================================
 --                                    Equipment and Gear Set Functions
 -- ===========================================================================================================
--- Creates an equipment item with the given name, priority, bag, and augments.
--- Parameters:
---   name (string): The name of the equipment item
---   priority (number, optional): The priority of the equipment item. Defaults to 0.
---   bag (number, optional): The bag where the equipment item is located. Defaults to 0.
---   augments (table, optional): The augments of the equipment item. Defaults to an empty table.
--- Returns:
---   A table representing the equipment item
+--- Creates an equipment object.
+-- This function creates an equipment object with the given parameters.
+-- If a parameter is not provided, it will be set to a default value.
+-- @param name (string) The name of the equipment. This must be a string.
+-- @param priority (number, optional) The priority of the equipment. This must be a number or nil. Defaults to nil if not provided.
+-- @param bag (string, optional) The bag in which the equipment is stored. This must be a string or nil. Defaults to nil if not provided.
+-- @param augments (table, optional) The augments of the equipment. This must be a table. Defaults to an empty table if not provided.
+-- @return table A table representing the equipment, with fields for name, priority, bag, and augments.
+-- @usage local equipment = createEquipment("Sword", 1, "Bag1", {"Augment1", "Augment2"})
 function createEquipment(name, priority, bag, augments)
+    if type(name) ~= 'string' then
+        error("Parameter 'name' must be a string")
+    end
+    if priority ~= nil and type(priority) ~= 'number' then
+        error("Parameter 'priority' must be a number or nil")
+    end
+    if bag ~= nil and type(bag) ~= 'string' then
+        error("Parameter 'bag' must be a string or nil")
+    end
+    if augments and type(augments) ~= 'table' then
+        error("Parameter 'augments' must be a table")
+    end
+
     return {
         name = name,
-        priority = priority or 0,
-        bag = bag or 0,
+        priority = priority or nil,
+        bag = bag or nil,
         augments = augments or {}
     }
 end
@@ -60,73 +75,135 @@ end
 -- ===========================================================================================================
 --                              State Management and Basic Data Handling
 -- ===========================================================================================================
--- Update the altState object whenever the state changes
+-- Update the SharedFunctions.altState object with the current state values.
+-- This function updates each field of the SharedFunctions.altState object with the corresponding value from the state object.
+-- If a state field does not exist or its value is nil, the corresponding SharedFunctions.altState field is set to nil.
+-- @function update_SharedFunctions.altState
+-- @param None
+-- @return None
+-- @usage
+-- update_SharedFunctions.altState()
 function update_altState()
-    altState.Light = state.altPlayerLight.value
-    altState.Tier = state.altPlayerTier.value
-    altState.Dark = state.altPlayerDark.value
-    altState.Ra = state.altPlayera.value
-    altState.Geo = state.altPlayerGeo.value
-    altState.Indi = state.altPlayerIndi.value
-    altState.Entrust = state.altPlayerEntrust.value
+    assert(type(state) == 'table', "state is not a table")
+
+    -- Update a specific field of the SharedFunctions.altState object.
+    -- This internal function is used to update a specific field of the SharedFunctions.altState object.
+    -- @local
+    -- @param stateField (string) The field of the state object to use for the update.
+    -- @param altStateField (string) The field of the SharedFunctions.altState object to update.
+    local function updateStateField(stateField, altStateField)
+        assert(type(state[stateField]) == 'table', stateField .. " is not a table")
+        SharedFunctions.altState[altStateField] = state[stateField].value
+    end
+
+    updateStateField('altPlayerLight', 'Light')
+    updateStateField('altPlayerTier', 'Tier')
+    updateStateField('altPlayerDark', 'Dark')
+    updateStateField('altPlayera', 'Ra')
+    updateStateField('altPlayerGeo', 'Geo')
+    updateStateField('altPlayerIndi', 'Indi')
+    updateStateField('altPlayerEntrust', 'Entrust')
 end
 
--- Retrieves the ID and name of the current target.
--- @return target.id, target.name The ID and name of the current target, or nil if no target is selected.
+--- Retrieves the ID and name of the current target.
+-- @return (number, string): The ID and name of the current target, or nil if no target is selected.
+-- @usage This function relies on the `windower.ffxi.get_mob_by_target` function to get the current target.
+-- If this function doesn't behave as expected, it could potentially lead to issues.
 function get_current_target_id_and_name()
-    local target = windower.ffxi.get_mob_by_target('lastst')
-    if target then
+    local status, target = pcall(windower.ffxi.get_mob_by_target, 'lastst')
+    if status and target then
         return target.id, target.name
     end
     return nil, nil
 end
 
--- Checks if the player is incapacitated by any defined buffs.
+--- Checks if the player is incapacitated by any defined buffs.
 -- If incapacitated, it cancels the spell, marks the event as handled, reverts to the previous gear set, and notifies the player.
 -- @param spell (table): The spell currently being cast. It should be a table with `action_type` and `name` fields.
 -- @param eventArgs (table): A table that can be used to pass additional event arguments. It should have a `handled` field.
 -- @return (boolean): true if the player is incapacitated, false otherwise.
 -- @return (string or nil): The type of incapacitation if the player is incapacitated, nil otherwise.
 function incapacitated(spell, eventArgs)
-    -- If the action type is 'Ability' or 'Item' and the player is silenced or muted, the player is not incapacitated.
+    -- Validate inputs
+    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or not spell.action_type or not spell.name then
+        return false, "Invalid inputs"
+    end
+
+    -- Check for silence or mute
     if (spell.action_type == 'Ability' or spell.action_type == 'Item') and (buffactive['silence'] or buffactive['mute']) then
         return false, nil
     end
 
-    -- If the player has any active buffs, check each one to see if it's an incapacitating buff.
+    -- Check for incapacitating buffs
     if next(buffactive) then
         for buff in pairs(buffactive) do
-            -- If the buff incapacitates, cancel the spell, handle the event, revert gear, and notify.
-            if incapacitating_buffs_set[buff] then
-                cancel_spell()
+            if SharedFunctions.incapacitating_buffs_set[buff] then
+                -- Handle errors in cancel_spell
+                local success, error = pcall(cancel_spell)
+                if not success then
+                    return false, "Error in cancel_spell: " .. error
+                end
+
                 eventArgs.handled = true
-                add_to_chat(167, createFormattedMessage('Cannot Use:', spell.name, nil, buff, true, true))
+
+                -- Handle errors in add_to_chat and createFormattedMessage
+                success, error = pcall(function()
+                    add_to_chat(167, createFormattedMessage('Cannot Use:', spell.name, nil, buff, true, true))
+                end)
+                if not success then
+                    return false, "Error in add_to_chat or createFormattedMessage: " .. error
+                end
+
                 return true, buff
             end
         end
     end
 
-    -- If no incapacitating buffs are found, the player is not incapacitated.
     return false, nil
 end
 
--- Checks if a specific party member has a pet.
--- @param name (string) : The name of the party member to check.
--- @return (boolean) true if the party member is found and they have a pet, false otherwise.
+--- Checks if a specific party member has a pet.
+-- @param name (string): The name of the party member to check.
+-- @return (boolean): true if the party member is found and they have a pet, false otherwise.
+-- @usage This function relies on the `party` table, which should be a list of party members.
+-- Each party member should be a table with a `mob` property, which should also be a table with `name` and `pet_index` properties.
+-- If these don't behave as expected, it could potentially lead to issues.
+-- @error Raises an error if `name` is not a string, if `party` is not a table, if a party member is not a table, or if `mob` is not a table.
 function find_member_and_pet_in_party(name)
+    if type(name) ~= 'string' then
+        error("name must be a string")
+    end
+    if type(party) ~= 'table' then
+        error("party must be a table")
+    end
     for i, member in ipairs(party) do
-        if member.mob and member.mob.name == name then
+        if type(member) ~= 'table' then
+            error("party member must be a table")
+        end
+        if not member.mob or type(member.mob) ~= 'table' then
+            error("mob must be a table")
+        end
+        if member.mob.name == name then
             return member.mob.pet_index ~= nil
         end
     end
     return false
 end
 
--- Checks if a table contains a specific element.
--- @param tbl (table) : The table to search in.
--- @param element (any) : The element to search for in the table.
--- @return (boolean) true if the element is found in the table, false otherwise.
+--- Checks if a table contains a specific element.
+-- @param tbl (table): The table to search in. This parameter is mandatory.
+-- @param element (any): The element to search for in the table. This parameter is mandatory.
+-- @return (boolean): true if the element is found in the table, false otherwise.
+-- @usage This function iterates over the provided table and checks for the presence of the specified element.
+-- It checks the types of its parameters to avoid issues.
+-- @error Raises an error if `tbl` is not a table or if `element` is nil.
 function table.contains(tbl, element)
+    if type(tbl) ~= 'table' then
+        error("tbl must be a table")
+    end
+    if element == nil then
+        error("element cannot be nil")
+    end
     for _, value in pairs(tbl) do
         if value == element then
             return true
@@ -139,7 +216,15 @@ end
 -- @param {number} category - The category of the action.
 -- @param {number} param - The specific action within the category.
 -- @return {boolean} - Returns true if the action inherently triggers Treasure Hunter, false otherwise.
+-- @error Raises an error if `category` or `param` is not a number.
 function th_action_check(category, param)
+    if type(category) ~= 'number' then
+        error("category must be a number")
+    end
+    if type(param) ~= 'number' then
+        error("param must be a number")
+    end
+
     -- Define a mapping of action categories to functions that check if the specific action within the category triggers Treasure Hunter.
     local th_actions = {
         [2] = function() return true end,                                       -- Any ranged attack triggers Treasure Hunter.
@@ -161,10 +246,20 @@ end
 -- ===========================================================================================================
 --                                      Message Formatting Functions
 -- ===========================================================================================================
--- Formats a recast duration into a human-readable string representation.
--- @param recast (number) : The recast time value in seconds.
--- @return (string) The formatted recast time string.
-local function formatRecastDuration(recast)
+--- Formats a recast duration into a human-readable string representation.
+-- This function takes a recast time value in seconds and returns a string that represents the recast time in a human-readable format.
+-- If the recast time is 60 seconds or more, it is formatted as "MM:SS min", where MM is the number of minutes and SS is the number of seconds.
+-- If the recast time is less than 60 seconds, it is formatted as "S.S sec", where S.S is the number of seconds with one decimal place.
+-- If the recast time is nil, the function returns nil.
+-- @param recast (number or nil) : The recast time value in seconds. This parameter can be nil.
+-- @return (string or nil) The formatted recast time string, or nil if the recast time is nil.
+-- @usage This function is useful for formatting recast times for display in a user interface.
+-- @error Raises an error if `recast` is not a number or nil.
+function formatRecastDuration(recast)
+    if recast ~= nil and type(recast) ~= 'number' then
+        error("recast must be a number or nil")
+    end
+
     if recast then
         if recast >= 60 then
             local minutes = math.floor(recast / 60)
@@ -176,56 +271,98 @@ local function formatRecastDuration(recast)
     end
 end
 
--- Constructs a formatted message string with optional color and recast time.
--- @param startMessage (string): The initial part of the message.
--- @param spellName (string): The name of the spell to be included in the message.
--- @param recastTime (number): The recast time in seconds to be included in the message.
--- @param endMessage (string): The final part of the message.
--- @param isLastMessage (boolean): A flag indicating whether this is the last message.
--- @param isColored (boolean): A flag indicating whether the message should be colored.
--- @return (string) The formatted message string.
+--- Asserts that a value is of the expected type or nil.
+-- @param value The value to check.
+-- @param expectedType The expected type of the value.
+-- @param name The name of the value (for error messages).
+function assertType(value, expectedType, name)
+    assert(value == nil or type(value) == expectedType,
+        string.format("%s must be a %s or nil, got %s", name, expectedType, type(value)))
+end
+
+--- Creates a color code from a color value.
+-- @param color The color value.
+-- @return The color code.
+function createColorCode(color)
+    assert(color ~= nil, "color must not be nil")
+    assertType(color, "number", "color")
+    return string.char(0x1F, color)
+end
+
+--- Adds a formatted message to a table of message parts.
+-- @param messageParts The table of message parts.
+-- @param format The format string for the message.
+-- @param ... The values to insert into the format string.
+function addFormattedMessage(messageParts, format, ...)
+    assert(messageParts ~= nil, "messageParts must not be nil")
+    assert(format ~= nil, "format must not be nil")
+    assertType(messageParts, "table", "messageParts")
+    assertType(format, "string", "format")
+    return table.insert(messageParts, string.format(format, ...))
+end
+
+--- Creates a formatted message from the given parameters.
+-- @param startMessage (string) - The message to display at the start.
+-- @param spellName (string) - The name of the spell to display.
+-- @param recastTime (number, optional) - The recast time of the spell. If nil, the recast time will not be displayed.
+-- @param endMessage (string, optional) - The message to display at the end. If nil, no end message will be displayed.
+-- @param isLastMessage (boolean) - If true, a separator line will be added at the end of the message.
+-- @param isColored (boolean) - If true, the message will be colored.
+-- @return (string) - The formatted message.
 function createFormattedMessage(startMessage, spellName, recastTime, endMessage, isLastMessage, isColored)
-    local colorGray = string.char(0x1F, GRAY)
-    local colorOrange = string.char(0x1F, ORANGE)
-    local colorRed = string.char(0x1F, RED)
-    local colorGreen = string.char(0x1F, YELLOW)
+    assertType(startMessage, "string", "startMessage")
+    assert(startMessage ~= "", "startMessage cannot be an empty string")
+    assertType(spellName, "string", "spellName")
+    assert(spellName ~= "", "spellName cannot be an empty string")
+    if recastTime ~= nil then
+        assertType(recastTime, "number", "recastTime")
+        assert(recastTime >= 0, "recastTime cannot be negative")
+    end
+    if endMessage ~= nil then
+        assertType(endMessage, "string", "endMessage")
+        assert(endMessage ~= "", "endMessage cannot be an empty string")
+    end
+    assertType(isLastMessage, "boolean", "isLastMessage")
+    assertType(isColored, "boolean", "isColored")
+
+    assert(type(formatRecastDuration) == "function", "formatRecastDuration must be a function")
+    local formattedRecastTime = formatRecastDuration(recastTime)
+    assertType(formattedRecastTime, "string", "formattedRecastTime")
+
+    assert(SharedFunctions.GRAY and SharedFunctions.ORANGE and SharedFunctions.RED and SharedFunctions.YELLOW,
+        "Color values must be defined in SharedFunctions")
+    for _, color in ipairs({ SharedFunctions.GRAY, SharedFunctions.ORANGE, SharedFunctions.RED, SharedFunctions.YELLOW }) do
+        assertType(color, "number", "color")
+        assert(color >= 0 and color <= 255, "color must be between 0 and 255")
+    end
+
+    local colorGray = createColorCode(SharedFunctions.GRAY)
+    local colorOrange = createColorCode(SharedFunctions.ORANGE)
+    local colorRed = createColorCode(SharedFunctions.RED)
+    local colorGreen = createColorCode(SharedFunctions.YELLOW)
 
     local messageParts = {}
 
-    local function addMessage(message)
-        table.insert(messageParts, message)
-    end
-
-    local startBracket =
-        startMessage and string.format('%s %s[', startMessage, colorGray) or string.format('%s[', colorGray)
-    addMessage(startBracket)
-
-    addMessage(string.format('%s%s%s', colorGreen, spellName, colorGray))
+    addFormattedMessage(messageParts, '%s%s[', startMessage and startMessage .. ' ' or '', colorGray)
+    addFormattedMessage(messageParts, '%s%s%s', colorGreen, spellName, colorGray)
 
     if recastTime then
-        addMessage(
-            string.format(
-                '%s] Recast: %s(%s%s%s)',
-                colorGray,
-                colorGray,
-                colorOrange,
-                formatRecastDuration(recastTime),
-                colorGray
-            )
-        )
+        addFormattedMessage(messageParts, '%s] Recast: %s(%s%s%s)', colorGray, colorGray, colorOrange,
+            formattedRecastTime, colorGray)
     else
-        addMessage(string.format('%s]', colorGray))
+        addFormattedMessage(messageParts, '%s]', colorGray)
 
-        if isColored and endMessage then
-            local buffFirstLetterUpper = string.upper(string.sub(endMessage, 1, 1)) .. string.sub(endMessage, 2)
-            addMessage(string.format(' Due to: %s[%s%s%s]', colorGray, colorRed, buffFirstLetterUpper, colorGray))
-        elseif endMessage then
-            addMessage(string.format(' %s', endMessage))
+        if endMessage then
+            local endMessageFormatted = isColored and
+                string.format(' Due to: %s[%s%s%s]', colorGray, colorRed,
+                    string.upper(string.sub(endMessage, 1, 1)) .. string.sub(endMessage, 2), colorGray) or
+                string.format(' %s', endMessage)
+            addFormattedMessage(messageParts, endMessageFormatted)
         end
     end
 
     if isLastMessage then
-        addMessage(string.format('\n%s=================================================', colorGray))
+        addFormattedMessage(messageParts, '\n%s=================================================', colorGray)
     end
 
     return table.concat(messageParts)
@@ -234,21 +371,47 @@ end
 -- ===========================================================================================================
 --                                     Spell Casting Functions
 -- ===========================================================================================================
-
--- Checks if a spell can be cast by verifying its recast time and any active spell-blocking buffs.
--- @param spell The spell to check. It should be a table with `id` and `action_type` fields.
--- @return true if the spell can be cast, false otherwise.
+--- Checks if a spell can be cast.
+-- This function checks if the spell is not nil, if the spell ID is not nil, if the spell is not on cooldown, and if the player is not incapacitated.
+-- @param spell (table): The spell to check. It should be a table with `id` and `action_type` fields.
+-- @param eventArgs (table): A table that can be used to pass additional event arguments.
+-- @return (boolean): true if the spell can be cast, false otherwise.
+-- @usage This function is used to check if a spell can be cast before attempting to cast it.
+-- It is used in conjunction with the `try_cast_spell` function to handle the casting of spells.
+-- @error Raises an error if the incapacitated function does not exist or is not a function.
 function can_cast_spell(spell, eventArgs)
-    if spell == nil or spell.id == nil then
+    -- Check if the spell or the spell ID is nil
+    if spell == nil or spell.id == nil or spell.action_type == nil then
         return false
     end
 
-    local is_incapacitated, incapacity_type = incapacitated(spell, eventArgs)
+    -- Check if the incapacitated function exists and is a function
+    if type(incapacitated) ~= "function" then
+        error("incapacitated function does not exist or is not a function")
+    end
+
+    -- Call the incapacitated function to check if the player is incapacitated
+    local is_incapacitated, incapacity_type
+    local status, err = pcall(function()
+        is_incapacitated, incapacity_type = incapacitated(spell, eventArgs)
+    end)
+    if not status then
+        print("Error calling incapacitated function: " .. err)
+        return false
+    end
     if is_incapacitated then
         return false
     end
 
-    local spellRecasts = windower.ffxi.get_spell_recasts()
+    -- Check the spell's cooldown
+    local spellRecasts
+    status, err = pcall(function()
+        spellRecasts = windower.ffxi.get_spell_recasts()
+    end)
+    if not status then
+        print("Error getting spell recasts: " .. err)
+        return false
+    end
     if spellRecasts ~= nil then
         local spellRecast = spellRecasts[spell.id]
         if spellRecast ~= nil and spellRecast > 0 then
@@ -256,25 +419,49 @@ function can_cast_spell(spell, eventArgs)
         end
     end
 
+    -- If all checks pass, the spell can be cast
     return true
 end
 
--- Attempts to cast a spell if possible.
--- @param spell The spell to attempt to cast. It should be a table with `id`, `action_type` and `target` fields.
--- @return true if the spell can be cast, false otherwise.
+--- Attempts to cast a spell if possible.
+-- This function checks if the spell can be cast using the `can_cast_spell` function. If the spell can be cast, it returns true. If the spell cannot be cast, it cancels the spell using the `cancel_spell` function and returns false. If an error occurs during this process, it prints the error and returns false.
+-- @function try_cast_spell
+-- @tparam table spell The spell to attempt to cast. It should be a table with `id` and `action_type` fields.
+-- @tparam table eventArgs A table that can be used to pass additional event arguments. It should have a `handled` field.
+-- @treturn boolean true if the spell was cast successfully, false otherwise.
+-- @usage This function is used to attempt to cast a spell and handle potential errors. It is used in conjunction with the `handle_unable_to_cast` function to handle the casting of spells.
+-- @raise Raises an error if the `cancel_spell` function does not exist or is not a function.
 function try_cast_spell(spell, eventArgs)
-    if not can_cast_spell(spell, eventArgs) then
-        cancel_spell()
+    -- Check if the cancel_spell function exists and is a function
+    if type(cancel_spell) ~= "function" then
+        error("cancel_spell function does not exist or is not a function")
+    end
+
+    -- Try to cast the spell and handle potential errors
+    local status, result_or_err = pcall(function()
+        if not can_cast_spell(spell, eventArgs) then
+            cancel_spell()
+            return false
+        end
+        return true
+    end)
+
+    -- If an error occurred, print the error and return false
+    if not status then
+        print(result_or_err) -- Print the error message
         return false
     end
-    return true
+
+    return result_or_err
 end
 
--- Handles the scenario when a spell cannot be cast.
+--- Handles the scenario when a spell cannot be cast.
 -- If the spell cannot be cast, the function cancels the spell, marks the event as handled,
 -- reverts to the previous gear set, and sends a chat message.
--- @param spell (table): The spell to attempt to cast. It should be a table with `id` and `action_type` fields.
--- @param eventArgs (table): A table that can be used to pass additional event arguments. It should have a `handled` field.
+-- @function handle_unable_to_cast
+-- @tparam table spell The spell to attempt to cast. It should be a table with `id` and `action_type` fields.
+-- @tparam table eventArgs A table that can be used to pass additional event arguments. It should have a `handled` field.
+-- @usage This function is used in the event handling system to handle the scenario when a spell cannot be cast. It is typically called when a spell casting event is triggered and the `can_cast_spell` function returns false.
 function handle_unable_to_cast(spell, eventArgs)
     if not try_cast_spell(spell, eventArgs) then
         cancel_spell()
@@ -285,72 +472,107 @@ function handle_unable_to_cast(spell, eventArgs)
     end
 end
 
--- Checks the cooldown of a given spell or ability and displays it if it's not ready.
--- @param spell (table): The spell or ability to check.
--- @param eventArgs (table): Additional event arguments.
 function checkDisplayCooldown(spell, eventArgs)
-    -- Skip cooldown check for ignored spells or certain types of spells and abilities
-    if
-        table.contains(ignoredSpells, spell.name) or spell.skill == 'Elemental Magic' or spell.type == 'Scholar' or
-        spell.action_type == 'Weapon Skill'
-    then
-        return
+    -- Check argument types
+    assert(type(spell) == 'table', "Error: spell is not a table")
+    assert(type(eventArgs) == 'table', "Error: eventArgs is not a table")
+
+    -- Check required keys in spell
+    local requiredKeys = { 'name', 'type', 'action_type', 'id' }
+    for _, key in ipairs(requiredKeys) do
+        assert(spell[key], "Error: spell does not have a '" .. key .. "' key")
     end
 
-    local recast = 0 -- Initialize recast time
+    -- Check for ignored spells or certain types of spells and abilities
+    local ignoredOrSpecialTypes = table.contains(SharedFunctions.ignoredSpells, spell.name) or
+        spell.skill == 'Elemental Magic' or
+        spell.type == 'Scholar' or
+        spell.action_type == 'Weapon Skill'
+    if ignoredOrSpecialTypes then return end
 
-    -- Get recast time from the appropriate list based on the action type
+    -- Initialize recast time
+    local recast = 0
+
+    -- Get recast time from the appropriate list based on action type
+    local status, recasts
     if spell.action_type == 'Magic' then
-        local spellRecasts = windower.ffxi.get_spell_recasts()
-        recast = spellRecasts[spell.id] / 60 -- Convert recast time to seconds
+        status, recasts = pcall(windower.ffxi.get_spell_recasts)
+        if status and type(recasts) == 'table' and recasts[spell.id] then
+            recast = recasts[spell.id] / 60 -- Convert recast time to seconds
+        end
     elseif spell.action_type == 'Ability' then
-        local abilityRecasts = windower.ffxi.get_ability_recasts()
-        recast = abilityRecasts[spell.recast_id]
+        status, recasts = pcall(windower.ffxi.get_ability_recasts)
+        if status and type(recasts) == 'table' and recasts[spell.recast_id] then
+            recast = recasts[spell.recast_id]
+        end
     end
 
     -- If the spell or ability is not ready, cancel it and display the recast time
     if recast and recast > 0 then
-        cancel_spell()
+        local status, err = pcall(cancel_spell)
+        if not status then
+            assert(status, "Error: failed to cancel spell: " .. (err or ""))
+        end
+
+        assert(type(eventArgs.handled) == 'boolean', "Error: eventArgs does not have a 'handled' field of type boolean")
+
+        status, err = pcall(add_to_chat, 123, createFormattedMessage(nil, spell.name, recast, nil, true))
+        if not status then
+            assert(status, "Error: failed to add message to chat: " .. (err or ""))
+        end
         eventArgs.handled = true
-        add_to_chat(123, createFormattedMessage(nil, spell.name, recast, nil, true))
     end
 end
 
--- If the spell was not cancelled and can be cast, it checks if there's an associated auto ability function and calls it.
--- If the spell is 'Cure III' or 'Cure IV', it generates and equips a cure set.
--- @param spell The spell object to attempt to cast. It should be a table with `name` and `target.type` fields.
--- @param eventArgs The event arguments object. It should have a `handled` field.
--- @param auto_abilities The table of auto abilities. It should map spell names to functions.
--- Initialisez auto_abilities comme une table avant d'appeler handle_spell
+--- Attempts to cast a spell and call an associated auto-ability function if it exists.
+-- If the spell has not been cancelled and can be cast, the function checks if there is an associated auto-ability function and calls it.
+-- @function handle_spell
+-- @tparam table spell The spell object to attempt to cast. It should be a table with `name` and `target.type` fields.
+-- @tparam table eventArgs The event arguments object. It should have a `handled` field.
+-- @tparam table auto_abilities The table of auto-abilities. It should map spell names to functions.
+-- @treturn nil This function does not return a value.
 function handle_spell(spell, eventArgs, auto_abilities)
+    assert(type(spell) == 'table', "Error: spell must be a table")
+    assert(type(eventArgs) == 'table', "Error: eventArgs must be a table")
+
     if not eventArgs.handled and try_cast_spell(spell, eventArgs) then
         if auto_abilities ~= nil then
             local auto_ability_function = auto_abilities[spell.name]
             if auto_ability_function ~= nil then
-                auto_ability_function(spell, eventArgs)
+                local status, err = pcall(auto_ability_function, spell, eventArgs)
+                if not status then
+                    error("Error in auto_ability_function: " .. tostring(err))
+                end
             end
         end
     end
 end
 
--- This function is used to handle the automatic use of abilities for 'Protect V', 'Cure III', and 'Cure IV' spells.
--- It simply calls the 'handle_majesty_and_cure_sets' function with the provided spell and event arguments.
--- @param spell The spell to be cast. It should be one of 'Protect V', 'Cure III', or 'Cure IV'.
--- @param eventArgs The event arguments.
-function handle_majesty_and_cure_sets_wrapper(spell, eventArgs)
-    handle_majesty_and_cure_sets(spell, eventArgs)
-end
-
--- Automatically casts an ability before a spell if possible.
--- If the spell can be cast and the ability is ready and not active, it cancels the current spell, uses the ability, waits for `WAIT_TIME` seconds, and then casts the spell.
--- If the spell cannot be cast, it cancels the spell and marks the event as handled.
--- @param spell The spell object to attempt to cast. It should be a table with `name` and `target.id` fields.
--- @param eventArgs The event arguments object. It should have a `handled` field.
--- @param abilityId The ID of the ability to use before the spell.
--- @param abilityName The name of the ability to use before the spell.
+--- Automatically casts an ability before a spell if possible.
+-- This function attempts to cast a spell, and if the spell can be cast, it checks if an ability is ready and not active.
+-- If the ability is ready and not active, it cancels the current spell, uses the ability, waits for a specified amount of time, and then casts the spell.
+-- If the spell cannot be cast, it calls `handle_unable_to_cast` and marks the event as handled.
+-- @function auto_ability
+-- @tparam table spell The spell object to attempt to cast. It should be a table with `name` and `target.id` fields.
+-- @tparam table eventArgs The event arguments object. It should have a `handled` field.
+-- @tparam number abilityId The ID of the ability to use before the spell.
+-- @tparam number waitTime The amount of time to wait after using the ability and before casting the spell.
+-- @tparam string abilityName The name of the ability to use before the spell.
+-- @usage This function is used in the event handling system to automatically use abilities before casting spells.
 function auto_ability(spell, eventArgs, abilityId, waitTime, abilityName)
+    -- Check input arguments
+    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or type(abilityId) ~= 'number' or type(waitTime) ~= 'string' or type(abilityName) ~= 'string' then
+        return
+    end
+
     if try_cast_spell(spell, eventArgs) then
-        local abilityCooldown = windower.ffxi.get_ability_recasts()[abilityId]
+        local abilityCooldown
+        -- Handle potential errors when calling windower.ffxi.get_ability_recasts()
+        local status, err = pcall(function() abilityCooldown = windower.ffxi.get_ability_recasts()[abilityId] end)
+        if not status then
+            return
+        end
+
         if abilityCooldown < 1 and not buffactive[abilityName] then
             cancel_spell()
             send_command(
@@ -368,120 +590,206 @@ function auto_ability(spell, eventArgs, abilityId, waitTime, abilityName)
     end
 end
 
--- Handles the event of a spell being interrupted.
--- This function reverts to the previous gear set, marks the event as handled, and sends a chat message.
--- @param spell (table): The spell that was interrupted.
--- @param eventArgs (table): Additional event arguments. This is modified by the function to mark the event as handled.
+--- Handles an interrupted spell event.
+-- This function checks that the `spell` and `eventArgs` are tables and that `spell` has a `name` property.
+-- It then calls `job_handle_equipping_gear` and `add_to_chat` using `pcall` to handle any errors.
+-- If an error occurs in either function, it prints an error message and returns `false`.
+-- If no errors occur, it marks the event as handled by setting `eventArgs.handled` to `true` and returns `true`.
+-- @param spell The spell that was interrupted. This should be a table with a `name` property.
+-- @param eventArgs The event arguments. This should be a table.
+-- @return `true` if the function completed successfully, `false` otherwise.
+-- @function handleInterruptedSpell
 function handleInterruptedSpell(spell, eventArgs)
-    eventArgs.handled = true -- Mark the event as handled
-    job_handle_equipping_gear(playerStatus, eventArgs)
-    -- Notify the user via chat that the spell was interrupted
-    add_to_chat(123, createFormattedMessage('Spell interrupted:', spell.name, nil, nil, true, nil))
+    -- Check that spell and eventArgs are tables and that spell has a name property
+    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or type(spell.name) ~= 'string' then
+        return false
+    end
+
+    -- Use pcall to call job_handle_equipping_gear and handle any errors
+    local success, message = pcall(job_handle_equipping_gear, playerStatus, eventArgs)
+    if not success then
+        return false
+    end
+
+    -- Mark the event as handled
+    eventArgs.handled = true
+
+    -- Use pcall to call add_to_chat and handle any errors
+    success, message = pcall(add_to_chat, 123,
+        createFormattedMessage('[Spell interrupted]:', spell.name, nil, nil, true, nil))
+    if not success then
+        return false
+    end
+
+    return true
 end
 
--- Handles actions to be performed after a spell has been successfully cast.
--- @param spell (table): The spell that has been successfully cast.
--- @param eventArgs (table): Additional event arguments.
--- This function equips the MoveSpeed gear set if the Moving state is true.
+--- Handles actions to be performed after a spell has been successfully cast.
+-- This function checks that the `spell` and `eventArgs` are tables.
+-- It then checks if the Moving state is true and if so, calls `send_command` using `pcall` to handle any errors.
+-- If an error occurs in `send_command`, it prints an error message and returns `false`.
+-- If no errors occur, it returns `true`.
+-- @param spell The spell that has been successfully cast. This should be a table.
+-- @param eventArgs Additional event arguments. This should be a table.
+-- @return `true` if the function completed successfully, `false` otherwise.
+-- @function handleCompletedSpell
 function handleCompletedSpell(spell, eventArgs)
+    -- Check that spell and eventArgs are tables
+    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or not spell.name then
+        return false
+    end
+
     if state.Moving.value == 'true' then
-        send_command('gs equip sets.MoveSpeed')
+        -- Use pcall to call send_command and handle any errors
+        local success, message = pcall(send_command, 'gs equip sets.MoveSpeed')
+        if not success then
+            return false
+        end
     end
+
+    return true
 end
 
--- Handles actions to be performed after a spell has been cast.
--- @param spell (table): The spell that has been cast.
--- @param eventArgs (table): Additional event arguments.
--- This function checks if the spell was interrupted or completed and calls the appropriate handler function.
+--- Handles actions to be performed after a spell has been cast.
+-- This function checks that the `spell` and `eventArgs` are tables.
+-- It then checks if the spell was interrupted or completed and calls the appropriate handler function using `pcall` to handle any errors.
+-- If an error occurs in the handler function, it prints an error message and returns `false`.
+-- If no errors occur, it returns `true`.
+-- @param spell The spell that has been cast. This should be a table.
+-- @param eventArgs Additional event arguments. This should be a table.
+-- @return `true` if the function completed successfully, `false` otherwise.
+-- @function handleSpellAftercast
 function handleSpellAftercast(spell, eventArgs)
-    if spell.interrupted then
-        -- If the spell was interrupted, handle the interruption.
-        handleInterruptedSpell(spell, eventArgs)
-    else
-        -- If the spell was successfully cast, handle the completion.
-        handleCompletedSpell(spell, eventArgs)
+    -- Check that spell and eventArgs are tables
+    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or not spell.name then
+        return false
     end
+
+    if spell.interrupted then
+        -- Use pcall to call handleInterruptedSpell and handle any errors
+        local success, message = pcall(handleInterruptedSpell, spell, eventArgs)
+        if not success then
+            return false
+        end
+    else
+        -- Use pcall to call handleCompletedSpell and handle any errors
+        local success, message = pcall(handleCompletedSpell, spell, eventArgs)
+        if not success then
+            return false
+        end
+    end
+
+    return true
 end
 
--- Casts a sequence of spells on a target.
--- @param altPlayerName (string): The name of the alternate player casting the spell.
--- @param mainPlayerName (string): The name of the main player.
--- @param spells (table): A table of spells to cast. Each spell is a table with a 'name' and a 'delay'.
--- This function iterates over the spells table and sends a command to cast each spell on the current target.
+--- Casts a sequence of spells on a target.
+-- This function checks that the `spells` is a table.
+-- It then gets the current target id and name using `get_current_target_id_and_name` and sends a command to cast each spell on the current target.
 -- If the spell is 'phalanx2', the main player is the target, and the main player's job is 'PLD',
 -- both 'phalanx' and 'phalanx2' are cast.
-function applySpellSequenceToTarget(altPlayerName, mainPlayerName, spells)
-    local targetid, targetname = get_current_target_id_and_name()
+-- @param spells A table of spells to cast. Each spell is a table with a 'name' and a 'delay'.
+-- @return `true` if the function completed successfully, `false` otherwise.
+-- @function applySpellSequenceToTarget
+function applySpellSequenceToTarget(spells)
+    -- Check that spells is a table and not empty
+    if type(spells) ~= 'table' or #spells == 0 then
+        return false
+    end
+
+    -- Use pcall to call get_current_target_id_and_name and handle any errors
+    local success, targetid, targetname = pcall(get_current_target_id_and_name)
+    if not success then
+        return false
+    end
+
     for _, spell in ipairs(spells) do
         local command
         if spell.delay == 0 then
-            command = string.format('send %s %s %s', altPlayerName, spell.name, tostring(targetid))
+            command = string.format('send %s %s %s', SharedFunctions.altPlayerName, spell.name, tostring(targetid))
         else
             command =
-                string.format('wait %d; send %s %s %s', spell.delay, altPlayerName, spell.name, tostring(targetid))
+                string.format('wait %d; send %s %s %s', spell.delay, SharedFunctions.altPlayerName, spell.name,
+                    tostring(targetid))
         end
-        if spell.name == 'phalanx2' and targetname == mainPlayerName and player.main_job == 'PLD' then
+        if spell.name == 'Phalanx2' and targetname == SharedFunctions.mainPlayerName and player.main_job == 'PLD' then
             local bothPhalanx
             if spell.delay == 0 then
                 bothPhalanx =
                     string.format(
-                        'send %s phalanx %s; send %s phalanx2 %s',
-                        mainPlayerName,
+                        'send %s Phalanx %s; send %s Phalanx2 %s',
+                        SharedFunctions.mainPlayerName,
                         tostring(targetid),
-                        altPlayerName,
+                        SharedFunctions.altPlayerName,
                         tostring(targetid)
                     )
             else
                 bothPhalanx =
                     string.format(
-                        'wait %d; send %s phalanx %s; send %s phalanx2 %s',
+                        'wait %d; send %s Phalanx %s; send %s Phalanx2 %s',
                         spell.delay,
-                        mainPlayerName,
+                        SharedFunctions.mainPlayerName,
                         tostring(targetid),
-                        altPlayerName,
+                        SharedFunctions.altPlayerName,
                         tostring(targetid)
                     )
             end
-            send_command(bothPhalanx)
+            -- Use pcall to call send_command and handle any errors
+            local success, message = pcall(send_command, bothPhalanx)
+            if not success then
+                return false
+            end
         else
-            send_command(command)
+            -- Use pcall to call send_command and handle any errors
+            local success, message = pcall(send_command, command)
+            if not success then
+                return false
+            end
         end
     end
+
+    return true
 end
 
--- Handles the command sequence for a character.
--- @param altPlayerName (string): The name of the alternate player casting the spells.
--- @param mainPlayerName (string): The name of the main player.
+--- Handles the command sequence for a character.
+-- This function checks that the `commandType` is a string.
+-- It then gets the current target id and name using `get_current_target_id_and_name` and defines a sequence of spells based on the command type.
+-- It calls the function 'applySpellSequenceToTarget' to apply the spell sequence to the current target.
 -- @param commandType (string): The type of the command (e.g., 'bufftank', 'bdd', 'buffrng', 'curaga', 'debuff').
--- This function defines a sequence of spells to be cast on the current target,
--- and calls the function 'applySpellSequenceToTarget' to apply them.
-function bufferRoleForAltRdm(altPlayerName, mainPlayerName, commandType)
-    local targetid, targetname = get_current_target_id_and_name()
-    tank = {
-        { name = 'haste2',   delay = 0 },
-        { name = 'refresh3', delay = 4.5 },
-        { name = 'phalanx2', delay = 9.2 },
-        { name = 'regen2',   delay = 13.2 }
-    }
-    melee = {
-        { name = 'haste2',   delay = 0 },
-        { name = 'phalanx2', delay = 4.7 },
-        { name = 'regen2',   delay = 8 }
-    }
-    ranger = {
-        { name = 'flurry2',  delay = 0 },
-        { name = 'phalanx2', delay = 4.5 },
-        { name = 'regen2',   delay = 9.2 }
-    }
+-- @return `true` if the function completed successfully, `false` otherwise.
+-- @function bufferRoleForAltRdm
+function bufferRoleForAltRdm(commandType)
+    -- Check that commandType is a string
+    if type(commandType) ~= 'string' then
+        return false
+    end
+
+    -- Use pcall to call get_current_target_id_and_name and handle any errors
+    local success, targetid, targetname = pcall(get_current_target_id_and_name)
+    if not success then
+        return false
+    end
 
     local spells = {}
 
     if commandType == 'bufftank' then
-        spells = tank
+        spells = {
+            { name = 'Haste2',   delay = 0 },
+            { name = 'Refresh3', delay = 4 },
+            { name = 'Phalanx2', delay = 9 },
+            { name = 'Regen2',   delay = 13 },
+        }
     elseif commandType == 'buffmelee' then
-        spells = melee
+        spells = {
+            { name = 'Haste2',   delay = 0 },
+            { name = 'Phalanx2', delay = 4 },
+            { name = 'Regen2',   delay = 9 },
+        }
     elseif commandType == 'buffrng' then
-        spells = ranger
+        spells = {
+            { name = 'flurry2',  delay = 0 },
+            { name = 'Phalanx2', delay = 4 },
+            { name = 'Regen2',   delay = 9 },
+        }
     elseif commandType == 'curaga' then
         spells = {
             { name = 'curaga3', delay = 0 }
@@ -496,7 +804,13 @@ function bufferRoleForAltRdm(altPlayerName, mainPlayerName, commandType)
         }
     end
 
-    applySpellSequenceToTarget(altPlayerName, mainPlayerName, spells)
+    -- Use pcall to call applySpellSequenceToTarget and handle any errors
+    local success, message = pcall(applySpellSequenceToTarget, spells)
+    if not success then
+        return false
+    end
+
+    return true
 end
 
 -- List of spells that should be targeted on the main player
@@ -506,112 +820,184 @@ local mainPlayerSpells = {
     'Geo-AGI', 'Geo-Fend', 'Geo-VIT', 'Geo-DEX', 'Geo-Acumen', 'Geo-Haste'
 }
 
--- This function handles the buffing sequence for an alternate Geomancer character in the game.
---
--- @param altSpell (string): The name of the spell to cast.
--- @param altPlayerName (string): The name of the alternate player casting the spell.
--- @param mainPlayerName (string): The name of the main player.
--- @param isEntrust (boolean): If true, the "Entrust" ability will be used before casting the spell.
--- @param isGeo (boolean): If true, the "Full Circle" ability will be used before casting the Geo spell.
---
--- The function first retrieves the current target's ID and name. It then checks the name of the spell to cast.
--- If the spell is a Geo spell that should be cast on the main player, it changes the target to the main player.
+--- Buffing sequence handler for an alternate Geomancer character in the game.
+-- This function retrieves the current target's ID and name, checks the name of the spell to cast,
+-- and changes the target to the main player if the spell is a Geo spell that should be cast on the main player.
 -- If the 'isEntrust' parameter is true, it sends a command to use the "Entrust" ability before casting the spell.
 -- If the 'isGeo' parameter is true, it sends a command to use the "Full Circle" ability before casting the Geo spell.
 -- Finally, it sends the command to cast the spell on the appropriate target.
-function bubbleBuffForAltGeo(altSpell, altPlayerName, mainPlayerName, isEntrust, isGeo)
+-- @param altSpell (string): The name of the spell to cast.
+-- @param isEntrust (boolean): If true, the "Entrust" ability will be used before casting the spell.
+-- @param isGeo (boolean): If true, the "Full Circle" ability will be used before casting the Geo spell.
+-- @return nil
+-- @usage bubbleBuffForAltGeo('Geo-Regen', true, false) -- Casts 'Geo-Regen' using 'Entrust' ability.
+-- @function bubbleBuffForAltGeo
+function bubbleBuffForAltGeo(altSpell, isEntrust, isGeo)
+    -- Check input parameters
+    if type(altSpell) ~= 'string' or type(isEntrust) ~= 'boolean' or type(isGeo) ~= 'boolean' then
+        error('Invalid input parameters')
+    end
+
     local targetid, targetname = get_current_target_id_and_name()
+
+    -- If targetid or targetname is nil, set them to default values
+    if not targetid or not targetname then
+        targetid = 0
+        targetname = 'NoTarget'
+    end
+
     local spellToCast = altSpell
     local targetForGeo = targetid
 
-    -- Si le sort est dans la liste mainPlayerSpells, changez la cible pour mainPlayerName
+    -- Si le sort est dans la liste mainPlayerSpells, changez la cible pour SharedFunctions.mainPlayerName
     if table.contains(mainPlayerSpells, altSpell) then
-        targetForGeo = '<' .. mainPlayerName .. '>'
+        targetForGeo = '<' .. SharedFunctions.mainPlayerName .. '>'
     end
 
-    local command = 'send ' .. altPlayerName
+    local command = 'send ' .. SharedFunctions.altPlayerName
 
     if isEntrust then
-        if targetname ~= altPlayerName then
-            command = command .. ' /ja "Entrust" <' .. altPlayerName .. '>'
+        if targetname ~= SharedFunctions.altPlayerName then
+            command = command .. ' /ja "Entrust" <' .. SharedFunctions.altPlayerName .. '>'
         end
-        command = command .. '; wait 2; send ' .. altPlayerName .. ' ' .. spellToCast .. ' ' .. targetid
+        command = command .. '; wait 2; send ' .. SharedFunctions.altPlayerName .. ' ' .. spellToCast .. ' ' .. targetid
     elseif isGeo then
-        if find_member_and_pet_in_party(altPlayerName) then
-            command = command .. ' /ja "Full Circle" <' .. altPlayerName .. '>'
+        if find_member_and_pet_in_party(SharedFunctions.altPlayerName) then
+            command = command .. ' /ja "Full Circle" <' .. SharedFunctions.altPlayerName .. '>'
             command = command ..
                 '; wait 2; send ' ..
-                altPlayerName ..
+                SharedFunctions.altPlayerName ..
                 ' ' ..
                 spellToCast ..
-                ' ' .. targetForGeo .. '; wait 4; send ' .. altPlayerName .. ' Cure <' .. mainPlayerName .. '>'
+                ' ' ..
+                targetForGeo ..
+                '; wait 4; send ' .. SharedFunctions.altPlayerName .. ' Cure <' .. SharedFunctions.mainPlayerName .. '>'
         else
             command = command ..
                 ' ' ..
                 spellToCast ..
-                ' ' .. targetForGeo .. '; wait 4; send ' .. altPlayerName .. ' Cure <' .. mainPlayerName .. '>'
+                ' ' ..
+                targetForGeo ..
+                '; wait 4; send ' .. SharedFunctions.altPlayerName .. ' Cure <' .. SharedFunctions.mainPlayerName .. '>'
         end
     else
-        command = command .. ' ' .. spellToCast .. ' ' .. '<' .. altPlayerName .. '>'
+        command = command .. ' ' .. spellToCast .. ' ' .. '<' .. SharedFunctions.altPlayerName .. '>'
     end
 
-    send_command(command)
+    -- Try to send the command and handle any errors
+    local success, error = pcall(send_command, command)
+    if not success then
+        error('Failed to send command: ' .. error)
+    end
 end
 
--- Handles the 'alt' command for an alternate character.
--- @param altSpell (string): The name of the elemental damage spell to cast.
--- @param altTier (string): The level of the spell to cast.
--- @param altPlayerName (string): The name of the alternate player casting the spell.
--- @param mainPlayerName (string): The name of the main player.
--- @param isRaSpell (boolean): If true, the spell is of type 'Ra'.
--- This function defines the spell to be cast, gets the current target,
--- and sends the appropriate command to the alternate player.
-function handle_altNuke(altSpell, altTier, altPlayerName, mainPlayerName, isRaSpell)
+--- Handles the casting of an alternate spell.
+-- This function checks the input parameters, determines the spell to cast, and sends the command to cast the spell.
+-- If the player is engaged, the function assists the main player and casts the spell on the target.
+-- If the player is not engaged, the function casts the spell on the last targeted monster.
+-- @param altSpell The name of the alternate spell to cast. Must be a string.
+-- @param altTier The tier of the alternate spell to cast. Must be a string.
+-- @param isRaSpell A boolean indicating whether the spell is a Ra spell.
+-- @usage handle_altNuke('Fire', 'IV', false) -- Casts Fire IV on the target.
+-- @function handle_altNuke
+function handle_altNuke(altSpell, altTier, isRaSpell)
+    -- Add argument validation
+    assert(altSpell ~= '' and altTier ~= '', "Invalid arguments: altSpell and altTier must not be empty strings")
+
+    -- Check input parameters
+    assert(type(altSpell) == 'string' and (altTier == nil or type(altTier) == 'string') and type(isRaSpell) == 'boolean',
+        'Invalid input parameters')
+
+    -- Determine the spell to cast
     local spellToCast = altSpell .. (isRaSpell and ' III' or altTier)
+
+    -- Get the current target's ID and name
     local targetid, targetname = get_current_target_id_and_name()
 
+    -- If the player is engaged
     if player.status == 'Engaged' then
+        -- If there is a target
         if targetid then
-            send_command(
+            -- Try to send the command to assist the main player and cast the spell on the target
+            local success, err = pcall(send_command,
                 'send ' ..
-                altPlayerName ..
+                SharedFunctions.altPlayerName ..
                 ' /assist <' ..
-                mainPlayerName .. '>; wait 1; send ' .. altPlayerName .. ' ' .. spellToCast .. ' <t>'
+                SharedFunctions.mainPlayerName ..
+                '>; wait 1; send ' .. SharedFunctions.altPlayerName .. ' ' .. spellToCast .. ' <t>'
             )
+            -- If the command could not be sent, throw an error
+            if not success then
+                assert(false, 'Failed to send command: ' .. (err or 'Unknown error'))
+            end
         end
     else
+        -- If the player is not engaged, try to cast the spell on the last targeted monster
         local mob = windower.ffxi.get_mob_by_target('lastst')
         if mob and mob.id then
             targetid = mob.id
-            send_command('send ' .. altPlayerName .. ' ' .. spellToCast .. ' ' .. targetid)
+            local success, err = pcall(send_command,
+                'send ' .. SharedFunctions.altPlayerName .. ' ' .. spellToCast .. ' ' .. targetid)
+            if not success then
+                assert(false, 'Failed to send command: ' .. (err or 'Unknown error'))
+            end
         end
     end
 end
 
--- Casts a specified spell on the selected Non-Player Character (NPC) target.
--- @param mainSpell (string): The name of the main spell to cast (e.g., "Fire", "Blizzard").
--- @param tier (string): The tier of the spell to cast. If not provided, the function will cast the main spell without a tier.
+--- Casts an elemental spell.
+-- This function takes a main spell and an optional tier, concatenates them to form the full spell name, and sends a command to cast the spell.
+-- It checks the input parameters and handles errors that might occur when sending the command.
+-- @param mainSpell The name of the main spell to cast. Must be a string and not nil.
+-- @param tier The tier of the spell to cast. Must be a string or nil.
+-- @usage castElementalSpells('Fire', ' II') -- Casts Fire II.
+-- @function castElementalSpells
 function castElementalSpells(mainSpell, tier)
+    -- Check that mainSpell is a string and not nil
+    assert(type(mainSpell) == 'string' and mainSpell ~= nil, 'Invalid mainSpell parameter')
+
+    -- Check that tier is a string or nil
+    assert(tier == nil or type(tier) == 'string', 'Invalid tier parameter')
+
+    -- Concatenate the main spell and the tier to form the full spell name
     local spell = mainSpell
     if tier then
         spell = spell .. tier
     end
-    send_command('input /ma "' .. spell .. '" <stnpc>')
+
+    -- Call send_command and check for errors
+    local success, err = pcall(function() send_command('input /ma "' .. spell .. '" <stnpc>') end)
+    assert(success, 'Failed to send command: ' .. tostring(err))
 end
 
--- Casts a specified art or addendum.
--- @param arts (string): The name of the art to cast (e.g., "Light Arts").
--- @param addendum (string): The name of the addendum to cast (e.g., "Addendum: White").
--- This function checks if the specified art is active. If not, it casts the art. If the art is already active, it casts the addendum instead.
+--- Casts arts or addendum.
+-- This function checks the type of `arts` and `addendum` parameters and throws an error if they are not strings or are nil.
+-- It then checks if the `arts` buff is active. If it is not, it sends a command to cast `arts`. If it is, it sends a command to cast `addendum`.
+-- It also checks for errors when sending the command and throws an error if one occurs.
+-- @param arts The name of the arts to cast. Must be a string and not nil.
+-- @param addendum The name of the addendum to cast. Must be a string and not nil.
+-- @usage castArtsOrAddendum('Light Arts', 'Addendum: White') -- Casts Light Arts if it is not active, otherwise casts Addendum: White.
+-- @function castArtsOrAddendum
 function castArtsOrAddendum(arts, addendum)
+    -- Check that arts is a string and not nil
+    assert(type(arts) == 'string' and arts ~= nil, 'Invalid arts parameter')
+
+    -- Check that addendum is a string and not nil
+    assert(type(addendum) == 'string' and addendum ~= nil, 'Invalid addendum parameter')
+
+    local command
     if not buffactive[arts] then
-        send_command('input /ja "' .. arts .. '" <me>')
+        command = 'input /ja "' .. arts .. '" <me>'
     else
-        send_command('input /ja "' .. addendum .. '" <me>')
+        command = 'input /ja "' .. addendum .. '" <me>'
     end
+
+    -- Call send_command and check for errors
+    local success, err = pcall(function() send_command(command) end)
+    assert(success, 'Failed to send command: ' .. tostring(err))
 end
 
--- Casts a Scholar spell with the appropriate arts and addendum.
+--- Casts a Scholar spell with the appropriate arts and addendum.
 -- @param spell (string): The name of the spell to cast.
 -- @param arts (string): The name of the art to use (e.g., "Light Arts" or "Dark Arts").
 -- @param addendum (string): The name of the addendum to use (e.g., "Addendum: White" or "Addendum: Black").
@@ -620,26 +1006,63 @@ end
 -- If the art is active but not the addendum, and a stratagem is available, it casts the addendum and then the spell.
 -- If a stratagem is available, it casts the art, then the addendum, then the spell.
 function castSchSpell(spell, arts, addendum)
+    -- Validate input parameters
+    assert(type(spell) == 'string', "Invalid parameters. 'spell' must be a string.")
+    assert(type(arts) == 'string', "Invalid parameters. 'arts' must be a string.")
+    assert(type(addendum) == 'string', "Invalid parameters. 'addendum' must be a string.")
+
     local delay = (spell == 'Sneak' or spell == 'Invisible') and 1 or 2.1
     local targetid, targetname = get_current_target_id_and_name()
 
+    -- Check if the required functions and variables are available
+    assert(send_command, "Required function 'send_command' is not available.")
+    assert(buffactive, "Required variable 'buffactive' is not available.")
+    assert(stratagems_available, "Required function 'stratagems_available' is not available.")
+    assert(add_to_chat, "Required function 'add_to_chat' is not available.")
+
+    local command
     if buffactive[addendum] then
-        send_command('input /ma "' .. spell .. '" ' .. targetid)
-    elseif buffactive[arts] and not buffactive[addendum] and stratagems_available() then
-        send_command('input /ja "' .. addendum .. '" <me>; wait 2; input /ma "' .. spell .. '" ' .. targetid)
+        command = 'input /ma "' .. spell .. '" ' .. targetid
+    elseif buffactive[arts] and not buffactive[addendum] then
+        assert(stratagems_available(), "Aucun stratagème n'est disponible.")
+        command = 'input /ja "' .. addendum .. '" <me>; wait 2; input /ma "' .. spell .. '" ' .. targetid
     elseif stratagems_available() then
-        send_command(
-            'input /ja "' ..
+        command = 'input /ja "' ..
             arts ..
             '" <me>; wait 2; input /ja "' ..
             addendum .. '" <me>; wait ' .. delay .. '; input /ma "' .. spell .. '" ' .. targetid
-        )
+    else
+        add_to_chat(123, "Aucun stratagème n'est disponible.")
+        return
     end
+
+    -- Send the command and handle potential errors
+    local success, err = pcall(function() send_command(command) end)
+    assert(success, "Failed to send command: " .. tostring(err))
 end
 
--- This function handles the commands specific to the Black Mage (BLM) job.
--- @param cmdParams: A table where the first element is the command to be executed.
+--- Handles Black Mage (BLM) commands based on the given command parameters.
+-- This function first checks if the command parameters are valid (i.e., they form a table and contain at least one element, and the first element is a string).
+-- Then, it defines a table of spells, where each key is a command and the value is the function to execute for that command.
+-- Finally, it executes the function corresponding to the given command, or throws an error if no matching command is found.
+-- @function handle_blm_commands
+-- @param cmdParams A table containing the command parameters. The first element should be a string representing the command.
+-- @usage handle_blm_commands({'mainlight'}) -- Executes the function for the 'mainlight' command.
+-- @usage handle_blm_commands({'unknown'}) -- Throws an error "Unknown command: unknown".
+-- @within SharedFunctions
 function handle_blm_commands(cmdParams)
+    -- Check if cmdParams is a table and contains at least one element
+    if type(cmdParams) ~= 'table' or #cmdParams < 1 then
+        error("Invalid command parameters.")
+    end
+
+    -- Check if cmdParams[1] is a string
+    if type(cmdParams[1]) ~= 'string' then
+        error("Command must be a string.")
+    end
+
+    local cmd = cmdParams[1]:lower()
+
     -- Define a table where each key is a command and the value is the function to execute for that command.
     local spells = {
         -- Casts a self buff.
@@ -668,18 +1091,25 @@ function handle_blm_commands(cmdParams)
         end
     }
 
-    -- Convert the command to lower case to ensure case-insensitive matching.
-    local cmd = cmdParams[1]:lower()
-
-    -- If the command exists in the spells table, execute the corresponding function.
+    -- If the command is in the spells table, execute it
     if spells[cmd] then
         spells[cmd]()
     end
 end
 
--- This function handles the commands specific to the Scholar (SCH) subjob.
+--- This function handles the commands specific to the Scholar (SCH) subjob.
 -- @param cmdParams: A table where the first element is the command to be executed.
 function handle_sch_subjob_commands(cmdParams)
+    -- Check if cmdParams is a table and contains at least one element
+    if type(cmdParams) ~= 'table' or #cmdParams < 1 then
+        error("Invalid command parameters.")
+    end
+
+    -- Check if cmdParams[1] is a string
+    if type(cmdParams[1]) ~= 'string' then
+        error("Command must be a string.")
+    end
+
     -- Convert the command to lower case to ensure case-insensitive matching.
     local cmd = cmdParams[1]:lower()
 
@@ -751,22 +1181,38 @@ function handle_sch_subjob_commands(cmdParams)
     end
 end
 
--- This function handles the commands specific to the Warrior (WAR) job.
--- @param cmdParams: A table where the first element is the command to be executed.
+--- Handles the commands specific to the Warrior (WAR) job.
+-- This function checks if the command parameters are valid, converts the command to lower case for case-insensitive matching,
+-- and then executes the corresponding function from the `warCommands` table if it exists.
+-- The `warCommands` table defines the following commands:
+-- * `berserk`: If 'Defender' is active, cancel it and activate 'Berserk'.
+-- * `defender`: If 'Berserk' is active, cancel it and activate 'Defender'. Also, if the hybrid mode is 'Normal', set it to 'PDT'.
+-- * `thirdeye`: Execute the 'ThirdEye' function.
+-- * `jump`: Execute the 'jump' function.
+-- @param cmdParams A table where the first element is the command to be executed. The command must be a string.
+-- @function handle_war_commands
 function handle_war_commands(cmdParams)
+    -- Check if cmdParams is a table and has at least one element
+    if type(cmdParams) ~= 'table' or #cmdParams < 1 then
+        return false
+    end
+
+    -- Check if the first element of cmdParams is a string
+    if type(cmdParams[1]) ~= 'string' then
+        return false
+    end
+
     -- Convert the command to lower case to ensure case-insensitive matching.
     local cmd = cmdParams[1]:lower()
+
     -- Define a table where each key is a command and the value is the function to execute for that command.
     local warCommands = {
-        -- If 'Defender' is active, cancel it and activate 'Berserk'.
         berserk = function()
             if buffactive['Defender'] then
                 send_command('cancel defender')
             end
             buffSelf('Berserk')
         end,
-        -- If 'Berserk' is active, cancel it and activate 'Defender'.
-        -- Also, if the hybrid mode is 'Normal', set it to 'PDT'.
         defender = function()
             if state.HybridMode.value == 'Normal' then
                 send_command('gs c set HybridMode PDT')
@@ -776,21 +1222,38 @@ function handle_war_commands(cmdParams)
             end
             buffSelf('Defender')
         end,
-        -- Execute the 'ThirdEye' function.
         thirdeye = ThirdEye,
-        -- Execute the 'jump' function.
         jump = jump
     }
 
     -- If the command exists in the warCommands table, execute the corresponding function.
     if warCommands[cmd] then
         warCommands[cmd]()
+        return true
     end
+
+    return false
 end
 
--- Handles Thief-specific commands.
--- @param cmdParams: A table where the first element is the command to execute.
+--- Handles the commands specific to the Thief (THF) job.
+-- This function checks if the command parameters are valid, converts the command to lower case for case-insensitive matching,
+-- and then executes the corresponding function from the `thfCommands` table if it exists.
+-- The `thfCommands` table defines the following command:
+-- * `thfbuff`: Applies the Thief-specific buff.
+-- @param cmdParams A table where the first element is the command to be executed. The command must be a string.
+-- @return true if the command was successfully executed, false otherwise.
+-- @function handle_thf_commands
 function handle_thf_commands(cmdParams)
+    -- Check if cmdParams is a table and has at least one element
+    if type(cmdParams) ~= 'table' or #cmdParams < 1 then
+        return false
+    end
+
+    -- Check if the first element of cmdParams is a string
+    if type(cmdParams[1]) ~= 'string' then
+        return false
+    end
+
     -- Convert the command to lower case for case-insensitive comparison.
     local cmd = cmdParams[1]:lower()
 
@@ -802,55 +1265,77 @@ function handle_thf_commands(cmdParams)
         end
     }
 
-    -- If the command exists in the thfCommands table, execute the corresponding function.
     if thfCommands[cmd] then
-        thfCommands[cmd]()
+        -- Check for errors when calling the command function.
+        local status, err = pcall(thfCommands[cmd])
+        if status then
+            return true
+        end
     end
+
+    -- Return false if the command was not recognized or if an error occurred.
+    return false
 end
 
 --- Adjusts the earring equipment based on the player's TP and the spell being cast.
 -- @param spell The spell that the player is casting.
+-- @usage
+-- adjust_Gear_Based_On_TP_For_WeaponSkill({type = 'WeaponSkill', name = 'Exenterator'})
 function adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
-    -- Check if the spell type is a WeaponSkill
-    if spell.type == 'WeaponSkill' then
-        -- Initialize sets.precast.WS[spell.name] to sets.precast.WS if it does not exist
-        if not sets.precast.WS[spell.name] then
-            sets.precast.WS[spell.name] = sets.precast.WS
-        end
-        -- Check if 'Centovente' is equipped as a sub weapon
-        if player.equipment.sub == 'Centovente' then
-            -- Check if player's TP is between 1750 and 2000
-            if player.tp >= 1750 and player.tp < 2000 then
-                sets.precast.WS[spell.name].left_ear = 'MoonShade Earring'
-            else
-                -- Adjust earring based on the spell name and Treasure Hunter status
-                sets.precast.WS[spell.name].left_ear =
-                    (spell.name == 'Exenterator') and 'Dawn Earring' or
-                    ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
-                        (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
-            end
-        else
-            -- If 'Centovente' is not equipped
-            -- Check if player's TP is between 1750 and 2000 or between 2750 and 3000
-            if (player.tp >= 1750 and player.tp < 2000) or (player.tp >= 2750 and player.tp < 3000) then
-                sets.precast.WS[spell.name].left_ear = 'MoonShade Earring'
-            else
-                -- Adjust earring based on the spell name and Treasure Hunter status
-                sets.precast.WS[spell.name].left_ear =
-                    (spell.name == 'Exenterator') and 'Dawn Earring' or
-                    ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
-                        (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
-            end
-        end
+    -- Check if the necessary tables and fields exist
+    -- If not, throw an error to avoid nil errors
+    assert(spell, "Spell is nil")
+    assert(sets and sets.precast and sets.precast.WS, "Required tables do not exist")
+    assert(player and player.equipment and player.tp, "Player information is not available")
+
+    -- Initialize sets.precast.WS[spell.name] to sets.precast.WS if it does not exist
+    -- This avoids nil errors when trying to access sets.precast.WS[spell.name]
+    if not sets.precast.WS[spell.name] then
+        sets.precast.WS[spell.name] = sets.precast.WS
+    end
+
+    -- Adjust the left ear equipment based on the spell name and Treasure Hunter status
+    sets.precast.WS[spell.name].left_ear = adjust_Left_Ear_Equipment(spell, player)
+end
+
+--- Adjusts the left ear equipment based on the spell name, player's TP, and Treasure Hunter status.
+-- @param spell The spell that the player is casting.
+-- @param player The player's current status.
+-- @return The name of the earring to equip.
+function adjust_Left_Ear_Equipment(spell, player)
+    -- Check if 'Centovente' is equipped as a sub weapon and player's TP is between 1750 and 2000
+    -- or if 'Centovente' is not equipped and player's TP is between 1750 and 2000 or between 2750 and 3000
+    -- If so, set the left ear equipment to 'MoonShade Earring'
+    -- Otherwise, adjust the left ear equipment based on the spell name and Treasure Hunter status
+    if ((player.equipment.sub == 'Centovente' and player.tp >= 1750 and player.tp < 2000) or
+            (player.equipment.sub ~= 'Centovente' and ((player.tp >= 1750 and player.tp < 2000) or (player.tp >= 2750 and player.tp < 3000)))) then
+        return 'MoonShade Earring'
+    else
+        return (spell.name == 'Exenterator') and 'Dawn Earring' or
+            ((spell.name == 'Aeolian Edge' and treasureHunter ~= 'None') and 'Sortiarius Earring' or
+                (spell.name == 'Aeolian Edge' and 'Sortiarius Earring' or 'Sherida Earring'))
     end
 end
 
 --- Refines the casting of Utsusemi spells based on their cooldown status.
--- @param spell The spell that the player is casting.
--- @param eventArgs Event arguments that can be modified to change the behavior of the casting.
+-- This function checks the cooldown status of Utsusemi: Ni and Utsusemi: Ichi. If the player is casting Utsusemi: Ni
+-- but it is on cooldown, the function cancels the casting and tries to cast Utsusemi: Ichi instead if it is not on cooldown.
+-- If both spells are on cooldown, the function displays a message.
+-- @param spell The spell that the player is casting. This parameter should be a table with a 'name' field.
+-- @param eventArgs Event arguments that can be modified to change the behavior of the casting. This parameter should be a table.
+-- @usage
+-- refine_Utsusemi(spell, eventArgs)
 function refine_Utsusemi(spell, eventArgs)
+    -- Check if spell and eventArgs are not nil and have the appropriate fields
+    assert(spell ~= nil and type(spell) == 'table' and spell.name ~= nil,
+        'Invalid spell: spell must be a table with a name field')
+    assert(eventArgs ~= nil and type(eventArgs) == 'table', 'Invalid eventArgs: eventArgs must be a table')
+
     -- Get the current cooldown status of all spells
     local spell_recasts = windower.ffxi.get_spell_recasts()
+
+    -- Check if spell_recasts is not nil
+    assert(spell_recasts ~= nil, 'Failed to get spell recasts')
 
     -- Get the cooldown status of Utsusemi: Ni and Utsusemi: Ichi
     local NiCD = spell_recasts[339]
@@ -875,56 +1360,107 @@ function refine_Utsusemi(spell, eventArgs)
             end
         end
     end
+    -- If the player is casting Utsusemi: Ichi
+    if spell.name == 'Utsusemi: Ichi' then
+        -- If Utsusemi: Ichi is on cooldown
+        if IchiCD > 1 then
+            -- Cancel the casting of Utsusemi: Ichi
+            eventArgs.cancel = true
+        end
+    end
 end
 
 -- ===========================================================================================================
 --                                     Equipment Management Functions
 -- ===========================================================================================================
---- Checks and equips the appropriate weapon set based on the player's job and state.
--- This function is specifically designed for the 'THF' and 'BLM' jobs, but also handles other jobs.
--- For 'THF', it checks the 'AbysseaProc' state and equips the corresponding weapon set.
--- For 'BLM', it does not equip any main weapon set.
--- For other jobs, it equips the main or sub weapon set based on the 'weaponType' parameter.
--- @param weaponType A string indicating the type of weapon to check ('main' or 'sub').
+--- Checks and equips the correct weapon set based on the player's main job and the weapon type.
+-- @param weaponType The type of weapon to check. Must be 'main' or 'sub'.
+-- @error If the player is not defined, if the player's main job is not defined, if the weapon type is not valid, if the necessary state variables are not defined, or if one of the weapon sets does not exist.
 function check_weaponset(weaponType)
+    -- Check if player is defined
+    assert(player ~= nil, 'player is nil')
+
+    -- Check if player.main_job is not nil
+    assert(player.main_job ~= nil, 'player.main_job is nil')
+
+    -- Check if weaponType is valid
+    assert(weaponType == 'main' or weaponType == 'sub', 'Invalid weaponType: ' .. tostring(weaponType))
+
     if player.main_job == 'THF' then
-        if state.AbysseaProc ~= nil then
+        -- Check if state variables are not nil
+        assert(state.AbysseaProc ~= nil and state.WeaponSet2 ~= nil and state.WeaponSet1 ~= nil and state.SubSet ~= nil,
+            'state.AbysseaProc, state.WeaponSet2, state.WeaponSet1, or state.SubSet is nil')
+
+        -- Check if sets exist
+        assert(
+            sets[state.WeaponSet1.current] ~= nil and sets[state.WeaponSet2.current] ~= nil and
+            sets[state.SubSet.current] ~= nil, 'One of the sets does not exist')
+
+        if weaponType == 'main' then
             if state.AbysseaProc.value then
                 equip(sets[state.WeaponSet2.current])
             else
                 equip(sets[state.WeaponSet1.current])
             end
-        else
-            equip(sets[state.WeaponSet.current])
-        end
-        if state.SubSet then
+        elseif weaponType == 'sub' then
             equip(sets[state.SubSet.current])
         end
     elseif player.main_job ~= 'BLM' then
+        -- Check if state variables are not nil
+        assert(state.WeaponSet ~= nil and state.SubSet ~= nil, 'state.WeaponSet or state.SubSet is nil')
+
+        -- Check if sets exist
+        assert(sets[state.WeaponSet.current] ~= nil and sets[state.SubSet.current] ~= nil,
+            'One of the sets does not exist')
+
         if weaponType == 'main' then
             equip(sets[state.WeaponSet.current])
-        elseif weaponType == 'sub' and state.SubSet then
+        elseif weaponType == 'sub' then
             equip(sets[state.SubSet.current])
         end
     end
 end
 
--- Function to check if a ranged weapon is equipped and disable/enable the corresponding slots.
--- This is specific to THF job.
+--- Checks if a ranged weapon is equipped and locks or unlocks the range and ammo slots accordingly.
+-- This function checks if the player, player.equipment, and player.equipment.range exist.
+-- If they do, it checks if a ranged weapon is equipped. If a ranged weapon is equipped, it disables the range and ammo slots.
+-- If no ranged weapon is equipped, it enables the range and ammo slots.
+-- If player, player.equipment, or player.equipment.range do not exist, it raises an error.
+-- @function check_range_lock
 function check_range_lock()
+    -- Check if player, player.equipment, and player.equipment.range exist
+    assert(player and player.equipment and player.equipment.range,
+        'player, player.equipment, or player.equipment.range is nil')
+
     if player.equipment.range ~= 'empty' then
-        disable('range', 'ammo') -- Disable the range and ammo slots if a ranged weapon is equipped.
+        -- Try to disable the range and ammo slots if a ranged weapon is equipped.
+        local status, err = pcall(disable, 'range', 'ammo')
+        if not status then
+            err = err or 'Unknown error'
+            assert(status, 'Failed to disable range and ammo slots: ' .. err)
+        end
     else
-        enable('range', 'ammo')  -- Enable the range and ammo slots if no ranged weapon is equipped.
+        -- Try to enable the range and ammo slots if no ranged weapon is equipped.
+        local status, err = pcall(enable, 'range', 'ammo')
+        if not status then
+            err = err or 'Unknown error'
+            err = type(err) == "table" and table.concat(err, ", ") or err
+            assert(status, 'Failed to enable range and ammo slots: ' .. err)
+        end
     end
 end
 
---- Resets the player's equipment to the default set based on their current state.
--- This function determines the base equipment set based on whether the player is engaged or idle.
--- If the player's HybridMode state is set, it equips the corresponding Physical Damage Taken (PDT) or Magical Damage Taken (MDT) set.
--- If the HybridMode state is not set or does not match 'PDT' or 'MDT', it equips the base set.
--- If the Xp state is set, it equips the XP set.
+--- Resets the player's equipment to its default state.
+-- This function first checks the player's status. If the player is in 'Event', 'Mount', 'Crafting', or 'Resting', the function returns without doing anything.
+-- Next, it checks that the player's status is 'Engaged' or 'Idle', and that the necessary equipment sets exist.
+-- It then determines the base equipment set based on the player's status.
+-- If the player is moving and not engaged, the base equipment set is combined with the MoveSpeed equipment set.
+-- Finally, it checks the HybridMode state and adjusts the equipment set accordingly before equipping the player with the final equipment set.
+-- @function reset_to_default_equipment
 function reset_to_default_equipment()
+    -- Check if the necessary equipment sets exist
+    assert(sets.engaged ~= nil and sets.idle ~= nil and sets.MoveSpeed ~= nil, 'Necessary equipment set is nil')
+
     -- Determine the base equipment set based on the player's status
     local baseSet = player.status == 'Engaged' and sets.engaged or sets.idle
 
@@ -953,22 +1489,43 @@ function reset_to_default_equipment()
     end
 end
 
--- Function to handle gear setup upon status change (buff gain or loss).
--- @param playerStatus (string) : The current status of the player.
--- @param eventArgs (table) : Additional event arguments.
+--- Handles the player's equipment based on their status and the event arguments.
+-- This function checks the player's state and the event arguments, and adjusts the player's equipment accordingly.
+-- It also checks if certain functions are not `nil` before calling them, to avoid runtime errors.
+-- @param playerStatus The player's status.
+-- @param eventArgs The event arguments.
+-- @function job_handle_equipping_gear
 function job_handle_equipping_gear(playerStatus, eventArgs)
-    if state.Xp and state.Xp.value == 'True' then
-        reset_to_default_equipment() -- Reset to default equipment
+    assert(playerStatus == nil or type(playerStatus) == 'string', 'playerStatus must be either nil or a string')
+    assert(eventArgs == nil or type(eventArgs) == 'table', 'eventArgs must be either nil or a table')
+    assert(state, 'state must not be nil')
+    assert(state.Xp == nil or type(state.Xp) == "table", 'state.Xp must be either nil or a table')
+    assert(type(reset_to_default_equipment) == 'function', 'reset_to_default_equipment must be a function')
+    assert(type(check_weaponset) == 'function', 'check_weaponset must be a function')
+    assert(type(check_range_lock) == 'function', 'check_range_lock must be a function')
+    -- Checks that `state` and `state.Xp` are not `nil`
+    if state and state.Xp and state.Xp.value == 'True' then
+        if reset_to_default_equipment then -- Checks that `reset_to_default_equipment` is not `nil`
+            reset_to_default_equipment()   -- Resets to the default equipment
+        end
     else
-        -- Check and handle main weapon gear set changes.
-        check_weaponset('main')
-        -- Check and handle sub weapon gear set changes.
-        check_weaponset('sub')
-        reset_to_default_equipment() -- Reset to default equipment
-        -- Only proceed if the player's main job is THF.
-        if player.main_job == 'THF' then
-            -- Check if a ranged weapon is equipped and handle gear setup accordingly.
-            check_range_lock()
+        -- Checks and handles equipment set changes for the main weapon.
+        if check_weaponset then -- Checks that `check_weaponset` is not `nil`
+            check_weaponset('main')
+        end
+        -- Checks and handles equipment set changes for the sub weapon.
+        if check_weaponset then -- Checks that `check_weaponset` is not `nil`
+            check_weaponset('sub')
+        end
+        if reset_to_default_equipment then -- Checks that `reset_to_default_equipment` is not `nil`
+            reset_to_default_equipment()   -- Resets to the default equipment
+        end
+        -- Continues only if the player's main job is 'THF'.
+        if player and player.main_job == 'THF' then
+            -- Checks if a ranged weapon is equipped and handles the equipment setup accordingly.
+            if check_range_lock then -- Checks that `check_range_lock` is not `nil`
+                check_range_lock()
+            end
         end
     end
 end
@@ -979,147 +1536,175 @@ end
 -- @param old_value (any): The old value of the changed field.
 -- This function is typically called when a job state change event occurs to ensure the correct gear sets are used.
 function job_state_change(field, new_value, old_value)
-    -- Handles equipping gear based on the player's state.
-    -- This ensures that the correct gear set is used based on the current state of the player.
+    -- Ensure that check_weaponset is a function
+    assert(type(check_weaponset) == 'function', "Error: check_weaponset is not a function")
+
+    -- Ensure that field, new_value, and old_value are not nil
+    assert(field ~= nil, "Error: field is nil")
+    assert(new_value ~= nil, "Error: new_value is nil")
+    assert(old_value ~= nil, "Error: old_value is nil")
 
     -- Checks and adjusts the main weapon set.
-    -- This ensures that the correct main weapon gear set is used based on the current main weapon.
     check_weaponset('main')
 
     -- Checks and adjusts the sub weapon set.
-    -- This ensures that the correct sub weapon gear set is used based on the current sub weapon.
     check_weaponset('sub')
 end
 
--- This function handles changes in buffs for the player.
--- @param buff: The name of the buff that has changed.
--- @param gain: A boolean indicating whether the buff was gained (true) or lost (false).
+--- @function buff_change
+-- Handles changes in buffs.
+-- @param buff The name of the buff.
+-- @param gain Whether the buff was gained or lost.
 function buff_change(buff, gain)
-    -- Initialize an empty set for equipment
-    local equip_set = {}
+    -- Ensure that buff and gain are not nil
+    assert(buff ~= nil, "Error: buff is nil")
+    assert(gain ~= nil, "Error: gain is nil")
 
-    -- Handle 'Doom' buff changes
+    local equip_set = {}
+    local isMoving = state.Moving.value == 'true'
+    local isTHFOrBLM = player.main_job == 'THF' or player.main_job == 'BLM'
+    local isSneakOrTrick = buff == 'Sneak Attack' or buff == 'Trick Attack'
+    local isBuffActive = state.Buff[buff]
+
     if buff == 'doom' then
         if gain then
-            -- If 'Doom' buff is gained, equip the 'Doom' set and disable the 'neck' slot
             equip_set = sets.buff.Doom
             disable('neck')
-            -- Send a warning message and a party message
             add_to_chat(123, createFormattedMessage('WARNING:', 'Doom', nil, 'is active!', true, nil))
             send_command('input /p [DOOM] <call21>')
         else
-            -- If 'Doom' buff is lost, enable the 'neck' slot and update the gear set
             enable('neck')
             send_command('gs c update')
-            -- Send a message indicating that 'Doom' is no longer active and a party message
             add_to_chat(123, createFormattedMessage(nil, 'Doom', nil, 'is no longer active!', true, nil))
             send_command('input /p [Doom] Off !')
         end
-        -- If the player is moving, combine the 'MoveSpeed' set with the current equipment set
-        if state.Moving.value == 'true' then
+        if isMoving then
             equip_set = set_combine(equip_set, sets.MoveSpeed)
         end
     end
 
-    -- Handle buff changes for 'THF' or 'BLM' main jobs
-    if player.main_job == 'THF' or player.main_job == 'BLM' then
-        if state.Buff[buff] ~= nil then
-            -- If the buff is recognized, update its state and re-equip gear
+    if isTHFOrBLM then
+        if isBuffActive ~= nil then
             state.Buff[buff] = gain
-            handle_equipping_gear(player.status)
         end
-        -- If the player is a 'BLM' and the 'Manawall' buff has changed, handle it
         if player.main_job == 'BLM' and buff == 'Mana Wall' then
             if gain then
-                -- If 'Manawall' is gained, equip the 'Mana Wall' set and disable the 'back' and 'feet' slots
                 equip_set = sets.precast.JA['Mana Wall']
                 disable('back', 'feet')
             else
-                -- If 'Manawall' is lost, enable the 'back' and 'feet' slots
                 enable('back', 'feet')
             end
         end
     end
 
-    -- Check if the buff is active and equip the corresponding gear
-    if state.Buff[buff] then
+    if isBuffActive then
         equip_set = set_combine(equip_set, sets.buff[buff] or {})
-        -- If the 'TreasureMode' is 'SATA' or 'Fulltime', combine the 'TreasureHunter' set with the current equipment set
         if state.TreasureMode and (state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime') then
             equip_set = set_combine(equip_set, sets.TreasureHunter)
         end
     end
 
-    -- Handle 'Sneak Attack' and 'Trick Attack' buffs
-    if buff == 'Sneak Attack' or buff == 'Trick Attack' then
+    if isSneakOrTrick then
         if gain then
-            -- If both 'Sneak Attack' and 'Trick Attack' are active, equip the combined set
             if state.Buff['Sneak Attack'] and state.Buff['Trick Attack'] then
                 equip_set = set_combine(equip_set, sets.buff['Sneak Attack'], sets.buff['Trick Attack'])
             else
-                -- Otherwise, equip the set for the active buff
                 equip_set = set_combine(equip_set, sets.buff[buff])
             end
         else
-            -- If one buff is lost but the other is still active, equip the set for the active buff
             if state.Buff['Sneak Attack'] then
                 equip_set = set_combine(equip_set, sets.buff['Sneak Attack'])
             elseif state.Buff['Trick Attack'] then
                 equip_set = set_combine(equip_set, sets.buff['Trick Attack'])
             else
-                -- If both buffs are lost, revert to the previous gear set
-                if player.status == 'Engaged' then
-                    equip_set = sets.engaged
-                else
-                    equip_set = sets.idle
-                end
+                equip_set = player.status == 'Engaged' and sets.engaged or sets.idle
             end
         end
-        -- Equip the final gear set only if there is a change in the equip_set
         if next(equip_set) then
             equip(equip_set)
         end
-        -- Do not call job_handle_equipping_gear if 'Sneak Attack' or 'Trick Attack' is active
         if not state.Buff['Sneak Attack'] and not state.Buff['Trick Attack'] then
             job_handle_equipping_gear(playerStatus, eventArgs)
         end
     else
-        -- For other buffs, call job_handle_equipping_gear as usual
         job_handle_equipping_gear(playerStatus, eventArgs)
     end
 end
 
--- Customizes a set based on given conditions.
--- It checks each condition in the `conditions` table. If a condition is true, it returns the corresponding set from the `setTable`.
--- If no conditions are met, it returns the default `set`.
+--- Returns a set based on the first true condition.
 -- @param set The default set.
--- @param conditions A table mapping from conditions to boolean values.
--- @param setTable A table mapping from conditions to sets.
--- @return The customized set.
+-- @param conditions A table of conditions.
+-- @param setTable A table mapping conditions to sets.
+-- @return The set corresponding to the first true condition or the default set.
+-- @raise Error if parameters are nil or not tables, or if a true condition is not in setTable.
 function customize_set(set, conditions, setTable)
+    -- Check for null or undefined parameters
+    assert(set and conditions and setTable, "Invalid parameters")
+
+    -- Check that conditions and setTable are tables
+    assert(type(conditions) == "table" and type(setTable) == "table",
+        "Invalid parameters: conditions and setTable must be tables")
+
     for condition, value in pairs(conditions) do
         if value then
+            -- Check that the condition is present in setTable
+            assert(setTable[condition], "Invalid condition: " .. condition)
             return setTable[condition]
         end
     end
     return set
 end
 
--- Generates the conditions and set tables for customization based on the current state.
--- The conditions are based on the `HybridMode` and `Xp` values of the state.
--- The set table maps the conditions to the corresponding sets.
--- @param setPDT_XP The set to use when the `HybridMode` is 'PDT' and `Xp` is 'True'.
--- @param setPDT The set to use when the `HybridMode` is 'PDT' and `Xp` is 'False'.
--- @param setMDT The set to use when the `HybridMode` is 'MDT'.
--- @return The conditions and the set table.
+--- Generates conditions and sets based on the current state.
+-- This function generates a table of conditions and a table of sets based on the current state.
+-- The conditions are determined by the values of `state.HybridMode`, `state.Xp`, and `state.OffenseMode`.
+-- The sets are determined by the input parameters `setPDT_XP`, `setPDT`, `setPDT_ACC`, and `setMDT`.
+-- @param setPDT_XP The set to use when the `PDT_XP` condition is true.
+-- @param setPDT The set to use when the `PDT` condition is true.
+-- @param setPDT_ACC The set to use when the `PDT_ACC` condition is true.
+-- @param setMDT The set to use when the `MDT` condition is true.
+-- @return conditions A table mapping condition names to their truth values.
+-- @return setTable A table mapping condition names to their corresponding sets.
+-- @function get_conditions_and_sets
 function get_conditions_and_sets(setPDT_XP, setPDT, setPDT_ACC, setMDT)
-    local xpValue = state.Xp and state.Xp.value or 'False'
+    -- Check the validity of the parameters
+    if (setPDT_XP ~= nil and type(setPDT_XP) ~= 'table') or
+        (setPDT ~= nil and type(setPDT) ~= 'table') or
+        (setPDT_ACC ~= nil and type(setPDT_ACC) ~= 'table') or
+        (setMDT ~= nil and type(setMDT) ~= 'table') then
+        error("Invalid parameters: setPDT_XP, setPDT, setPDT_ACC and setMDT must be either nil or tables")
+    end
+
+    -- Check that state is a table
+    assert(type(state) == "table", "Invalid state: state must be a table")
+
+    -- Check that state.HybridMode and state.OffenseMode are tables
+    assert(type(state.HybridMode) == "table" and type(state.OffenseMode) == "table",
+        "Invalid state: HybridMode and OffenseMode must be tables")
+
+    -- Check that state.HybridMode.value and state.OffenseMode.value are strings
+    assert(type(state.HybridMode.value) == "string" and type(state.OffenseMode.value) == "string",
+        "Invalid state: HybridMode.value and OffenseMode.value must be strings")
+
+    -- If state.Xp exists and is a table, get its value. Otherwise, set xpValue to 'False'
+    local xpValue = type(state.Xp) == "table" and state.Xp.value or 'False'
+
+    -- Check that xpValue is a string
+    assert(type(xpValue) == "string", "Invalid state: Xp.value must be a string")
+
+    -- Check that setPDT_XP, setPDT, setPDT_ACC and setMDT are either nil or tables
+    assert(
+        (setPDT_XP == nil or type(setPDT_XP) == "table") and
+        (setPDT == nil or type(setPDT) == "table") and
+        (setPDT_ACC == nil or type(setPDT_ACC) == "table") and
+        (setMDT == nil or type(setMDT) == "table"),
+        "Invalid parameters: setPDT_XP, setPDT, setPDT_ACC and setMDT must be either nil or tables")
 
     local conditions = {
         ['PDT_XP'] = state.HybridMode.value == 'PDT' and xpValue == 'True',
         ['PDT'] = state.HybridMode.value == 'PDT' and xpValue == 'False',
         ['PDT_ACC'] = state.HybridMode.value == 'PDT' and state.OffenseMode.value == 'Acc',
-        ['MDT'] = state.HybridMode.value == 'MDT'
+        ['MDT'] = state.HybridMode.value == 'MDT' and xpValue == 'False',
     }
 
     local setTable = {
@@ -1151,69 +1736,182 @@ end
 -- Stratagems are available when 'SCH' is either the player's main or sub job.
 -- @return number: The maximum number of SCH stratagems available, or 0 if 'SCH' is neither the main nor sub job.
 function get_max_stratagem_count()
+    assert(player, "Erreur : l'objet 'player' n'est pas défini.")
+    assert(type(player.main_job) == 'string', "Erreur : 'player.main_job' n'est pas une chaîne.")
+    assert(type(player.sub_job) == 'string', "Erreur : 'player.sub_job' n'est pas une chaîne.")
+    assert(type(player.main_job_level) == 'number', "Erreur : 'player.main_job_level' n'est pas un nombre.")
+    assert(type(player.sub_job_level) == 'number', "Erreur : 'player.sub_job_level' n'est pas un nombre.")
+
     if S { player.main_job, player.sub_job }:contains('SCH') then
         local lvl = player.main_job == 'SCH' and player.main_job_level or player.sub_job_level
-        return math.floor(((lvl - 10) / 20) + 1)
+        if lvl >= 99 then
+            return 5
+        elseif lvl >= 90 then
+            return 5
+        elseif lvl >= 70 then
+            return 4
+        elseif lvl >= 50 then
+            return 3
+        elseif lvl >= 30 then
+            return 2
+        else
+            return 1
+        end
     end
     return 0
 end
 
--- Calculates the number of Scholar (SCH) stratagems currently available for use.
--- @return number: The number of SCH stratagems currently available for use.
+--- Returns the recast time for a stratagem based on the player's job level.
+-- The recast time depends on the player's job level. If the player's main job is 'SCH',
+-- the main job level is used. Otherwise, the sub job level is used. The recast time
+-- decreases as the job level increases.
+-- @return number: The recast time for a stratagem in seconds.
+-- @usage
+-- -- Get the recast time for a stratagem
+-- local recast_time = get_stratagem_recast_time()
+-- print("The recast time for a stratagem is " .. recast_time .. " seconds.")
+function get_stratagem_recast_time()
+    assert(player, "Error: 'player' object is not defined.")
+    assert(type(player.main_job) == 'string', "Error: 'player.main_job' is not a string.")
+    assert(type(player.sub_job) == 'string', "Error: 'player.sub_job' is not a string.")
+    assert(type(player.main_job_level) == 'number', "Error: 'player.main_job_level' is not a number.")
+    assert(type(player.sub_job_level) == 'number', "Error: 'player.sub_job_level' is not a number.")
+
+    local lvl = player.main_job == 'SCH' and player.main_job_level or player.sub_job_level
+    if lvl >= 99 then
+        return 33
+    elseif lvl >= 90 then
+        return 48
+    elseif lvl >= 70 then
+        return 60
+    elseif lvl >= 50 then
+        return 80
+    elseif lvl >= 30 then
+        return 120
+    else
+        return 240
+    end
+end
+
+--- Returns the number of available Scholar (SCH) stratagems.
+-- The number of available stratagems is calculated based on the recast time of the Stratagem ability and the maximum number of stratagems available.
+-- @return number: The number of available SCH stratagems.
+-- @usage
+-- -- Get the number of available stratagems
+-- local available_stratagems = get_available_stratagem_count()
+-- print("The number of available stratagems is " .. available_stratagems)
 function get_available_stratagem_count()
     -- Get the recast time of the Stratagem ability (ID 231)
     local recastTime = windower.ffxi.get_ability_recasts()[231] or 0
+    assert(type(recastTime) == 'number', "Error: 'recastTime' is not a number.")
+
     -- Get the maximum number of stratagems available
     local maxStrats = get_max_stratagem_count()
+    assert(type(maxStrats) == 'number', "Error: 'maxStrats' is not a number.")
+
     -- If no stratagems are available, return 0
     if maxStrats == 0 then
         return 0
     end
+
     -- Calculate the number of stratagems used
-    local stratsUsed = (recastTime / strat_charge_time[maxStrats]):ceil()
+    local stratagemRecastTime = get_stratagem_recast_time()
+    assert(type(stratagemRecastTime) == 'number', "Error: 'stratagemRecastTime' is not a number.")
+
+    local stratsUsed = recastTime > stratagemRecastTime and math.ceil(recastTime / stratagemRecastTime) or 0
+
+    -- If recastTime is equal to stratagemRecastTime, set stratsUsed to 0
+    if recastTime == stratagemRecastTime then
+        stratsUsed = math.floor(recastTime / stratagemRecastTime)
+    end
+
     -- Return the number of stratagems available
-    return maxStrats - stratsUsed
+    return math.max(0, maxStrats - stratsUsed)
 end
 
 -- Checks if there are any Scholar (SCH) stratagems available for use.
 -- @return boolean: True if there are stratagems available, false otherwise.
 function stratagems_available()
-    return get_available_stratagem_count() > 0
+    -- Check that get_available_stratagem_count is a function
+    assert(type(get_available_stratagem_count) == 'function', "Error: 'get_available_stratagem_count' is not a function.")
+
+    -- Call get_available_stratagem_count and check that it returns a number
+    local stratagem_count = get_available_stratagem_count()
+    assert(type(stratagem_count) == 'number', "Error: 'get_available_stratagem_count' did not return a number.")
+
+    return stratagem_count > 0
 end
 
 -- Define a set of commands and their corresponding handlers
 commandFunctions = {
     bufftank = function()
-        bufferRoleForAltRdm(altPlayerName, mainPlayerName, 'bufftank')
+        assert(type(bufferRoleForAltRdm) == 'function', "Error: 'bufferRoleForAltRdm' is not a function.")
+        return bufferRoleForAltRdm('bufftank')
     end,
     buffmelee = function()
-        bufferRoleForAltRdm(altPlayerName, mainPlayerName, 'buffmelee')
+        assert(type(bufferRoleForAltRdm) == 'function', "Error: 'bufferRoleForAltRdm' is not a function.")
+        return bufferRoleForAltRdm('buffmelee')
     end,
     buffrng = function()
-        bufferRoleForAltRdm(altPlayerName, mainPlayerName, 'buffrng')
+        assert(type(bufferRoleForAltRdm) == 'function', "Error: 'bufferRoleForAltRdm' is not a function.")
+        return bufferRoleForAltRdm('buffrng')
     end,
     curaga = function()
-        bufferRoleForAltRdm(altPlayerName, mainPlayerName, 'curaga')
+        assert(type(bufferRoleForAltRdm) == 'function', "Error: 'bufferRoleForAltRdm' is not a function.")
+        return bufferRoleForAltRdm('curaga')
     end,
     debuff = function()
-        bufferRoleForAltRdm(altPlayerName, mainPlayerName, 'debuff')
+        assert(type(bufferRoleForAltRdm) == 'function', "Error: 'bufferRoleForAltRdm' is not a function.")
+        return bufferRoleForAltRdm('debuff')
     end,
     altlight = function()
-        handle_altNuke(altState.Light, altState.Tier, altPlayerName, mainPlayerName, false) -- for 'altLight'
+        assert(type(handle_altNuke) == 'function', "Error: 'handle_altNuke' is not a function.")
+        return handle_altNuke(state.altPlayerLight.value, state.altPlayerTier.value, false) -- for 'altLight'
     end,
     altdark = function()
-        handle_altNuke(altState.Dark, altState.Tier, altPlayerName, mainPlayerName, false) -- for 'altDark'
+        assert(type(handle_altNuke) == 'function', "Error: 'handle_altNuke' is not a function.")
+        return handle_altNuke(state.altPlayerDark.value, state.altPlayerTier.value, false) -- for 'altDark'
     end,
     altra = function()
-        handle_altNuke(altState.Ra, nil, altPlayerName, mainPlayerName, true) -- for 'altRa'
+        assert(type(handle_altNuke) == 'function', "Error: 'handle_altNuke' is not a function.")
+        return handle_altNuke(state.altPlayera.value, nil, true) -- for 'altRa'
     end,
     altindi = function()
-        bubbleBuffForAltGeo(altState.Indi, altPlayerName, false, false) -- for 'altIndi'
+        assert(type(bubbleBuffForAltGeo) == 'function', "Error: 'bubbleBuffForAltGeo' is not a function.")
+        return bubbleBuffForAltGeo(SharedFunctions.altState.Indi, false, false) -- for 'altIndi'
     end,
     altentrust = function()
-        bubbleBuffForAltGeo(altState.Entrust, altPlayerName, mainPlayerName, true, false) -- for 'altEntrust'
+        assert(type(bubbleBuffForAltGeo) == 'function', "Error: 'bubbleBuffForAltGeo' is not a function.")
+        return bubbleBuffForAltGeo(SharedFunctions.altState.Entrust, true, false) -- for 'altEntrust'
     end,
     altgeo = function()
-        bubbleBuffForAltGeo(altState.Geo, altPlayerName, mainPlayerName, false, true) -- for 'altGeo'
+        assert(type(bubbleBuffForAltGeo) == 'function', "Error: 'bubbleBuffForAltGeo' is not a function.")
+        return bubbleBuffForAltGeo(SharedFunctions.altState.Geo, false, true) -- for 'altGeo'
     end,
 }
+
+--- Checks if a spell of type "WeaponSkill" is within range of the target.
+-- @param spell table: A table containing information about the spell. Must include 'type', 'range', 'target' fields.
+-- 'target' should be a table containing 'distance' and 'model_size' fields.
+-- @return Nothing if the spell is within range, otherwise cancels the spell and displays a message in the chat.
+-- @usage Ws_range(spell) -- where 'spell' is a table containing information about the spell.
+function Ws_range(spell)
+    if spell.type == "WeaponSkill" then
+        assert(type(spell) == 'table', "Error: 'spell' is not a table.")
+        assert(type(spell.target) == 'table', "Error: 'spell.target' is not a table.")
+        assert(type(spell.range) == 'number', "Error: 'spell.range' is not a number.")
+        assert(type(spell.type) == 'string', "Error: 'spell.type' is not a string.")
+        assert(type(spell.target.distance) == 'number', "Error: 'spell.target.distance' is not a number.")
+        assert(type(spell.target.model_size) == 'number', "Error: 'spell.target.model_size' is not a number.")
+
+        local mult = 1.55
+        if (spell.target.model_size + spell.range * mult) < spell.target.distance then
+            cancel_spell()
+            local message = createFormattedMessage("[Cancel]", spell.name, nil, "Too Far !", isLastMessage, isColored)
+            add_to_chat(057, message)
+            return
+        end
+    end
+end
+
+return SharedFunctions

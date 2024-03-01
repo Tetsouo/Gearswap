@@ -21,7 +21,6 @@ end
 
 -- Handles user-specific configuration and setup.
 function job_setup()
-    -- Hybrid mode options: 'MagicBurst', 'Normal'
     -- Command to change Casting mode: /console gs c cycle CastingMode
     state.CastingMode:options('MagicBurst', 'Normal')
     state.Xp = M { ['description'] = 'XP', 'False', 'True' }
@@ -69,7 +68,7 @@ function user_setup()
     if (player.main_job == 'SCH' or (player.sub_job == 'SCH' and player.sub_job_level > 0)) then
         send_command('lua l sch-hud')
     end
-    select_default_macro_book()     -- Selects the default macro book based on sub-job
+    select_default_macro_book() -- Selects the default macro book based on sub-job
 end
 
 -- Handles the unload event when changing job or reloading the file.
