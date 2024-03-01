@@ -1,4 +1,4 @@
 Tetsouo.code-workspace
 .gitignore
 .vscode
-.SharedFunctionsTest
+SharedFunctionsTest.lua
