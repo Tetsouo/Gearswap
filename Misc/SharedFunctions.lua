@@ -51,18 +51,10 @@ SharedFunctions.incapacitating_buffs_set = {
 -- @return table A table representing the equipment, with fields for name, priority, bag, and augments.
 -- @usage local equipment = createEquipment("Sword", 1, "Bag1", {"Augment1", "Augment2"})
 function createEquipment(name, priority, bag, augments)
-    if type(name) ~= 'string' then
-        error("Parameter 'name' must be a string")
-    end
-    if priority ~= nil and type(priority) ~= 'number' then
-        error("Parameter 'priority' must be a number or nil")
-    end
-    if bag ~= nil and type(bag) ~= 'string' then
-        error("Parameter 'bag' must be a string or nil")
-    end
-    if augments and type(augments) ~= 'table' then
-        error("Parameter 'augments' must be a table")
-    end
+    assert(type(name) == 'string', "Parameter 'name' must be a string")
+    assert(priority == nil or type(priority) == 'number', "Parameter 'priority' must be a number or nil")
+    assert(bag == nil or type(bag) == 'string', "Parameter 'bag' must be a string or nil")
+    assert(not augments or type(augments) == 'table', "Parameter 'augments' must be a table")
 
     return {
         name = name,
@@ -111,10 +103,10 @@ end
 -- If this function doesn't behave as expected, it could potentially lead to issues.
 function get_current_target_id_and_name()
     local status, target = pcall(windower.ffxi.get_mob_by_target, 'lastst')
-    if status and target then
-        return target.id, target.name
+    if not status or not target then
+        return nil, nil
     end
-    return nil, nil
+    return target.id, target.name
 end
 
 --- Checks if the player is incapacitated by any defined buffs.
@@ -198,12 +190,8 @@ end
 -- It checks the types of its parameters to avoid issues.
 -- @error Raises an error if `tbl` is not a table or if `element` is nil.
 function table.contains(tbl, element)
-    if type(tbl) ~= 'table' then
-        error("tbl must be a table")
-    end
-    if element == nil then
-        error("element cannot be nil")
-    end
+    assert(type(tbl) == 'table', "tbl must be a table")
+    assert(element ~= nil, "element cannot be nil")
     for _, value in pairs(tbl) do
         if value == element then
             return true

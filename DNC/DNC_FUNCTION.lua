@@ -43,11 +43,11 @@ auto_abilities = {
         if player.tp < 800 then
             eventArgs.handled = true
             cancel_spell()
-            local message = createFormattedMessage("", tostring(player.tp) .. ' TP', nil, "Not enough TP !!!", true)
+            local message = createFormattedMessage(nil, tostring(player.tp) .. ' TP', nil, "Not enough TP !!!", true)
             add_to_chat(057, message)
         else
             -- Otherwise, use the 'Contradance' ability.
-            auto_ability(spell, eventArgs, constants.ABILITY_IDS.CONTRADANCE, "2", 'Contradance')
+            auto_ability(spell, eventArgs, constants.ABILITY_IDS.CONTRADANCE, "1.2", 'Contradance')
         end
     end
 }

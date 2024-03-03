@@ -47,6 +47,9 @@ function BuffSelf()
     -- Get the recast times for all spells
     local SpellRecasts = windower.ffxi.get_spell_recasts()
 
+    -- Assert that SpellRecasts is a table
+    assert(type(SpellRecasts) == "table", "Failed to get spell recasts")
+
     -- Define the spells to manage
     local spells = {
         { name = 'Stoneskin',  recast = 54,  delay = 0, buffName = 'Stoneskin',  duration = 488 },
@@ -69,12 +72,15 @@ function BuffSelf()
 
         -- If the spell duration is greater than 0 and the buff is not active or is about to expire
         if spell.duration > 0 and (not buffactive[spell.buffName] or (buffactive[spell.buffName] and spell.recast < 1 and remainingTime <= 30)) then
-            if #readySpells > 0 then
-                -- Increase the total delay
-                totalDelay = totalDelay + spell.delay
+            -- Check if the spell is ready to be cast
+            if spell.recast == 0 then
+                if #readySpells > 0 then
+                    -- Increase the total delay
+                    totalDelay = totalDelay + spell.delay
+                end
+                -- Add the spell to the list of spells ready to be cast
+                table.insert(readySpells, { spell = spell, delay = totalDelay })
             end
-            -- Add the spell to the list of spells ready to be cast
-            table.insert(readySpells, { spell = spell, delay = totalDelay })
         end
     end
 
@@ -122,6 +128,8 @@ function refine_various_spells(spell, eventArgs, spellCorrespondence)
         if replacement == '' and newSpell ~= 'Aspir' and player_mp < (newSpell == 'Aspir' and 10 or 9) then
             -- Cancel the spell
             cancel_spell()
+            -- Cancel the original event
+            eventArgs.cancel = true
             -- Display a message to the player
             windower.add_to_chat(123, createFormattedMessage(
                 'Cannot cast spell:',
@@ -176,13 +184,23 @@ function refine_various_spells(spell, eventArgs, spellCorrespondence)
     end
 end
 
--- Customizes the idle gear set based on specific conditions.
--- Parameters:
---   idleSet (table): The base idle gear set to be customized.
+--- Customizes the idle set based on the current conditions.
+-- This function uses the `customize_set` function to modify the `idleSet` based on the current conditions and the corresponding sets. It checks if the 'Mana Wall' buff is active and, if so, it applies the 'Mana Wall' set to the `idleSet`.
+-- @param idleSet The set to be customized. This should be a table that represents the current idle set. This parameter must not be `nil`.
+-- @return The customized idle set. This will be a table that represents the idle set after it has been modified by the `customize_set` function.
+-- @usage
+-- -- Define the current idle set
+-- local idleSet = { item1 = 'item1', item2 = 'item2' }
+-- -- Customize the idle set
+-- idleSet = customize_idle_set(idleSet)
 function customize_idle_set(idleSet)
+    assert(idleSet, "idleSet must not be nil")
+
     -- Define the conditions and the corresponding sets
     local conditions = { Manawall = Manawall }
     local setTable = { Manawall = sets.buff['Mana Wall'] }
+
+    assert(setTable.Manawall, "'Mana Wall' set must not be nil")
 
     -- Use the customize_set function to customize the idleSet
     return customize_set(idleSet, conditions, setTable)
@@ -191,6 +209,9 @@ end
 -- Function: mergeTables
 -- This function merges two tables together.
 function mergeTables(t1, t2)
+    assert(t1 and type(t1) == 'table', "t1 must be a table")
+    assert(t2 and type(t2) == 'table', "t2 must be a table")
+
     local result = {}
     for k, v in pairs(t1) do
         result[k] = v
@@ -255,6 +276,9 @@ local magicBurstSetHighMP = mergeTables(baseSet, {
 -- Function: SaveMP
 -- Adjusts player's gear based on current MP and casting mode.
 function SaveMP()
+    assert(player.mp, "player.mp must not be nil")
+    assert(state and state.CastingMode and state.CastingMode.value, "state.CastingMode.value must not be nil")
+
     -- If MP is less than 1000, adjust gear based on casting mode.
     if player.mp < 1000 then
         -- If casting mode is 'Normal', use normalSetLowMP. Otherwise, use magicBurstSetLowMP.
@@ -282,6 +306,14 @@ end
 --   spell (table): The spell being cast.
 --   eventArgs (table): Additional event arguments.
 function checkArts(spell, eventArgs)
+    -- Check if the parameters are tables.
+    assert(type(spell) == 'table', "Parameter 'spell' must be a table.")
+    assert(type(eventArgs) == 'table', "Parameter 'eventArgs' must be a table.")
+
+    -- Check if the necessary keys exist in the 'spell' table.
+    assert(spell.skill, "Key 'skill' must exist in the 'spell' table.")
+    assert(spell.name, "Key 'name' must exist in the 'spell' table.")
+
     -- Check if the player's sub-job is Scholar (SCH).
     if player.sub_job == 'SCH' then
         -- Get the recast time for the 'Dark Arts' ability.
