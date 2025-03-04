@@ -109,30 +109,37 @@ function generate_cure_set(spell, target_type)
         CureSelf = set_combine(
             base_set,
             {
-                sub = 'Srivatsa',
-                14,
-                neck = 'Unmoving Collar +1',
-                16,
-                body = 'Rev. Surcoat +3',
-                2,
-                left_ring = 'Supershear Ring',
-                5,
-                right_ring = 'Defending Ring',
-                6,
-                waist = 'Plat. Mog. Belt',
-                17
+                waist = { name = "Plat. Mog. Belt", priority = 13 },
+                head = createEquipment('Souv. Schaller +1', 12),
+                back = createEquipment('Moonlight Cape', 11),
+                hands = createEquipment('Regal Gauntlets', 10),
+                neck = { name = "Unmoving Collar +1", priority = 9 },
+                body = { name = "Souveran cuirass +1", priority = 8 },
+                left_ear = createEquipment('tuisto Earring', 7),
+                right_ring = { name = "Gelatinous Ring +1", priority = 6 },
+                left_ring = { name = "Moonlight Ring", priority = 5 },
+                feet = createEquipment('Odyssean Greaves', 4),
+                legs = createEquipment("Founder's Hose", 0),
+                ammo = createEquipment('staunch Tathlum +1', 1),
+                right_ear = createEquipment('Chev. Earring +1', 0),
             })
         ,
         CureOther = set_combine(
             base_set,
             {
-                neck = 'Sacro Gorget',
-                10,
-                body = SouvBody,
-                left_ring = 'Apeile Ring +1',
-                right_ring = 'Defending Ring',
-                waist = 'Creed Baudrier',
-                4
+                head = createEquipment('Souv. Schaller +1', 13),
+                body = { name = "Souveran cuirass +1", priority = 12 },
+                left_ear = createEquipment('tuisto Earring', 11),
+                hands = createEquipment("Chevalier's Gauntlets +3", 10),
+                legs = createEquipment("Founder's Hose", 9),
+                neck = { name = "Sacro gorget", priority = 8 },
+                feet = createEquipment('Odyssean Greaves', 7),
+                waist = { name = "Audumbla sash", priority = 0 },
+                ammo = createEquipment('staunch Tathlum +1', 0),
+                right_ear = createEquipment('Chev. Earring +1', 0),
+                right_ring = { name = "Apeile Ring +1", priority = 0 },
+                left_ring = { name = "Apeile Ring +1", priority = 0 },
+                back = { name = "Rudianos's Mantle", augments = { 'MND+20', 'Eva.+20 /Mag. Eva.+20', 'MND+10', '"Cure" potency +10%', 'Damage taken-5%', }, priority = 0 },
             }
         )
     }

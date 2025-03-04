@@ -10,13 +10,13 @@
 -- Initializes GearSwap for the Paladin job by setting up the necessary libraries and files.
 -- This function is called once when the script is loaded.
 function get_sets()
-    mote_include_version = 2             -- Specifies the version of the Mote library to use
+    mote_include_version = 2                 -- Specifies the version of the Mote library to use
     -- Include necessary libraries and modules
-    include('Mote-Include.lua')          -- Mote library for GearSwap
-    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
-    include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
-    include('/PLD/PLD_SET.lua')          -- Paladin specific gear sets
-    include('/PLD/PLD_FUNCTION.lua')     -- Advanced functions specific to Paladin
+    include('Mote-Include.lua')              -- Mote library for GearSwap
+    include('/Misc/0_AutoMove.lua')          -- Module for movement speed gear management
+    include('/Misc/SharedFunctions.lua')     -- Shared functions across jobs
+    include('/PLD/PLD_SET.lua')              -- Paladin specific gear sets
+    include('/PLD/PLD_FUNCTION.lua')         -- Advanced functions specific to Paladin
 end
 
 -- Initializes gear sets for the Paladin job.
@@ -26,7 +26,7 @@ end
 
 -- Sets up user-specific configurations and binds keys for the Paladin job.
 function user_setup()
-    select_default_macro_book() -- Selects the default macro book based on sub-job
+    select_default_macro_book()     -- Selects the default macro book based on sub-job
 end
 
 -- Sets up user-specific configurations and binds keys for the Paladin job.
@@ -37,7 +37,7 @@ function job_setup()
     -- Define options for main weapon set
     state.WeaponSet = M { ['description'] = 'Main Weapon', 'Burtgang', 'Naegling', 'Malevo' }
     -- Define options for sub weapon set
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Duban', 'Aegis', 'Ochain', 'Blurred' }
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Duban', 'Aegis'}
     -- Define options for XP mode
     state.Xp = M { ['description'] = 'XP', 'False', 'True' }
     -- Bind keys to cycle through modes and sets
@@ -60,9 +60,9 @@ end
 -- This function is called once when the script is unloaded.
 function file_unload()
     -- Unbind the keys associated with the hybrid mode, weapon set, and sub weapon set.
-    send_command('unbind F9')  -- Unbind key for cycling hybrid mode
-    send_command('unbind F10') -- Unbind key for cycling main weapon set
-    send_command('unbind F11') -- Unbind key for cycling sub weapon set
+    send_command('unbind F9')      -- Unbind key for cycling hybrid mode
+    send_command('unbind F10')     -- Unbind key for cycling main weapon set
+    send_command('unbind F11')     -- Unbind key for cycling sub weapon set
 end
 
 -- Initializes the gear sets for the Paladin job.
@@ -120,16 +120,16 @@ function select_default_macro_book()
 
     -- Set macro book and lockstyle based on sub job
     if player.sub_job == 'BLU' then
-        set_macro_page(1, 23) -- BLU sub job
+        set_macro_page(1, 23)     -- BLU sub job
         send_command('wait 5; input /lockstyleset 3')
     elseif player.sub_job == 'WAR' then
-        set_macro_page(1, 21) -- WAR sub job
+        set_macro_page(1, 21)     -- WAR sub job
         send_command('wait 5; input /lockstyleset 4')
     elseif player.sub_job == 'RDM' then
-        set_macro_page(1, 28) -- RDM sub job
+        set_macro_page(1, 28)     -- RDM sub job
         send_command('wait 5; input /lockstyleset 3')
     else
-        set_macro_page(1, 23) -- Default for other sub jobs
+        set_macro_page(1, 23)     -- Default for other sub jobs
         send_command('wait 5; input /lockstyleset 3')
     end
 

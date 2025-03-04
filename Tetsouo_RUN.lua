@@ -10,13 +10,9 @@
 -- Initializes GearSwap for the Paladin job by setting up the necessary libraries and files.
 -- This function is called once when the script is loaded.
 function get_sets()
-    mote_include_version = 2             -- Specifies the version of the Mote library to use
-    -- Include necessary libraries and modules
+    mote_include_version = 2
     include('Mote-Include.lua')          -- Mote library for GearSwap
     include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
-    include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
-    include('/RUN/RUN_SET.lua')          -- Paladin specific gear sets
-    include('/RUN/RUN_FUNCTION.lua')     -- Advanced functions specific to Paladin
 end
 
 -- Initializes gear sets for the Paladin job.

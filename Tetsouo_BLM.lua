@@ -53,7 +53,7 @@ function job_setup()
     -- Command to change Aja mode: /console gs c cycle altPlayera
     state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
     -- Command to change Aja mode: /console gs c cycle altPlayerGeo
-    state.altPlayerGeo = M('Geo-Precision', 'Geo-Malaise', 'Geo-Refresh', 'Geo-Languor')
+    state.altPlayerGeo = M('Geo-Focus', 'Geo-Precision', 'Geo-Malaise', 'Geo-Refresh', 'Geo-Languor')
     -- Command to change Aja mode: /console gs c cycle altPlayerGeo
     state.altPlayerIndi = M('Indi-Acumen', 'Indi-Refresh',
         'Indi-Haste')
@@ -64,17 +64,15 @@ function job_setup()
     send_command('bind F9 gs c cycle CastingMode')
 end
 
+-- Function called during user setup at the start or after a job change
 function user_setup()
-    if (player.main_job == 'SCH' or (player.sub_job == 'SCH' and player.sub_job_level > 0)) then
-        send_command('lua l sch-hud')
-    end
-    select_default_macro_book() -- Selects the default macro book based on sub-job
+    -- Calls a function to select the default macro book based on the sub-job
+    select_default_macro_book()
 end
 
 -- Handles the unload event when changing job or reloading the file.
 function file_unload()
     -- Unbinds the keys associated with the states.
-    send_command('lua unload sch-hud')
     send_command('unbind F9')
 end
 

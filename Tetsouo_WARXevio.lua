@@ -14,10 +14,9 @@ function get_sets()
     -- Include necessary libraries and modules
     include('Mote-Include.lua')          -- Mote library for GearSwap
     include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
-    include('/WAR/WAR_FUNCTION.lua')     -- Advanced functions specific to Warrior
     include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
-    include('/WAR/WAR_SET.lua')          -- Warrior specific gear sets
-    removeRetaliationOnLongMovement()
+    include('/WAR/WAR_SET_Xevio.lua')    -- Warrior specific gear sets
+    include('/WAR/WAR_FUNCTION.lua')     -- Advanced functions specific to Warrior
 end
 
 function init_gear_sets()
@@ -30,8 +29,8 @@ function job_setup()
     state.HybridMode:options('PDT', 'Normal')
 
     -- Sets the options for the main weapon set.
-    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Ukonvasara', 'Chango', 'Naegling', 'Shining', 'Loxotic' }
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Utu Grip', 'Blurred Shield +1' }
+    state.WeaponSet = M { ['description'] = 'Main Weapon','Shining', 'Ukonvasara',}
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Utu Grip'}
     state.ammoSet = M { ['description'] = 'Ammo', 'Aurgelmir Orb +1' }
 
     -- Binds keys to cycle through hybrid modes and weapon sets.
@@ -64,43 +63,20 @@ function file_unload()
     send_command('unbind F11')
 end
 
--- =========================================================================================================
--- Function: job_precast
 -- Prepares for the casting of a spell or ability.
--- Handles Weapon Skill (WS) gear selection based on TP thresholds and custom WS modes.
---
+-- This function is called before each spell or ability is cast.
 -- Parameters:
---   spell (table): The spell being cast.
---   action (table): The action being performed.
---   spellMap (string): The mapping of the spell, used for categorization.
---   eventArgs (table): Additional event arguments.
--- =========================================================================================================
+--   spell (table): The spell being cast
+--   action (table): The action being performed
+--   spellMap (table): The spell mapping table
+--   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    -- Handle the spell casting logic
+    -- Handle the spell casting
     handle_spell(spell, eventArgs, auto_abilities)
-
-    -- Check and display the recast cooldown for the spell
+    -- Check and display the recast cooldown
     checkDisplayCooldown(spell, eventArgs)
-
-    -- Ensure the spell is within weapon skill range
     Ws_range(spell)
-
-    -- If the spell is a Weapon Skill, handle gear selection
-    if spell.type == 'WeaponSkill' then
-        -- Determine the custom WS mode based on TP thresholds
-        local wsmode = get_custom_wsmode(spell, spellMap)
-
-        -- Select and equip the appropriate gear set
-        local ws_set = sets.precast.WS[spell.english] or sets.precast.WS
-        if wsmode and ws_set[wsmode] then
-            equip(ws_set[wsmode])
-        else
-            equip(ws_set)
-        end
-
-        -- Prevent default gear handling since gear has already been equipped
-        eventArgs.handled = true
-    end
+    adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
 end
 
 -- Manages actions during the casting of a spell or ability.

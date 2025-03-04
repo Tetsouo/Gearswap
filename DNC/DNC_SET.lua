@@ -42,11 +42,14 @@ Senuna.WS1 = createEquipment("Senuna's Mantle", nil, nil,
 --                                           Equipments - Weapon Sets
 -- =========================================================================================================
 sets['Twashtar'] = { main = createEquipment('Twashtar') }
+sets['Mpu Gandring'] = { main = createEquipment('Mpu Gandring') }
+sets['Demersal'] = { main = createEquipment('Demers. Degen +1') }
 sets['Tauret'] = { main = createEquipment('Tauret') }
 sets['Aern Dagger II'] = { main = createEquipment('Aern Dagger II') }
 sets['Centovente'] = { sub = createEquipment('Centovente') }
 sets['Blurred'] = { sub = createEquipment('Blurred Knife +1') }
 sets['Gleti'] = { sub = createEquipment("Gleti's Knife") }
+sets['Aurgelmir'] = { ammo = createEquipment("Aurgelmir Orb +1") }
 
 -- =========================================================================================================
 --                                           Equipments - Idle and Defense Sets
@@ -78,84 +81,76 @@ sets.ExtraRegen = {
     feet = createEquipment('Meg. Jam. +2'),
     left_ear = createEquipment('Dawn Earring'),
     right_ear = createEquipment('Infused Earring'),
-    left_ring = createEquipment('ChirichRing1'),
-    right_ring = createEquipment('ChirichRing2')
+    left_ring = ChirichRing1,
+    right_ring = ChirichRing2,
 }
 
 -- =========================================================================================================
 --                                           Equipments - Engaged Sets
 -- =========================================================================================================
 sets.engaged = {
-    ammo = createEquipment('Aurgelmir Orb +1'),
-    head = createEquipment('Adhemar Bonnet +1', nil, nil, { 'STR+12', 'DEX+12', 'Attack+20' }),
-    body = createEquipment('Horos Casaque +3'),
-    hands = createEquipment('Adhemar Wrist. +1', nil, nil, { 'STR+12', 'DEX+12', 'Attack+20' }),
-    legs = createEquipment('Samnuha Tights', nil, nil, { 'STR+10', 'DEX+10', '"Dbl.Atk."+3', '"Triple Atk."+3' }),
-    feet = createEquipment('Horos T. Shoes +3'),
-    neck = createEquipment('Etoile Gorget +2'),
-    waist = createEquipment('Windbuffet Belt +1'),
-    left_ear = createEquipment('Sherida Earring'),
-    right_ear = createEquipment('Crep. Earring'),
-    left_ring = createEquipment('Hetairoi Ring'),
-    right_ring = createEquipment("Epona's Ring"),
+    ammo = "Aurgelmir Orb +1",
+    head = "Maculele Tiara +3",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Malignance Tights",
+    feet = "Macu. Toe Sh. +3",
+    neck = "Etoile Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Sherida Earring",
+    right_ear = "Crep. Earring",
+    left_ring = "Gere Ring",
+    right_ring = "Defending Ring",
     back = Senuna.STP
 }
 
-sets.engaged.Acc =
-    set_combine(
-        sets.engaged,
-        {
-            ammo = createEquipment('Aurgelmir Orb +1'),
-            neck = createEquipment('Etoile Gorget +2'),
-            waist = createEquipment('Kentarch Belt +1'),
-            left_ear = createEquipment('Sherida Earring'),
-            right_ear = createEquipment('Crep. Earring'),
-            left_ring = createEquipment('Chirich Ring +1'),
-            right_ring = createEquipment('Chirich Ring +1')
-        }
-    )
+sets.engaged.Acc = set_combine(sets.engaged, {
+    ammo = createEquipment('Aurgelmir Orb +1'),
+    neck = createEquipment('Etoile Gorget +2'),
+    waist = createEquipment('Kentarch Belt +1'),
+    left_ear = createEquipment('Sherida Earring'),
+    right_ear = createEquipment('Crep. Earring'),
+    left_ring = createEquipment('Chirich Ring +1'),
+    right_ring = createEquipment('Chirich Ring +1')
+})
 
 sets.engaged.Evasion =
-    set_combine(
-        sets.engaged,
-        {
-            head = createEquipment('Maculele Tiara +3'),
-            body = createEquipment('Macu. casaque +3'),
-            hands = createEquipment('Macu. Bangles +3'),
-            legs = createEquipment('Maculele Tights +3'),
-            feet = createEquipment('Macu. Toe Sh. +3')
-        }
-    )
+    set_combine(sets.engaged, {
+        head = createEquipment('Maculele Tiara +3'),
+        body = createEquipment('Macu. casaque +3'),
+        hands = createEquipment('Macu. Bangles +3'),
+        legs = createEquipment('Maculele Tights +3'),
+        feet = createEquipment('Macu. Toe Sh. +3')
+    })
 
-sets.engaged.PDT =
-    set_combine(
-        sets.engaged,
-        {
-            head = createEquipment('Malignance Chapeau'),
-            body = createEquipment('Macu. casaque +3'),
-            hands = createEquipment('Macu. Bangles +3'),
-            legs = createEquipment('Malignance Tights'),
-            feet = createEquipment('Macu. Toe Sh. +3')
-        }
-    )
+sets.engaged.PDT = set_combine(sets.engaged, {
+    ammo = "Coiste Bodhar",
+    head = "Malignance Chapeau",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Samnuha Tights",
+    feet = "Macu. Toe Sh. +3",
+    neck = "Etoile Gorget +2",
+    waist = "Windbuffet Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Macu. Earring +1",
+    ring1 = "Epona's Ring",
+    ring2 = "Gere Ring",
+    back = "Senuna's Mantle",
+})
 
-sets.engaged.Acc.PDT =
-    set_combine(
-        sets.engaged.PDT,
-        {
-            ammo = createEquipment('Aurgelmir Orb +1'),
-            head = createEquipment('Maculele Tiara +3'),
-            legs = createEquipment('Maculele Tights +3'),
-            neck = createEquipment('Etoile Gorget +2'),
-            waist = createEquipment('Kentarch Belt +1'),
-            left_ear = createEquipment('Sherida Earring'),
-            right_ear = createEquipment('Crep. Earring'),
-            left_ring = createEquipment('Chirich Ring +1'),
-            right_ring = createEquipment('Defending Ring'),
-            back = createEquipment("Senuna's Mantle", nil, nil,
-                { 'DEX+20', 'Accuracy+20 Attack+20', 'DEX+10', '"Dbl.Atk."+10', 'Damage taken-5%' })
-        }
-    )
+sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
+    ammo = createEquipment('Aurgelmir Orb +1'),
+    head = createEquipment('Maculele Tiara +3'),
+    legs = createEquipment('Maculele Tights +3'),
+    neck = createEquipment('Etoile Gorget +2'),
+    waist = createEquipment('Kentarch Belt +1'),
+    left_ear = createEquipment('Sherida Earring'),
+    right_ear = createEquipment('Crep. Earring'),
+    left_ring = createEquipment('Chirich Ring +1'),
+    right_ring = createEquipment('Defending Ring'),
+    back = Senuna.STP
+})
 
 sets.engaged.Acc.Evasion = set_combine(sets.engaged.Acc, sets.engaged.Evasion)
 
@@ -175,7 +170,7 @@ sets.buff['Saber Dance'] = {
 }
 
 sets.buff['Fan Dance'] = {
-    legs = createEquipment('horos bangles +3')
+    hands = createEquipment('horos bangles +3')
 }
 
 sets.buff['Climactic Flourish'] = {
@@ -217,18 +212,18 @@ sets.precast.Waltz = {
 sets.precast.Waltz['Healing Waltz'] = set_combine(sets.precast.Waltz, {})
 
 sets.precast.Samba = {
-    head = createEquipment('Maxixi Tiara +2'),
+    head = createEquipment('Maxixi Tiara +3'),
     back = Senuna.STP
 }
 
 sets.precast.Jig = {
     legs = createEquipment('horos tights +3'),
-    feet = createEquipment('Maxixi Toe Shoes +2')
+    feet = createEquipment('Maxixi Toe Shoes +3')
 }
 
 sets.precast.Step = {
     ammo = createEquipment('Ginsen'),
-    head = createEquipment('Maxixi Tiara +2'),
+    head = createEquipment('Maxixi Tiara +3'),
     body = createEquipment('Macu. casaque +3'),
     hands = createEquipment('maxixi bangles +3'),
     legs = createEquipment('Maculele Tights +3'),
@@ -242,9 +237,7 @@ sets.precast.Step = {
     back = createEquipment('Toetapper Mantle')
 }
 
-sets.precast.Step['Feather Step'] = {
-    feet = createEquipment('Maculele toe shoes +3')
-}
+sets.precast.Step['Feather Step'] = { feet = createEquipment('Maculele toe shoes +3') }
 
 sets.precast.Flourish1 = {}
 
@@ -301,37 +294,21 @@ sets.precast.Flourish2['Reverse Flourish'] = {
 -- =========================================================================================================
 sets.precast.FC = {
     ammo = createEquipment('Sapience Orb'),
-    head = createEquipment('Maculele Tiara +3'),
-    body = createEquipment('Macu. casaque +3'),
-    hands = createEquipment('Macu. Bangles +3'),
-    legs = createEquipment('Maculele Tights +3'),
+    head = HerculeanHelm,
+    body = createEquipment('Macu. Casaque +3'),
+    hands = createEquipment('Leyline Gloves'),
+    legs = createEquipment('Limbo Trousers'),
     feet = createEquipment('Macu. Toe Sh. +3'),
     neck = createEquipment('Voltsurge Torque'),
+    waist = createEquipment('Svelt. Gouriz +1'),
     left_ear = createEquipment('Loquac. Earring'),
-    right_ear = createEquipment('Enchntr. Earring +1')
+    right_ear = createEquipment('Enchntr. Earring +1'),
+    left_ring = createEquipment('Prolix Ring'),
+    right_ring = createEquipment('Defending Ring'),
+    back = Senuna.STP,
 }
 
-sets.precast.FC.Utsusemi = set_combine(
-    sets.precast.FC,
-    {
-        ammo = createEquipment('Sapience Orb'),
-        head = createEquipment('Herculean Helm', nil, nil,
-            { 'Mag. Acc.+14 "Mag.Atk.Bns."+14', 'Weapon skill damage +3%', 'Mag. Acc.+13', '"Mag.Atk.Bns."+15' }),
-        body = createEquipment('Macu. Casaque +3'),
-        hands = createEquipment('Leyline Gloves', nil, nil,
-            { 'Accuracy+14', 'Mag. Acc.+13', '"Mag.Atk.Bns."+13', '"Fast Cast"+2' }),
-        legs = createEquipment('Limbo Trousers'),
-        feet = createEquipment('Macu. Toe Sh. +3'),
-        neck = createEquipment('Voltsurge Torque'),
-        waist = createEquipment('Svelt. Gouriz +1'),
-        left_ear = createEquipment('Loquac. Earring'),
-        right_ear = createEquipment('Enchntr. Earring +1'),
-        left_ring = createEquipment('Prolix Ring'),
-        right_ring = createEquipment('Defending Ring'),
-        back = createEquipment("Senuna's Mantle", nil, nil,
-            { 'DEX+20', 'Accuracy+20 Attack+20', 'DEX+10', '"Dbl.Atk."+10', 'Damage taken-5%' })
-    }
-)
+sets.precast.FC.Utsusemi = sets.precast.FC
 
 -- =========================================================================================================
 --                                           Equipments - Midcast Sets
@@ -358,77 +335,141 @@ sets.precast.WS = {
     back = Senuna.WS1
 }
 
-sets.precast.WS['Exenterator'] =
-    set_combine(
-        sets.precast.WS,
-        {
-            body = createEquipment('Mummu Jacket +2'),
-            hands = createEquipment('Mummu Wrists +2'),
-            legs = createEquipment('Mummu Kecks +2'),
-            feet = createEquipment('Mummu Gamash. +2'),
-            left_ear = createEquipment('Sherida Earring'),
-            left_ring = createEquipment('Mummu Ring')
-        }
-    )
+sets.precast.WS['Exenterator'] = set_combine(sets.precast.WS, {
+    ammo = createEquipment("Crepuscular Pebble"),
+    head = createEquipment("Maculele Tiara +3"),
+    body = createEquipment("Gleti's Cuirass"),
+    hands = createEquipment("Macu. Bangles +3"),
+    legs = createEquipment("Maculele Tights +3"),
+    feet = createEquipment("Macu. Toe Sh. +3"),
+    neck = createEquipment("Fotia Gorget"),
+    waist = createEquipment("Fotia Belt"),
+    ear1 = createEquipment("Sherida Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Gere Ring"),
+    ring2 = createEquipment("Defending Ring"),
+    back = Senuna.WS1,
+})
 
-sets.precast.WS['Evisceration'] =
-    set_combine(
-        sets.precast.WS,
-        {
-            ammo = createEquipment('Charis Feather'),
-            hands = createEquipment('Mummu Wrists +2'),
-            legs = createEquipment('Samnuha Tights', nil, nil, { 'STR+10', 'DEX+10', '"Dbl.Atk."+3', '"Triple Atk."+3' }),
-            left_ear = createEquipment('Sherida Earring')
-        }
-    )
+sets.precast.WS['Evisceration'] = set_combine(sets.precast.WS, {
+    ammo = createEquipment("Charis Feather"),
+    head = createEquipment("Adhemar Bonnet +1"),
+    body = createEquipment("Gleti's Cuirass"),
+    hands = createEquipment("Adhemar Wrist. +1"),
+    legs = createEquipment("Gleti's Breeches"),
+    feet = createEquipment("Gleti's Boots"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Fotia Belt"),
+    ear1 = createEquipment("Odr Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Regal Ring"),
+    ring2 = createEquipment("Gere Ring"),
+    back = Senuna.WS1,
+})
 
-sets.precast.WS["Rudra's Storm"] =
-    set_combine(
-        sets.precast.WS,
-        {
-            head = createEquipment('Maculele Tiara +3'),
-            neck = createEquipment('Etoile Gorget +2'),
-            body = createEquipment("Gleti's Cuirass"),
-            hands = createEquipment('maxixi bangles +3'),
-            waist = createEquipment('Kentarch belt +1'),
-            ammo = createEquipment('Charis Feather')
-        }
-    )
+sets.precast.WS["Rudra's Storm"] = {
+    ammo = createEquipment("Crepuscular Pebble"),
+    head = createEquipment("Maculele Tiara +3"),
+    body = createEquipment("Gleti's Cuirass"),
+    hands = createEquipment("Maxixi Bangles +3"),
+    legs = createEquipment("Maculele Tights +3"),
+    feet = createEquipment("Lustra. Leggings +1"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Kentarch Belt +1"),
+    ear1 = createEquipment("Moonshade Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Epaminondas's Ring"),
+    ring2 = createEquipment("Cornelia's ring"),
+    back = createEquipment("Senuna's Mantle"),
+}
 
-sets.precast.WS['Shark Bite'] =
-    set_combine(
-        sets.precast.WS,
-        {
-            head = createEquipment('Maculele Tiara +3'),
-            body = createEquipment('Herculean Vest'),
-            hands = createEquipment('maxixi bangles +3'),
-            waist = createEquipment('Kentarch belt +1'),
-            feet = createEquipment('Herculean Boots')
-        }
-    )
+sets.precast.WS["Rudra's Storm"].Clim = {
+    ammo = createEquipment("Charis Feather"),
+    head = createEquipment("Maculele Tiara +3"),
+    body = createEquipment("Meg. Cuirie +2"),
+    hands = createEquipment("Maxixi Bangles +3"),
+    legs = createEquipment("Maculele Tights +3"),
+    feet = createEquipment("Lustra. Leggings +1"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Kentarch Belt +1"),
+    ear1 = createEquipment("Moonshade Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Epaminondas's Ring"),
+    ring2 = createEquipment("Cornelia's ring"),
+    back = Senuna.WS1,
+}
 
-sets.precast.WS['Pyrrhic Kleos'] =
-    set_combine(
-        sets.precast.WS,
-        {
-            head = createEquipment("Gleti's Mask"),
-            body = createEquipment("Gleti's Cuirass"),
-            hands = createEquipment("Gleti's Gauntlets"),
-            legs = createEquipment("Gleti's Breeches"),
-            feet = createEquipment("Gleti's Boots")
-        }
-    )
+sets.precast.WS["Ruthless Stroke"] = {
+    head = createEquipment("Maculele Tiara +3"),
+    body = createEquipment("Gleti's Cuirass"),
+    hands = createEquipment("Maxixi Bangles +3"),
+    legs = createEquipment("Gleti's Breeches"),
+    feet = createEquipment("Macu. Toe Sh. +3"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Kentarch Belt +1"),
+    ear1 = createEquipment("Moonshade Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Defending Ring"),
+    ring2 = createEquipment("Cornelia's ring"),
+    back = Senuna.WS1,
+}
+
+sets.precast.WS['Shark Bite'] = {
+    ammo = createEquipment("Crepuscular Pebble"),
+    head = createEquipment("Maculele Tiara +3"),
+    body = createEquipment("Gleti's Cuirass"),
+    hands = createEquipment("Maxixi Bangles +3"),
+    legs = createEquipment("Maculele Tights +3"),
+    feet = createEquipment("Gleti's Boots"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Sailfi Belt +1"),
+    ear1 = createEquipment("Moonshade Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Epaminondas's Ring"),
+    ring2 = createEquipment("Cornelia's ring"),
+    back = Senuna.WS1,
+}
+
+sets.precast.WS['Shark Bite'].Clim = {
+    ammo = createEquipment("Charis Feather"),
+    head = createEquipment("Maculele Tiara +3"),
+    body = createEquipment("Meg. Cuirie +2"),
+    hands = createEquipment("Maxixi Bangles +3"),
+    legs = createEquipment("Maculele Tights +3"),
+    feet = createEquipment("Gleti's Boots"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Kentarch Belt +1"),
+    ear1 = createEquipment("Moonshade Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Epaminondas's Ring"),
+    ring2 = createEquipment("Cornelia's ring"),
+    back = Senuna.WS1,
+}
+
+sets.precast.WS['Pyrrhic Kleos'] = set_combine(sets.precast.WS, {
+    ammo = createEquipment("Crepuscular Pebble"),
+    head = createEquipment("Gleti's Mask"),
+    body = createEquipment("Gleti's Cuirass"),
+    hands = createEquipment("Gleti's Gauntlets"),
+    legs = createEquipment("Maculele Tights +3"),
+    feet = createEquipment("Lustra. Leggings +1"),
+    neck = createEquipment("Etoile Gorget +2"),
+    waist = createEquipment("Fotia Belt"),
+    ear1 = createEquipment("Sherida Earring"),
+    ear2 = createEquipment("Macu. Earring +1"),
+    ring1 = createEquipment("Epona's Ring"),
+    ring2 = createEquipment("Gere Ring"),
+    back = Senuna.WS1,
+
+})
 
 sets.precast.WS['Aeolian Edge'] = {
     ammo = createEquipment("Oshasha's Treatise"),
-    head = createEquipment('Herculean Helm', nil, nil,
-        { '"Mag.Atk.Bns."+20', 'Weapon skill damage +5%', 'INT+8', 'Mag. Acc.+1', }),
-    body = createEquipment('Herculean Vest', nil, nil, { '"Mag.Atk.Bns."+21', 'Weapon skill damage +5%', 'MND+9' }),
-    hands = createEquipment('Herculean Gloves', nil, nil,
-        { 'Rng.Acc.+25', 'Pet: Mag. Acc.+18', 'Weapon skill damage +7%', 'Mag. Acc.+20 "Mag.Atk.Bns."+20' }),
-    legs = createEquipment('Herculean Trousers', nil, nil,
-        { '"Mag.Atk.Bns."+23', 'Weapon skill damage +4%', 'INT+10', 'Mag. Acc.+5' }),
-    feet = createEquipment('Herculean Boots', nil, nil, { '"Mag.Atk.Bns."+25', 'Weapon skill damage +4%', 'STR+9' }),
+    head = createEquipment('Nyame Helm'),
+    body = createEquipment('Nyame Mail'),
+    hands = createEquipment('Nyame Gauntlets'),
+    legs = createEquipment('Nyame Flanchard'),
+    feet = createEquipment('Nyame Sollerets'),
     neck = createEquipment('Sibyl Scarf'),
     waist = createEquipment("Orpheus's Sash"),
     left_ear = createEquipment('Sortiarius Earring'),
@@ -438,25 +479,17 @@ sets.precast.WS['Aeolian Edge'] = {
     back = Senuna.WS1
 }
 
-sets.AeolianTH =
-    set_combine(
-        sets.precast.WS['Aeolian Edge'],
-        {
-            head = createEquipment('Herculean Helm', nil, nil, { 'MND+1', 'Attack+23', '"Treasure Hunter"+2' }),
-            legs = createEquipment('Herculean Trousers', nil, nil,
-                { 'Rng.Acc.+13', 'Attack+9', '"Treasure Hunter"+2', 'Mag. Acc.+6 "Mag.Atk.Bns."+6' })
-        }
-    )
+sets.AeolianTH = set_combine(sets.precast.WS['Aeolian Edge'], {
+    head = createEquipment('Herculean Helm', nil, nil, { 'MND+1', 'Attack+23', '"Treasure Hunter"+2' }),
+    legs = createEquipment('Herculean Trousers', nil, nil,
+        { 'Rng.Acc.+13', 'Attack+9', '"Treasure Hunter"+2', 'Mag. Acc.+6 "Mag.Atk.Bns."+6' })
+})
 
-sets.precast.Skillchain =
-    set_combine(
-        sets.precast.WS["Rudra's Storm"],
-        {
-            hands = createEquipment('Maculele Bangles +3'),
-            legs = createEquipment('maxixi tights + 2'),
-            right_ear = createEquipment('Macu. Earring +1'),
-        }
-    )
+sets.precast.Skillchain = set_combine(sets.precast.WS["Rudra's Storm"], {
+    hands = createEquipment('Maculele Bangles +3'),
+    legs = createEquipment('maxixi tights +2'),
+    right_ear = createEquipment('Macu. Earring +1'),
+})
 
 -- =========================================================================================================
 --                                           Equipments - Movement Sets

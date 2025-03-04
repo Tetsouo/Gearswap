@@ -40,14 +40,14 @@ function job_setup()
     state.Buff['Trick Attack'] = buffactive['trick attack'] or false
     state.Buff['Feint'] = buffactive['feint'] or false
     -- Configures hybrid and offense mode options
-    state.HybridMode:options('PDT', 'Normal')
+    state.HybridMode:options('PDT', 'Normal', 'MDT')
     state.OffenseMode:options('Normal', 'Acc')
     -- Define options for AbysseaProc mode
     state.AbysseaProc = M(false, 'Abyssea Proc')
     -- Configures gear sets for main and sub weapons
-    state.WeaponSet1 = M { ['description'] = 'Main Weapon', 'Vajra', 'Malevolence' }
+    state.WeaponSet1 = M { ['description'] = 'Main Weapon', 'Vajra', 'Malevolence', 'Mpu Gandring', 'Tauret', 'Dagger' }
     state.WeaponSet2 = M { ['description'] = 'Main Weapon', 'Dagger', 'Sword', 'Great Sword', 'Polearm', 'Club', 'Staff', 'Scythe' }
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'TwashtarS', 'Gleti', 'Centovente' }
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Centovente', 'Crepu', 'TwashtarS', 'Jugo', 'Gleti' }
     -- Sets up default job ability IDs for actions that always have Treasure Hunter
     info.default_ja_ids = S { 35, 204 }
     info.default_u_ja_ids = S { 201, 202, 203, 205, 207 }

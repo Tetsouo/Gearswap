@@ -28,7 +28,7 @@ sets.idle = {
     neck = createEquipment('Loricate Torque +1'),
     waist = createEquipment('Acuity Belt +1'),
     left_ear = createEquipment('Ethereal Earring'),
-    right_ear = createEquipment('Lugalbanda Earring'),
+    right_ear = createEquipment('Infused Earring'),
     left_ring = StikiRing1,
     right_ring = StikiRing2,
     back = createEquipment("Taranus's Cape"),
@@ -90,55 +90,38 @@ sets.precast.JA.Manafont = { body = createEquipment("Archmage's Coat +1") }
 --                                           Equipments - Fast Cast Sets
 -- =========================================================================================================
 sets.precast.FC = {
-    main = createEquipment("Malevolence", nil, nil, { 'INT+10', 'Mag. Acc.+10', '"Mag.Atk.Bns."+8', '"Fast Cast"+5' }),
-    sub = createEquipment('Culminus'),
-    ammo = createEquipment('Sapience Orb'),
-    head = createEquipment('Merlinic Hood', nil, nil, { 'Attack+14', '"Fast Cast"+7', 'MND+3' }),
-    body = createEquipment('Merlinic Jubbah', nil, nil, { 'Mag. Acc.+24', '"Fast Cast"+7', 'CHR+2', '"Mag.Atk.Bns."+3' }),
-    hands = createEquipment('Merlinic Dastanas', nil, nil, { '"Fast Cast"+7', 'Mag. Acc.+5', '"Mag.Atk.Bns."+4' }),
-    legs = createEquipment('Merlinic Shalwar', nil, nil, { '"Mag.Atk.Bns."+5', '"Fast Cast"+5', 'Mag. Acc.+11' }),
-    feet = createEquipment('Merlinic Crackows', nil, nil,
-        { '"Mag.Atk.Bns."+1', '"Fast Cast"+7', 'STR+9', 'Mag. Acc.+10' }),
-    neck = createEquipment('Voltsurge Torque'),
-    waist = createEquipment('Witful Belt'),
-    right_ear = createEquipment('Loquac. Earring'),
-    left_ear = createEquipment('Malignance Earring'),
-    left_ring = createEquipment('Kishar Ring'),
-    right_ring = createEquipment('Prolix Ring'),
-    back = createEquipment('Fi Follet Cape +1')
+    main = { name = "Grioavolr", augments = { '"Fast Cast"+6', '"Mag.Atk.Bns."+6', } },
+    sub = "Enki Strap",
+    ammo = "Impatiens",
+    head = { name = "Merlinic Hood", augments = { 'Attack+14', '"Fast Cast"+7', 'MND+3', } },
+    body = { name = "Merlinic Jubbah", augments = { 'Mag. Acc.+24', '"Fast Cast"+7', 'CHR+2', '"Mag.Atk.Bns."+3', } },
+    hands = { name = "Merlinic Dastanas", augments = { '"Fast Cast"+7', 'Mag. Acc.+5', '"Mag.Atk.Bns."+4', } },
+    legs = { name = "Merlinic Shalwar", augments = { '"Mag.Atk.Bns."+5', '"Fast Cast"+5', 'Mag. Acc.+11', } },
+    feet = { name = "Merlinic Crackows", augments = { '"Mag.Atk.Bns."+1', '"Fast Cast"+7', 'STR+9', 'Mag. Acc.+10', } },
+    neck = "Orunmila's Torque",
+    waist = "Witful Belt",
+    left_ear = "Malignance Earring",
+    right_ear = "Loquac. Earring",
+    left_ring = "Kishar Ring",
+    right_ring = "Lebeche Ring",
+    back = "Perimede Cape",
 }
-sets.precast.FC['Enhancing Magic'] = set_combine(sets.precast.FC, { waist = createEquipment('Siegel Sash') })
-sets.precast.FC['Elemental Magic'] =
-    set_combine(
-        sets.precast.FC,
-        {
-            head = createEquipment('Wicce Petasos +3'),
-            body = createEquipment('Wicce Coat +3')
-        }
-    )
+sets.precast.FC['Enhancing Magic'] = sets.precast.FC
+sets.precast.FC['Elemental Magic'] = sets.precast.FC
 sets.precast.FC.Death = set_combine(sets.precast.FC, {})
-sets.precast.FC.Cure =
-    set_combine(
-        sets.precast.FC,
-        {
-            legs = createEquipment('Doyen Pants')
-        }
-    )
+sets.precast.FC.Cure = sets.precast.FC
 sets.precast.FC.Curaga = sets.precast.FC.Cure
 sets.precast.FC.Impact = set_combine(sets.precast.FC, {
     head = empty,
     body = createEquipment('Twilight Cloak')
 })
+
 sets.precast.FC.Death.MagicBurst = sets.precast.FC.Death
-sets.precast.FC.Stoneskin =
-    set_combine(
-        sets.precast.FC,
-        {
-            head = createEquipment('Umuthi Hat'),
-            legs = createEquipment('Doyen Pants'),
-            waist = createEquipment('Siegel Sash')
-        }
-    )
+sets.precast.FC.Stoneskin = set_combine(sets.precast.FC, {
+    head = createEquipment('Umuthi Hat'),
+    legs = createEquipment('Doyen Pants'),
+    waist = createEquipment('Siegel Sash')
+})
 
 -- =========================================================================================================
 --                                           Equipments - Midcast Sets
@@ -180,30 +163,27 @@ sets.midcast['Enhancing Magic'] = {
     neck = createEquipment('Loricate Torque +1'),
     waist = createEquipment('Olympus Sash'),
     left_ear = createEquipment('Andoaa Earring'),
-    right_ear = createEquipment('Lugalbanda Earring'),
-    ring_ring = createEquipment('Evanescence Ring'),
+    right_ear = createEquipment('Regal Earring'),
     left_ring = StikiRing1,
+    right_ring = createEquipment('Evanescence ring'),
     back = createEquipment('Fi Follet Cape +1')
 }
-sets.midcast.Stoneskin =
-    set_combine(
-        sets.midcast['Enhancing Magic'],
-        {
-            ammo = createEquipment("Impatiens"),
-            head = createEquipment('Telchine Cap', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
-            body = createEquipment('Telchine Chas.', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
-            hands = createEquipment('Telchine Gloves', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
-            legs = createEquipment('Telchine Braconi', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
-            feet = createEquipment('Telchine Pigaches', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
-            neck = createEquipment("Nodens Gorget"),
-            waist = createEquipment("Siegel Sash"),
-            left_ear = createEquipment("Ethereal Earring"),
-            right_ear = createEquipment("Lugalbanda Earring"),
-            left_ring = StikiRing1,
-            right_ring = StikiRing2,
-            back = createEquipment("Fi Follet Cape +1"),
-        }
-    )
+sets.midcast.Stoneskin = set_combine(sets.midcast['Enhancing Magic'], {
+    ammo = createEquipment("Impatiens"),
+    head = createEquipment('Telchine Cap', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
+    body = createEquipment('Telchine Chas.', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
+    hands = createEquipment('Telchine Gloves', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
+    legs = createEquipment('Telchine Braconi', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
+    feet = createEquipment('Telchine Pigaches', nil, nil, { 'Enh. Mag. eff. dur. +10' }),
+    neck = createEquipment("Nodens Gorget"),
+    waist = createEquipment("Siegel Sash"),
+    left_ear = createEquipment("Ethereal Earring"),
+    right_ear = createEquipment("Regal Earring"),
+    left_ring = StikiRing1,
+    right_ring = StikiRing2,
+    back = createEquipment("Fi Follet Cape +1"),
+})
+
 sets.midcast.Phalanx = set_combine(sets.midcast['Enhancing Magic'], {})
 sets.midcast.Aquaveil = {
     main = createEquipment('Daybreak'),
@@ -217,13 +197,12 @@ sets.midcast.Aquaveil = {
     neck = createEquipment("Loricate Torque +1"),
     waist = createEquipment("Olympus Sash"),
     left_ear = createEquipment("Andoaa Earring"),
-    right_ear = createEquipment("Lugalbanda Earring"),
+    right_ear = createEquipment("Regal Earring"),
     left_ring = StikiRing1,
     right_ring = createEquipment("Evanescence Ring"),
     back = createEquipment("Fi Follet Cape +1"),
 }
-sets.midcast.Refresh = set_combine(
-    sets.midcast.Aquaveil,
+sets.midcast.Refresh = set_combine(sets.midcast.Aquaveil,
     {
         main = createEquipment('Daybreak'),
         sub = createEquipment('Ammurapi Shield'),
@@ -236,12 +215,12 @@ sets.midcast.Refresh = set_combine(
         neck = createEquipment('Loricate Torque +1'),
         waist = createEquipment('Olympus Sash'),
         left_ear = createEquipment('Andoaa Earring'),
-        right_ear = createEquipment('Lugalbanda Earring'),
+        right_ear = createEquipment('Regal Earring'),
         right_ring = createEquipment('Evanescence Ring'),
         left_ring = StikiRing1,
         back = createEquipment('Fi Follet Cape +1')
-    }
-)
+    })
+    
 sets.midcast.Haste = {
     main = createEquipment('Daybreak'),
     sub = createEquipment('Ammurapi Shield'),
@@ -254,7 +233,7 @@ sets.midcast.Haste = {
     neck = createEquipment('Loricate Torque +1'),
     waist = createEquipment('Olympus Sash'),
     left_ear = createEquipment('Andoaa Earring'),
-    right_ear = createEquipment('Lugalbanda Earring'),
+    right_ear = createEquipment('Regal Earring'),
     right_ring = createEquipment('Evanescence Ring'),
     left_ring = StikiRing1,
     back = createEquipment('Fi Follet Cape +1'),
@@ -428,10 +407,23 @@ sets.precast.WS = {
     back = createEquipment("Taranus's Cape"),
 }
 
-sets.precast.WS['Myrkr'] = {}
-sets.precast.WS['Vidohunir'] = {}
-sets.precast.WS['Cataclysm'] = {}
-sets.precast.WS['Spiral Hell'] = {}
+sets.test = {
+    main = "Bunzi's Rod",
+    sub = "Ammurapi Shield",
+    ammo = { name = "Ghastly Tathlum +1", augments = { 'Path: A', } },
+    head = "Wicce Petasos +3",
+    body = "Spaekona's Coat +3",
+    hands = "Wicce Gloves +3",
+    legs = "Wicce Chausses +3",
+    feet = "Wicce Sabots +3",
+    neck = { name = "Src. Stole +2", augments = { 'Path: A', } },
+    waist = { name = "Acuity Belt +1", augments = { 'Path: A', } },
+    left_ear = "Malignance Earring",
+    right_ear = "Regal Earring",
+    left_ring = "Freke Ring",
+    right_ring = { name = "Metamor. Ring +1", augments = { 'Path: A', } },
+    back = "Taranus's cape"
+}
 
 -- =========================================================================================================
 --                                           Equipments - Movement Sets

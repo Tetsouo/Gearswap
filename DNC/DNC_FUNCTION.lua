@@ -52,6 +52,40 @@ auto_abilities = {
     end
 }
 
+-- Determines the custom weapon skill mode based on active buffs.
+-- @param {table} spell - The spell being cast.
+-- @param {string} spellMap - The map of the spell.
+-- @param {string} default_wsmode - The default weapon skill mode.
+-- @return {string} The custom weapon skill mode if 'Sneak Attack' or 'Trick Attack' buffs are active.
+function get_custom_wsmode(spell, spellMap, default_wsmode)
+    local wsmode
+
+    -- Check if 'Climactic Flourish' buff is active. If so, set the weapon skill mode to 'Clim'.
+    if state.Buff['Climactic Flourish'] then
+        wsmode = (wsmode or '') .. 'Clim'
+    end
+
+    -- Return the custom weapon skill mode. If no buffs are active, this will be nil.
+    return wsmode
+end
+
+-- Determines the custom weapon skill mode based on active buffs.
+-- @param {table} spell - The spell being cast.
+-- @param {string} spellMap - The map of the spell.
+-- @param {string} default_wsmode - The default weapon skill mode.
+-- @return {string} The custom weapon skill mode if 'Sneak Attack' or 'Trick Attack' buffs are active.
+function get_custom_wsmode(spell, spellMap, default_wsmode)
+    local wsmode
+
+    -- Check if 'Climactic Flourish' buff is active. If so, set the weapon skill mode to 'Clim'.
+    if state.TpBonus then
+        wsmode = (wsmode or '') .. 'Tpbonus'
+    end
+
+    -- Return the custom weapon skill mode. If no buffs are active, this will be nil.
+    return wsmode
+end
+
 --- Automatically triggers 'Climactic Flourish' when executing 'Rudra's Storm' or 'Shark Bite'.
 -- @param {table} spell - The spell object to attempt to cast.
 function auto_WS_flourish(spell)

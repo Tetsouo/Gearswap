@@ -67,7 +67,7 @@ function get_custom_wsmode(spell, spellMap, default_wsmode)
 
     -- Check if 'Sneak Attack' buff is active. If so, set the weapon skill mode to 'SA'.
     if state.Buff['Sneak Attack'] then
-        wsmode = 'SA'
+        wsmode = (wsmode or '') .. 'SA'
     end
 
     -- Check if 'Trick Attack' buff is active. If so, append 'TA' to the weapon skill mode.
@@ -89,7 +89,7 @@ function customize_idle_set(idleSet)
     end
 
     -- Get the conditions and sets for customizing the idle set.
-    local conditions, setTable = get_conditions_and_sets(nil, sets.idle.PDT, nil, sets.defense.MDT)
+    local conditions, setTable = get_conditions_and_sets(nil, sets.idle.PDT, nil, nil)
 
     -- Customize the idle set based on the conditions and sets.
     return customize_set(idleSet, conditions, setTable)
@@ -115,8 +115,8 @@ function customize_melee_set(meleeSet)
     end
 
     -- Get the conditions and sets for customizing the melee set.
-    local conditions, setTable = get_conditions_and_sets(sets.engaged.PDT, sets.engaged.PDT, sets.engaged.Acc.PDT,
-        sets.idle.MDT)
+    local conditions, setTable = get_conditions_and_sets(nil, sets.engaged.PDT, sets.engaged.Acc.PDT,
+        nil)
 
     -- Customize the melee set based on the conditions and sets.
     return customize_set(meleeSet, conditions, setTable)

@@ -93,92 +93,113 @@ function BuffSelf()
     end
 end
 
--- This function refines various spells based on certain conditions.
--- @param spell: The spell to be refined.
--- @param eventArgs: The event arguments.
--- @param spellCorrespondence: The correspondence table for spells.
-function refine_various_spells(spell, eventArgs, spellCorrespondence)
-    -- Store the original spell name
-    local newSpell = spell.english
-    -- Get the current spell recasts
-    local spell_recasts = windower.ffxi.get_spell_recasts()
-    -- Get the player's current mana points
-    local player_mp = player.mp
+--- Handles the replacement of a spell.
+-- This function checks if a spell needs to be replaced based on the current recast time and player's MP.
+-- If a replacement is needed, it modifies the spell name accordingly.
+-- @param spell The spell to be checked for replacement.
+-- @param spell_recasts The table containing the recast times for all spells.
+-- @param player_mp The current MP of the player.
+-- @param correspondence The table containing the correspondence between spells and their replacements.
+-- @param spellCategory The category of the spell (e.g., 'Cure', 'Fire', etc.).
+-- @param spellLevel The level of the spell (e.g., 'I', 'II', 'III', etc.).
+-- @return newSpell The name of the new spell after replacement.
+-- @return replacement The name of the replacement spell.
+function handle_spell_replacement(spell, spell_recasts, player_mp, correspondence, spellCategory, spellLevel)
+    assert(spell, "spell cannot be nil")
+    assert(spell_recasts, "spell_recasts cannot be nil")
+    assert(player_mp, "player_mp cannot be nil")
+    assert(spellCategory, "spellCategory cannot be nil")
+    assert(spellLevel, "spellLevel cannot be nil")
 
-    -- Extract the spell category and level from the spell name
-    local spellCategory, spellLevel = spell.name:match('(%a+)%s*(%a*)')
-    -- Get the correspondence for the spell category
-    local correspondence = spellCorrespondence[spellCategory]
-    -- Get the replacement for the spell if it exists
     local replacement = correspondence and (spellLevel ~= '' and correspondence[spellLevel] or correspondence)
+    local newSpell = spell.english
 
-    -- If a replacement exists and the spell is on cooldown or the player doesn't have enough mana
-    if replacement and (spell_recasts[spell.recast_id] > 0 or player.mp < spell.mp_cost) then
-        -- Get the replacement spell name
+    if replacement and (spell_recasts[spell.recast_id] > 0 or player_mp < spell.mp_cost) then
         replacement = correspondence[spellLevel] and correspondence[spellLevel].replace or ''
-        -- Set the new spell name
         newSpell = replacement == '' and spellCategory or spellCategory .. ' ' .. replacement
 
-        -- If the spell is a 'ja' spell, replace it with a 'ga' spell
         if spell.name:find('ja') then
             newSpell = string.gsub(spell.name, 'ja', 'ga') .. ' III'
         end
-
-        -- If the replacement doesn't exist and the new spell isn't 'Aspir' and the player doesn't have enough mana
-        if replacement == '' and newSpell ~= 'Aspir' and player_mp < (newSpell == 'Aspir' and 10 or 9) then
-            -- Cancel the spell
-            cancel_spell()
-            -- Cancel the original event
-            eventArgs.cancel = true
-            -- Display a message to the player
-            windower.add_to_chat(123, createFormattedMessage(
-                'Cannot cast spell:',
-                newSpell,
-                nil,
-                'Not enough Mana: (' .. player_mp .. 'MP)',
-                true,
-                true
-            ))
-            -- Exit the function
-            return
-        end
     end
 
-    -- If the new spell is different from the original spell
-    if newSpell ~= spell.english then
-        -- Cast the new spell
-        send_command('@input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
-        -- Cancel the original event
+    return newSpell, replacement
+end
+
+--- Handles the cancellation of a spell.
+-- This function checks if a spell needs to be cancelled based on the replacement spell and player's MP.
+-- If a cancellation is needed, it cancels the spell and returns true.
+-- @param newSpell The name of the new spell after replacement.
+-- @param replacement The name of the replacement spell.
+-- @param player_mp The current MP of the player.
+-- @param spell The original spell before replacement.
+-- @return A boolean indicating whether the spell was cancelled.
+function handle_spell_cancellation(newSpell, replacement, player_mp, spell)
+    assert(newSpell, "newSpell cannot be nil")
+    assert(player_mp, "player_mp cannot be nil")
+    assert(spell, "spell cannot be nil")
+
+    if replacement == '' and newSpell ~= 'Aspir' and player_mp < (newSpell == 'Aspir' and 10 or 9) then
+        cancel_spell()
+        return true
+    end
+
+    return false
+end
+
+--- Refines various spells based on their recast times and player's MP.
+-- This function checks if a spell needs to be replaced or cancelled based on the current recast time and player's MP.
+-- If a replacement or cancellation is needed, it modifies the spell accordingly and updates the eventArgs.
+-- @param spell The spell to be checked for replacement or cancellation.
+-- @param eventArgs The event arguments to be updated if a replacement or cancellation is needed.
+-- @param spellCorrespondence The table containing the correspondence between spells and their replacements.
+function refine_various_spells(spell, eventArgs, spellCorrespondence)
+    assert(spell, "spell cannot be nil")
+    assert(eventArgs, "eventArgs cannot be nil")
+    assert(spellCorrespondence, "spellCorrespondence cannot be nil")
+
+    local newSpell = spell.english
+    local spell_recasts = windower.ffxi.get_spell_recasts()
+    local player_mp = player.mp
+
+    local spellCategory, spellLevel = spell.name:match('(%a+)%s*(%a*)')
+    local correspondence = spellCorrespondence[spellCategory]
+
+    newSpell, replacement = handle_spell_replacement(spell, spell_recasts, player_mp, correspondence, spellCategory,
+        spellLevel)
+
+    if handle_spell_cancellation(newSpell, replacement, player_mp, spell) then
         eventArgs.cancel = true
-        -- If the casting mode is 'MagicBurst' and the spell skill is 'Elemental Magic'
+        windower.add_to_chat(123, createFormattedMessage(
+            'Cannot cast spell:',
+            newSpell,
+            nil,
+            'Not enough Mana: (' .. player_mp .. 'MP)',
+            true,
+            true
+        ))
+        return
+    end
+
+    if newSpell ~= spell.english then
+        send_command('@input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
+        eventArgs.cancel = true
     elseif state.CastingMode.value == 'MagicBurst' and spell.skill == 'Elemental Magic' then
-        -- Send a message to the party
         send_command((spellLevel == 'VI' and 'wait 2; ' or '') ..
             'input /p Casting: [' .. spellCategory .. ' ' .. spellLevel .. '] => Nuke')
     end
 
-    -- If the spell is 'Breakga' and it's on cooldown
     if spell.english == 'Breakga' and spell_recasts[spell.recast_id] > 0 then
-        -- Cancel the spell
         cancel_spell()
-        -- Set the new spell to 'Break'
         newSpell = 'Break'
-        -- If 'Break' is also on cooldown
         if spell_recasts[255] > 0 then
-            -- Cancel the spell
             cancel_spell()
-            -- Cancel the original event
             eventArgs.cancel = true
-            -- Calculate the recast time
             local recastTime = spell_recasts[255] / 60
-            -- Create a message
             local msg = createFormattedMessage(nil, newSpell, recastTime)
-            -- Display the message to the player
             add_to_chat(123, msg)
         else
-            -- Cast the new spell
             send_command('@input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
-            -- Cancel the original event
             eventArgs.cancel = true
         end
     end
@@ -259,6 +280,7 @@ local normalSetHighMP = mergeTables(baseSet, {
 -- This set merges the base set with additional pieces for body, ammo, feet, and waist.
 local magicBurstSetLowMP = mergeTables(baseSet, {
     body = "Spaekona's Coat +3",
+    hands = "Agwu's Gages",
     ammo = 'Ghastly tathlum +1',
     feet = "Agwu's Pigaches",
     waist = 'Hachirin-no-obi'
@@ -268,6 +290,7 @@ local magicBurstSetLowMP = mergeTables(baseSet, {
 -- This set merges the base set with different pieces for body, and additional pieces for ammo, feet, and waist.
 local magicBurstSetHighMP = mergeTables(baseSet, {
     body = 'Wicce Coat +3',
+    hands = "Agwu's Gages",
     ammo = 'Ghastly tathlum +1',
     feet = "Agwu's Pigaches",
     waist = 'Hachirin-no-obi'
@@ -311,11 +334,10 @@ function checkArts(spell, eventArgs)
     assert(type(eventArgs) == 'table', "Parameter 'eventArgs' must be a table.")
 
     -- Check if the necessary keys exist in the 'spell' table.
-    assert(spell.skill, "Key 'skill' must exist in the 'spell' table.")
     assert(spell.name, "Key 'name' must exist in the 'spell' table.")
 
     -- Check if the player's sub-job is Scholar (SCH).
-    if player.sub_job == 'SCH' then
+    if player.sub_job == 'SCH' and player.sub_job_level ~= 0 then
         -- Get the recast time for the 'Dark Arts' ability.
         local darkArtsRecast = windower.ffxi.get_ability_recasts()[232]
         -- Check if the player is casting an 'Elemental Magic' spell and doesn't have 'Dark Arts' or 'Addendum: Black' active,

@@ -52,6 +52,8 @@ ChirichRing1 = createEquipment('Chirich Ring +1', nil, 'wardrobe 1')
 ChirichRing2 = createEquipment('Chirich Ring +1', nil, 'wardrobe 2')
 ShivaRing1 = createEquipment('Shiva Ring', 'wardrobe 1')
 ShivaRing2 = createEquipment('Shiva Ring', 'wardrobe 2')
+Moonlight1 = createEquipment('MoonLight Ring', 0, 'Wardrobe 2')
+Moonlight2 = createEquipment('MoonLight Ring', 0, 'Wardrobe 4')
 HercAeoHead = createEquipment('Herculean Helm', nil, nil,
     { '"Mag.Atk.Bns."+20', 'Weapon skill damage +5%', 'INT+8', 'Mag. Acc.+1' })
 HercAeoBody = createEquipment('Herculean Vest', nil, nil, { '"Mag.Atk.Bns."+21', 'Weapon skill damage +5%', 'MND+9' })
@@ -72,8 +74,17 @@ sets.MoveSpeed = {
 sets['TwashtarM'] = {
     main = createEquipment('Twashtar')
 }
+sets['Mpu Gandring'] = {
+    main = createEquipment('Mpu Gandring')
+}
 sets['TwashtarS'] = {
     sub = createEquipment('Twashtar')
+}
+sets['Jugo'] = {
+    sub = createEquipment('Jugo Kukri +1')
+}
+sets['Crepu'] = {
+    sub = createEquipment('Crepuscular Knife')
 }
 sets['Vajra'] = {
     main = createEquipment('Vajra')
@@ -105,9 +116,7 @@ sets['Club'] = {
 sets['Staff'] = {
     main = createEquipment('Ram staff')
 }
-sets['Crepu'] = {
-    main = createEquipment('Crepuscular Knife')
-}
+
 sets['Centovente'] = {
     sub = createEquipment('Centovente')
 }
@@ -158,60 +167,49 @@ sets.idle.PDT = set_combine(sets.idle, {
     right_ring = ChirichRing2,
     left_ear = createEquipment('Sherida Earring')
 })
-sets.idle.MDT = set_combine(sets.idle, {
-    ammo = createEquipment('Staunch Tathlum +1'),
-    head = createEquipment('Nyame Helm'),
-    body = createEquipment('Nyame Mail'),
-    hands = createEquipment("Skulker's Armlets +3"),
-    legs = createEquipment("Skulker's culottes +3"),
-    feet = createEquipment("Skulker's Poulaines +3"),
-    neck = createEquipment('Elite Royal Collar'),
-    waist = createEquipment('Flume Belt'),
-    left_ear = createEquipment("handler's Earring"),
-    right_ear = createEquipment('Eabani Earring'),
-    left_ring = createEquipment('Defending Ring'),
-    right_ring = ChirichRing2,
-    back = createEquipment('Solemnity Cape')
-})
+
 sets.idle.Weak = sets.idle
 
 -- =========================================================================================================
 --                                           Equipments - Engagement Sets
 -- =========================================================================================================
 sets.engaged = {
-    ammo = createEquipment('Aurgelmir Orb +1'),
-    head = createEquipment("Skulker's Bonnet +3"),
-    body = createEquipment("Pillager's Vest +3"),
-    hands = createEquipment('Malignance Gloves'),
-    legs = createEquipment('Pill. Culottes +3'),
-    feet = createEquipment('Plun. Poulaines +3'),
-    neck = createEquipment('Asn. Gorget +2'),
-    waist = createEquipment('Windbuffet Belt +1'),
-    left_ear = createEquipment('Sherida Earring'),
-    right_ear = createEquipment('Skulk. Earring +1'),
-    left_ring = createEquipment('Gere Ring'),
-    right_ring = createEquipment("Epona's Ring"),
-    back = Toutatis.STP
+    ammo = "Aurgelmir Orb +1",
+    head = "Skulker's Bonnet +3",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Malignance Tights",
+    feet = "Malignance Boots",
+    neck = "Iskur Gorget",
+    waist = "Windbuffet Belt +1",
+    left_ear = "Dedition Earring",
+    right_ear = "Skulk. Earring +1",
+    left_ring = "Moonlight Ring",
+    right_ring = "Gere Ring",
+    back = Toutatis.STP,
 }
 
 sets.engaged.Acc = set_combine(sets.engaged, {
     waist = createEquipment('Kentarch belt +1'),
-    left_ring = createEquipment('Gere Ring'),
-    right_ring = ChirichRing2
-})
-
-sets.engaged.PDT = set_combine(sets.engaged, {
-    ammo = createEquipment('Aurgelmir Orb +1'),
-    head = createEquipment('Malignance Chapeau'),
-    body = createEquipment('Malignance Tabard'),
-    hands = createEquipment('Malignance Gloves'),
-    legs = createEquipment('Malignance Tights'),
-    feet = createEquipment('Skulk. Poulaines +3'),
-    neck = createEquipment('Asn. Gorget +2'),
-    waist = createEquipment('Kentarch Belt +1'),
-    left_ring = createEquipment('Defending Ring'),
+    left_ring = ChirichRing2,
     right_ring = createEquipment('Gere Ring'),
 })
+
+sets.engaged.PDT = {
+    ammo = "Aurgelmir Orb +1",
+    head = "Malignance Chapeau",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Malignance Tights",
+    feet = "Skulk. Poulaines +3",
+    neck = "Iskur Gorget",
+    waist = "Kentarch Belt +1",
+    left_ear = "Sherida Earring",
+    right_ear = "Skulk. Earring +1",
+    left_ring = Moonlight1,
+    right_ring = Moonlight2,
+    back = Toutatis.STP,
+}
 
 sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     ammo = createEquipment('Aurgelmir Orb +1'),
@@ -224,9 +222,9 @@ sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
     waist = createEquipment('Kentarch Belt +1'),
     left_ear = createEquipment('Crep. Earring'),
     right_ear = createEquipment('Skulk. Earring +1'),
-    left_ring = createEquipment('Gere Ring'),
-    right_ring = ChirichRing1,
-    back = Toutatis.STP
+    left_ring = ChirichRing1,
+    right_ring = createEquipment('Gere Ring'),
+    back = Toutatis.STP,
 })
 
 -- =========================================================================================================
@@ -236,21 +234,23 @@ sets.precast.RA = {
     range = createEquipment('Exalted Crossbow'),
     ammo = createEquipment('Acid Bolt'),
     head = createEquipment('Malignance Chapeau'),
-    body = createEquipment('Meg. Cuirie +2'),
-    hands = createEquipment('Meg. Gloves +2'),
+    body = createEquipment('Malignance Tabard'),
+    hands = createEquipment('Malignance Gloves'),
     legs = createEquipment('Malignance Tights'),
-    feet = createEquipment('Meghanada Jambeaux +2'),
-    neck = createEquipment('Iskur gorget'),
-    waist = createEquipment('Kentarch belt +1'),
+    feet = createEquipment('Malignance Boots'),
+    neck = createEquipment('Null Loop'),
+    waist = createEquipment('Yemaya Belt'),
     left_ear = createEquipment('Crepuscular Earring'),
-    right_ear = createEquipment('Volley Earring'),
+    right_ear = createEquipment('Telos Earring'),
     left_ring = createEquipment('Cacoethic Ring'),
     right_ring = createEquipment('Crepuscular Ring'),
-    back = createEquipment('Jaeger Mantle')
+    back = createEquipment('Sacro mantle')
 }
+
 sets.precast.RATH = set_combine(sets.precast.RA, {
     feet = createEquipment("Skulker's Poulaines +3")
 })
+
 sets.midcast.RA = sets.precast.RA
 sets.midcast.RA.Acc = sets.midcast.RA
 
@@ -262,14 +262,14 @@ sets.buff['Sneak Attack'] = {
     head = AdhemarBonnet,
     body = createEquipment("Pillager's Vest +3"),
     hands = createEquipment("Skulker's Armlets +3"),
-    legs = createEquipment('Pill. Culottes +3'),
+    legs = "Lustr. Subligar +1",
     feet = LustraLeggings,
     neck = createEquipment('Asn. Gorget +2'),
     waist = createEquipment('Kentarch belt +1'),
-    left_ear = createEquipment('Mache Earring +1'),
     right_ear = createEquipment('Odr Earring'),
-    left_ring = createEquipment('Regal Ring'),
-    right_ring = createEquipment('Ilabrat Ring'),
+    left_ear = createEquipment('Mache Earring +1'),
+    left_ring = createEquipment('Ilabrat Ring'),
+    right_ring = createEquipment('Regal Ring'),
     back = Toutatis.STP
 }
 
@@ -284,8 +284,8 @@ sets.buff['Trick Attack'] = {
     waist = createEquipment('Svelt. Gouriz +1'),
     left_ear = createEquipment('Dawn Earring'),
     right_ear = createEquipment('Infused Earring'),
-    left_ring = createEquipment('Regal Ring'),
-    right_ring = createEquipment('Ilabrat Ring'),
+    left_ring = createEquipment('Ilabrat Ring'),
+    right_ring = createEquipment('Regal Ring'),
     back = CannyCape
 }
 
@@ -298,7 +298,7 @@ sets.precast.JA['Collaborator'] = {
 }
 sets.precast.JA['Accomplice'] = sets.precast.JA['Collaborator']
 
-sets.precast.JA['Conspirator'] = {body = createEquipment("skulker's Vest +3")}
+sets.precast.JA['Conspirator'] = { body = createEquipment("skulker's Vest +3") }
 
 sets.precast.JA['Animated Flourish'] = {
     ammo = createEquipment('Sapience Orb'),
@@ -315,9 +315,9 @@ sets.precast.JA['Animated Flourish'] = {
     right_ring = createEquipment('Supershear Ring'),
     back = createEquipment('Solemnity Cape')
 }
-sets.precast.JA['Flee'] = {feet = createEquipment('Pill. Poulaines +3')}
+sets.precast.JA['Flee'] = { feet = createEquipment('Pill. Poulaines +3') }
 
-sets.precast.JA['Hide'] = {body = createEquipment('Pill. Vest +3')}
+sets.precast.JA['Hide'] = { body = createEquipment("Pill. Vest +3") }
 
 sets.precast.JA['Steal'] = {
     neck = createEquipment('Pentalagus Charm'),
@@ -372,17 +372,11 @@ sets.precast.Step = {
 sets.precast.JA.Provoke = {
     ammo = createEquipment('Sapience Orb'),
     head = createEquipment("Skulker's Bonnet +3"),
-    body = createEquipment({
-        name = "Plunderer's Vest +3",
-        augments = { 'Enhances "Ambush" effect' }
-    }),
+    body = createEquipment("Plunderer's Vest +3"),
     hands = createEquipment("Skulker's Armlets +3"),
     legs = createEquipment("Skulker's culottes +3"),
     feet = createEquipment("Skulker's Poulaines +3"),
-    neck = createEquipment({
-        name = 'Unmoving Collar +1',
-        augments = { 'Path: A' }
-    }),
+    neck = createEquipment('Unmoving Collar +1'),
     waist = createEquipment('Svelt. Gouriz +1'),
     left_ear = createEquipment('Friomisi Earring'),
     right_ear = createEquipment('Eabani Earring'),
@@ -393,12 +387,9 @@ sets.precast.JA.Provoke = {
 sets.precast.Flourish1 = sets.precast.JA.Provoke
 sets.precast.FC = {
     ammo = createEquipment('Sapience Orb'),
-    head = createEquipment(HerculeanHelm),
+    head = HerculeanHelm,
     body = createEquipment('Dread Jupon'),
-    hands = createEquipment({
-        name = 'Leyline Gloves',
-        augments = { 'Accuracy+15', 'Mag. Acc.+15', '"Mag.Atk.Bns."+15', '"Fast Cast"+3' }
-    }),
+    hands = createEquipment('Leyline Gloves'),
     legs = createEquipment('Enif Cosciales'),
     neck = createEquipment('Voltsurge Torque'),
     left_ear = createEquipment('Enchntr. Earring +1'),
@@ -421,56 +412,115 @@ sets.precast.WS = {
     waist = createEquipment('Fotia Belt'),
     left_ear = MoonShadeEarring,
     right_ear = createEquipment('Odr Earring'),
-    left_ring = createEquipment('Regal Ring'),
-    right_ring = createEquipment("Cornelia's Ring"),
+    left_ring = createEquipment("Cornelia's Ring"),
+    right_ring = createEquipment('Regal Ring'),
     back = Toutatis.WS1
 }
 sets.precast.WS.Acc = set_combine(sets.precast.WS, {})
+
 sets.precast.WS['Exenterator'] = set_combine(sets.precast.WS, {
-    head = createEquipment("skulker's Bonnet +3"),
-    hands = createEquipment('Mummu Wrists +2'),
-    feet = createEquipment('Mummu Gamash. +2'),
-    left_ear = createEquipment('Dawn Earring'),
-    right_ear = createEquipment('Infused Earring'),
-    right_ring = createEquipment('Dingir Ring'),
-    back = Toutatis.WS1
+    ammo = "Aurgelmir Orb +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Skulk. Armlets +3",
+    legs = "Meg. Chausses +2",
+    feet = "Skulk. Poulaines +3",
+    neck = "Fotia Gorget",
+    waist = "Fotia Belt",
+    left_ear = "Sherida Earring",
+    right_ear = "Skulk. Earring +1",
+    left_ring = "Gere Ring",
+    right_ring = "Regal Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Exenterator'].Mid = set_combine(sets.precast.WS['Exenterator'], {})
+
 sets.precast.WS['Exenterator'].Acc = set_combine(sets.precast.WS['Exenterator'].Mid, {})
+
 sets.precast.WS['Exenterator'].SA = set_combine(sets.precast.WS['Exenterator'].Mid, {
-    hands = createEquipment("Skulker's Armlets +3")
+    ammo = "C. Palug Stone",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Skulk. Armlets +3",
+    legs = "Plun. Culottes +3",
+    feet = "Skulk. Poulaines +3",
+    neck = "Fotia Gorget",
+    waist = "Fotia Belt",
+    left_ear = "Sherida Earring",
+    right_ear = "Skulk. Earring +1",
+    left_ring = "Ilabrat Ring",
+    right_ring = "Regal Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Exenterator'].TA = set_combine(sets.precast.WS['Exenterator'].Mid, {
-    hands = createEquipment('Pill. Armlets +3')
+    ammo = "C. Palug Stone",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Pill. Armlets +3",
+    legs = "Meg. Chausses +2",
+    feet = "Skulk. Poulaines +3",
+    neck = "Fotia Gorget",
+    waist = "Fotia Belt",
+    left_ear = "Sherida Earring",
+    right_ear = "Skulk. Earring +1",
+    left_ring = "Ilabrat Ring",
+    right_ring = "Regal Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Exenterator'].SATA = set_combine(sets.precast.WS['Exenterator'].SA, {})
 
 sets.precast.WS['Dancing Edge'] = set_combine(sets.precast.WS, {})
+
 sets.precast.WS['Dancing Edge'].Mid = set_combine(sets.precast.WS['Dancing Edge'], {})
+
 sets.precast.WS['Dancing Edge'].Acc = set_combine(sets.precast.WS['Dancing Edge'], {})
+
 sets.precast.WS['Dancing Edge'].SA = set_combine(sets.precast.WS['Dancing Edge'].Mid, {
     hands = createEquipment("Skulker's Armlets +3")
 })
+
 sets.precast.WS['Dancing Edge'].TA = set_combine(sets.precast.WS['Dancing Edge'].Mid, {
     hands = createEquipment('Pill. Armlets +3')
 })
+
 sets.precast.WS['Dancing Edge'].SATA = set_combine(sets.precast.WS['Dancing Edge'].Mid, {})
+
 sets.precast.WS['Evisceration'] = set_combine(sets.precast.WS, {
-    Hands = createEquipment("Gleti's Gauntlets"),
-    Feet = createEquipment("Gleti's boots"),
-    left_ring = createEquipment('Mummu Ring')
+    ammo = "Yetshila +1",
+    head = "Skulker's Bonnet +3",
+    body = "Plunderer's Vest +3",
+    hands = "Mummu Wrists +2",
+    legs = "Gleti's Breeches",
+    feet = "Lustra. Leggings +1",
+    neck = "Fotia Gorget",
+    waist = "Fotia Belt",
+    left_ear = "Sherida Earring",
+    right_ear = "Odr Earring",
+    left_ring = "Mummu Ring",
+    right_ring = "Regal Ring",
+    back = "Toutatis's Cape",
+
 })
+
 sets.precast.WS['Evisceration'].Mid = set_combine(sets.precast.WS['Evisceration'], {})
+
 sets.precast.WS['Evisceration'].Acc = set_combine(sets.precast.WS['Evisceration'], {})
+
 sets.precast.WS['Evisceration'].SA = set_combine(sets.precast.WS['Evisceration'].Mid, {
     hands = createEquipment("Skulker's Armlets +3")
 })
+
 sets.precast.WS['Evisceration'].TA = set_combine(sets.precast.WS['Evisceration'].Mid, {
     hands = createEquipment('Pill. Armlets +3')
 })
+
 sets.precast.WS['Evisceration'].SATA = set_combine(sets.precast.WS['Evisceration'].Mid, {
     hands = createEquipment('Pill. Armlets +3')
 })
+
 sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {
     head = createEquipment('Pill. Bonnet +3'),
     body = createEquipment("skulker's Vest +3"),
@@ -481,84 +531,195 @@ sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {
     back = Toutatis.WS2,
     ammo = createEquipment("Oshasha's treatise")
 })
+
 sets.precast.WS["Rudra's Storm"] = set_combine(sets.precast.WS, {
-    head = createEquipment('Pill. Bonnet +3'),
-    body = createEquipment("skulker's Vest +3"),
-    hands = createEquipment('Meg. Gloves +2'),
-    legs = createEquipment('Plun. Culottes +3'),
-    neck = createEquipment('Asn. Gorget +2'),
-    waist = createEquipment('Kentarch belt +1'),
+    ammo = "Aurgelmir Orb +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Meg. Gloves +2",
+    legs = "Plun. Culottes +3",
+    feet = "Lustra. Leggings +1",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Odr Earring",
+    right_ear = "Moonshade Earring",
+    left_ring = "Cornelia's ring",
+    right_ring = "Regal Ring",
     back = Toutatis.WS2,
-    ammo = createEquipment("Oshasha's treatise")
 })
+
 sets.precast.WS["Rudra's Storm"].Mid = set_combine(sets.precast.WS["Rudra's Storm"], {})
+
 sets.precast.WS["Rudra's Storm"].Acc = set_combine(sets.precast.WS["Rudra's Storm"], {})
+
 sets.precast.WS["Rudra's Storm"].SA = set_combine(sets.precast.WS["Rudra's Storm"].Mid, {
-    hands = createEquipment("Skulker's Armlets +3"),
-    ammo = createEquipment('Yetshila +1')
+    ammo = "Yetshila +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Meg. Gloves +2",
+    legs = "Lustr. Subligar +1",
+    feet = "Lustra. Leggings +1",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Domin. Earring +1",
+    right_ear = "Moonshade Earring",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS["Rudra's Storm"].TA = set_combine(sets.precast.WS["Rudra's Storm"].Mid, {
-    hands = createEquipment('Pill. Armlets +3'),
-    ammo = createEquipment('Yetshila +1')
+    ammo = "Yetshila +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Meg. Gloves +2",
+    legs = "Plun. Culottes +3",
+    feet = "Gleti's Boots",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Odr Earring",
+    right_ear = "Moonshade Earring",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS["Rudra's Storm"].SATA = set_combine(sets.precast.WS["Rudra's Storm"].Mid, {
     hands = createEquipment('Pill. Armlets +3'),
     ammo = createEquipment('Yetshila +1')
 })
+
 sets.precast.WS['Mandalic Stab'] = set_combine(sets.precast.WS, {
-    head = createEquipment('Pill. Bonnet +3'),
-    body = createEquipment("skulker's Vest +3"),
-    hands = createEquipment('Meg. Gloves +2'),
-    legs = createEquipment('Plun. Culottes +3'),
-    neck = createEquipment('Asn. Gorget +2'),
-    waist = createEquipment('Kentarch belt +1'),
+    ammo = "Crepuscular Pebble",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Malignance Gloves",
+    legs = "Gleti's Breeches",
+    feet = "Gleti's Boots",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Odr Earring",
+    right_ear = "Dominance Earring +1",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
     back = Toutatis.WS2,
-    ammo = createEquipment("Oshasha's treatise")
+
 })
+
 sets.precast.WS['Mandalic Stab'].Mid = set_combine(sets.precast.WS['Mandalic Stab'], {})
+
 sets.precast.WS['Mandalic Stab'].Acc = set_combine(sets.precast.WS['Mandalic Stab'], {})
+
 sets.precast.WS['Mandalic Stab'].SA = set_combine(sets.precast.WS['Mandalic Stab'].Mid, {
-    hands = createEquipment("Skulker's Armlets +3"),
-    ammo = createEquipment('Yetshila +1')
+    ammo = "Yetshila +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Malignance Gloves",
+    legs = "Plun. Culottes +3",
+    feet = "Lustra. Leggings +1",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Odr Earring",
+    right_ear = "Domin. Earring +1",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Mandalic Stab'].TA = set_combine(sets.precast.WS['Mandalic Stab'].Mid, {
-    hands = createEquipment('Pill. Armlets +3'),
-    ammo = createEquipment('Yetshila +1')
+    ammo = "Yetshila +1",
+    head = "Skulker2's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Malignance Gloves",
+    legs = "Plun. Culottes +3",
+    feet = "Gleti's Boots",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Odr Earring",
+    right_ear = "Domin. Earring +1",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Mandalic Stab'].SATA = set_combine(sets.precast.WS['Mandalic Stab'].Mid, {
     hands = createEquipment('Pill. Armlets +3'),
     ammo = createEquipment('Yetshila +1')
 })
-sets.precast.WS['Shark Bite'] = set_combine(sets.precast.WS["Rudra's Storm"], {})
+
+sets.precast.WS['Shark Bite'] = set_combine(sets.precast.WS["Rudra's Storm"], {
+    ammo = "Aurgelmir Orb +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Meg. Gloves +2",
+    legs = "Plun. Culottes +3",
+    feet = "Skulk. Poulaines +3",
+    neck = "Asn. Gorget +2",
+    waist = "Sailfi Belt +1",
+    left_ear = "Sherida Earring",
+    right_ear = "Moonshade Earring",
+    left_ring = "Cornelia's ring",
+    right_ring = "Regal Ring",
+    back = Toutatis.WS2,
+})
+
 sets.precast.WS['Shark Bite'].Acc = set_combine(sets.precast.WS['Shark Bite'], {})
+
 sets.precast.WS['Shark Bite'].Mid = set_combine(sets.precast.WS['Shark Bite'], {})
+
 sets.precast.WS['Shark Bite'].SA = set_combine(sets.precast.WS['Shark Bite'].Mid, {
-    hands = createEquipment("Skulker's Armlets +3"),
-    ammo = createEquipment('Yetshila +1')
+    ammo = "Yetshila +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Meg. Gloves +2",
+    legs = "Plun. Culottes +3",
+    feet = "Gleti's Boots",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Odr Earring",
+    right_ear = "Moonshade Earring",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Shark Bite'].TA = set_combine(sets.precast.WS['Shark Bite'].Mid, {
-    hands = createEquipment('Pill. Armlets +3'),
-    ammo = createEquipment('Yetshila +1')
+    ammo = "Yetshila +1",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Meg. Gloves +2",
+    legs = "Plun. Culottes +3",
+    feet = "Skulk. Poulaines +3",
+    neck = "Asn. Gorget +2",
+    waist = "Kentarch Belt +1",
+    left_ear = "Ishvara Earring",
+    right_ear = "Moonshade Earring",
+    left_ring = "Cornelia's ring",
+    right_ring = "Epaminondas's Ring",
+    back = Toutatis.WS2,
 })
+
 sets.precast.WS['Shark Bite'].SATA = set_combine(sets.precast.WS['Shark Bite'].Mid, {
     hands = createEquipment('Pill. Armlets +3'),
     ammo = createEquipment('Yetshila +1')
 })
+
 sets.precast.WS['Aeolian Edge'] = {
     ammo = createEquipment("Oshasha's treatise"),
-    head = HercAeoHead,
+    head = "Nyame Helm",
     neck = createEquipment('Sibyl Scarf'),
-    body = HercAeoBody,
-    legs = HercAeoLegs,
-    hands = HercAeoHands,
-    feet = createEquipment(HercAeoFeet),
-    left_ear = createEquipment('Sortiarius Earring'),
-    right_ear = createEquipment('Friomisi Earring'),
-    left_ring = createEquipment("Cornelia's Ring"),
-    right_ring = createEquipment('Dingir Ring'),
+    body = "Nyame Mail",
+    legs = "Nyame Flanchard",
+    hands = "Nyame Gauntlets",
+    feet = "Nyame Sollerets",
+    left_ear = createEquipment('Friomisi Earring'),
+    right_ear = createEquipment('Moonshade Earring'),
+    left_ring = createEquipment("Epaminondas's Ring"),
+    right_ring = createEquipment("Cornelia's Ring"),
     waist = createEquipment("Orpheus's Sash"),
     back = Toutatis.WS2
 }
+
 sets.precast.WS['Circle Blade'] = set_combine(sets.precast.WS, {
     ammo = createEquipment("Oshasha's Treatise"),
     head = createEquipment("skulker's Bonnet +3"),
@@ -574,19 +735,23 @@ sets.precast.WS['Circle Blade'] = set_combine(sets.precast.WS, {
     right_ring = createEquipment('Mummu Ring'),
     back = Toutatis.WS1
 })
-
 -- =========================================================================================================
 --                                           Equipments - TreasureHunter Sets
 -- =========================================================================================================
 sets.TreasureHunter = {
-    feet = createEquipment("Skulker's Poulaines +3")
+    hands = PlundererArmlets,
+    legs = HerculeanLegs,
+    feet = createEquipment("Skulker's Poulaines +3"),
 }
+
 sets.TreasureHunterRA = set_combine(sets.precast.RA, {
     feet = createEquipment("Skulker's Poulaines +3")
 })
+
 sets.midcast.RA.TH = set_combine(sets.precast.RA, {
     feet = createEquipment("Skulker's Poulaines +3")
 })
+
 sets.AeolianTH = set_combine(sets.precast.WS['Aeolian Edge'], {
     feet = createEquipment("Skulker's Poulaines +3")
 })
@@ -609,4 +774,11 @@ sets.midcast.FastRecast = {
     right_ring = ChirichRing2,
     back = createEquipment('Solemnity Cape')
 }
+
 sets.midcast.Utsusemi = sets.midcast.FastRecast
+
+sets.buff.Doom = {
+    neck = createEquipment("Nicander's Necklace"), -- Reduces Doom effects
+    left_ring = createEquipment("Purity Ring"),        -- Additional Doom resistance
+    waist = createEquipment("Gishdubar Sash"),     -- Enhances Doom recovery effects
+}

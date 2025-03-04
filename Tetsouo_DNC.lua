@@ -34,8 +34,9 @@ function job_setup()
     -- Configures hybrid and offense mode options
     state.HybridMode:options('PDT', 'Normal')
     state.OffenseMode:options('Normal', 'Acc')
-    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Twashtar', 'Tauret' }         --gs c cycle WeaponSet
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti' } --gs c cycle SubSet
+    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Twashtar', 'Mpu Gandring', 'Demersal', 'Tauret' } --gs c cycle WeaponSet
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti' }                    --gs c cycle SubSet
+    state.ammoSet = M { ['description'] = 'Ammo', 'Aurgelmir' }                                              --gs c cycle SubSet
     climactic = buffactive['climactic flourish'] or false
     building = buffactive['building flourish'] or false
     ternary = buffactive['ternary flourish'] or false
@@ -45,15 +46,16 @@ function job_setup()
     state.SelectStepTarget = M(true, 'Select Step Target')
     state.CurrentStep = M { ['description'] = 'Current Step', 'Main', 'Alt' }
     state.SkillchainPending = M(false, 'Skillchain Pending')
+    state.Buff['Climactic Flourish'] = buffactive['Climactic Flourish'] or false
     -- Defines options for alternative player state
     state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
     state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
     state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
     state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
-    state.altPlayerGeo = M('Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
-    state.altPlayerIndi = M('Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Fury', 'Indi-Acumen', 'Indi-Precision',
+    state.altPlayerGeo = M('Geo-Fury', 'Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
+    state.altPlayerIndi = M('Indi-Barrier', 'Indi-Refresh', 'Indi-Fend', 'Indi-Fury', 'Indi-Acumen', 'Indi-Precision',
         'Indi-Haste')
-    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
+    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Haste', 'Indi-AGI', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
     -- Sets up default job ability IDs for actions that always have Treasure Hunter
     info.default_ja_ids = S { 35, 204 }
     info.default_u_ja_ids = S { 201, 202, 203, 205, 207 }
@@ -72,6 +74,7 @@ function job_precast(spell, action, spellMap, eventArgs)
     adjust_Gear_Based_On_TP_For_WeaponSkill(spell) -- Selects the earrings based on the weapon and TP.
     handle_presto_and_step(spell, eventArgs)
     auto_WS_flourish(spell)
+    Ws_range(spell)
     -- Sets the state for the buff corresponding to the spell being cast to true, if it exists.
     if state.Buff[spell.english] ~= nil then
         state.Buff[spell.english] = true

@@ -12,16 +12,16 @@
 -- =========================================================================================================
 -- Define Rudianos set with different augments for different situations
 Rudianos = {
-    tank = createEquipment("Rudianos's Mantle", 8, nil,
-        { 'VIT+20', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Damage taken-5%' }),
-    FCSIRD = createEquipment("Rudianos's Mantle", 8, nil,
+    tank = createEquipment("Rudianos's Mantle", 1, nil,
+        { 'VIT+20', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Phys. dmg. taken-10%', }),
+    FCSIRD = createEquipment("Rudianos's Mantle", 12, nil,
         { 'HP+60', 'HP+20', '"Fast Cast"+10', 'Spell interruption rate down-10%' }),
     STP = createEquipment("Rudianos's Mantle", 0, nil,
         { 'DEX+20', 'Accuracy+20 Attack+20', 'Accuracy+10', '"Store TP"+10', 'Occ. inc. resist. to stat. ailments+10' }),
     WS = createEquipment("Rudianos's Mantle", 0, nil,
-        { 'STR+20', 'Accuracy+20 Attack+20', 'STR+10', 'Weapon skill damage +10%', 'Damage taken-5%' }),
+        { 'STR+20', 'Accuracy+20 Attack+20', 'STR+10', 'Weapon skill damage +10%', 'Phys. dmg. taken-10%' }),
     cure = createEquipment("Rudianos's Mantle", 0, nil,
-        { 'MND+20', 'Eva.+20 /Mag. Eva.+20', 'MND+10', '"Cure" potency +10%', 'Damage taken-5%' })
+        { 'MND+20', 'Eva.+20 /Mag. Eva.+20', 'MND+10', '"Cure" potency +10%', 'Phys. dmg. taken-10%' })
 }
 
 JumalikHead = createEquipment('Jumalik Helm', 0, nil,
@@ -32,11 +32,14 @@ ChirichRing1 = createEquipment('Chirich Ring +1', 0, 'wardrobe 1')
 ChirichRing2 = createEquipment('Chirich Ring +1', 0, 'wardrobe 2')
 StikiRing1 = createEquipment('Stikini Ring +1', 0, 'wardrobe 6')
 StikiRing2 = createEquipment('Stikini Ring +1', 0, 'wardrobe 7')
+Moonlight1 = createEquipment('MoonLight Ring', 13, 'Wardrobe 2')
+Moonlight2 = createEquipment('MoonLight Ring', 12, 'Wardrobe 4')
 
 -- =========================================================================================================
 --                                           Equipments - Weapon Sets
 -- =========================================================================================================
 sets['Burtgang'] = { main = createEquipment('Burtgang') }
+sets['Shining One'] = { main = createEquipment('Shining One'), sub = createEquipment('Alber Strap') }
 sets['Naegling'] = { main = createEquipment('Naegling') }
 sets['Malevo'] = {
     main = createEquipment("Malevolence", 0, nil,
@@ -44,92 +47,114 @@ sets['Malevo'] = {
 }
 -- =========================================================================================================
 sets['Ochain'] = { sub = createEquipment('Ochain') }
+sets['Alber'] = { sub = createEquipment('Alber Strap') }
 sets['Aegis'] = { sub = createEquipment('Aegis') }
 sets['Duban'] = { sub = createEquipment('Duban') }
 sets['Blurred'] = { sub = createEquipment('Blurred Shield +1') }
+
+sets['Staunch'] = { ammo = createEquipment('Staunch Tathlum +1') }
 
 -- =========================================================================================================
 --                                           Equipments - Idle and Defense Sets
 -- =========================================================================================================
 sets.idle = {
-    ammo = createEquipment('Staunch Tathlum +1'),
-    head = createEquipment('Chev. Armet +3', 10),
-    body = createEquipment("Sakpata's Plate"),
-    hands = createEquipment("Chev. Gauntlets +3"),
-    legs = createEquipment('Chev. Cuisses +3', 15),
-    feet = createEquipment('Chev. Sabatons +3', 14),
-    neck = createEquipment('Kgt. beads +2'),
-    waist = createEquipment("Creed Baudrier"),
-    left_ear = createEquipment('Odnowa Earring +1', 17),
-    right_ear = createEquipment('Chev. Earring +1'),
-    left_ring = createEquipment("Moonbeam Ring", 11, 'wardrobe 2'),
-    right_ring = createEquipment("Moonbeam Ring", 11, 'wardrobe 3'),
-    back = Rudianos.tank
+    ammo = createEquipment('Staunch Tathlum +1', 0),        -- DT -3%, Status resistance +11, Spell interruption rate -11%
+    head = createEquipment('Chev. Armet +3', 12),           -- HP+145, DT -11%, Converts 8% of physical damage to MP
+    body = createEquipment("Adamantite Armor", 13),         -- HP+182, DT -20%, Very high DEF
+    hands = createEquipment("Chev. Gauntlets +3", 8),       -- HP+64, DT -11%, Shield block bonus
+    legs = createEquipment('Chev. Cuisses +3', 10),         -- HP+127, DT -13%, Enmity+14
+    feet = createEquipment('Chev. Sabatons +3', 6),         -- HP+52, Completes set bonus for damage absorption
+    neck = createEquipment('Kgt. beads +2', 7),             -- HP+60, DT -7%, Enmity+10
+    waist = createEquipment('Null Belt', 0),                -- Magic defense bonus, no HP gain
+    left_ear = createEquipment('Odnowa Earring +1', 9),     -- HP+110, DT -3%, MDT -2%
+    right_ear = createEquipment('Chev. Earring +1', 0),     -- DT -4%, Cure potency +11%
+    left_ring = createEquipment('Fortified Ring', 5),       -- MDT -5%, Reduces enemy critical hit rate
+    right_ring = createEquipment('Gelatinous Ring +1', 11), -- HP+100, PDT -7%, VIT+15
+    back = Rudianos.tank                                    -- PDT -10%, VIT+20, Enmity+10
 }
 
+sets.idle_After_Cure = {
+    ammo = createEquipment('Staunch Tathlum +1', 0),        -- DT -3%, Status resistance +11, Spell interruption rate -11%
+    head = createEquipment('Chev. Armet +3', 12),           -- HP+145, DT -11%, Converts 8% of physical damage to MP
+    body = createEquipment("Adamantite Armor", 13),         -- HP+182, DT -20%, Very high DEF
+    hands = createEquipment("Chev. Gauntlets +3", 8),       -- HP+64, DT -11%, Shield block bonus
+    legs = createEquipment('Chev. Cuisses +3', 10),         -- HP+127, DT -13%, Enmity+14
+    feet = createEquipment('Chev. Sabatons +3', 6),         -- HP+52, Completes set bonus for damage absorption
+    neck = createEquipment('Kgt. beads +2', 7),             -- HP+60, DT -7%, Enmity+10
+    waist = createEquipment('Asklepian Belt', 0),           -- Magic defense bonus, no HP gain
+    left_ear = createEquipment('Odnowa Earring +1', 9),     -- HP+110, DT -3%, MDT -2%
+    right_ear = createEquipment('Chev. Earring +1', 0),     -- DT -4%, Cure potency +11%
+    left_ring = createEquipment('Fortified Ring', 5),       -- MDT -5%, Reduces enemy critical hit rate
+    right_ring = createEquipment('Gelatinous Ring +1', 11), -- HP+100, PDT -7%, VIT+15
+    back = Rudianos.tank                                    -- PDT -10%, VIT+20, Enmity+10
+}
+
+
 sets.idle.PDT = sets.idle
+
 sets.idle.MDT = {
     sub = createEquipment('Aegis'),
-    ammo = createEquipment('Staunch Tathlum +1'),
-    head = createEquipment("Sakpata's Helm"),
-    body = createEquipment("Sakpata's Plate"),
-    hands = createEquipment("Sakpata's Gauntlets"),
-    legs = createEquipment("Sakpata's Cuisses"),
-    feet = createEquipment("Sakpata's Leggings"),
-    neck = createEquipment('Unmoving Collar +1', 0),
-    waist = createEquipment('Asklepian Belt'),
-    left_ear = createEquipment('Eabani Earring'),
-    right_ear = createEquipment('Chev. Earring +1', 0, nil,
-        { 'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', 'Damage taken-4%' }),
-    left_ring = createEquipment("Moonbeam Ring", 19, 'wardrobe 2'),
-    right_ring = createEquipment("Moonbeam Ring", 20, 'wardrobe 3'),
-    back = createEquipment("Solemnity Cape")
+    ammo = "Staunch Tathlum +1",
+    head = { name = "Sakpata's Helm", augments = { 'Path: A', } },
+    body = { name = "Sakpata's Plate", augments = { 'Path: A', } },
+    hands = { name = "Sakpata's Gauntlets", augments = { 'Path: A', } },
+    legs = { name = "Sakpata's Cuisses", augments = { 'Path: A', } },
+    feet = { name = "Sakpata's Leggings", augments = { 'Path: A', } },
+    neck = "Moonlight Necklace",
+    waist = "Carrier's Sash",
+    left_ear = "Tuisto Earring",
+    right_ear = "Eabani Earring",
+    left_ring = "Purity Ring",
+    right_ring = { name = "Gelatinous Ring +1", augments = { 'Path: A', } },
+    back = { name = "Rudianos's Mantle", augments = { 'VIT+20', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Phys. dmg. taken-10%', } },
 }
 
 sets.idleNormal = set_combine(sets.idle, {
     head = createEquipment('Chev. Armet +3', 14),
-    body = createEquipment("Sakpata's Plate", 15),
+    body = createEquipment("Adamantite Armor", 15),
     legs = createEquipment('Chev. Cuisses +3', 16),
     neck = createEquipment("Kgt. beads +2", 17),
     waist = createEquipment("Creed Baudrier", 18),
-    left_ring = createEquipment("Moonbeam Ring", 19, 'wardrobe 2'),
-    right_ring = createEquipment("Moonbeam Ring", 20, 'wardrobe 3')
+    Left_ring = Moonlight1,
+    right_ring = Moonlight2,
 })
 
 sets.idleXp = set_combine(sets.idle, {
     main = "Burtgang",
     sub = "Duban",
     body = createEquipment('Chev. Cuirass +3', 16),
-    waist = createEquipment('Kentarch Belt +1'),
-    left_ring = createEquipment("Supershear Ring", 11),
-    right_ring = createEquipment("Defending Ring")
 })
 
-sets.idle.Town = set_combine(sets.idle, {
-    neck = createEquipment('Elite Royal Collar'),
-    waist = createEquipment('Kentarch Belt +1'),
-    left_ring = createEquipment("Supershear Ring", 11),
-    right_ring = createEquipment("Provocare Ring")
-})
-
-sets.resting = set_combine(sets.idleNormal, {
-    sub = createEquipment("Aegis")
-})
-
-sets.latent_refresh = {
-    ammo = createEquipment('Staunch Tathlum +1'),
-    head = JumalikHead,                        -- Refresh 1
-    neck = createEquipment('Coatl Gorget +1'), -- Refresh 1
-    left_ear = createEquipment('Odnowa Earring +1', 15),
-    right_ear = createEquipment('Tuisto Earring', 16),
-    body = JumalikBody,                         -- Refresh 2
-    hands = createEquipment('Regal Gauntlets'), -- Refresh 1
+sets.idle.Town = {
+    ammo = createEquipment("Staunch Tathlum +1", 0),
+    head = createEquipment("Chev. Armet +3", 0),
+    body = createEquipment("Jumalik Mail", 0),
+    hands = createEquipment("Regal Gauntlets", 13),
+    legs = createEquipment("Carmine Cuisses +1", 12),
+    feet = createEquipment("Chev. Sabatons +3", 1),
+    neck = createEquipment("Coatl Gorget +1", 0),
+    waist = createEquipment("Plat. Mog. Belt", 8),
+    left_ear = createEquipment("Etiolation Earring", 0),
+    right_ear = createEquipment("Chev. Earring +1", 0),
     left_ring = StikiRing1,
     right_ring = StikiRing2,
     back = Rudianos.tank,
-    waist = createEquipment('Platinum Moogle Belt', 17),
-    legs = createEquipment('Chev. Cuisses +3', 13),
-    feet = createEquipment('Chev. Sabatons +3', 14)
+}
+
+sets.latent_refresh = {
+    ammo = "Staunch Tathlum +1",
+    head = "Chev. Armet +3",
+    body = { name = "Jumalik Mail", augments = { 'HP+50', 'Attack+15', 'Enmity+9', '"Refresh"+2', } },
+    hands = "Regal Gauntlets",
+    legs = { name = "Carmine Cuisses +1", augments = { 'HP+80', 'STR+12', 'INT+12', } },
+    feet = "Chev. Sabatons +3",
+    neck = "Coatl Gorget +1",
+    waist = "Plat. Mog. Belt",
+    left_ear = "Etiolation Earring",
+    right_ear = { name = "Chev. Earring +1", augments = { 'System: 1 ID: 1676 Val: 0', 'Accuracy+13', 'Mag. Acc.+13', 'Damage taken-4%', } },
+    left_ring = "Stikini Ring +1",
+    right_ring = "Stikini Ring +1",
+    back = { name = "Rudianos's Mantle", augments = { 'VIT+20', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Phys. dmg. taken-10%', } },
     -- Total Refresh 5
 }
 
@@ -137,20 +162,20 @@ sets.latent_refresh = {
 --                                           Equipments - FullEnmity Sets
 -- =========================================================================================================
 sets.FullEnmity = {
-    --[[ sub = createEquipment('Srivatsa', 14), ]]
-    ammo = createEquipment('Sapience Orb'),
-    head = createEquipment('Loess Barbuta +1', 13),
-    neck = createEquipment('Moonlight Necklace', 1),
-    left_ear = createEquipment("Trux Earring"),
-    right_ear = createEquipment('Cryptic Earring', 12),
-    body = createEquipment('Souv. Cuirass +1', 16),
-    hands = createEquipment('Souv. Handsch. +1', 15),
-    left_ring = createEquipment('Apeile Ring +1'),
-    right_ring = createEquipment('Apeile Ring'),
-    back = Rudianos.tank,
-    waist = createEquipment('Creed Baudrier', 11),
-    legs = createEquipment('Souv. Diechlings +1', 14),
-    feet = createEquipment("Chevalier's Sabatons +3", 13)
+    --[[ sub = createEquipment('Srivatsa', 14), ]]       -- Optionnel : Bouclier avec DT élevé
+    ammo = createEquipment('Sapience Orb', 3),           -- Enmity+2, Fast Cast+2%
+    head = createEquipment('Loess Barbuta +1', 10),      -- HP+105, Enmity+14, DT-10%
+    neck = createEquipment('Moonlight Necklace', 2),     -- Enmity+15, SIRD+15%
+    left_ear = createEquipment("Trux Earring", 6),       -- Enmity+5
+    right_ear = createEquipment('Cryptic Earring', 8),   -- HP+40, Enmity+4
+    body = createEquipment('Souv. Cuirass +1', 11),      -- HP+66, Enmity+11, DT-10%
+    hands = createEquipment('Souv. Handsch. +1', 13),    -- HP+134, Enmity+9, MDT-5%
+    left_ring = createEquipment('Apeile Ring +1', 5),    -- Enmity+9, Regen+4
+    right_ring = createEquipment('Apeile Ring', 4),      -- Enmity+9, Regen+3
+    back = Rudianos.tank,                                -- VIT+20, Enmity+10, PDT-10%
+    waist = createEquipment('Creed Baudrier', 7),        -- HP+40, Enmity+5
+    legs = createEquipment('Souv. Diechlings +1', 12),   -- HP+57, Enmity+9, DT-4%
+    feet = createEquipment("Chevalier's Sabatons +3", 9) -- HP+52, Enmity+15, Fast Cast+13%
     -- Gear Enmity 159
     -- Crusade Enmity 189
 }
@@ -159,7 +184,7 @@ sets.FullEnmity = {
 --                                           Equipments - Job Ability Sets
 -- =========================================================================================================
 sets.precast.JA = set_combine(sets.FullEnmity, {})
-sets.precast.JA['Divine Emblem'] = set_combine(sets.FullEnmity, {})
+sets.precast.JA['Divine Emblem'] = set_combine(sets.FullEnmity, { feet = createEquipment("Chevalier's Sabatons +3") })
 sets.precast.JA['Palisade'] = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Cover'] = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Provoke'] = set_combine(sets.FullEnmity, {})
@@ -176,19 +201,19 @@ sets.precast.JA['Rampart'] = set_combine(sets.FullEnmity, { head = createEquipme
 --                                           Equipments - Fast Cast Sets
 -- =========================================================================================================
 sets.precast.FC = {
-    ammo = createEquipment('Sapience Orb', 5),
-    head = createEquipment('Carmine Mask +1'),
-    neck = createEquipment("Orunmila's Torque", 11),
-    left_ear = createEquipment("Enchanter's earring +1", 3),
-    right_ear = createEquipment('Loquac. Earring', 4),
-    body = createEquipment('Reverence surcoat +3', 13),
-    hands = createEquipment('Leyline Gloves', 1),
-    left_ring = createEquipment('Kishar Ring', 9),
-    right_ring = createEquipment('Prolix Ring', 10),
-    back = Rudianos.FCSIRD,
-    waist = createEquipment('Platinum Moogle Belt', 12),
-    legs = createEquipment('Enif cosciales', 2),
-    feet = createEquipment("Chevalier's Sabatons +3")
+    ammo = createEquipment('Sapience Orb', 5),               -- Fast Cast +2%, Enmity+2
+    head = createEquipment('Carmine Mask +1', 8),            -- HP+38, Fast Cast +14%
+    neck = createEquipment("Orunmila's Torque", 6),          -- MP+30, Fast Cast +5%
+    left_ear = createEquipment("Enchanter's Earring +1", 1), -- Fast Cast +2%
+    right_ear = createEquipment('Loquac. Earring', 2),       -- MP+30, Fast Cast +2%
+    body = createEquipment('Reverence Surcoat +3', 13),      -- **HP+254**, Fast Cast +10%, DT -11%
+    hands = createEquipment('Leyline Gloves', 7),            -- **HP+25**, Fast Cast +8%
+    left_ring = createEquipment('Kishar Ring', 4),           -- Fast Cast +4%
+    right_ring = createEquipment('Prolix Ring', 3),          -- Fast Cast +2%
+    back = Rudianos.FCSIRD,                                  -- **HP+80**, Fast Cast +10%, SIRD -10%
+    waist = createEquipment('Platinum Moogle Belt', 11),     -- **HP+10%**, DT -3%
+    legs = createEquipment('Enif Cosciales', 9),             -- **HP+40**, Fast Cast +8%
+    feet = createEquipment("Chevalier's Sabatons +3", 10)    -- **HP+52**, Fast Cast +13%
 }
 
 sets.precast.FC['Healing Magic'] = sets.precast.FC
@@ -213,17 +238,17 @@ sets.midcast.Enmity = sets.FullEnmity
 sets.midcast.SIRDEnmity = {
     --[[ sub = createEquipment('Srivatsa', 14), ]]
     ammo = createEquipment('staunch Tathlum +1'),
-    head = createEquipment('Loess barbuta +1'),
-    body = createEquipment("Souv. Cuirass +1", 17),
+    head = createEquipment('Loess barbuta +1', 12),
+    body = createEquipment("Souv. Cuirass +1", 13),
     hands = createEquipment('Regal Gauntlets', 15),
     legs = createEquipment("Founder's Hose", 1),
-    feet = createEquipment('Odyssean greaves', 2),
+    feet = createEquipment('Odyssean greaves', 9),
     neck = createEquipment('Moonlight Necklace', 8),
-    waist = createEquipment("Audumbla Sash"),
-    left_ear = createEquipment("Trux Earring"),
-    right_ear = createEquipment('Tuisto Earring', 16),
+    waist = createEquipment("Creed Baudrier", 10),
+    left_ear = createEquipment('Tuisto Earring', 14),
+    right_ear = createEquipment("Knightly Earring"),
     left_ring = createEquipment("Apeile ring +1"),
-    right_ring = createEquipment('Apeile ring'),
+    right_ring = createEquipment('Gelatinous Ring +1', 11),
     back = Rudianos.tank
 }
 -- Gear Enmity 115
@@ -235,13 +260,13 @@ sets.midcast.SIRDEnmity = {
 
 -- ================================================ Phalanx Sets ===========================================
 sets.midcast.PhalanxPotency = {
-    --[[ main = createEquipment("Sakpata's Sword"), ]]
+    --[[ main = cereateEquipment("Sakpata's Sword"), ]]
     ammo = createEquipment('Staunch Tathlum +1'),
-    head = createEquipment('Yorium Barbuta', 13),
+    head = createEquipment('Odyssean helm', 13),
     neck = createEquipment("Colossus's Torque"),
-    right_ear = createEquipment('Chev. Earring +1'),
     left_ear = createEquipment('Tuisto Earring', 12),
-    body = createEquipment('Yorium Cuirass'),
+    right_ear = createEquipment('Chev. Earring +1'),
+    body = createEquipment('Odyssean Chestplate'),
     hands = createEquipment('Souv. Handsch. +1', 14),
     left_ring = StikiRing1,
     right_ring = StikiRing2,
@@ -255,17 +280,18 @@ sets.midcast.SIRDPhalanx = {
     main = createEquipment("Sakpata's Sword"),
     sub = createEquipment("Priwen", 0, nil, { 'HP+50', 'Mag. Evasion+50', 'Damage Taken -3%' }),
     ammo = createEquipment("Staunch Tathlum +1"),
-    head = createEquipment("Yorium Barbuta", 0, nil, { 'Spell interruption rate down -9%', 'Phalanx +3' }),
-    body = createEquipment("Yorium Cuirass", 0, nil, { 'Spell interruption rate down -10%', 'Phalanx +3' }),
+    head = createEquipment("Odyssean Helm"),
+    body = createEquipment("Odyssean Chestplate"),
     hands = createEquipment("Souv. Handsch. +1"),
     legs = createEquipment("Founder's Hose"),
-    feet = createEquipment("Odyssean Greaves"),
+    feet = createEquipment("Odyssean Greaves", 0, nil,
+        { 'Pet: "Mag.Atk.Bns."+20', 'Pet: Mag. Acc.+7', 'Phalanx +4', 'Accuracy+18 Attack+18' }),
     neck = createEquipment("Moonlight Necklace"),
     waist = createEquipment("Audumbla Sash"),
-    left_ear = createEquipment("Odnowa Earring +1"),
-    right_ear = createEquipment("Chev. Earring +1"),
-    left_ring = createEquipment("Gelatinous Ring +1"),
-    right_ring = createEquipment("Defending Ring"),
+    left_ear = createEquipment("Knightly Earring"),
+    right_ear = createEquipment("Odnowa Earring +1"),
+    left_ring = createEquipment("Defending Ring"),
+    right_ring = createEquipment("Gelatinous Ring +1"),
     back = createEquipment("Weard Mantle", 0, nil, { 'VIT+4', 'Phalanx +5' })
 }
 
@@ -275,7 +301,7 @@ sets.midcast['Enlight'] = set_combine(sets.midcast.SIRDEnmity, {
     body = createEquipment('Reverence surcoat +3'),
     hands = createEquipment('Eschite Gauntlets'),
     waist = createEquipment('Asklepian belt'),
-    back = createEquipment("Moonbeam Cape", 16),
+    back = createEquipment("Moonlight Cape", 16),
     left_ear = createEquipment("Knight's Earring")
 })
 
@@ -304,53 +330,54 @@ sets.midcast['Haste'] = sets.midcast.SIRDEnmity
 -- ================================================ Cure Sets ==============================================
 sets.Cure = {
     ammo = createEquipment('staunch Tathlum +1', 1),
-    head = createEquipment('Souv. Schaller +1', 2),
-    left_ear = createEquipment('tuisto Earring', 15),
-    right_ear = createEquipment('Chev. Earring +1'),
-    hands = createEquipment('Regal Gauntlets', 14),
-    back = Rudianos.cure,
-    legs = createEquipment("Founder's Hose", 8),
-    feet = createEquipment('Odyssean Greaves', 9)
+    head = createEquipment('Souv. Schaller +1', 8),
+    left_ear = createEquipment('tuisto Earring', 10),
+    right_ear = createEquipment('Chev. Earring +1', 0),
+    hands = createEquipment('Regal Gauntlets', 7),
+    back = createEquipment('Moonlight Cape', 12),
+    legs = createEquipment("Founder's Hose", 0),
+    feet = createEquipment('Odyssean Greaves', 5)
 }
 
 -- =========================================================================================================
 --                                           Equipments - Weapon Skill Sets
 -- =========================================================================================================
 sets.precast.WS = {
-    ammo = createEquipment("Aurgelmir Orb +1", 1),
-    head = createEquipment("Hjarrandi Helm", 10),
-    body = createEquipment("Rev. Surcoat +3", 13),
-    hands = createEquipment("Odyssean Gauntlets", 9),
-    legs = createEquipment("Chev. Cuisses +3", 2),
-    feet = createEquipment("Sulev. Leggings +2", 8),
-    neck = createEquipment("Fotia Gorget"),
+    ammo = "Crepuscular Pebble",
+    head = "Sakpata's Helm",
+    body = "Sakpata's Breastplate",
+    hands = "Sakpata's Gauntlets",
+    legs = "Sakpata's Cuisses",
+    feet = "Sulevia's Leggings +2",
+    neck = "Knight's bead Necklace +2",
     waist = createEquipment("Sailfi Belt +1", 3),
-    left_ear = createEquipment("Odnowa Earring +1", 12),
-    right_ear = createEquipment("Thrud Earring", 4),
-    left_ring = createEquipment("Cornelia's Ring", 5),
-    right_ring = createEquipment("Regal Ring", 11),
+    left_ear = "Ishvara Earring",
+    right_ear = "Thrud Earring",
+    left_ring = "Cornelia's Ring",
+    right_ring = "Sroda Ring",
     back = Rudianos.WS
 }
 
 sets.precast.WS.Acc = set_combine(sets.precast.WS, {})
 sets.precast.WS['Requiescat'] = set_combine(sets.precast.WS, {})
 sets.precast.WS['Chant du Cygne'] = set_combine(sets.precast.WS, {})
-sets.precast.WS['Atonement'] = set_combine(sets.precast.WS, {
-    ammo = createEquipment('Sapience Orb'),
-    head = createEquipment('Loess Barbuta +1', 13),
-    neck = createEquipment('Moonlight Necklace', 1),
-    left_ear = createEquipment('Friomisi Earring'),
-    right_ear = createEquipment('Cryptic Earring', 12),
-    body = createEquipment('Souv. Cuirass +1', 16),
-    hands = createEquipment('Souv. Handsch. +1', 15),
-    left_ring = createEquipment('Apeile Ring +1'),
-    right_ring = createEquipment('Apeile Ring'),
-    back = Rudianos.tank,
-    waist = createEquipment('Creed Baudrier', 11),
-    legs = createEquipment('Souv. Diechlings +1', 14),
-    feet = createEquipment("Chevalier's Sabatons +3", 13)
+sets.precast.WS['Atonement'] = sets.FullEnmity
+
+sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {
+    ammo = createEquipment("Crepuscular pebble"),
+    head = createEquipment("Sakpata's Helm"),
+    body = createEquipment("Sakpata's Plate"),
+    hands = createEquipment("Sakpata's Gauntlets"),
+    legs = createEquipment("Sakpata's Cuisses"),
+    feet = createEquipment("Sulev. Leggings +2"),
+    neck = createEquipment("Kgt. Beads +2"),
+    waist = createEquipment("Sailfi Belt +1"),
+    left_ear = createEquipment("Tuisto Earring"),
+    right_ear = createEquipment("Thrud Earring"),
+    left_ring = createEquipment("Cornelia's ring"),
+    right_ring = createEquipment("Gelatinous ring +1"),
+    back = Rudianos.WS
 })
-sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {})
 
 sets.precast.WS['Sanguine Blade'] = set_combine(sets.precast.WS, {
     head = createEquipment('Nyame Helm'),
@@ -366,19 +393,19 @@ sets.precast.WS['Sanguine Blade'] = set_combine(sets.precast.WS, {
 })
 
 sets.precast.WS['Aeolian Edge'] = set_combine(sets.precast.WS, {
-    ammo = createEquipment("Staunch Tathlum +1"),
+    ammo = createEquipment("Oshasha's treatise"),
     head = createEquipment("Nyame Helm"),
     body = createEquipment("Nyame Mail"),
     hands = createEquipment("Nyame Gauntlets"),
     legs = createEquipment("Nyame Flanchard"),
     feet = createEquipment("Nyame Sollerets"),
-    neck = createEquipment("Sibyl Scarf"),
+    neck = createEquipment("Baetyl Pendant"),
     waist = createEquipment("Orpheus's Sash"),
-    left_ear = createEquipment("Sortiarius Earring"),
+    left_ear = createEquipment("Crematio Earring"),
     right_ear = createEquipment("Friomisi Earring"),
     left_ring = createEquipment("Cornelia's Ring"),
-    right_ring = createEquipment("Defending Ring"),
-    back = createEquipment("Toro Cape")
+    right_ring = createEquipment("Defending ring"),
+    back = createEquipment("Moonlight Cape")
 })
 
 sets.precast.WS['Circle Blade'] = set_combine(sets.precast.WS, {
@@ -391,10 +418,9 @@ sets.precast.WS['Circle Blade'] = set_combine(sets.precast.WS, {
     neck = createEquipment("Sibyl Scarf"),
     waist = createEquipment("Orpheus's Sash"),
     left_ear = createEquipment("Sortiarius Earring"),
-    right_ear = createEquipment("Chev. Earring +1", 0, nil,
-        { 'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', 'Damage taken-4%' }),
-    left_ring = createEquipment("Regal Ring"),
-    right_ring = createEquipment("Cornelia's Ring"),
+    right_ear = createEquipment("Chev. Earring +1"),
+    left_ring = createEquipment("Cornelia's Ring"),
+    right_ring = createEquipment("Regal Ring"),
     back = createEquipment("Toro Cape")
 })
 
@@ -403,36 +429,41 @@ sets.precast.WS['Circle Blade'] = set_combine(sets.precast.WS, {
 -- =========================================================================================================
 sets.defense.MDT = {
     sub = createEquipment('Aegis'),
-    ammo = createEquipment('Staunch Tathlum +1'),
-    head = createEquipment("Sakpata's Helm"),
-    body = createEquipment("Sakpata's Plate"),
-    hands = createEquipment("Sakpata's Gauntlets"),
-    legs = createEquipment("Sakpata's Cuisses"),
-    feet = createEquipment("Sakpata's Leggings"),
-    neck = createEquipment('Unmoving Collar +1', 0, nil, { 'Path: A' }),
-    waist = createEquipment('Asklepian Belt'),
-    left_ear = createEquipment('Eabani Earring'),
-    right_ear = createEquipment('Chev. Earring +1', 0, nil,
-        { 'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', 'Damage taken-4%' }),
-    left_ring = createEquipment("Moonbeam Ring", 19, 'wardrobe 2'),
-    right_ring = createEquipment("Moonbeam Ring", 20, 'wardrobe 3'),
-    back = createEquipment("Solemnity Cape")
+    ammo = "Staunch Tathlum +1",
+    head = { name = "Sakpata's Helm", augments = { 'Path: A', } },
+    body = { name = "Sakpata's Plate", augments = { 'Path: A', } },
+    hands = { name = "Sakpata's Gauntlets", augments = { 'Path: A', } },
+    legs = { name = "Sakpata's Cuisses", augments = { 'Path: A', } },
+    feet = { name = "Sakpata's Leggings", augments = { 'Path: A', } },
+    neck = "Moonlight Necklace",
+    waist = "Carrier's Sash",
+    left_ear = "Tuisto Earring",
+    right_ear = "Eabani Earring",
+    left_ring = "Purity Ring",
+    right_ring = { name = "Gelatinous Ring +1", augments = { 'Path: A', } },
+    back = { name = "Rudianos's Mantle", augments = { 'VIT+20', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Phys. dmg. taken-10%', } },
 }
 
 -- =========================================================================================================
 --                                           Equipments - Engaged Sets
 -- =========================================================================================================
 sets.engaged = set_combine(sets.idleNormal, {
-    left_ring = ChirichRing1,
-    right_ring = ChirichRing2,
-    back = Rudianos.STP
+    ammo = createEquipment('Aurgelmir Orb +1', 2),      -- Pas de bonus HP
+    head = createEquipment('Hjarrandi Helm', 0),        -- HP+114
+    body = createEquipment('Crepuscular Mail', 13),     -- HP+228
+    hands = createEquipment("Sakpata's Gauntlets", 11), -- HP+91
+    legs = createEquipment('Chev. Cuisses +3', 11),     -- HP+127
+    feet = createEquipment("Sakpata's Leggings", 0),    -- HP+68
+    neck = createEquipment('Unmoving Collar +1', 12),   -- Pas de bonus HP
+    waist = createEquipment('Sailfi Belt +1', 6),       -- Pas de bonus HP
+    left_ear = createEquipment('Crep. Earring', 0),     -- Pas de bonus HP
+    right_ear = createEquipment('Chev. Earring +1', 4), -- Pas de bonus HP
+    left_ring = createEquipment('Moonlight Ring', 12),  -- HP+110
+    right_ring = createEquipment('Chirich Ring +1', 0), -- Pas de bonus HP
+    back = Rudianos.STP                                 -- Pas de bonus HP
 })
 
-sets.engaged.PDT = set_combine(sets.idleNormal, {
-    left_ring = ChirichRing1,
-    right_ring = createEquipment('Defending Ring'),
-    back = Rudianos.STP
-})
+sets.engaged.PDT = sets.engaged
 
 sets.engaged.MDT = sets.idle.MDT
 
@@ -447,13 +478,13 @@ sets.meleeXp = set_combine(sets.idleXp, {
 -- =========================================================================================================
 sets.MoveSpeed = {
     legs = createEquipment('Carmine Cuisses +1', 2),
-    waist = createEquipment('Audumbla sash', 3),
-    right_ring = createEquipment('Defending Ring', 1)
 }
 
 -- =========================================================================================================
 --                                           Equipments - Custom Buff Sets
 -- =========================================================================================================
 sets.buff.Doom = {
-    neck = createEquipment("Nicander's Necklace")
+    neck = createEquipment("Nicander's Necklace"), -- Reduces Doom effects
+    left_ring = createEquipment("Purity Ring"),    -- Additional Doom resistance
+    waist = createEquipment("Gishdubar Sash"),     -- Enhances Doom recovery effects
 }

@@ -1,5 +1,5 @@
 --============================================================--
---=                        WARRIOR                           =--
+--=                        BEAST MASTER                      =--
 --============================================================--
 --=                    Author: Tetsouo                       =--
 --=                     Version: 1.0                         =--
@@ -12,14 +12,14 @@
 function get_sets()
     mote_include_version = 2             -- Specifies the version of the Mote library to use
     -- Include necessary libraries and modules
-    include('Mote-Include.lua')          -- Mote library for GearSwap
-    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
-    include('/WAR/WAR_FUNCTION.lua')     -- Advanced functions specific to Warrior
+    include('Mote-Include.lua')          -- Module for movement speed gear management
     include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
-    include('/WAR/WAR_SET.lua')          -- Warrior specific gear sets
-    removeRetaliationOnLongMovement()
+    include('/BST/BST_SET.lua')          -- Beast Master specific gear sets
+    include('/BST/BST_FUNCTION.lua')     -- Advanced functions specific to Beast Master
+    send_command('lua l pettp')
 end
 
+-- Initialize gear sets.
 function init_gear_sets()
 end
 
@@ -30,25 +30,27 @@ function job_setup()
     state.HybridMode:options('PDT', 'Normal')
 
     -- Sets the options for the main weapon set.
-    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Ukonvasara', 'Chango', 'Naegling', 'Shining', 'Loxotic' }
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Utu Grip', 'Blurred Shield +1' }
-    state.ammoSet = M { ['description'] = 'Ammo', 'Aurgelmir Orb +1' }
+    state.WeaponSet = M { ['description'] = 'Main Weapon', "Aymur", "Agwu's axe", 'Arktoi', "Tauret" }
+    state.SubSet = M { ['description'] = 'Sub Weapon', "Izizoeksi", "Blur Knife", "Agwu's axe" }
+    state.petEngaged = M('false', 'true')
+    state.ammoSet = M { ['description'] = 'ammo', "Chapuli", "Tulfaire", "Acuex", "Slug", "Hippo", 'Slime', 'Leech', 'Crab' }
 
     -- Binds keys to cycle through hybrid modes and weapon sets.
-    send_command('bind F9 gs c cycle HybridMode')
-    send_command('bind F10 gs c cycle WeaponSet')
-    send_command('bind F11 gs c cycle SubSet')
+    send_command('bind F2 gs c cycle HybridMode')
+    send_command('bind F3 gs c cycle WeaponSet')
+    send_command('bind F4 gs c cycle SubSet')
+    send_command('bind F5 gs c cycle ammoSet')
+    send_command('bind F6 gs c cycle petEngaged')
 
     -- Sets the options for the alternative player state.
     state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
     state.altPlayerDark = M('Stone', 'Blizzard', 'Water')
     state.altPlayerTier = M('V', 'IV', 'III', 'II', '')
     state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
-    state.altPlayerGeo = M('Geo-Fury', 'Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
-    state.altPlayerIndi = M('Indi-Fury', 'Indi-Agi', 'Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Acumen',
-        'Indi-Precision',
+    state.altPlayerGeo = M('Geo-Frailty', 'Geo-Malaise', 'Geo-Languor', 'Geo-Slow', 'Geo-Torpor')
+    state.altPlayerIndi = M('Indi-Fury', 'Indi-Refresh', 'Indi-Barrier', 'Indi-Fend', 'Indi-Acumen', 'Indi-Precision',
         'Indi-Haste')
-    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Barrier', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
+    state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 end
 
 function user_setup()
@@ -62,45 +64,22 @@ function file_unload()
     send_command('unbind F9')
     send_command('unbind F10')
     send_command('unbind F11')
+    send_command('lua unload pettp')
 end
 
--- =========================================================================================================
--- Function: job_precast
 -- Prepares for the casting of a spell or ability.
--- Handles Weapon Skill (WS) gear selection based on TP thresholds and custom WS modes.
---
+-- This function is called before each spell or ability is cast.
 -- Parameters:
---   spell (table): The spell being cast.
---   action (table): The action being performed.
---   spellMap (string): The mapping of the spell, used for categorization.
---   eventArgs (table): Additional event arguments.
--- =========================================================================================================
+--   spell (table): The spell being cast
+--   action (table): The action being performed
+--   spellMap (table): The spell mapping table
+--   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
-    -- Handle the spell casting logic
+    -- Handle the spell casting
     handle_spell(spell, eventArgs, auto_abilities)
-
-    -- Check and display the recast cooldown for the spell
+    -- Check and display the recast cooldown
     checkDisplayCooldown(spell, eventArgs)
-
-    -- Ensure the spell is within weapon skill range
-    Ws_range(spell)
-
-    -- If the spell is a Weapon Skill, handle gear selection
-    if spell.type == 'WeaponSkill' then
-        -- Determine the custom WS mode based on TP thresholds
-        local wsmode = get_custom_wsmode(spell, spellMap)
-
-        -- Select and equip the appropriate gear set
-        local ws_set = sets.precast.WS[spell.english] or sets.precast.WS
-        if wsmode and ws_set[wsmode] then
-            equip(ws_set[wsmode])
-        else
-            equip(ws_set)
-        end
-
-        -- Prevent default gear handling since gear has already been equipped
-        eventArgs.handled = true
-    end
+    job_pet_precast(spell, action, spellMap, eventArgs)
 end
 
 -- Manages actions during the casting of a spell or ability.
@@ -122,7 +101,7 @@ end
 --   eventArgs (table): Additional event arguments
 function job_aftercast(spell, action, spellMap, eventArgs)
     -- Handles actions to be performed after the spell is cast.
-    handleSpellAftercast(spell, eventArgs)
+    --[[ handleSpellAftercast(spell, eventArgs) ]]
 end
 
 -- Sets the default macro book based on the player's sub job.
@@ -130,13 +109,15 @@ function select_default_macro_book()
     -- Unloads the dressup plugin.
     send_command('lua unload dressup')
     -- Sets the macro page and style set based on the sub job.
-    if player.sub_job == 'DRG' then
-        set_macro_page(1, 32)
-    elseif player.sub_job == 'SAM' then
-        set_macro_page(1, 30)
+    if player.sub_job == 'DNC' then
+        set_macro_page(1, 15)
+    elseif player.sub_job == 'SCH' then
+        set_macro_page(1, 16)
     else
-        set_macro_page(1, 30)
+        set_macro_page(1, 15)
     end
     -- Locks the style set.
-    send_command('wait 15;input /lockstyleset 5; wait 5; lua load dressup')
+    send_command('input /lockstyleset 11')
+    -- Waits for 15 seconds before loading the dressup plugin.
+    send_command('wait 15; lua load dressup')
 end
