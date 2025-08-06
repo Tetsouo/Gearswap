@@ -1,5 +1,21 @@
-Tetsouo.code-workspace
-.gitignore
-.vscode
-SharedFunctionsTest.lua
-BLM_FUNCTIONTest.lua
+# Claude settings and documentation - local only
+.claude/
+CLAUDE.md
+*.local.json
+
+# Backup files
+backups/
+*.bak
+
+# Temporary files
+*.tmp
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+.vscode/settings.json
