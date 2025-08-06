@@ -177,7 +177,7 @@ log.info("Spell downgraded: %s -> %s", originalSpell, newSpell)
 
 ## 📚 Documentation
 
-- **📋 Master Documentation**: `CLAUDE.md` - Technical specs, changelog, and project status
+- **📋 Master Documentation**: `DOCUMENTATION.md` - Technical specs, changelog, and project status
 - **🏗️ Architecture Overview**: `docs/ARCHITECTURE_OVERVIEW.md` - System design and modules  
 - **👤 User Guide**: `docs/GUIDE_UTILISATEUR.md` - Installation and usage guide
 - **🔧 Auto-Documentation**: `auto_document.lua` - Generate code documentation

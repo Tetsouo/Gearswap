@@ -14,29 +14,34 @@
 
 ### 🪄 **Black Mage Major Enhancements**
 
-**✅ BuffSelf Logic Completely Rewritten**
+#### BuffSelf Logic Completely Rewritten
+
 - **Problem Fixed**: No longer re-casts spells when buffs are already active
 - **Before**: BuffSelf would recast Stoneskin/Blink even when active
 - **After**: Only casts when buff is NOT active
 - **Enhanced**: Shows recast times when all spells are on cooldown
 
-**✅ Multi-Tier Spell Downgrade System**
+#### Multi-Tier Spell Downgrade System
+
 - **Fire VI → V → IV → III → II → I** (complete downgrade chain)
 - **Aspir III → II → I** with recast display
 - **Firaja III → Firaga III → II** (intelligent -ja to -ga transitions)
 - **Anti-loop Protection** with timestamp system
 
-**✅ Resource Tables Fixed**
+#### Resource Tables Fixed
+
 - **Critical Fix**: `res.spells` instead of `gearswap.res.spells`
 - **All Spells**: Elemental, Aja, Aspir, etc. now work correctly
 - **Complete Validation** of spell IDs and MP costs
 
-**✅ FFXI-Style Colored Messages**
+#### FFXI-Style Colored Messages
+
 - **FFXI Styling**: Gray brackets + colored text
 - **Recast Display**: "Aspir III: 2.3 minutes remaining"
 - **Consistency**: Same style as WAR/THF/PLD systems
 
 ### 📊 **Measured Performance Impact**
+
 - **Spell Casting Errors**: 90% reduction
 - **BuffSelf Efficiency**: 100% improvement (no unnecessary recasting)
 - **User Experience**: Clear, informative messages
@@ -54,7 +59,8 @@
 **✅ Infrastructure Layer**: Configuration + Logging  
 
 ### 🔧 **12 Specialized Modules**
-```
+
+```text
 core/                    utils/
 ├─ equipment.lua ✅      ├─ helpers.lua ✅
 ├─ spells.lua ✅        ├─ logger.lua ✅  
@@ -67,7 +73,8 @@ core/                    utils/
 ```
 
 ### 📁 **Project Structure**
-```
+
+```text
 D:\Windower\addons\GearSwap\data\YourName\
 ├── 📄 8 main job files (Tetsouo_JOB.lua)
 ├── 📁 config/              # Centralized configuration
@@ -105,6 +112,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 ## 🎮 **Supported Jobs (8 Complete)**
 
 ### 🪄 **Black Mage (BLM)** - ⭐ RECENTLY ENHANCED
+
 - **Multi-Tier Spell Downgrade** - Fire VI → V → IV → III → II → I
 - **Intelligent BuffSelf** - Only casts when buffs not active
 - **Recast Information** - Shows all tier cooldowns: "Aspir III: 2.3 minutes"
@@ -112,6 +120,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 - **Magic Burst Optimization** - Advanced elemental magic management
 
 ### 🗡️ **Other Production-Ready Jobs**
+
 - **Thief (THF)** - SA/TA optimization, Treasure Hunter, stealth mechanics
 - **Paladin (PLD)** - Tank sets, enmity management, extensive documentation (35+ files)
 - **Warrior (WAR)** - Weapon skill optimization, Aftermath tracking, Relic support
@@ -125,12 +134,14 @@ D:\Windower\addons\GearSwap\data\YourName\
 ## 🔧 **Advanced Features**
 
 ### 🎨 **Multi-Level Colored Messages**
+
 - **WS interrupted**: Orange + Red
 - **JA interrupted**: Orange + Yellow  
 - **Spells interrupted**: Orange + Blue/Green
 - **Neutral elements**: Gray separators
 
 ### ⚙️ **Centralized Configuration**
+
 ```lua
 -- config/settings.lua
 {
@@ -150,11 +161,13 @@ D:\Windower\addons\GearSwap\data\YourName\
 ```
 
 ### 🎯 **Dual-Boxing System**
+
 - Automatic multi-character coordination
 - Group spell synchronization
 - Intelligent shared buff management
 
 ### 🛡️ **Validation & Security**
+
 - Automatic equipment validation
 - Input security checks on all commands
 - Graceful error handling with fallbacks
@@ -164,6 +177,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 ## 📊 **Performance Metrics**
 
 ### 🚀 **Measured Improvements**
+
 - **Startup Time**: ~200ms (60% improvement)
 - **Memory Usage**: ~2MB modules (vs 8MB monolith)
 - **Code Reduction**: 53.4% in core files
@@ -171,6 +185,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 - **BuffSelf Efficiency**: 100% improvement
 
 ### 📈 **Project Statistics**
+
 - **45+ Lua files** total
 - **8 jobs supported** with complete functionality
 - **12 modules** with specialized responsibilities
@@ -182,6 +197,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 ## 🏆 **Technical Excellence**
 
 ### ✅ **Enterprise Standards Applied**
+
 - **JSDoc/LuaDoc Headers**: Professional documentation
 - **Modular Architecture**: Clean separation of concerns
 - **Error Handling**: Comprehensive validation and fallbacks
@@ -189,6 +205,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 - **Backward Compatibility**: 100% preserved
 
 ### 🔄 **Design Patterns Used**
+
 1. **Module Pattern** - Clean encapsulation
 2. **Facade Pattern** - Compatibility layer
 3. **Centralized Configuration** - Single source of truth
@@ -199,6 +216,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 ## 🎯 **Installation & Usage**
 
 ### 📥 **Quick Start**
+
 1. Download entire repository
 2. Place in `Windower/addons/GearSwap/data/YourName/`
 3. Rename job files: `YourName_JOB.lua`
@@ -206,6 +224,7 @@ D:\Windower\addons\GearSwap\data\YourName\
 5. Load with `//gs load YourName_JOB`
 
 ### 📚 **Documentation**
+
 - **📋 Architecture**: `docs/ARCHITECTURE_OVERVIEW.md`
 - **👤 User Guide**: `docs/GUIDE_UTILISATEUR.md`
 - **🔧 Auto-Documentation**: `auto_document.lua`
@@ -215,12 +234,14 @@ D:\Windower\addons\GearSwap\data\YourName\
 ## 🎖️ **Version History**
 
 ### **v2.1.0** (2025-08-06): **BLACK MAGE REVOLUTION**
+
 - Complete BLM spell system overhaul
 - Multi-tier spell downgrade implementation
 - FFXI-style colored message system
 - 90% reduction in casting errors
 
 ### **v2.0.0** (2025-08-05): **MODULAR ARCHITECTURE**
+
 - 12 specialized modules implemented
 - 4-layer architecture with 53.4% code reduction
 - 8 jobs fully supported and tested
@@ -236,4 +257,4 @@ This GearSwap system exceeds all typical FFXI script standards and serves as a *
 
 ---
 
-*Professional GearSwap system for the FFXI community*
+Professional GearSwap system for the FFXI community

@@ -1,21 +1,12 @@
 {
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(cp:*)",
-      "Bash(mkdir:*)",
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(lua:*)",
-      "Bash(rm:*)",
-      "Bash(mv:*)",
-      "Bash(ls:*)",
-      "Bash(tree:*)",
-      "Bash(for:*)",
-      "Bash(do echo \"=== Checking $file ===\")",
-      "Bash(echo:*)",
-      "Bash(done)"
-    ],
-    "deny": []
-  }
+      "Bash(git reset:*)",
+      "Bash(git add:*)"
+    ]
+  },
+  "cline.codeEditingMaxIterations": 8,
+  "cline.maxRequestsPerTask": 50,
+  "cline.alwaysAllowReadOnly": true,
+  "cline.customInstructions": "You are working on a FFXI GearSwap Lua project. Focus on modular architecture, professional coding standards, and maintain backward compatibility."
 }
