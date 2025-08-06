@@ -1,7 +1,8 @@
-# Claude settings and documentation - local only
-.claude/
-CLAUDE.md
+# Development settings and documentation - local only
+.dev/
+.local/
 *.local.json
+*.internal.md
 
 # Backup files
 backups/
