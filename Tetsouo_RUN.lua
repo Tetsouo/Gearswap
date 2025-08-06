@@ -1,32 +1,77 @@
---============================================================--
---=                        RUNE FENCER                       =--
---============================================================--
---=                    Author: Tetsouo                       =--
---=                     Version: 1.0                         =--
---=                  Created: 2023-07-10                     =--
---=               Last Modified: 07/02/2024                  =--
---============================================================--
+---============================================================================
+--- FFXI GearSwap Configuration - Rune Fencer (RUN)
+---============================================================================
+--- Professional Rune Fencer job configuration with elemental resistance 
+--- management, rune enhancement optimization, and hybrid tanking capabilities.
+--- Features include:
+---
+--- • **Elemental Resistance Management** - Dynamic rune selection and stacking
+--- • **Ward/Barrier Optimization** - Spell timing and potency enhancement
+--- • **Hybrid Tank/DD Modes** - PDT/MDT switching with offensive capabilities
+--- • **Elemental Weapon Skills** - Damage type optimization for encounters
+--- • **Rune Duration Tracking** - Visual and logical rune state management
+--- • **Spell Interruption Recovery** - Intelligent recasting and error handling
+--- • **Multi-Element Strategy** - Complex rune combinations for specific fights
+---
+--- @file Tetsouo_RUN.lua
+--- @author Tetsouo
+--- @version 2.0
+--- @date Created: 2023-07-10 | Modified: 2025-08-05
+--- @requires Mote-Include.lua, RUN_SET.lua, RUN_FUNCTION.lua
+--- @requires modules/automove.lua, modules/shared.lua
+---
+--- @usage
+---   F2:  Cycle HybridMode (PDT ⇆ MDT)
+---   F3:  Cycle WeaponSet (Aettir variants)
+---   F4:  Cycle SubSet (Refined Grip +1 ⇆ Utu Grip)
+---   //gs c cycle [mode] - Manual mode cycling via chat commands
+---
+--- @see jobs/run/RUN_FUNCTION.lua for rune management algorithms
+--- @see jobs/run/RUN_SET.lua for elemental resistance equipment sets
+---============================================================================
 
--- Initializes GearSwap for the Paladin job by setting up the necessary libraries and files.
--- This function is called once when the script is loaded.
+--- Initialize GearSwap libraries and job-specific modules for Rune Fencer
+--- Sets up all necessary dependencies including elemental resistance management,
+--- rune tracking systems, and hybrid tanking/damage dealer capabilities
+---
+--- @usage Called automatically on script load - no manual invocation needed
 function get_sets()
-    mote_include_version = 2
-    include('Mote-Include.lua')          -- Mote library for GearSwap
-    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
+    mote_include_version = 2                    -- Target Motenten Include v2 for compatibility
+    include('Mote-Include.lua')                 -- Core GearSwap framework with RUN support
+    include('modules/automove.lua')             -- Automatic movement speed gear management
+    include('modules/shared.lua')               -- Shared utility functions across all jobs
+    include('jobs/run/RUN_SET.lua')            -- RUN-specific equipment sets and resistances
+    include('jobs/run/RUN_FUNCTION.lua')       -- Advanced RUN job mechanics and rune logic
 end
 
--- Initializes gear sets for the Paladin job.
--- This function is called once when the script is loaded.
+--- Initialize equipment sets for Rune Fencer
+--- Equipment sets are defined externally in RUN_SET.lua for modularity
+--- This placeholder ensures compatibility with Mote-Include framework
+---
+--- @see jobs/run/RUN_SET.lua for actual equipment definitions
 function init_gear_sets()
+    -- Equipment sets are loaded from external module
+    -- This function exists for Mote-Include compatibility
 end
 
--- Sets up user-specific configurations and binds keys for the Paladin job.
+---============================================================================
+--- USER CONFIGURATION SECTION
+---============================================================================
+
+--- Configure user-specific preferences and macro book selection
+--- Called after job setup to apply user customizations and initialize
+--- macro books and lockstyles based on subjob configuration
+---
+--- @usage Called automatically by Mote-Include framework
 function user_setup()
-    select_default_macro_book() -- Selects the default macro book based on sub-job
+    select_default_macro_book() -- Initialize macro book and lockstyle for current subjob
 end
 
--- Sets up user-specific configurations and binds keys for the Paladin job.
--- This function is called once when the script is loaded.
+--- Configure job-specific states, rune management, and keybindings
+--- Sets up all user-configurable options and state variables for RUN
+--- Called once during initialization to establish job behavior patterns
+---
+--- @usage Called automatically by Mote-Include framework
 function job_setup()
     -- Define options for hybrid mode
     state.HybridMode:options('PDT', 'MDT')
@@ -108,27 +153,17 @@ function job_aftercast(spell, action, spellMap, eventArgs)
     handleSpellAftercast(spell, eventArgs)
 end
 
--- Sets the default macro book based on the player's sub job.
--- This function is called once when the script is loaded.
+-- Sets the default macro book and lockstyle for RUN
 function select_default_macro_book()
-    -- Unloads the 'dressup' Lua script.
     send_command('lua unload dressup')
-
-    -- Set macro book and lockstyle based on sub job
-    if player.sub_job == 'BLU' then
-        set_macro_page(1, 23) -- BLU sub job
-        send_command('wait 5; input /lockstyleset 3')
-    elseif player.sub_job == 'WAR' then
-        set_macro_page(1, 21) -- WAR sub job
-        send_command('wait 5; input /lockstyleset 4')
-    elseif player.sub_job == 'RDM' then
-        set_macro_page(1, 28) -- RDM sub job
-        send_command('wait 5; input /lockstyleset 3')
-    else
-        set_macro_page(1, 23) -- Default for other sub jobs
-        send_command('wait 5; input /lockstyleset 3')
-    end
-
-    -- Waits for 15 seconds, locks the style set to 1, waits for another 5 seconds, and then loads the 'dressup' Lua script.
-    send_command('wait 15; lua load dressup')
+    
+    -- RUN macro pages based on subjob
+    local macro_page = ({ BLU = 23, WAR = 21, RDM = 28 })[player.sub_job] or 23
+    set_macro_page(1, macro_page)
+    
+    -- RUN lockstyle
+    send_command('wait 3; input /lockstyleset 3')
+    
+    -- Reload dressup with delay to avoid macro loss
+    send_command('wait 20; lua load dressup')
 end

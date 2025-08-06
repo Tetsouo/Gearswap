@@ -1,31 +1,111 @@
---============================================================--
---=                        DANCER                            =--
---============================================================--
---=                    Author: Tetsouo                       =--
---=                     Version: 1.0                         =--
---=                  Created: 2023-07-10                     =--
---=               Last Modified: 2024/02/03                  =--
---============================================================--
+---============================================================================
+--- FFXI GearSwap Configuration - Dancer (DNC)
+---============================================================================
+--- Professional GearSwap configuration for Dancer job in FFXI.
+--- Provides advanced automation for step management, flourish tracking,
+--- treasure hunter optimization, and dual-boxing functionality.
+---
+--- @file Tetsouo_DNC.lua
+--- @author Tetsouo
+--- @version 2.0
+--- @date Created: 2023-07-10
+--- @date Modified: 2025-08-05
+--- @requires Mote-Include v2.0+
+--- @requires Mote-TreasureHunter.lua
+--- @requires GearSwap addon
+--- @requires Windower FFXI
+---
+--- Dependencies:
+---   - modules/automove.lua        : Automatic movement detection and gear swapping
+---   - modules/shared.lua          : Shared utility functions across jobs
+---   - jobs/dnc/DNC_SET.lua       : DNC-specific equipment sets
+---   - jobs/dnc/DNC_FUNCTION.lua  : DNC-specific advanced functions
+---   - Mote-TreasureHunter.lua    : Treasure Hunter automation framework
+---
+--- Features:
+---   - Intelligent step management with main/alt step rotation
+---   - Flourish buff tracking (Climactic, Building, Ternary)
+---   - Treasure Hunter integration with step/flourish coordination
+---   - Dynamic weapon set switching for different combat scenarios
+---   - Step target selection automation
+---   - Skillchain coordination and timing
+---   - Hybrid defense mode management (PDT/Normal)
+---   - Accuracy mode switching for different content
+---   - Dual-boxing support for mage coordination
+---
+--- Usage:
+---   Place in: Windower4/addons/GearSwap/data/[CharacterName]/
+---   Load with: //gs load Tetsouo_DNC
+---   Unload with: //gs unload
+---
+--- Step Management:
+---   - Main Step: Primary step for debuffing (Box Step, Quickstep, etc.)
+---   - Alt Step: Secondary step for additional effects
+---   - Auto target selection for optimal step application
+---
+--- Console Commands:
+---   //gs c cycle TreasureMode : Toggle treasure hunter mode
+---   //gs c cycle HybridMode  : Toggle defense mode (PDT/Normal)
+---   //gs c cycle OffenseMode : Toggle accuracy mode (Normal/Acc)
+---   //gs c cycle WeaponSet   : Change main weapon configuration
+---   //gs c cycle SubSet      : Change sub weapon configuration
+---============================================================================
 
--- Initializes GearSwap for the Dancer job by setting up the necessary libraries and files.
--- This function is called once when the script is loaded.
+---============================================================================
+--- CORE INITIALIZATION FUNCTIONS
+---============================================================================
 
--- Initialization function for this job file.
+--- Initialize the GearSwap environment and load required dependencies.
+--- This function is automatically called by GearSwap when the lua file is loaded.
+--- Sets up Mote-Include v2 framework and loads all necessary DNC-specific modules.
+---
+--- Initialization Order:
+---   1. Mote-Include v2 framework
+---   2. Movement automation module
+---   3. Shared utility functions
+---   4. DNC equipment sets
+---   5. DNC advanced functions
+---
+--- @usage Automatically called by GearSwap - do not call manually
+--- @see Mote-Include.lua For framework documentation
 function get_sets()
     mote_include_version = 2             -- Specifies the version of the Mote library to use
     include('Mote-Include.lua')          -- Mote library for GearSwap
-    include('/Misc/0_AutoMove.lua')      -- Module for movement speed gear management
-    include('/Misc/SharedFunctions.lua') -- Shared functions across jobs
-    include('/DNC/DNC_SET.lua')          -- Dancer specific gear sets
-    include('/DNC/DNC_FUNCTION.lua')     -- Advanced functions specific to Dancer
+    include('modules/automove.lua')      -- Module for movement speed gear management
+    include('modules/shared.lua') -- Shared functions across jobs
+    include('jobs/dnc/DNC_SET.lua')          -- Dancer specific gear sets
+    include('jobs/dnc/DNC_FUNCTION.lua')     -- Advanced functions specific to Dancer
 end
 
--- Initializes gear sets for the Dancer job.
--- This function is called once when the script is loaded.
+--- Initialize gear sets for Dancer.
+--- This function is intentionally minimal as gear sets are externally defined
+--- in the DNC_SET.lua file for better organization and maintainability.
+---
+--- @usage Automatically called by Mote framework
+--- @see jobs/dnc/DNC_SET.lua For complete equipment set definitions
 function init_gear_sets()
 end
 
--- Setup vars that are user-independent.  state.Buff vars initialized here will automatically be tracked.
+---============================================================================
+--- JOB SETUP AND STATE MANAGEMENT
+---============================================================================
+
+--- Configure job-specific logic, states, and Dancer mechanics.
+--- Initializes all DNC-specific mechanics including step management,
+--- flourish tracking, treasure hunter modes, and dual-boxing states.
+---
+--- Key Features Configured:
+---   - Treasure Hunter automation via Mote-TreasureHunter.lua
+---   - Flourish buff state tracking (Climactic, Building, Ternary)
+---   - Step management system with main/alt step rotation
+---   - Dynamic weapon and sub weapon configurations
+---   - Hybrid and offense mode options
+---   - Step target selection automation
+---   - Skillchain coordination timing
+---   - Dual-boxing mage coordination states
+---
+--- @usage Automatically called by Mote framework after dependency loading
+--- @see Mote-TreasureHunter.lua For TH automation framework
 function job_setup()
     include('Mote-TreasureHunter.lua') -- Includes the file for handling Treasure Hunter.
     -- Initializes the treasureHunter state variable from TreasureMode and sets default treasure mode
@@ -93,20 +173,17 @@ function job_aftercast(spell, action, spellMap, eventArgs)
     handleSpellAftercast(spell, eventArgs)
 end
 
--- Sets the default macro book based on the player's sub job.
--- This function is called once when the script is loaded.
+-- Sets the default macro book and lockstyle for DNC
 function select_default_macro_book()
-    -- Unloads the 'dressup' Lua script.
     send_command('lua unload dressup')
-    -- If the player's sub-job is 'DNC', 'WAR', or 'NIN', selects the corresponding macro page. Otherwise, selects the first macro page.
-    if player.sub_job == 'WAR' then
-        set_macro_page(1, 6)
-    elseif player.sub_job == 'NIN' then
-        set_macro_page(1, 8)
-    else
-        set_macro_page(1, 6)
-    end
-
-    -- Waits for 15 seconds, locks the style set to 1, waits for another 5 seconds, and then loads the 'dressup' Lua script.
-    send_command('wait 10;input /lockstyleset 2; wait 5; lua load dressup')
+    
+    -- DNC macro pages based on subjob
+    local macro_page = ({ WAR = 6, NIN = 8 })[player.sub_job] or 6
+    set_macro_page(1, macro_page)
+    
+    -- DNC lockstyle
+    send_command('wait 3; input /lockstyleset 2')
+    
+    -- Reload dressup with delay to avoid macro loss
+    send_command('wait 20; lua load dressup')
 end

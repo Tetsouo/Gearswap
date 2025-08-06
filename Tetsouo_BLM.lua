@@ -1,25 +1,90 @@
---============================================================--
---=                      BLACK MAGE                          =--
---============================================================--
---=                    Author: Tetsouo                       =--
---=                     Version: 1.0                         =--
---=                  Created: 2023-07-10                     =--
---=               Last Modified: 2023-07-13                  =--
---============================================================--
+---============================================================================
+--- FFXI GearSwap Configuration - Black Mage (BLM)
+---============================================================================
+--- Professional GearSwap configuration for Black Mage job in FFXI.
+--- Provides advanced automation for gear swapping, spell management, and
+--- dual-boxing functionality with intelligent magic burst support.
+---
+--- @file Tetsouo_BLM.lua
+--- @author Tetsouo
+--- @version 2.0
+--- @date Created: 2023-07-10
+--- @date Modified: 2025-08-05
+--- @requires Mote-Include v2.0+
+--- @requires GearSwap addon
+--- @requires Windower FFXI
+---
+--- Dependencies:
+---   - modules/automove.lua    : Automatic movement detection and gear swapping
+---   - modules/shared.lua      : Shared utility functions across jobs
+---   - jobs/blm/BLM_SET.lua   : BLM-specific equipment sets
+---   - jobs/blm/BLM_FUNCTION.lua : BLM-specific advanced functions
+---
+--- Features:
+---   - Intelligent magic burst detection and optimization
+---   - Automatic spell tier selection based on target and situation
+---   - Dual-boxing support for synchronized spellcasting
+---   - Storm spell management and rotation
+---   - Experience point optimization mode
+---   - Mana Wall buff tracking and gear adjustment
+---   - Macro book and lockstyle automation
+---
+--- Usage:
+---   Place in: Windower4/addons/GearSwap/data/[CharacterName]/
+---   Load with: //gs load Tetsouo_BLM
+---   Unload with: //gs unload
+---
+--- Key Bindings:
+---   F9 : Cycle Casting Mode (MagicBurst/Normal)
+---
+--- Console Commands:
+---   //gs c cycle CastingMode     : Toggle casting mode
+---   //gs c cycle mainLightSpell  : Cycle light element spells
+---   //gs c cycle mainDarkSpell   : Cycle dark element spells
+---   //gs c cycle tierSpell       : Cycle spell tiers (VI-II)
+---   //gs c cycle Aja             : Cycle -ja spells
+---   //gs c cycle Storm           : Cycle storm spells
+---============================================================================
 
--- Initialize libraries and files for Gearswap.
+---============================================================================
+--- CORE INITIALIZATION FUNCTIONS
+---============================================================================
+
+--- Initialize the GearSwap environment and load required dependencies.
+--- This function is automatically called by GearSwap when the lua file is loaded.
+--- Sets up Mote-Include framework and loads all necessary modules.
+---
+--- @usage Automatically called by GearSwap - do not call manually
+--- @see Mote-Include.lua For framework documentation
 function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua')          -- Utility functions and structures for GearSwap
-    include('/Misc/0_AutoMove.lua')      -- Automatic movement speed gear swapping
-    include('/Misc/SharedFunctions.lua') -- Functions shared across multiple jobs
-    include('/BLM/BLM_SET.lua')          -- Gear sets specific to Black Mage
-    include('/BLM/BLM_FUNCTION.lua')     -- Advanced functions specific to Black Mage
+    include('modules/automove.lua')      -- Automatic movement speed gear swapping
+    include('modules/shared.lua') -- Functions shared across multiple jobs
+    include('jobs/blm/BLM_SET.lua')          -- Gear sets specific to Black Mage
+    include('jobs/blm/BLM_FUNCTION.lua')     -- Advanced functions specific to Black Mage
 end
 
 -------------------------------------------------------------------------------------------------------------
 
--- Handles user-specific configuration and setup.
+---============================================================================
+--- JOB SETUP AND CONFIGURATION
+---============================================================================
+
+--- Configure job-specific states and user preferences.
+--- Initializes all customizable options, state management, and keybindings.
+--- Called automatically after Mote-Include initialization.
+---
+--- States configured:
+---   - CastingMode: Magic burst vs normal casting optimization
+---   - Xp: Experience point gain optimization toggle
+---   - Element selection: Light/Dark element preferences for main/alt player
+---   - Spell tiers: Automatic tier selection (VI down to base spells)
+---   - Aja spells: Ancient magic rotation management
+---   - Storm spells: Enhancing magic storm rotation
+---
+--- @usage Automatically called by Mote framework
+--- @see job_self_command For command handling
 function job_setup()
     -- Command to change Casting mode: /console gs c cycle CastingMode
     state.CastingMode:options('MagicBurst', 'Normal')
@@ -42,7 +107,8 @@ function job_setup()
     Manawall = buffactive['Mana Wall'] or false
 
     --------------------------------------------------------------------------------------------
-    --                              Alt_Player_State
+    -- DUAL-BOXING CONFIGURATION
+    -- State management for secondary character coordination and automation
     --------------------------------------------------------------------------------------------
     -- Command to change MainLight mode: /console gs c cycle AltPlayerLight
     state.altPlayerLight = M('Fire', 'Thunder', 'Aero')
@@ -53,7 +119,7 @@ function job_setup()
     -- Command to change Aja mode: /console gs c cycle altPlayera
     state.altPlayera = M('Fira', 'Stonera', 'Blizzara', 'Aera', 'Thundara', 'Watera')
     -- Command to change Aja mode: /console gs c cycle altPlayerGeo
-    state.altPlayerGeo = M('Geo-Focus', 'Geo-Precision', 'Geo-Malaise', 'Geo-Refresh', 'Geo-Languor')
+    state.altPlayerGeo = M('Geo-Malaise', 'Geo-Focus', 'Geo-Precision', 'Geo-Refresh', 'Geo-Languor')
     -- Command to change Aja mode: /console gs c cycle altPlayerGeo
     state.altPlayerIndi = M('Indi-Acumen', 'Indi-Refresh',
         'Indi-Haste')
@@ -64,29 +130,57 @@ function job_setup()
     send_command('bind F9 gs c cycle CastingMode')
 end
 
--- Function called during user setup at the start or after a job change
+--- Configure user-specific settings and preferences.
+--- Called after job_setup to handle user customizations.
+--- Primarily handles macro book selection based on subjob.
+---
+--- @usage Automatically called by Mote framework
+--- @see select_default_macro_book For macro configuration
 function user_setup()
     -- Calls a function to select the default macro book based on the sub-job
     select_default_macro_book()
 end
 
--- Handles the unload event when changing job or reloading the file.
+--- Clean up resources when unloading the GearSwap file.
+--- Unbinds all custom keybindings to prevent conflicts.
+--- Called automatically when changing jobs or reloading.
+---
+--- @usage Automatically called by GearSwap
 function file_unload()
     -- Unbinds the keys associated with the states.
     send_command('unbind F9')
 end
 
--- Loads the gear sets from the PLD_SET.lua file.
+--- Initialize gear sets for Black Mage.
+--- This function is intentionally empty as gear sets are loaded
+--- from the external BLM_SET.lua file via include statement.
+---
+--- @usage Automatically called by Mote framework
+--- @see jobs/blm/BLM_SET.lua For actual gear set definitions
 function init_gear_sets()
 
 end
 
--- Handles actions and checks to perform before casting a spell or ability.
--- Parameters:
---   spell (table): The spell being cast
---   action (table): The action being performed
---   spellMap (table): The spell mapping table
---   eventArgs (table): Additional event arguments
+---============================================================================
+--- SPELL CASTING EVENT HANDLERS
+---============================================================================
+
+--- Handle pre-casting logic and validations.
+--- Performs comprehensive checks before spell execution including:
+--- - Action lock validation to prevent casting during other actions
+--- - Spell refinement and optimization based on current state
+--- - Cooldown checking and display
+--- - Arts buff validation for enhancing magic
+---
+--- @param spell table The spell object being cast
+--- @param action table The action object containing cast information
+--- @param spellMap string Mote's spell classification mapping
+--- @param eventArgs table Event arguments with cancel/handled flags
+--- @usage Automatically called by GearSwap before spell casting
+--- @see handle_spell For spell processing logic
+--- @see checkDisplayCooldown For recast timer display
+--- @see refine_various_spells For spell optimization
+--- @see checkArts For arts buff validation
 function job_precast(spell, action, spellMap, eventArgs)
     -- If the player is currently performing an action, immediately return and do nothing else.
     if midaction() then
@@ -99,44 +193,87 @@ function job_precast(spell, action, spellMap, eventArgs)
     checkArts(spell, eventArgs)
 end
 
--- Handles actions to perform during the casting of a spell or ability.
--- Parameters:
---   spell (table): The spell being cast
---   action (table): The action being performed
---   spellMap (table): The spell mapping table
---   eventArgs (table): Additional event arguments
+--- Handle mid-casting logic and gear optimization.
+--- Executes during the casting animation phase to optimize mana usage
+--- and prepare for potential interruptions.
+---
+--- @param spell table The spell object being cast
+--- @param action table The action object containing cast information  
+--- @param spellMap string Mote's spell classification mapping
+--- @param eventArgs table Event arguments with cancel/handled flags
+--- @usage Automatically called by GearSwap during spell casting
+--- @see SaveMP For mana conservation logic
 function job_midcast(spell, action, spellMap, eventArgs)
     SaveMP()
 end
 
--- Handles actions to perform after the casting of a spell or ability.
--- Parameters:
---   spell (table): The spell that was cast
---   action (table): The action that was performed
---   spellMap (table): The spell mapping table
---   eventArgs (table): Additional event arguments
-lastSpell = nil
+--- Handle post-casting cleanup and state management.
+--- Executes after spell completion to handle buff management,
+--- MP recovery, and state transitions. Includes duplicate call
+--- protection to prevent event handling issues.
+---
+--- Technical Implementation:
+---   Uses timestamp-based deduplication with 100ms window to prevent
+---   double-processing of aftercast events, which can occur due to
+---   GearSwap's event handling architecture.
+---
+--- @param spell table The spell object that was cast
+--- @param action table The action object that was performed
+--- @param spellMap string Mote's spell classification mapping  
+--- @param eventArgs table Event arguments with cancel/handled flags
+--- @usage Automatically called by GearSwap after spell completion
+--- @see handleSpellAftercast For actual aftercast processing
+
+--- @type table Tracking structure for duplicate call prevention
+--- @field spell_id number Last processed spell ID
+--- @field timestamp number Timestamp of last processed spell (milliseconds)
+local last_aftercast = {spell_id = nil, timestamp = 0}
 
 function job_aftercast(spell, action, spellMap, eventArgs)
-    if lastSpell == spell.name then
-        -- Ignore this call, it's a duplicate
+    -- Get current time in milliseconds
+    local current_time = os.clock() * 1000
+    
+    -- Check if this is a duplicate call (same spell within 100ms)
+    if last_aftercast.spell_id == spell.id and 
+       (current_time - last_aftercast.timestamp) < 100 then
+        -- Ignore duplicate call
         return
     end
-
-    lastSpell = spell.name
+    
+    -- Update tracking
+    last_aftercast.spell_id = spell.id
+    last_aftercast.timestamp = current_time
+    
+    -- Process aftercast normally
     handleSpellAftercast(spell, eventArgs)
 end
 
--- Sets the default macro book based on the player's sub job.
+---============================================================================
+--- MACRO AND APPEARANCE MANAGEMENT
+---============================================================================
+
+--- Configure macro book and visual appearance for Black Mage.
+--- Automatically selects appropriate macro page based on subjob and
+--- applies the configured lockstyle set. Includes safe loading/unloading
+--- of the dressup addon to prevent macro conflicts.
+---
+--- Macro Page Selection:
+---   - Page 1, Book 14 for all subjobs (SCH/RDM/WHM optimized)
+---   - Lockstyle set 6 applied with delay
+---   - Dressup addon safely reloaded to maintain custom appearance
+---
+--- @usage Called automatically during user_setup
+--- @see user_setup For initialization context
 function select_default_macro_book()
     send_command('lua unload dressup')
-    -- If sub job is SCH
-    if player.sub_job == 'SCH' then
-        set_macro_page(1, 14)
-        send_command('wait 5;input /lockstyleset 6')
-        -- For other sub jobs
-    else
-        set_macro_page(1, 14)
-    end
-    send_command('wait 15; lua load dressup')
+    
+    -- BLM macro pages based on subjob
+    local macro_page = ({ SCH = 14, RDM = 14, WHM = 14 })[player.sub_job] or 14
+    set_macro_page(1, macro_page)
+    
+    -- BLM lockstyle
+    send_command('wait 3; input /lockstyleset 6')
+    
+    -- Reload dressup with delay to avoid macro loss
+    send_command('wait 20; lua load dressup')
 end
