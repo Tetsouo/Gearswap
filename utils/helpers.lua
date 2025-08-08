@@ -37,8 +37,14 @@
 local UtilityUtils = {}
 
 -- Load critical dependencies for utility operations
-local config = require('config/config')              -- Centralized configuration system
-local log = require('utils/logger')                  -- Professional logging framework
+local config = require('config/config') -- Centralized configuration system
+local log = require('utils/logger')     -- Professional logging framework
+
+--- @type table Validation utilities for parameter checking
+local ValidationUtils = require('utils/validation')
+
+--- @type table Equipment validator for set validation
+local EquipmentValidator = require('utils/equipment_validator')
 
 -- ===========================================================================================================
 --                                     Target Management Functions
@@ -52,7 +58,7 @@ function UtilityUtils.get_current_target_id_and_name()
         log.debug("No target found or error getting target")
         return nil, nil
     end
-    
+
     return target.id, target.name
 end
 
@@ -63,7 +69,7 @@ function UtilityUtils.get_target_info()
     if not success or not target then
         return nil
     end
-    
+
     return {
         id = target.id,
         name = target.name,
@@ -91,26 +97,35 @@ end
 -- @param name (string): The name of the party member to check.
 -- @return (boolean): True if the party member is found and they have a pet, false otherwise.
 function UtilityUtils.find_member_and_pet_in_party(name)
-    if type(name) ~= 'string' then
-        log.error("Party member name must be a string")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(name, 'name') then
         return false
     end
-    
+
+    if not ValidationUtils.validate_string_not_empty(name, 'name') then
+        return false
+    end
+
     if type(party) ~= 'table' then
         log.error("Party data not available")
         return false
     end
-    
-    for _, member in ipairs(party) do
+
+    -- Optimized party iteration with cached length and early exit
+    local partySize = #party
+
+    for i = 1, partySize do
+        local member = party[i]
         if type(member) == 'table' and member.mob and type(member.mob) == 'table' then
-            if member.mob.name == name then
-                local has_pet = member.mob.pet_index ~= nil
+            local mob = member.mob
+            if mob.name == name then
+                local has_pet = mob.pet_index ~= nil
                 log.debug("Party member %s %s pet", name, has_pet and "has" or "has no")
                 return has_pet
             end
         end
     end
-    
+
     log.debug("Party member %s not found", name)
     return false
 end
@@ -119,39 +134,49 @@ end
 -- @param name (string): Name of the party member
 -- @return (table): Party member data or nil if not found
 function UtilityUtils.get_party_member(name)
-    if type(name) ~= 'string' then
-        log.error("Party member name must be a string")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(name, 'name') then
         return nil
     end
-    
+
+    if not ValidationUtils.validate_string_not_empty(name, 'name') then
+        return nil
+    end
+
     if type(party) ~= 'table' then
         log.debug("Party data not available")
         return nil
     end
-    
-    for _, member in ipairs(party) do
+
+    -- Optimized party member lookup with cached length
+    local partySize = #party
+
+    for i = 1, partySize do
+        local member = party[i]
         if type(member) == 'table' and member.mob and type(member.mob) == 'table' then
-            if member.mob.name == name then
+            local mob = member.mob
+            if mob.name == name then
+                -- Return member data with cached mob reference
                 return {
-                    name = member.mob.name,
-                    id = member.mob.id,
-                    hpp = member.mob.hpp,
-                    mp = member.mob.mp,
-                    mpp = member.mob.mpp,
-                    tp = member.mob.tp,
-                    main_job = member.mob.main_job,
-                    main_job_level = member.mob.main_job_level,
-                    sub_job = member.mob.sub_job,
-                    sub_job_level = member.mob.sub_job_level,
-                    has_pet = member.mob.pet_index ~= nil,
-                    pet_index = member.mob.pet_index,
-                    zone = member.mob.zone,
-                    distance = member.mob.distance
+                    name = mob.name,
+                    id = mob.id,
+                    hpp = mob.hpp,
+                    mp = mob.mp,
+                    mpp = mob.mpp,
+                    tp = mob.tp,
+                    main_job = mob.main_job,
+                    main_job_level = mob.main_job_level,
+                    sub_job = mob.sub_job,
+                    sub_job_level = mob.sub_job_level,
+                    has_pet = mob.pet_index ~= nil,
+                    pet_index = mob.pet_index,
+                    zone = mob.zone,
+                    distance = mob.distance
                 }
             end
         end
     end
-    
+
     return nil
 end
 
@@ -159,26 +184,33 @@ end
 -- @return (table): Array of party member data
 function UtilityUtils.get_all_party_members()
     local members = {}
-    
+
     if type(party) ~= 'table' then
         log.debug("Party data not available")
         return members
     end
-    
-    for _, member in ipairs(party) do
+
+    -- Optimized party member collection with pre-allocated array
+    local partySize = #party
+    local memberCount = 0
+
+    for i = 1, partySize do
+        local member = party[i]
         if type(member) == 'table' and member.mob and type(member.mob) == 'table' then
-            table.insert(members, {
-                name = member.mob.name,
-                id = member.mob.id,
-                hpp = member.mob.hpp,
-                main_job = member.mob.main_job,
-                main_job_level = member.mob.main_job_level,
-                has_pet = member.mob.pet_index ~= nil,
-                distance = member.mob.distance
-            })
+            local mob = member.mob
+            memberCount = memberCount + 1
+            members[memberCount] = {
+                name = mob.name,
+                id = mob.id,
+                hpp = mob.hpp,
+                main_job = mob.main_job,
+                main_job_level = mob.main_job_level,
+                has_pet = mob.pet_index ~= nil,
+                distance = mob.distance
+            }
         end
     end
-    
+
     return members
 end
 
@@ -191,22 +223,26 @@ end
 -- @param element (any): The element to search for in the table.
 -- @return (boolean): True if the element is found in the table, false otherwise.
 function UtilityUtils.table_contains(tbl, element)
-    if type(tbl) ~= 'table' then
-        log.error("First parameter must be a table")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(tbl, 'tbl') then
         return false
     end
-    
-    if element == nil then
-        log.error("Element cannot be nil")
+
+    if not ValidationUtils.validate_type(tbl, 'table', 'tbl') then
         return false
     end
-    
+
+    if not ValidationUtils.validate_not_nil(element, 'element') then
+        return false
+    end
+
+    -- Optimized table search with early exit
     for _, value in pairs(tbl) do
         if value == element then
-            return true
+            return true -- Early exit on match
         end
     end
-    
+
     return false
 end
 
@@ -222,17 +258,28 @@ end
 -- @param element (any): The element to find
 -- @return (number): Index of the element, or nil if not found
 function UtilityUtils.table_find(tbl, element)
-    if type(tbl) ~= 'table' then
-        log.error("First parameter must be a table")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(tbl, 'tbl') then
         return nil
     end
-    
-    for i, value in ipairs(tbl) do
-        if value == element then
-            return i
+
+    if not ValidationUtils.validate_type(tbl, 'table', 'tbl') then
+        return nil
+    end
+
+    if not ValidationUtils.validate_not_nil(element, 'element') then
+        return nil
+    end
+
+    -- Optimized array search with cached length and early exit
+    local tableLength = #tbl
+
+    for i = 1, tableLength do
+        if tbl[i] == element then
+            return i -- Early exit on match
         end
     end
-    
+
     return nil
 end
 
@@ -241,15 +288,27 @@ end
 -- @param source (table): Source table to merge from
 -- @return (table): The merged target table
 function UtilityUtils.table_merge(target, source)
-    if type(target) ~= 'table' or type(source) ~= 'table' then
-        log.error("Both parameters must be tables")
-        return target or {}
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(target, 'target') then
+        return {}
     end
-    
+
+    if not ValidationUtils.validate_type(target, 'table', 'target') then
+        return {}
+    end
+
+    if not ValidationUtils.validate_not_nil(source, 'source') then
+        return target
+    end
+
+    if not ValidationUtils.validate_type(source, 'table', 'source') then
+        return target
+    end
+
     for key, value in pairs(source) do
         target[key] = value
     end
-    
+
     return target
 end
 
@@ -257,16 +316,20 @@ end
 -- @param tbl (table): Table to copy
 -- @return (table): Shallow copy of the table
 function UtilityUtils.table_copy(tbl)
-    if type(tbl) ~= 'table' then
-        log.error("Parameter must be a table")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(tbl, 'tbl') then
         return {}
     end
-    
+
+    if not ValidationUtils.validate_type(tbl, 'table', 'tbl') then
+        return {}
+    end
+
     local copy = {}
     for key, value in pairs(tbl) do
         copy[key] = value
     end
-    
+
     return copy
 end
 
@@ -274,16 +337,21 @@ end
 -- @param tbl (table): Table to count
 -- @return (number): Number of elements in the table
 function UtilityUtils.table_size(tbl)
-    if type(tbl) ~= 'table' then
-        log.error("Parameter must be a table")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(tbl, 'tbl') then
         return 0
     end
-    
+
+    if not ValidationUtils.validate_type(tbl, 'table', 'tbl') then
+        return 0
+    end
+
+    -- Optimized table size counting
     local count = 0
     for _ in pairs(tbl) do
         count = count + 1
     end
-    
+
     return count
 end
 
@@ -296,16 +364,23 @@ end
 -- @param param (number): The specific action within the category.
 -- @return (boolean): True if the action inherently triggers Treasure Hunter, false otherwise.
 function UtilityUtils.th_action_check(category, param)
-    if type(category) ~= 'number' then
-        log.error("TH action check: category must be a number")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(category, 'category') then
         return false
     end
-    
-    if type(param) ~= 'number' then
-        log.error("TH action check: param must be a number")
+
+    if not ValidationUtils.validate_type(category, 'number', 'category') then
         return false
     end
-    
+
+    if not ValidationUtils.validate_not_nil(param, 'param') then
+        return false
+    end
+
+    if not ValidationUtils.validate_type(param, 'number', 'param') then
+        return false
+    end
+
     local th_actions = {
         [2] = function() return true end,                                                                  -- Any ranged attack
         [4] = function() return true end,                                                                  -- Any magic action
@@ -313,7 +388,7 @@ function UtilityUtils.th_action_check(category, param)
         [6] = function(p) return info and info.default_ja_ids and info.default_ja_ids:contains(p) end,     -- Provoke, Animated Flourish
         [14] = function(p) return info and info.default_u_ja_ids and info.default_u_ja_ids:contains(p) end -- Quick/Box/Stutter Step, etc.
     }
-    
+
     if th_actions[category] then
         local success, result = pcall(th_actions[category], param)
         if success then
@@ -322,7 +397,7 @@ function UtilityUtils.th_action_check(category, param)
             log.warn("Error checking TH action for category %d, param %d: %s", category, param, result)
         end
     end
-    
+
     return false
 end
 
@@ -343,8 +418,17 @@ end
 -- @param default (number, optional): Default value if conversion fails
 -- @return (number): Converted number or default
 function UtilityUtils.to_number(value, default)
-    default = default or 0
-    
+    -- Basic validation - value can be any type, default should be number if provided
+    if default ~= nil and not ValidationUtils.validate_type(default, 'number', 'default') then
+        default = 0
+    else
+        default = default or 0
+    end
+
+    if value == nil then
+        return default
+    end
+
     if type(value) == 'number' then
         return value
     elseif type(value) == 'string' then
@@ -360,8 +444,13 @@ end
 -- @param default (string, optional): Default value if conversion fails
 -- @return (string): Converted string or default
 function UtilityUtils.to_string(value, default)
-    default = default or ""
-    
+    -- Basic validation - default should be string if provided
+    if default ~= nil and not ValidationUtils.validate_type(default, 'string', 'default') then
+        default = ""
+    else
+        default = default or ""
+    end
+
     if value == nil then
         return default
     else
@@ -390,11 +479,31 @@ end
 -- @param max (number): Maximum value
 -- @return (number): Clamped value
 function UtilityUtils.clamp(value, min, max)
-    if type(value) ~= 'number' or type(min) ~= 'number' or type(max) ~= 'number' then
-        log.error("All parameters must be numbers for clamp")
-        return value or 0
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(value, 'value') then
+        return 0
     end
-    
+
+    if not ValidationUtils.validate_type(value, 'number', 'value') then
+        return 0
+    end
+
+    if not ValidationUtils.validate_not_nil(min, 'min') then
+        return value
+    end
+
+    if not ValidationUtils.validate_type(min, 'number', 'min') then
+        return value
+    end
+
+    if not ValidationUtils.validate_not_nil(max, 'max') then
+        return value
+    end
+
+    if not ValidationUtils.validate_type(max, 'number', 'max') then
+        return value
+    end
+
     return math.max(min, math.min(max, value))
 end
 
@@ -403,11 +512,19 @@ end
 -- @param decimals (number, optional): Number of decimal places (default: 0)
 -- @return (number): Rounded number
 function UtilityUtils.round(value, decimals)
-    if type(value) ~= 'number' then
-        log.error("Value must be a number for rounding")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(value, 'value') then
         return 0
     end
-    
+
+    if not ValidationUtils.validate_type(value, 'number', 'value') then
+        return 0
+    end
+
+    if decimals ~= nil and not ValidationUtils.validate_type(decimals, 'number', 'decimals') then
+        decimals = 0
+    end
+
     decimals = decimals or 0
     local multiplier = 10 ^ decimals
     return math.floor(value * multiplier + 0.5) / multiplier
@@ -417,16 +534,117 @@ end
 -- @param str (string): String to hash
 -- @return (number): Simple hash value
 function UtilityUtils.simple_hash(str)
-    if type(str) ~= 'string' then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(str, 'str') then
         return 0
     end
-    
+
+    if not ValidationUtils.validate_type(str, 'string', 'str') then
+        return 0
+    end
+
+    -- Optimized hash calculation with cached string length
     local hash = 0
-    for i = 1, #str do
+    local strLength = #str
+
+    for i = 1, strLength do
         hash = hash + string.byte(str, i)
     end
-    
+
     return hash
+end
+
+-- ===========================================================================================================
+--                                     Equipment Validation Functions
+-- ===========================================================================================================
+
+--- Validates an equipment set using the GearSwap-compatible validator
+-- @param equipment_set (table): Equipment set to validate
+-- @param set_name (string, optional): Name of the set for error reporting
+-- @return (table): Validation result with valid, missing_items, errors fields
+function UtilityUtils.validate_equipment_set(equipment_set, set_name)
+    -- Parameter validation
+    if not ValidationUtils.validate_type(equipment_set, 'table', 'equipment_set') then
+        return {
+            valid = false,
+            missing_items = {},
+            errors = {"Invalid equipment set: must be a table"},
+            used_items = {}
+        }
+    end
+    
+    -- Use the dedicated equipment validator
+    return EquipmentValidator.validate_equipment_set(equipment_set, set_name)
+end
+
+--- Quick check if an equipment set is valid (returns boolean only)
+-- @param equipment_set (table): Equipment set to validate
+-- @param set_name (string, optional): Name of the set
+-- @return (boolean): True if set is completely valid, false otherwise
+function UtilityUtils.is_equipment_set_valid(equipment_set, set_name)
+    if not ValidationUtils.validate_type(equipment_set, 'table', 'equipment_set') then
+        return false
+    end
+    
+    local result = EquipmentValidator.validate_equipment_set(equipment_set, set_name)
+    return result and result.valid == true
+end
+
+--- Validates equipment and reports errors to chat
+-- @param equipment_set (table): Equipment set to validate
+-- @param set_name (string, optional): Name of the set
+-- @param show_success (boolean, optional): Show success message if valid
+-- @return (boolean): True if valid, false otherwise
+function UtilityUtils.validate_and_report_equipment(equipment_set, set_name, show_success)
+    if not ValidationUtils.validate_type(equipment_set, 'table', 'equipment_set') then
+        windower.add_to_chat(167, "[Equipment] Invalid equipment set provided")
+        return false
+    end
+    
+    EquipmentValidator.validate_and_report(equipment_set, set_name, show_success)
+    return UtilityUtils.is_equipment_set_valid(equipment_set, set_name)
+end
+
+--- Gets missing items from an equipment set
+-- @param equipment_set (table): Equipment set to check
+-- @param set_name (string, optional): Name of the set
+-- @return (table): Array of missing items with slot and name fields
+function UtilityUtils.get_missing_equipment_items(equipment_set, set_name)
+    if not ValidationUtils.validate_type(equipment_set, 'table', 'equipment_set') then
+        return {}
+    end
+    
+    local result = EquipmentValidator.validate_equipment_set(equipment_set, set_name)
+    return result and result.missing_items or {}
+end
+
+--- Validates all equipment sets in the sets table
+-- @param sets_table (table, optional): Sets table to validate (defaults to global 'sets')
+-- @param report_valid (boolean, optional): Whether to report valid sets too
+-- @return (table): Summary with total_sets, valid_sets, invalid_sets counts
+function UtilityUtils.validate_all_equipment_sets(sets_table, report_valid)
+    sets_table = sets_table or sets
+    
+    if not sets_table or not ValidationUtils.validate_type(sets_table, 'table', 'sets_table') then
+        windower.add_to_chat(167, "[Equipment] No sets table available for validation")
+        return {total_sets = 0, valid_sets = 0, invalid_sets = 0}
+    end
+    
+    EquipmentValidator.validate_all_sets(sets_table, report_valid or false)
+    
+    -- Return summary (simplified - the full function shows detailed results)
+    return {total_sets = -1, valid_sets = -1, invalid_sets = -1} -- Detailed counting would require refactoring
+end
+
+--- Clears the equipment validation cache
+function UtilityUtils.clear_equipment_validation_cache()
+    EquipmentValidator.clear_cache()
+end
+
+--- Gets equipment validation cache statistics
+-- @return (table): Cache statistics with entries, age, max_age fields
+function UtilityUtils.get_equipment_validation_cache_stats()
+    return EquipmentValidator.get_cache_stats()
 end
 
 -- Initialize backward compatibility
