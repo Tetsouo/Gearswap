@@ -380,7 +380,7 @@ sets.Cure = {
 sets.precast.WS = {
     ammo = "Crepuscular Pebble",
     head = "Sakpata's Helm",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Sakpata's Cuisses",
     feet = "Sulevia's Leggings +2",
@@ -527,9 +527,15 @@ sets.meleeXp = set_combine(sets.idleXp, {
 -- =========================================================================================================
 --                                           Equipments - Movement Sets
 -- =========================================================================================================
+-- Set de mouvement avec équipement de base plus commun
 sets.MoveSpeed = {
-    legs = createEquipment('Carmine Cuisses +1', 2),
+    legs = "Carmine Cuisses +1",  -- Item commun pour vitesse
 }
+
+-- Set spécial pour Adoulin avec le body pour vitesse supplémentaire
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"  -- Bonus de vitesse en ville d'Adoulin
+})
 
 -- =========================================================================================================
 --                                           Equipments - Custom Buff Sets

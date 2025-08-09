@@ -1,5 +1,5 @@
 ---============================================================================
---- FFXI GearSwap Compatibility Layer - Shared Functions Module  
+--- FFXI GearSwap Compatibility Layer - Shared Functions Module
 ---============================================================================
 --- **CRITICAL COMPATIBILITY LAYER** - This module serves as the intelligent
 --- bridge between legacy GearSwap code and the new modular architecture.
@@ -7,7 +7,7 @@
 --- the new module system. Features include:
 ---
 --- • **21 Backward Compatibility Wrappers** - Zero breaking changes
---- • **Intelligent Module Loading** - Lazy loading for optimal performance  
+--- • **Intelligent Module Loading** - Lazy loading for optimal performance
 --- • **Legacy Function Preservation** - All existing code continues to work
 --- • **Progressive Migration Path** - Gradual transition to new modules
 --- • **Configuration Integration** - Centralized settings with fallbacks
@@ -33,24 +33,54 @@
 ---============================================================================
 
 ---============================================================================
---- MODULE INITIALIZATION AND DEPENDENCIES  
+--- MODULE INITIALIZATION AND DEPENDENCIES
 ---============================================================================
 
 local SharedFunctions = {}
 
--- Load critical modular dependencies for compatibility layer operation
-local config = require('config/config')              -- Centralized configuration system
-local log = require('utils/logger')                  -- Professional logging framework
-local MessageUtils = require('utils/messages')       -- Message formatting utilities  
-local EquipmentUtils = require('core/equipment')     -- Equipment management core
-local SpellUtils = require('core/spells')           -- Spell validation and handling
+-- Load critical modular dependencies for compatibility layer operation with error handling
+local config_success, config = pcall(require, 'config/config')
+if not config_success then
+    windower.add_to_chat(167, "Shared Module: Config module not found")
+    return
+end
+
+local log_success, log = pcall(require, 'utils/logger')
+if not log_success then
+    windower.add_to_chat(167, "Shared Module: Logger module not found")
+    return
+end
+
+local msg_success, MessageUtils = pcall(require, 'utils/messages')
+if not msg_success then
+    windower.add_to_chat(167, "Shared Module: Messages module not found")
+    return
+end
+
+local eq_success, EquipmentUtils = pcall(require, 'core/equipment')
+if not eq_success then
+    windower.add_to_chat(167, "Shared Module: Equipment module not found")
+    return
+end
+
+local spell_success, SpellUtils = pcall(require, 'core/spells')
+if not spell_success then
+    windower.add_to_chat(167, "Shared Module: Spells module not found")
+    return
+end
+
+-- Load equipment factory (optional)
+local factory_success = pcall(require, 'utils/equipment_factory')
+if not factory_success then
+    log.warn("Equipment factory module not found, continuing without it")
+end
 
 -- Constants used throughout the script (from config)
-SharedFunctions.GRAY = config.get_color('debug') or 160      -- Color code for gray
-SharedFunctions.ORANGE = config.get_color('warning') or 057  -- Color code for orange
-SharedFunctions.YELLOW = config.get_color('info') or 050     -- Color code for yellow
-SharedFunctions.RED = config.get_color('error') or 028       -- Color code for red
-SharedFunctions.WAIT_TIME = 1.2 -- Time to wait between actions, in seconds
+SharedFunctions.GRAY = config.get_color('debug') or 160     -- Color code for gray
+SharedFunctions.ORANGE = config.get_color('warning') or 057 -- Color code for orange
+SharedFunctions.YELLOW = config.get_color('info') or 050    -- Color code for yellow
+SharedFunctions.RED = config.get_color('error') or 028      -- Color code for red
+SharedFunctions.WAIT_TIME = 1.2                             -- Time to wait between actions, in seconds
 
 -- Array of stratagem charge times
 SharedFunctions.strat_charge_time = { 240, 120, 80, 60, 48 }
@@ -88,12 +118,29 @@ function formatRecastDuration(recast)
 end
 
 function createFormattedMessage(startMessage, spellName, recastTime, endMessage, isLastMessage, isColored)
-    return MessageUtils.create_formatted_message(startMessage, spellName, recastTime, endMessage, isLastMessage, isColored)
+    return MessageUtils.create_formatted_message(startMessage, spellName, recastTime, endMessage, isLastMessage,
+        isColored)
 end
 
 -- ===========================================================================================================
 --                                    2. Alternate Player Functions
 -- ===========================================================================================================
+
+-- Declare local variables to avoid global namespace pollution
+local send_command = send_command
+local windower = windower
+local player = player
+local assert = assert
+local pcall = pcall
+local type = type
+local tonumber = tonumber
+local tostring = tostring
+local string = string
+local math = math
+local os = os
+local table = table
+local pairs = pairs
+local ipairs = ipairs
 
 -- List of spells that should be targeted on the main player
 local mainPlayerSpells = {
@@ -169,37 +216,29 @@ function applySpellSequenceToTarget(spells)
         return false
     end
 
-    for _, spell in ipairs(spells) do
-        local command
-        if spell.delay == 0 then
-            command = string.format('send %s %s %s', SharedFunctions.altPlayerName, spell.name, tostring(targetid))
-        else
-            command =
-                string.format('wait %d; send %s %s %s', spell.delay, SharedFunctions.altPlayerName, spell.name,
-                    tostring(targetid))
-        end
-        if spell.name == 'Phalanx2' and targetname == SharedFunctions.mainPlayerName and player.main_job == 'PLD' then
-            local bothPhalanx
-            if spell.delay == 0 then
-                bothPhalanx =
-                    string.format(
-                        'send %s Phalanx %s; send %s Phalanx2 %s',
-                        SharedFunctions.mainPlayerName,
-                        tostring(targetid),
-                        SharedFunctions.altPlayerName,
-                        tostring(targetid)
-                    )
-            else
-                bothPhalanx =
-                    string.format(
-                        'wait %d; send %s Phalanx %s; send %s Phalanx2 %s',
-                        spell.delay,
-                        SharedFunctions.mainPlayerName,
-                        tostring(targetid),
-                        SharedFunctions.altPlayerName,
-                        tostring(targetid)
-                    )
-            end
+    -- Optimized spell sequence processing with cached values
+    local spellCount = #spells
+    local altPlayerName = SharedFunctions.altPlayerName
+    local targetIdStr = tostring(targetid)
+
+    for i = 1, spellCount do
+        local spell = spells[i]
+        local spellName = spell.name
+        local spellDelay = spell.delay
+
+        -- Optimized command building
+        local command = (spellDelay == 0) and
+            ('send ' .. altPlayerName .. ' ' .. spellName .. ' ' .. targetIdStr) or
+            ('wait ' .. spellDelay .. '; send ' .. altPlayerName .. ' ' .. spellName .. ' ' .. targetIdStr)
+        -- Optimized Phalanx command building with cached values
+        if spellName == 'Phalanx2' and targetname == SharedFunctions.mainPlayerName and player.main_job == 'PLD' then
+            local mainPlayerName = SharedFunctions.mainPlayerName
+
+            -- Build Phalanx command efficiently
+            local bothPhalanx = (spellDelay == 0) and
+                ('send ' .. mainPlayerName .. ' Phalanx ' .. targetIdStr .. '; send ' .. altPlayerName .. ' Phalanx2 ' .. targetIdStr) or
+                ('wait ' .. spellDelay .. '; send ' .. mainPlayerName .. ' Phalanx ' .. targetIdStr .. '; send ' .. altPlayerName .. ' Phalanx2 ' .. targetIdStr)
+
             local success, message = pcall(send_command, bothPhalanx)
             if not success then
                 return false
@@ -275,10 +314,8 @@ end
 --                            3. Equipment and Gear Set Management Functions
 -- ===========================================================================================================
 
--- Legacy wrapper for equipment creation (now uses EquipmentUtils)
-function createEquipment(name, priority, bag, augments)
-    return EquipmentUtils.create_equipment(name, priority, bag, augments)
-end
+-- Legacy wrapper for equipment creation (now uses centralized equipment factory)
+-- Note: The global createEquipment function is now provided by utils/equipment_factory
 
 -- DEPRECATED: Equipment functions moved to EquipmentUtils.lua
 function adjust_Gear_Based_On_TP_For_WeaponSkill(spell)
@@ -358,7 +395,7 @@ function spell_interrupted(spell, eventArgs)
     if eventArgs then
         eventArgs.handled = true
     end
-    
+
     local MessageUtils = require('utils/messages')
     MessageUtils.spell_interrupted_message(spell)
     return true
@@ -372,7 +409,7 @@ function handleCompletedSpell(spell, eventArgs)
     if state and state.Moving and state.Moving.value == 'true' then
         send_command('gs equip sets.MoveSpeed')
     end
-    
+
     return true
 end
 
@@ -446,7 +483,7 @@ end
 
 -- Legacy wrapper for ear equipment adjustment (now uses EquipmentUtils)
 function adjust_Left_Ear_Equipment(spell, player_info)
-    return EquipmentUtils.adjust_left_ear_equipment(spell, player_info)
+    return EquipmentUtils.adjust_ear_equipment(spell, player_info)
 end
 
 -----------------------------------------------------------------------------------------------
@@ -484,12 +521,12 @@ end
 --- Backward compatibility wrapper for job state change
 function job_state_change(field, new_value, old_value)
     local StateUtils = require('core/state')
-    
+
     -- Handle legacy BST-specific functions that may not be in StateUtils
     if field and field:lower() == 'ammo' and display_broth_count then
         display_broth_count()
     end
-    
+
     -- BST logic is now centralized in BST_FUNCTION.lua
     -- Only handle ammoSet changes for F5 cycling
     if field and field:lower() == 'ammoset' then
@@ -498,7 +535,7 @@ function job_state_change(field, new_value, old_value)
             coroutine.schedule(function() equip_pet_broth() end, 0.1)
         end
     end
-    
+
     return StateUtils.job_state_change(field, new_value, old_value)
 end
 

@@ -2,8 +2,12 @@
 --- FFXI GearSwap Job Module - Black Mage Advanced Functions
 ---============================================================================
 
--- Load Windower resources for spell data
-local res = require('resources')
+-- Load Windower resources for spell data with error handling
+local res_success, res = pcall(require, 'resources')
+if not res_success then
+    windower.add_to_chat(167, "BLM Functions: Resources module not found")
+    return
+end
 --- Professional Black Mage job-specific functionality providing intelligent
 --- elemental magic optimization, spell tier management, Magic Burst detection,
 --- and advanced casting strategies. Core features include:
@@ -85,102 +89,129 @@ spellCorrespondence = {
 }
 
 --- Secure spell casting check for lag compensation
---- TEMPORARILY DISABLED - Always returns true to diagnose spell replacement issues
+--- Prevents spell spam in laggy zones by tracking cast timestamps
 --- @param spellName string The name of the spell to check
 --- @param currentTime number Current timestamp
 --- @return boolean true if spell is safe to cast
 local function isSpellSafeToCast(spellName, currentTime)
-    -- DISABLED FOR DEBUGGING - Always allow casting
-    return true
+    -- Initialize tracking for this spell if needed
+    if not secureSpellTracking[spellName] then
+        secureSpellTracking[spellName] = {
+            lastCast = 0,
+            minDelay = 2.5 -- Minimum seconds between casts to prevent spam
+        }
+    end
+
+    local spellData = secureSpellTracking[spellName]
+    local timeSinceLastCast = currentTime - spellData.lastCast
+
+    -- Allow cast if enough time has passed
+    if timeSinceLastCast >= spellData.minDelay then
+        spellData.lastCast = currentTime
+        return true
+    end
+
+    -- Prevent spam - spell was cast too recently
+    local log = require('utils/logger')
+    log.debug("Spell %s blocked - cast too recently (%.1fs ago)", spellName, timeSinceLastCast)
+    return false
 end
 
 -- This function manages self-buff spells in the game Final Fantasy XI.
 -- It checks the recast time of each spell and if the buff is active.
 -- If the buff is not active or is about to expire, it queues the spell to be cast.
--- ENHANCED: Now includes lag compensation to prevent spell spam in laggy zones
+-- ENHANCED: Now includes lag compensation and optimized loop processing
 function BuffSelf()
-    -- Get the current time
+    -- Cache frequently accessed values
     local currentTime = os.time()
-    -- Get the recast times for all spells
-    local SpellRecasts = windower.ffxi.get_spell_recasts()
+    local spellRecasts = windower.ffxi.get_spell_recasts()
+    local buffActive = buffactive
 
     -- Assert that SpellRecasts is a table
-    assert(type(SpellRecasts) == "table", "Failed to get spell recasts")
+    assert(type(spellRecasts) == "table", "Failed to get spell recasts")
 
-    -- Define the spells to manage
+    -- Pre-defined spell data (cached for performance)
     local spells = {
-        { name = 'Stoneskin',  recast = 54,  delay = 0, buffName = 'Stoneskin',  duration = 488 },
-        { name = 'Blink',      recast = 53,  delay = 6, buffName = 'Blink',      duration = 488 },
-        { name = 'Aquaveil',   recast = 55,  delay = 6, buffName = 'Aquaveil',   duration = 914 },
-        { name = 'Ice Spikes', recast = 251, delay = 6, buffName = 'Ice Spikes', duration = 274 }
+        { name = 'Stoneskin',  recastId = 54,  delay = 0, buffName = 'Stoneskin',  duration = 488 },
+        { name = 'Blink',      recastId = 53,  delay = 6, buffName = 'Blink',      duration = 488 },
+        { name = 'Aquaveil',   recastId = 55,  delay = 6, buffName = 'Aquaveil',   duration = 914 },
+        { name = 'Ice Spikes', recastId = 251, delay = 6, buffName = 'Ice Spikes', duration = 274 }
     }
 
-    -- Initialize the list of spells ready to be cast
+    -- Pre-allocate arrays for better performance
     local readySpells = {}
-    -- Initialize the total delay for casting spells
+    local spellsOnCooldown = {}
     local totalDelay = 0
+    local readyCount = 0
+    local cooldownCount = 0
 
-    -- For each spell
-    for _, spell in ipairs(spells) do
-        -- Get the recast time for the spell
-        spell.recast = SpellRecasts[spell.recast]
+    -- Single loop to process all spells (optimized iteration)
+    for i = 1, #spells do
+        local spell = spells[i]
+        local recastTime = spellRecasts[spell.recastId]
+        local isBuffActive = buffActive[spell.buffName]
 
-        -- Only cast if buff is not active (simple and reliable logic)
-        if spell.duration > 0 and not buffactive[spell.buffName] then
-            -- Check if the spell is ready to be cast AND safe to cast (lag compensation)
-            if spell.recast == 0 and isSpellSafeToCast(spell.name, currentTime) then
-                if #readySpells > 0 then
-                    -- Increase the total delay
+        -- Only process spells with valid duration and without active buff
+        if spell.duration > 0 and not isBuffActive then
+            -- Check if spell is ready and safe to cast
+            if recastTime == 0 and isSpellSafeToCast(spell.name, currentTime) then
+                -- Increment delay only if we have previous spells queued
+                if readyCount > 0 then
                     totalDelay = totalDelay + spell.delay
                 end
-                -- Add the spell to the list of spells ready to be cast
-                table.insert(readySpells, { spell = spell, delay = totalDelay })
+
+                -- Add to ready spells using pre-incremented count
+                readyCount = readyCount + 1
+                readySpells[readyCount] = { spell = spell, delay = totalDelay }
+            elseif recastTime > 0 then
+                -- Add to cooldown list using pre-incremented count
+                cooldownCount = cooldownCount + 1
+                spellsOnCooldown[cooldownCount] = { spell = spell, recast = recastTime }
             end
+        elseif recastTime > 0 then
+            -- Track cooldowns even for active buffs (for display purposes)
+            cooldownCount = cooldownCount + 1
+            spellsOnCooldown[cooldownCount] = { spell = spell, recast = recastTime }
         end
     end
 
-    -- For each spell ready to be cast
-    for _, readySpell in ipairs(readySpells) do
-        -- Send the command to cast the spell after the delay
-        send_command('wait ' .. readySpell.delay .. '; input /ma "' .. readySpell.spell.name .. '" <me>')
-        -- Update the last cast time for the spell
-        lastCastTimes[readySpell.spell.name] = currentTime
-
-        -- Log the cast attempt for debugging in laggy conditions
+    -- Process ready spells if any (optimized command building)
+    if readyCount > 0 then
+        -- Cache logger for performance
         local log = require('utils/logger')
-        log.debug("BuffSelf: Casting %s (delay: %ds, safe: %s)",
-            readySpell.spell.name, readySpell.delay, "true")
-    end
 
-    -- If no spells are ready, show recast times for spells that are on cooldown
-    if #readySpells == 0 then
-        local spellsOnCooldown = {}
-        for _, spell in ipairs(spells) do
-            -- Show recast for spells that are on cooldown, regardless of buff status
-            if spell.recast > 0 then
-                table.insert(spellsOnCooldown, spell)
-            end
+        for i = 1, readyCount do
+            local readySpell = readySpells[i]
+            local spellName = readySpell.spell.name
+
+            -- Build command string efficiently
+            local command = readySpell.delay > 0 and
+                ('wait ' .. readySpell.delay .. '; input /ma "' .. spellName .. '" <me>') or
+                ('input /ma "' .. spellName .. '" <me>')
+
+            send_command(command)
+            lastCastTimes[spellName] = currentTime
+
+            -- Log cast attempt
+            log.debug("BuffSelf: Casting %s (delay: %ds, safe: true)", spellName, readySpell.delay)
         end
-
-        -- Display recast times for spells on cooldown
-        if #spellsOnCooldown > 0 then
-            for _, spell in ipairs(spellsOnCooldown) do
-                local recastTime = spell.recast / 60  -- Convert to minutes
-                local msg = createFormattedMessage(nil, spell.name, recastTime, nil, true)
+    else
+        -- Display cooldown information if no spells are ready
+        if cooldownCount > 0 then
+            for i = 1, cooldownCount do
+                local cooldownData = spellsOnCooldown[i]
+                local recastTime = cooldownData.recast / 60 -- Convert to minutes
+                local msg = createFormattedMessage(nil, cooldownData.spell.name, recastTime, nil, true)
                 add_to_chat(123, msg)
             end
         else
-            -- All spells are ready but buffs are active - inform user with colored message
+            -- All spells ready but buffs active - cached message creation
             local MessageUtils = require('utils/messages')
-            local colorGreen = MessageUtils.create_color_code(MessageUtils.colors.YELLOW)  -- Vert pour le texte principal
-            local colorGray = MessageUtils.create_color_code(MessageUtils.colors.GRAY)     -- Gris pour les séparateurs
-            
-            local coloredMsg = string.format('%s[%sAll buff spells are ready%s] %sbut already active',
-                colorGray,     -- [
-                colorGreen,    -- All buff spells are ready (en vert)
-                colorGray,     -- ]
-                colorGray      -- but already active (en gris)
-            )
+            local colorGreen = MessageUtils.create_color_code(MessageUtils.colors.YELLOW)
+            local colorGray = MessageUtils.create_color_code(MessageUtils.colors.GRAY)
+
+            local coloredMsg = colorGray .. '[' .. colorGreen .. 'All buff spells are ready' ..
+                colorGray .. '] ' .. colorGray .. 'but already active'
             add_to_chat(123, coloredMsg)
         end
     end
@@ -213,44 +244,54 @@ function handle_spell_replacement(spell, spell_recasts, player_mp, correspondenc
         return newSpell, nil
     end
 
-    -- Keep trying lower tiers until we find one that works
+    -- Optimized tier checking with early exit and cached lookups
     local maxIterations = 6 -- Prevent infinite loops (VI -> V -> IV -> III -> II -> I)
-    local iterations = 0
 
-    while currentLevel and iterations < maxIterations do
-        iterations = iterations + 1
+    -- Cache frequently accessed values for performance
+    local resSpells = res.spells
+    local playerMp = player_mp
 
-        -- Build the spell name for this tier
-        local testSpellName = currentLevel == '' and spellCategory or spellCategory .. ' ' .. currentLevel
+    for iteration = 1, maxIterations do
+        if not currentLevel then
+            break
+        end
 
-        -- Try to get spell info using Windower's resource tables
-        local testSpell = res.spells:with('en', testSpellName)
+        -- Build the spell name for this tier (optimized string concatenation)
+        local testSpellName = (currentLevel == '') and spellCategory or (spellCategory .. ' ' .. currentLevel)
+
+        -- Try to get spell info using cached resource table
+        local testSpell = resSpells:with('en', testSpellName)
 
         if testSpell then
-            -- Check if this tier is available
-            if spell_recasts[testSpell.recast_id] == 0 and player_mp >= (testSpell.mp_cost or 999) then
-                -- This tier is available, use it
+            local mpCost = testSpell.mp_cost or 999
+            local recastId = testSpell.recast_id
+
+            -- Check availability with cached values
+            if spell_recasts[recastId] == 0 and playerMp >= mpCost then
                 newSpell = testSpellName
-                break
+                break -- Early exit on success
             end
         end
 
         -- Get next lower tier from correspondence table
         local tier = correspondence[currentLevel]
         if not tier then
-            break
+            break -- Early exit if no more tiers
         end
 
         currentLevel = tier.replace
 
-        -- If we've reached the base tier (empty string = tier I)
+        -- Handle base tier (empty string = tier I) with early exit
         if currentLevel == '' then
             local tierOneSpell = spellCategory
-            local tierOne = res.spells:with('en', tierOneSpell)
-            if tierOne and spell_recasts[tierOne.recast_id] == 0 and player_mp >= (tierOne.mp_cost or 999) then
-                newSpell = tierOneSpell
+            local tierOne = resSpells:with('en', tierOneSpell)
+            if tierOne then
+                local mpCost = tierOne.mp_cost or 999
+                if spell_recasts[tierOne.recast_id] == 0 and playerMp >= mpCost then
+                    newSpell = tierOneSpell
+                end
             end
-            break
+            break -- Always exit after checking base tier
         end
     end
 
@@ -259,33 +300,33 @@ function handle_spell_replacement(spell, spell_recasts, player_mp, correspondenc
         -- First check if the original -ja spell is actually unavailable
         local originalJaSpell = res.spells:with('en', originalSpell)
         local jaUnavailable = false
-        
+
         if originalJaSpell then
             if spell_recasts[originalJaSpell.recast_id] > 0 or player_mp < (originalJaSpell.mp_cost or 999) then
                 jaUnavailable = true
             end
         else
-            jaUnavailable = true  -- Spell not found, treat as unavailable
+            jaUnavailable = true -- Spell not found, treat as unavailable
         end
-        
+
         -- Only downgrade to -ga series if the -ja spell is truly unavailable
         if jaUnavailable then
-            local baseElement = string.gsub(spell.name, 'ja.*', '')  -- Fire, Stone, etc.
+            local baseElement = string.gsub(spell.name, 'ja.*', '') -- Fire, Stone, etc.
             local gaCorrespondence = spellCorrespondence[baseElement .. 'ga']
-            
+
             if gaCorrespondence then
                 -- Try to find available -ga spell starting from III
                 local gaNewSpell, _ = handle_spell_replacement(
-                    {english = baseElement .. 'ga III', name = baseElement .. 'ga III'},
+                    { english = baseElement .. 'ga III', name = baseElement .. 'ga III' },
                     spell_recasts, player_mp, gaCorrespondence, baseElement .. 'ga', 'III'
                 )
                 if gaNewSpell and gaNewSpell ~= baseElement .. 'ga III' then
                     newSpell = gaNewSpell
                 else
-                    newSpell = baseElement .. 'ga III'  -- Fallback to ga III
+                    newSpell = baseElement .. 'ga III' -- Fallback to ga III
                 end
             else
-                newSpell = string.gsub(spell.name, 'ja', 'ga') .. ' III'  -- Original logic
+                newSpell = string.gsub(spell.name, 'ja', 'ga') .. ' III' -- Original logic
             end
         end
     end
@@ -362,6 +403,29 @@ function refine_various_spells(spell, eventArgs, spellCorrespondence)
         return
     end
 
+    -- Magic Burst announcement - Now using the correct (refined) spell name
+    if state.CastingMode.value == 'MagicBurst' and spell.skill == 'Elemental Magic' then
+        -- Parse the final spell name to get category and level  
+        local finalSpellName = newSpell ~= spell.english and newSpell or spell.english
+        local finalCategory, finalLevel = finalSpellName:match('(%a+)%s*(%a*)')
+        
+        -- Handle different spell types correctly
+        local displayName
+        if finalSpellName:find('ja') then
+            -- For -ja spells, just use the full name (no tier)
+            displayName = finalSpellName
+        elseif not finalLevel or finalLevel == '' then
+            -- For base tier spells (Fire, Cure, etc.), just use the category
+            displayName = finalCategory
+        else
+            -- For tiered spells (Fire III, Cure IV, etc.), show category + level
+            displayName = finalCategory .. ' ' .. finalLevel
+        end
+        
+        send_command((finalLevel == 'VI' and 'wait 2; ' or '') ..
+            'input /p Casting: [' .. displayName .. '] => Nuke')
+    end
+
     if newSpell ~= spell.english then
         -- Update timestamp to prevent rapid replacements
         lastReplacementTime = currentTime
@@ -381,23 +445,26 @@ function refine_various_spells(spell, eventArgs, spellCorrespondence)
             if recastTime and recastTime > 0 then
                 -- Original spell is on cooldown, show recast times for all tiers
                 eventArgs.cancel = true
-                
+
                 -- Show recast for original spell
                 local msg = createFormattedMessage(nil, spell.english, recastTime / 60, nil, true)
                 windower.add_to_chat(123, msg)
-                
-                -- Also show recast for lower tiers if they exist and are on cooldown
-                local currentLevel = spellLevel
-                local maxIterations = 6
-                local iterations = 0
-                
-                while currentLevel and correspondence[currentLevel] and iterations < maxIterations do
-                    iterations = iterations + 1
-                    local nextLevel = correspondence[currentLevel].replace
-                    
+
+                -- Optimized recast display for lower tiers
+                local currentTier = spellLevel
+                local resSpells = res.spells -- Cache resource table
+
+                -- Use numeric for loop for better performance
+                for iteration = 1, 6 do
+                    if not currentTier or not correspondence[currentTier] then
+                        break -- Early exit if no more tiers
+                    end
+
+                    local nextLevel = correspondence[currentTier].replace
+
                     if nextLevel == '' then
-                        -- Check base tier (no roman numeral)
-                        local baseTierSpell = res.spells:with('en', spellCategory)
+                        -- Check base tier (no roman numeral) with cached lookups
+                        local baseTierSpell = resSpells:with('en', spellCategory)
                         if baseTierSpell then
                             local baseTierRecast = spell_recasts[baseTierSpell.recast_id]
                             if baseTierRecast and baseTierRecast > 0 then
@@ -405,11 +472,11 @@ function refine_various_spells(spell, eventArgs, spellCorrespondence)
                                 windower.add_to_chat(123, baseMsg)
                             end
                         end
-                        break
+                        break -- Always exit after base tier
                     else
-                        -- Check next tier
+                        -- Check next tier with optimized string building
                         local nextTierSpellName = spellCategory .. ' ' .. nextLevel
-                        local nextTierSpell = res.spells:with('en', nextTierSpellName)
+                        local nextTierSpell = resSpells:with('en', nextTierSpellName)
                         if nextTierSpell then
                             local nextTierRecast = spell_recasts[nextTierSpell.recast_id]
                             if nextTierRecast and nextTierRecast > 0 then
@@ -417,20 +484,17 @@ function refine_various_spells(spell, eventArgs, spellCorrespondence)
                                 windower.add_to_chat(123, nextMsg)
                             end
                         end
-                        currentLevel = nextLevel
+                        currentTier = nextLevel -- Update for next iteration
                     end
                 end
-                
+
                 return
             end
         end
     end
-    
-    -- Magic Burst announcement
-    if state.CastingMode.value == 'MagicBurst' and spell.skill == 'Elemental Magic' then
-        send_command((spellLevel == 'VI' and 'wait 2; ' or '') ..
-            'input /p Casting: [' .. spellCategory .. ' ' .. spellLevel .. '] => Nuke')
-    end
+
+    -- Magic Burst announcement - MOVED to use refined spell name
+    -- (Will be displayed after spell refinement below)
 
     if spell.english == 'Breakga' and spell_recasts[spell.recast_id] > 0 then
         -- LAG COMPENSATION: Secure Breakga -> Break replacement
@@ -642,6 +706,12 @@ function job_self_command(cmdParams, eventArgs, spell)
     -- Let standard GearSwap handle cycle commands for proper state management
     if command == 'cycle' then
         return -- Let GearSwap handle this natively
+    end
+    
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
     end
 
     -- If the command is defined, execute it

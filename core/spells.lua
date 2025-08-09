@@ -62,6 +62,9 @@ local log = require('utils/logger')
 --- @type table Message formatting utilities for user feedback
 local MessageUtils = require('utils/messages')
 
+--- @type table Validation utilities for parameter checking
+local ValidationUtils = require('utils/validation')
+
 --- Spells excluded from standard cooldown checking
 --- @type table List of spell names that bypass normal recast validation
 SpellUtils.ignoredSpells = { 'Breakga', 'Aspir III', 'Aspir II' }
@@ -84,8 +87,20 @@ SpellUtils.ignoredSpells = { 'Breakga', 'Aspir III', 'Aspir II' }
 --- @param eventArgs table Event arguments for cancellation handling
 --- @return boolean True if spell can be cast safely, false otherwise
 function SpellUtils.can_cast_spell(spell, eventArgs)
-    if spell == nil or spell.id == nil or spell.action_type == nil then
-        log.debug("Invalid spell data")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_spell(spell) then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
         return false
     end
 
@@ -131,8 +146,25 @@ end
 --- @return boolean True if player is incapacitated
 --- @return string|nil Type of incapacitation, or nil if not incapacitated
 function SpellUtils.check_incapacitated(spell, eventArgs)
-    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or not spell.action_type or not spell.name then
-        return false, "Invalid inputs"
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return false, "Invalid spell parameter"
+    end
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return false, "Invalid spell parameter"
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return false, "Invalid eventArgs parameter"
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
+        return false, "Invalid eventArgs parameter"
+    end
+    
+    if not spell.action_type or not spell.name then
+        return false, "Invalid spell structure"
     end
 
     -- Define incapacitating buffs
@@ -180,6 +212,15 @@ end
 --- @param eventArgs table Event arguments for cancellation handling
 --- @return boolean True if spell can proceed, false if cancelled
 function SpellUtils.try_cast_spell(spell, eventArgs)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return false
+    end
+    
     local can_cast = SpellUtils.can_cast_spell(spell, eventArgs)
 
     if not can_cast then
@@ -203,6 +244,15 @@ end
 --- @param spell table The spell that failed to cast
 --- @param eventArgs table Event arguments for state management
 function SpellUtils.handle_unable_to_cast(spell, eventArgs)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return
+    end
+    
     if not SpellUtils.try_cast_spell(spell, eventArgs) then
         cancel_spell()
         eventArgs.handled = true
@@ -212,7 +262,8 @@ function SpellUtils.handle_unable_to_cast(spell, eventArgs)
             job_handle_equipping_gear(player.status, eventArgs)
         end
 
-        MessageUtils.status_message('error', 'Cannot cast ' .. spell.name)
+        local spell_name = spell.name or 'Unknown Spell'
+        MessageUtils.status_message('error', 'Cannot cast ' .. spell_name)
     end
 end
 
@@ -227,8 +278,20 @@ end
 --- @param spell table The spell being checked for cooldown
 --- @param eventArgs table Event arguments for context
 function SpellUtils.check_display_cooldown(spell, eventArgs)
-    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' then
-        log.error("Invalid parameters for check_display_cooldown")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
         return
     end
 
@@ -296,13 +359,25 @@ end
 -- @param spell (table): The spell that the player is casting.
 -- @param eventArgs (table): Additional event arguments.
 function SpellUtils.refine_utsusemi(spell, eventArgs)
-    if not spell or type(spell) ~= 'table' or not spell.name then
-        log.error('Invalid spell: spell must be a table with a name field')
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
         return
     end
-
-    if not eventArgs or type(eventArgs) ~= 'table' then
-        log.error('Invalid eventArgs: eventArgs must be a table')
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
+        return
+    end
+    
+    if not spell.name then
+        log.error('Spell must have a name field')
         return
     end
 
@@ -343,8 +418,24 @@ end
 -- @param eventArgs (table): Additional event arguments.
 -- @param auto_abilities (table): A table mapping spell names to functions.
 function SpellUtils.handle_spell(spell, eventArgs, auto_abilities)
-    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' then
-        log.error("Invalid parameters for handle_spell")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
+        return
+    end
+    
+    if auto_abilities ~= nil and not ValidationUtils.validate_type(auto_abilities, 'table', 'auto_abilities') then
         return
     end
 
@@ -368,10 +459,44 @@ end
 -- @param waitTime (number): The time to wait after using the ability.
 -- @param abilityName (string): The name of the ability to use before the spell.
 function SpellUtils.auto_ability(spell, eventArgs, abilityId, waitTime, abilityName)
-    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or
-        type(abilityId) ~= 'number' or type(waitTime) ~= 'number' or
-        type(abilityName) ~= 'string' then
-        log.error("Invalid parameters for auto_ability")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(abilityId, 'abilityId') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(abilityId, 'number', 'abilityId') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(waitTime, 'waitTime') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(waitTime, 'number', 'waitTime') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(abilityName, 'abilityName') then
+        return
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(abilityName, 'abilityName') then
         return
     end
 
@@ -402,7 +527,24 @@ end
 -- @param eventArgs (table): Additional event arguments.
 -- @return (boolean): True if successful, false otherwise.
 function SpellUtils.handle_interrupted_spell(spell, eventArgs)
-    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or type(spell.name) ~= 'string' then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
+        return false
+    end
+    
+    if not spell.name or not ValidationUtils.validate_type(spell.name, 'string', 'spell.name') then
         return false
     end
 
@@ -426,7 +568,24 @@ end
 -- @param eventArgs (table): Additional event arguments.
 -- @return (boolean): True if successful, false otherwise.
 function SpellUtils.handle_spell_aftercast(spell, eventArgs)
-    if type(spell) ~= 'table' or type(eventArgs) ~= 'table' or not spell.name then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(eventArgs, 'eventArgs') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
+        return false
+    end
+    
+    if not spell.name then
         return false
     end
 
@@ -450,13 +609,16 @@ end
 -- @param mainSpell (string): The name of the main spell to cast.
 -- @param tier (string or nil): The tier of the spell to cast.
 function SpellUtils.cast_elemental_spell(mainSpell, tier)
-    if type(mainSpell) ~= 'string' or mainSpell == '' then
-        log.error('Invalid mainSpell parameter')
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(mainSpell, 'mainSpell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(mainSpell, 'mainSpell') then
         return
     end
 
-    if tier ~= nil and type(tier) ~= 'string' then
-        log.error('Invalid tier parameter')
+    if tier ~= nil and not ValidationUtils.validate_type(tier, 'string', 'tier') then
         return
     end
 
@@ -473,8 +635,28 @@ end
 -- @param arts (string): The name of the art to use.
 -- @param addendum (string): The name of the addendum to use.
 function SpellUtils.cast_sch_spell(spell, arts, addendum)
-    if type(spell) ~= 'string' or type(arts) ~= 'string' or type(addendum) ~= 'string' then
-        log.error("Invalid parameters for cast_sch_spell")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(arts, 'arts') then
+        return
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(arts, 'arts') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(addendum, 'addendum') then
+        return
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(addendum, 'addendum') then
         return
     end
 
@@ -488,11 +670,9 @@ function SpellUtils.cast_sch_spell(spell, arts, addendum)
     if buffactive[addendum] then
         command = 'input /ma "' .. spell .. '" ' .. tostring(targetid)
     elseif buffactive[arts] and not buffactive[addendum] then
-        -- Check if stratagems are available
-        local strat_count = 0
-        if windower.ffxi.get_ability_recasts()[231] == 0 then
-            strat_count = 1
-        end
+        -- Check if stratagems are available using proper Scholar utils
+        local ScholarUtils = require('utils/scholar')
+        local strat_count = ScholarUtils.get_available_stratagem_count()
 
         if strat_count > 0 then
             command = 'input /ja "' .. addendum .. '" <me>; wait 2; input /ma "' .. spell .. '" ' .. tostring(targetid)

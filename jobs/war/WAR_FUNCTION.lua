@@ -46,21 +46,37 @@ function equip_weapons()
     
     -- WAR uses complete weapon sets (main + sub together)
     if state.WeaponSet and sets[state.WeaponSet.value] then
+        local start_time = os.clock()
         local success, error_msg = pcall(equip, sets[state.WeaponSet.value])
+        local swap_time = (os.clock() - start_time) * 1000 -- en millisecondes
+        
         if not success then
             log.error("Failed to equip WAR weapon set '%s': %s", state.WeaponSet.value, error_msg or "unknown error")
         else
             log.debug("WAR weapon set equipped: %s", state.WeaponSet.value)
+            
+            -- Track equipment swap metrics (only if enabled)
+            if _G.metrics_collector and _G.metrics_collector.is_active() then
+                _G.metrics_collector.track_equipment_swap(state.WeaponSet.value, swap_time)
+            end
         end
     end
     
     -- Equip ammo set if available
     if state.ammoSet and sets[state.ammoSet.value] then
+        local start_time = os.clock()
         local success, error_msg = pcall(equip, sets[state.ammoSet.value])
+        local swap_time = (os.clock() - start_time) * 1000 -- en millisecondes
+        
         if not success then
             log.error("Failed to equip WAR ammo set '%s': %s", state.ammoSet.value, error_msg or "unknown error")
         else
             log.debug("WAR ammo set equipped: %s", state.ammoSet.value)
+            
+            -- Track equipment swap metrics (only if enabled)
+            if _G.metrics_collector and _G.metrics_collector.is_active() then
+                _G.metrics_collector.track_equipment_swap('ammo_' .. state.ammoSet.value, swap_time)
+            end
         end
     end
 end
@@ -305,24 +321,21 @@ end
 --     table: The adjusted melee set based on player state and gear.
 -----------------------------------------------------------------------------------------------
 function customize_melee_set(meleeSet)
-    local EquipmentUtils = require('core/equipment')
+    local hybrid_mode = state.HybridMode.value
+    local current_weapon = player.equipment.main
+    local has_am3 = buffactive["Aftermath: Lv.3"]
     
-    -- WAR-specific condition: Ukonvasara with AM3 gets special PDT set
-    local ukon_am3_condition = (player.equipment.main == 'Ukonvasara' and buffactive["Aftermath: Lv.3"])
+    -- Priority logic: Ukonvasara + AM3 ALWAYS uses PDTAFM3 regardless of mode
+    if current_weapon == 'Ukonvasara' and has_am3 then
+        return sets.engaged.PDTAFM3
+    end
     
-    local conditions = {
-        ['PDTAFM3'] = (state.HybridMode.value == 'PDT' and ukon_am3_condition),
-        ['PDTTP'] = (state.HybridMode.value == 'PDT' and not ukon_am3_condition),
-        ['Normal'] = (state.HybridMode.value ~= 'PDT')
-    }
-    
-    local setTable = {
-        ['PDTAFM3'] = sets.engaged.PDTAFM3,
-        ['PDTTP'] = sets.engaged.PDTTP,
-        ['Normal'] = sets.engaged.Normal
-    }
-    
-    return EquipmentUtils.customize_set(meleeSet, conditions, setTable)
+    -- Standard mode-based selection for other weapons
+    if hybrid_mode == 'PDT' then
+        return sets.engaged.PDTTP  -- Balanced PDT+TP set
+    else
+        return sets.engaged.Normal  -- TP-focused set
+    end
 end
 
 -----------------------------------------------------------------------------------------------
@@ -423,16 +436,184 @@ function job_self_command(cmdParams, eventArgs, spell)
 
     local command = cmdParams[1]:lower()
 
+    -- Debug output
+    
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
+    
+
+    
+    -- Module loader commands
+    if command == 'modules' then
+        local subcommand = cmdParams[2] and cmdParams[2]:lower() or 'stats'
+        
+        if subcommand == 'stats' then
+            local Colors = require('utils/colors')
+            
+            Colors.show_header("STATISTIQUES MODULES")
+            
+            local success, ModuleLoader = pcall(require, 'utils/module_loader')
+            if success then
+                local stats = ModuleLoader.get_statistics()
+                
+                Colors.show_empty_line()
+                
+                -- Section Cache & Performance
+                local cache_stats = {
+                    ["Modules charges"] = stats.cached_modules or 0,
+                    ["Memoire utilisee"] = string.format("%.2f KB", stats.total_memory_kb or 0),
+                    ["Taux de reussite"] = {
+                        value = string.format("%.1f%%", stats.hit_rate or 0),
+                        color = Colors.get_performance_color(stats.hit_rate or 0)
+                    },
+                    ["Temps moyen"] = {
+                        value = string.format("%.2f ms", stats.avg_load_time_ms or 0),
+                        color = Colors.get_time_color(stats.avg_load_time_ms or 0)
+                    }
+                }
+                Colors.show_stats_section("CACHE & PERFORMANCE", cache_stats)
+                
+                Colors.show_empty_line()
+                
+                -- Section Accès & Utilisation
+                local access_stats = {
+                    ["Total acces"] = (stats.cache_hits or 0) + (stats.cache_misses or 0),
+                    ["Cache hits"] = stats.cache_hits or 0,
+                    ["Cache misses"] = stats.cache_misses or 0
+                }
+                Colors.show_stats_section("ACCES & UTILISATION", access_stats)
+                
+            else
+                Colors.show_status('Module loader non disponible', 'error')
+            end
+            
+            Colors.show_footer()
+            
+        elseif subcommand == 'cleanup' then
+            local Colors = require('utils/colors')
+            
+            Colors.show_header("NETTOYAGE MODULES")
+            
+            local success, ModuleLoader = pcall(require, 'utils/module_loader')
+            if success then
+                Colors.show_action("Nettoyage des modules inutilises...")
+                ModuleLoader.cleanup_unused_modules()
+                Colors.show_status('Nettoyage termine avec succes!', 'success')
+            else
+                Colors.show_status('Module loader non disponible', 'error')
+            end
+            
+            Colors.show_footer()
+        end
+        return
+    end
+    
+    -- Cache management commands
+    if command == 'cache' then
+        local subcommand = cmdParams[2] and cmdParams[2]:lower() or 'stats'
+        
+        if subcommand == 'stats' then
+            local Colors = require('utils/colors')
+            
+            Colors.show_header("STATISTIQUES CACHE")
+            
+            local success, EquipmentCache = pcall(require, 'core/equipment_cache')
+            if success then
+                local stats = EquipmentCache.get_statistics()
+                
+                Colors.show_empty_line()
+                
+                -- Section Capacité & Utilisation
+                local entries = stats.entries or 0
+                local max_entries = stats.max_entries or 1
+                local usage_percent = math.floor((entries / max_entries) * 100)
+                
+                local capacity_stats = {
+                    ["Entrees"] = {
+                        value = string.format("%d/%d (%d%%)", entries, max_entries, usage_percent),
+                        color = Colors.get_performance_color(100 - usage_percent)  -- Inversé car plein = mauvais
+                    },
+                    ["Taux de reussite"] = {
+                        value = string.format("%.1f%%", stats.hit_rate or 0),
+                        color = Colors.get_performance_color(stats.hit_rate or 0)
+                    }
+                }
+                Colors.show_stats_section("CAPACITE & UTILISATION", capacity_stats)
+                
+                Colors.show_empty_line()
+                
+                -- Section Performance & Accès
+                local perf_stats = {
+                    ["Cache hits"] = stats.hits or 0,
+                    ["Cache misses"] = stats.misses or 0,
+                    ["Temps moyen"] = {
+                        value = string.format("%.2f ms", stats.avg_access_time_ms or 0),
+                        color = Colors.get_time_color(stats.avg_access_time_ms or 0)
+                    }
+                }
+                Colors.show_stats_section("PERFORMANCE & ACCES", perf_stats)
+                
+            else
+                Colors.show_status('Cache non disponible', 'error')
+            end
+            
+            Colors.show_footer()
+            
+        elseif subcommand == 'cleanup' then
+            local Colors = require('utils/colors')
+            
+            Colors.show_header("NETTOYAGE CACHE")
+            
+            local success, EquipmentCache = pcall(require, 'core/equipment_cache')
+            if success then
+                Colors.show_action("Nettoyage des entrees anciennes...")
+                Colors.show_action("Suppression des entrees obsoletes...")
+                EquipmentCache.cleanup()
+                Colors.show_status('Nettoyage termine avec succes!', 'success')
+            else
+                Colors.show_status('Cache non disponible', 'error')
+            end
+            
+            Colors.show_footer()
+            
+        elseif subcommand == 'clear' then
+            local Colors = require('utils/colors')
+            
+            Colors.show_header("VIDAGE CACHE")
+            
+            local success, EquipmentCache = pcall(require, 'core/equipment_cache')
+            if success then
+                Colors.show_status("ATTENTION: Suppression de toutes les entrees...", "warning")
+                Colors.show_action("Vidage en cours...")
+                EquipmentCache.clear()
+                Colors.show_status('Cache completement vide!', 'success')
+                Colors.show_action('Redemarrage du cache en cours...')
+            else
+                Colors.show_status('Cache non disponible', 'error')
+            end
+            
+            Colors.show_footer()
+        end
+        return
+    end
+    
     -- Predefined command handler
     if commandFunctions[command] then
         commandFunctions[command](altPlayerName, mainPlayerName)
 
         -- Fallback: job-specific + subjob-specific logic
     else
-        handle_war_commands(cmdParams)
+        if handle_war_commands then
+            handle_war_commands(cmdParams)
+        end
 
         if player.sub_job == 'SCH' then
-            handle_sch_subjob_commands(cmdParams)
+            if handle_sch_subjob_commands then
+                handle_sch_subjob_commands(cmdParams)
+            end
         end
     end
 end

@@ -37,6 +37,9 @@ local config = require('config/config')
 local log = require('utils/logger')
 local MessageUtils = require('utils/messages')
 
+--- @type table Validation utilities for parameter checking
+local ValidationUtils = require('utils/validation')
+
 -- ===========================================================================================================
 --                                     Buff Management Functions
 -- ===========================================================================================================
@@ -45,9 +48,24 @@ local MessageUtils = require('utils/messages')
 -- @param buff (string): The name of the buff.
 -- @param gain (boolean): Whether the buff was gained or lost.
 function BuffUtils.handle_buff_change(buff, gain)
-    -- Validation
-    if not buff or not gain then
-        log.error("Invalid buff change parameters: buff=%s, gain=%s", tostring(buff), tostring(gain))
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(buff, 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(buff, 'string', 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(buff, 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(gain, 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(gain, 'boolean', 'gain') then
         return
     end
 
@@ -101,6 +119,15 @@ end
 --- Handles Doom buff specifically
 -- @param gain (boolean): Whether Doom was gained or lost
 function BuffUtils.handle_doom_buff(gain)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(gain, 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(gain, 'boolean', 'gain') then
+        return
+    end
+    
     if gain then
         -- Apply Doom set if available
         if sets and sets.buff and sets.buff.Doom then
@@ -132,7 +159,16 @@ end
 --- Handles Aftermath buff for WAR with Ukonvasara
 -- @param gain (boolean): Whether Aftermath was gained or lost
 function BuffUtils.handle_aftermath_buff(gain)
-    if not state or not state.HybridMode then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(gain, 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(gain, 'boolean', 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_state({'HybridMode'}) then
         return
     end
 
@@ -167,7 +203,24 @@ end
 -- @param buff (string): The buff name
 -- @param gain (boolean): Whether buff was gained or lost
 function BuffUtils.handle_thf_blm_buffs(buff, gain)
-    if not state or not state.Buff then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(buff, 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(buff, 'string', 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(gain, 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(gain, 'boolean', 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_state({'Buff'}) then
         return
     end
 
@@ -196,6 +249,31 @@ end
 -- @param gain (boolean): Whether buff was gained or lost
 -- @param equip_set (table): Equipment set to modify
 function BuffUtils.handle_standard_buff(buff, gain, equip_set)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(buff, 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(buff, 'string', 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(gain, 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(gain, 'boolean', 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(equip_set, 'equip_set') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(equip_set, 'table', 'equip_set') then
+        return
+    end
+    
     if gain and sets and sets.buff and sets.buff[buff] then
         equip_set = set_combine(equip_set, sets.buff[buff])
     end
@@ -213,7 +291,24 @@ end
 -- @param buff (string): The buff name (should be 'Sneak Attack' or 'Trick Attack')
 -- @param gain (boolean): Whether buff was gained or lost
 function BuffUtils.handle_sa_ta_buffs(buff, gain)
-    if not state or not state.Buff then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(buff, 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(buff, 'string', 'buff') then
+        return
+    end
+    
+    if not ValidationUtils.validate_not_nil(gain, 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(gain, 'boolean', 'gain') then
+        return
+    end
+    
+    if not ValidationUtils.validate_state({'Buff'}) then
         return
     end
 
@@ -264,8 +359,20 @@ end
 -- @param param (number): The specific action within the category.
 -- @return (boolean): True if the action inherently triggers Treasure Hunter, false otherwise.
 function BuffUtils.th_action_check(category, param)
-    if type(category) ~= 'number' or type(param) ~= 'number' then
-        log.error("TH action check requires numeric parameters")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(category, 'category') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(category, 'number', 'category') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(param, 'param') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(param, 'number', 'param') then
         return false
     end
 
@@ -292,8 +399,12 @@ end
 -- @param name (string): The name of the party member to check.
 -- @return (boolean): True if the party member is found and they have a pet, false otherwise.
 function BuffUtils.find_member_and_pet_in_party(name)
-    if type(name) ~= 'string' then
-        log.error("Party member name must be a string")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(name, 'name') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(name, 'name') then
         return false
     end
 
@@ -321,39 +432,69 @@ end
 -- @param buff_list (table): Table of buffs to maintain with their settings
 -- @param force_refresh (boolean): Force refresh even if buff is active
 function BuffUtils.maintain_buffs(buff_list, force_refresh)
-    if type(buff_list) ~= 'table' then
-        log.error("buff_list must be a table")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(buff_list, 'buff_list') then
+        return
+    end
+    
+    if not ValidationUtils.validate_type(buff_list, 'table', 'buff_list') then
+        return
+    end
+    
+    if not ValidationUtils.validate_table_not_empty(buff_list, 'buff_list') then
+        return
+    end
+    
+    if force_refresh ~= nil and not ValidationUtils.validate_type(force_refresh, 'boolean', 'force_refresh') then
         return
     end
 
+    -- Cache configuration values and frequently accessed data
     local refresh_threshold = config.get('automation.buffs.refresh_threshold') or 30
     local cast_delay = config.get('automation.buffs.cast_delay') or 2
     local total_delay = 0
+    local spell_recasts = windower.ffxi.get_spell_recasts()
+    local buffActive = buffactive
+    local listLength = #buff_list
 
-    for _, buff_data in ipairs(buff_list) do
-        if type(buff_data) == 'table' and buff_data.name and buff_data.spell then
-            local should_cast = false
+    -- Early exit if no spell recasts available
+    if not spell_recasts then
+        log.warn("Spell recasts not available for buff maintenance")
+        return
+    end
 
-            if force_refresh then
-                should_cast = true
-            elseif not buffactive[buff_data.name] then
-                should_cast = true
-            elseif buff_data.duration and buffactive[buff_data.name] then
+    -- Optimized loop with pre-cached values
+    for i = 1, listLength do
+        local buff_data = buff_list[i]
+        
+        -- Pre-validate buff_data structure
+        if type(buff_data) == 'table' and buff_data.name and buff_data.spell and buff_data.spell_id then
+            local buffName = buff_data.name
+            local spellName = buff_data.spell
+            local spellId = buff_data.spell_id
+            local isBuffActive = buffActive[buffName]
+            
+            -- Determine if spell should be cast using cached values
+            local should_cast = force_refresh or not isBuffActive
+            
+            -- Additional duration check (optimized)
+            if not should_cast and buff_data.duration and isBuffActive then
                 -- Check remaining duration if available
                 -- This would need integration with buff tracking
                 should_cast = false -- Placeholder
             end
 
-            if should_cast then
-                local spell_recasts = windower.ffxi.get_spell_recasts()
-                if spell_recasts and spell_recasts[buff_data.spell_id] == 0 then
-                    local command = string.format('wait %d; input /ma "%s" <me>',
-                        total_delay, buff_data.spell)
-                    send_command(command)
-                    total_delay = total_delay + cast_delay
+            -- Process spell casting with cached recast data
+            if should_cast and spell_recasts[spellId] == 0 then
+                -- Build command efficiently
+                local command = (total_delay > 0) and 
+                    ('wait ' .. total_delay .. '; input /ma "' .. spellName .. '" <me>') or
+                    ('input /ma "' .. spellName .. '" <me>')
+                
+                send_command(command)
+                total_delay = total_delay + cast_delay
 
-                    log.info("Queued buff refresh: %s", buff_data.name)
-                end
+                log.info("Queued buff refresh: %s", buffName)
             end
         end
     end
@@ -363,6 +504,15 @@ end
 -- @param buff_name (string): Name of the buff
 -- @return (number): Remaining duration in seconds, or nil if not available
 function BuffUtils.get_buff_remaining_duration(buff_name)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(buff_name, 'buff_name') then
+        return nil
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(buff_name, 'buff_name') then
+        return nil
+    end
+    
     -- This would require integration with a buff tracking system
     -- For now, return nil as a placeholder
     return nil

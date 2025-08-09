@@ -71,10 +71,15 @@
 function get_sets()
     mote_include_version = 2             -- Specifies the version of the Mote library to use
     include('Mote-Include.lua')          -- Mote library for GearSwap
+    include('core/globals.lua')
     include('modules/automove.lua')      -- Module for movement speed gear management
-    include('modules/shared.lua') -- Shared functions across jobs
-    include('jobs/dnc/DNC_SET.lua')          -- Dancer specific gear sets
-    include('jobs/dnc/DNC_FUNCTION.lua')     -- Advanced functions specific to Dancer
+    include('modules/shared.lua')        -- Shared functions across jobs
+    include('jobs/dnc/DNC_SET.lua')      -- Dancer specific gear sets
+    include('jobs/dnc/DNC_FUNCTION.lua') -- Advanced functions specific to Dancer
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 --- Initialize gear sets for Dancer.
@@ -115,8 +120,8 @@ function job_setup()
     state.HybridMode:options('PDT', 'Normal')
     state.OffenseMode:options('Normal', 'Acc')
     state.WeaponSet = M { ['description'] = 'Main Weapon', 'Twashtar', 'Mpu Gandring', 'Demersal', 'Tauret' } --gs c cycle WeaponSet
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti' }                    --gs c cycle SubSet
-    state.ammoSet = M { ['description'] = 'Ammo', 'Aurgelmir' }                                              --gs c cycle SubSet
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Centovente', 'Blurred', 'Gleti' }                     --gs c cycle SubSet
+    state.ammoSet = M { ['description'] = 'Ammo', 'Aurgelmir' }                                               --gs c cycle SubSet
     climactic = buffactive['climactic flourish'] or false
     building = buffactive['building flourish'] or false
     ternary = buffactive['ternary flourish'] or false
@@ -145,9 +150,53 @@ function user_setup()
     select_default_macro_book() -- Selects the default macro book based on sub-job
 end
 
+---============================================================================
+--- FILE UNLOAD AND SELF COMMAND HANDLER
+---============================================================================
+
+--- Clean up resources when unloading the GearSwap file.
+--- Currently no specific cleanup required for DNC.
+--- Called automatically when changing jobs or reloading GearSwap.
+---
+--- @usage Automatically called by GearSwap during unload process
+function file_unload()
+    -- Add any DNC-specific cleanup here if needed
+end
+
+--- Handle custom console commands for Dancer.
+--- Provides specialized command handling for DNC-specific operations and testing.
+---
+--- Available Commands:
+---   test : Execute GearSwap module unit tests
+---
+--- @param cmdParams table Array of command parameters
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+function job_self_command(cmdParams, eventArgs)
+    -- Universal metrics system commands
+    local MetricsIntegration = require('core/metrics_integration')
+    if MetricsIntegration.handle_command(cmdParams, eventArgs) then
+        return
+    end
+    
+    -- Run unit tests
+    if cmdParams[1] == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other DNC-specific commands here as needed
+end
+
 -- Set eventArgs.handled to true if we don't want any automatic gear equipping to be done.
 -- Set eventArgs.useMidcastGear to true if we want midcast gear equipped on precast.
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     handle_spell(spell, eventArgs, auto_abilities) -- Handles the spell based on its type and the current state.
     checkDisplayCooldown(spell, eventArgs)         -- Checks and displays the cooldown for the spell.
     refine_Utsusemi(spell, eventArgs)
@@ -161,9 +210,20 @@ function job_precast(spell, action, spellMap, eventArgs)
     end
 end
 
+-- Add midcast function for metrics tracking
+function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+end
+
 -- Return true if we handled the aftercast work.  Otherwise it will fall back
 -- to the general aftercast() code in Mote-Include.
 function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
+    
     if not spell.interrupted then
         if state.Buff[spell.english] ~= nil then
             state.Buff[spell.english] = not spell.interrupted or buffactive[spell.english]
@@ -176,14 +236,14 @@ end
 -- Sets the default macro book and lockstyle for DNC
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- DNC macro pages based on subjob
     local macro_page = ({ WAR = 6, NIN = 8 })[player.sub_job] or 6
     set_macro_page(1, macro_page)
-    
+
     -- DNC lockstyle
     send_command('wait 3; input /lockstyleset 2')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
 end

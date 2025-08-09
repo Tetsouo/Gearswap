@@ -172,6 +172,23 @@ function job_self_command(cmdParams, eventArgs, spell)
     update_altState()
     local command = cmdParams[1]:lower()
 
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
+    
+    -- Debug commands for troubleshooting
+    if command == 'debug' then
+        local DebugSets = require('debug_sets')
+        if cmdParams[2] then
+            DebugSets.debug_command(cmdParams[2])
+        else
+            DebugSets.test_common_sets()
+        end
+        return
+    end
+
     -- If the command is defined in shared command functions, execute it
     if commandFunctions[command] then
         commandFunctions[command](altPlayerName, mainPlayerName)

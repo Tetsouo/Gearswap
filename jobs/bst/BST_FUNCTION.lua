@@ -68,7 +68,7 @@ local COL = { TAG = c(1), ECO = c(56), COUNT = c(57), ERR = c(167) } -- 56 = ble
 local function get_filtered_pets(eco, species)
     local broth_pet_data = require('jobs/bst/broth_pet_data')
     local pets = {}
-    
+
     for pet_name, data in pairs(broth_pet_data) do
         local eco_match = (eco == "All" or data.ecosystem == eco)
         local species_match = (species == "All" or data.species == species)
@@ -76,7 +76,7 @@ local function get_filtered_pets(eco, species)
             table.insert(pets, pet_name)
         end
     end
-    
+
     table.sort(pets)
     return pets
 end
@@ -85,8 +85,8 @@ end
 local function get_species_for_ecosystem(eco)
     local broth_pet_data = require('jobs/bst/broth_pet_data')
     local species_set = {}
-    local species_list = {"All"}
-    
+    local species_list = { "All" }
+
     for _, data in pairs(broth_pet_data) do
         if eco == "All" or data.ecosystem == eco then
             if not species_set[data.species] then
@@ -95,19 +95,19 @@ local function get_species_for_ecosystem(eco)
             end
         end
     end
-    
+
     -- Sort species (keeping All first)
     local to_sort = {}
     for i = 2, #species_list do
         table.insert(to_sort, species_list[i])
     end
     table.sort(to_sort)
-    
-    species_list = {"All"}
+
+    species_list = { "All" }
     for _, s in ipairs(to_sort) do
         table.insert(species_list, s)
     end
-    
+
     return species_list
 end
 
@@ -116,15 +116,15 @@ function bst_change_ecosystem()
     -- Cycle ecosystem
     state.ecosystem:cycle()
     local eco = state.ecosystem.value
-    
+
     -- Update species list for this ecosystem
     local species_list = get_species_for_ecosystem(eco)
     state.species = M { description = "Species", unpack(species_list) }
     state.species:set("All")
-    
+
     -- Get pets for this ecosystem + All species
     local pets = get_filtered_pets(eco, "All")
-    
+
     -- Update ammoSet
     if #pets > 0 then
         state.ammoSet = M { description = "ammo", unpack(pets) }
@@ -132,9 +132,9 @@ function bst_change_ecosystem()
         -- Equip broth
         coroutine.schedule(function() equip_pet_broth() end, 0.1)
     end
-    
+
     -- Show simple ecosystem message
-    local msg = COL.ECO .. eco .. RESET .. " (" .. COL.COUNT .. tostring(#pets) .. RESET .. ")"
+    local msg = createFormattedMessage(nil, eco, nil, '(' .. tostring(#pets) .. ' pets available)', false, true)
     add_to_chat(262, msg)
 end
 
@@ -149,15 +149,15 @@ function bst_change_species()
     -- STEP 1: Advance to next species in current ecosystem
     -- ───────────────────────────────────────────────────────────────────────
     state.species:cycle()
-    local eco = state.ecosystem.value      -- Current ecosystem (Aquan, Beast, etc.)
-    local species = state.species.value    -- Selected species within ecosystem
-    
+    local eco = state.ecosystem.value   -- Current ecosystem (Aquan, Beast, etc.)
+    local species = state.species.value -- Selected species within ecosystem
+
     -- ───────────────────────────────────────────────────────────────────────
     -- STEP 2: Filter pets by ecosystem + species combination
     -- This creates a focused list of pets matching both criteria
     -- ───────────────────────────────────────────────────────────────────────
     local pets = get_filtered_pets(eco, species)
-    
+
     -- ───────────────────────────────────────────────────────────────────────
     -- STEP 3: Update pet selection system
     -- Replace ammoSet with filtered pet list and auto-select first pet
@@ -165,14 +165,14 @@ function bst_change_species()
     if #pets > 0 then
         -- Create new ammoSet state with filtered pets
         state.ammoSet = M { description = "ammo", unpack(pets) }
-        state.ammoSet:set(pets[1])  -- Auto-select first available pet
-        
+        state.ammoSet:set(pets[1]) -- Auto-select first available pet
+
         -- ───────────────────────────────────────────────────────────────────
         -- STEP 4: Auto-equip appropriate broth for selected pet
         -- Use coroutine to prevent equipment conflicts during state changes
         -- ───────────────────────────────────────────────────────────────────
         coroutine.schedule(function() equip_pet_broth() end, 0.1)
-        
+
         -- ───────────────────────────────────────────────────────────────────
         -- STEP 5: User feedback - show selected pet name
         -- Simple, clean display of the current pet selection
@@ -194,15 +194,15 @@ function display_selection_info()
     local eco = state.ecosystem.value
     local species = state.species.value
     local current_pet = state.ammoSet.value
-    
+
     -- Get filtered pets
     local pets = get_filtered_pets(eco, species)
-    
+
     -- Display info
     local msg = table.concat({
         COL.TAG, "[BST Selection Info]", RESET, "\n",
         "  Ecosystem: ", COL.ECO, eco, RESET, "\n",
-        "  Species: ", COL.ECO, species, RESET, "\n", 
+        "  Species: ", COL.ECO, species, RESET, "\n",
         "  Current Pet: ", COL.COUNT, current_pet, RESET, "\n",
         "  Available Pets: ", COL.COUNT, tostring(#pets), RESET
     })
@@ -377,9 +377,9 @@ function check_pet_engaged()
 end
 
 windower.register_event('time change', function()
-    --[[ check_pet_engaged()
+    check_pet_engaged()
     check_and_engage_pet()
-    send_command('gs c update') ]]
+    send_command('gs c update')
 end)
 
 ready_moves = {}
@@ -398,16 +398,22 @@ function update_ready_moves()
     ready_moves = moves
 end
 
-function job_self_command(cmdParams)
+function job_self_command(cmdParams, eventArgs)
     update_altState()
     local command = (cmdParams[1] or ''):lower()
+
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
 
     -- Handle BST unified commands
     if command == 'bst_ecosystem' then
         bst_change_ecosystem()
         return
     end
-    
+
     if command == 'bst_species' then
         bst_change_species()
         return
@@ -465,9 +471,28 @@ function job_pet_precast(spell)
     if set then equip(set) end
 end
 
+-- Helper function to determine Ready move type from element
+local function get_ready_move_type_from_element(element)
+    -- Physical damage elements: 0 (non-elemental), 5 (blunt), 6 (piercing), 7 (slashing)
+    if element == 0 or element == 5 or element == 6 or element == 7 then
+        return "physical"
+    -- Magical elements: 1 (fire), 2 (ice), 3 (wind), 4 (earth), 8 (thunder), 9 (water), 15 (light), 16 (dark)
+    elseif element >= 1 and element <= 4 or element == 8 or element == 9 or element == 15 or element == 16 then
+        return "magical"
+    else
+        -- Default to physical for unknown elements
+        return "physical"
+    end
+end
+
 function job_pet_midcast(spell)
     local name = spell.name
 
+    -- Debug: Log the exact spell name received
+    local log = require('utils/logger')
+    log.debug("[BST] Pet midcast spell name: '%s', element: %s", name, tostring(spell.element))
+
+    -- First check our manually categorized lists
     if petPhysicalMoves:contains(name) then
         equip(sets.midcast.pet_physical_moves)
     elseif petPhysicalMultiMoves:contains(name) then
@@ -482,9 +507,40 @@ function job_pet_midcast(spell)
             and sets.midcast.pet_magicAcc_moves_ww
             or sets.midcast.pet_magicAcc_moves
         equip(set)
-    elseif petTpMoves:contains(name) then
-        equip(sets.midcast.pet_physical_moves)
     else
-        add_to_chat(123, "[BST] Unknown Ready move: " .. name)
+        -- For unknown moves, try to use Windower resources to determine type
+        local res = require('resources')
+        local ability = nil
+        
+        -- Search for the ability in job_abilities
+        if res and res.job_abilities then
+            for _, ja in pairs(res.job_abilities) do
+                if ja.en == name and ja.type == "Monster" then
+                    ability = ja
+                    break
+                end
+            end
+        end
+        
+        if ability then
+            -- Found the ability, use element to determine type
+            local move_type = get_ready_move_type_from_element(ability.element or spell.element)
+            
+            log.debug("[BST] Auto-detected Ready move '%s' as %s (element: %s)", 
+                      name, move_type, tostring(ability.element or spell.element))
+            
+            if move_type == "magical" then
+                local set = (player.status == "Engaged")
+                    and sets.midcast.pet_magicAtk_moves_ww
+                    or sets.midcast.pet_magicAtk_moves
+                equip(set)
+            else
+                equip(sets.midcast.pet_physical_moves)
+            end
+        else
+            -- Ability not found in resources, use default
+            log.debug("[BST] Ready move '%s' not found in resources, using default physical set", name)
+            equip(sets.midcast.pet_physical_moves)
+        end
     end
 end

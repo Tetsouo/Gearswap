@@ -60,7 +60,8 @@ function jump()
 
         -- Check if already enough TP
         if player.tp >= 1000 then
-            add_to_chat(057, 'You have enough TP after jumps!')
+            local msg = createFormattedMessage(nil, 'TP Status', nil, 'You have enough TP after jumps!', false, true)
+            add_to_chat(057, msg)
             return
         end
 
@@ -86,6 +87,12 @@ end
 function job_self_command(cmdParams, eventArgs, spell)
     local command = cmdParams[1]:lower()
 
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
+
     if command == 'jump' then
         jump()
     elseif command == 'jump_step' then
@@ -106,7 +113,8 @@ function job_self_command(cmdParams, eventArgs, spell)
                 local recast = recasts[jumpId] or 0
 
                 if player.tp >= 1000 then
-                    add_to_chat(057, 'You have enough TP after jumps!')
+                    local msg = createFormattedMessage(nil, 'TP Status', nil, 'You have enough TP after jumps!', false, true)
+            add_to_chat(057, msg)
                     return
                 end
 
@@ -152,20 +160,20 @@ end
 function customize_idle_set(idleSet)
     -- Use the new modular system for consistency with PLD/RUN/WAR
     local EquipmentUtils = require('core/equipment')
-    
+
     -- Special case: City idle (DRG-specific logic preserved)
     if areas.Cities:contains(world.area) and not world.area:contains('Dynamis') then
         return sets.idle.Town
     end
-    
+
     -- Use standard modular approach for PDT/normal idle
     local conditions, setTable = EquipmentUtils.get_conditions_and_sets(
-        nil,             -- sets.idleXp (not used for DRG)
-        sets.idle.PDT,   -- PDT set
-        nil,             -- Acc PDT (not used for DRG)
-        nil              -- MDT (not used for DRG)
+        nil,           -- sets.idleXp (not used for DRG)
+        sets.idle.PDT, -- PDT set
+        nil,           -- Acc PDT (not used for DRG)
+        nil            -- MDT (not used for DRG)
     )
-    
+
     return EquipmentUtils.customize_set(idleSet, conditions, setTable)
 end
 

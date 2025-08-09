@@ -71,7 +71,6 @@ sets['Twashtar'] = { main = createEquipment('Twashtar') }
 sets['Mpu Gandring'] = { main = createEquipment('Mpu Gandring') }
 sets['Demersal'] = { main = createEquipment('Demers. Degen +1') }
 sets['Tauret'] = { main = createEquipment('Tauret') }
-sets['Aern Dagger II'] = { main = createEquipment('Aern Dagger II') }
 sets['Centovente'] = { sub = createEquipment('Centovente') }
 sets['Blurred'] = { sub = createEquipment('Blurred Knife +1') }
 sets['Gleti'] = { sub = createEquipment("Gleti's Knife") }

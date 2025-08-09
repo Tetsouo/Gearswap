@@ -1,0 +1,230 @@
+{
+  "ffxi_colors": {
+    "description": "Codes couleur FFXI/Windower valides pour windower.add_to_chat() - Codes exacts",
+    "last_updated": "2025-08-07",
+    "source": "assets/color.png - Codes couleur officiels FFXI",
+    "colors": {
+      "001": {
+        "name": "Blanc",
+        "hex": "#ffffff",
+        "description": "Blanc pur",
+        "usage": "Texte neutre, informations générales"
+      },
+      "002": {
+        "name": "Rose clair",
+        "hex": "#ffbcd5",
+        "description": "Rose pâle",
+        "usage": "Texte délicat"
+      },
+      "003": {
+        "name": "Rose",
+        "hex": "#ff9eb6",
+        "description": "Rose standard",
+        "usage": "Texte rose"
+      },
+      "004": {
+        "name": "Rose magenta",
+        "hex": "#ff9eff",
+        "description": "Rose-magenta",
+        "usage": "Texte coloré"
+      },
+      "005": {
+        "name": "Cyan vif",
+        "hex": "#63ffff",
+        "description": "Cyan brillant",
+        "usage": "Magie, sorts"
+      },
+      "006": {
+        "name": "Cyan pâle",
+        "hex": "#c0ffff",
+        "description": "Cyan clair",
+        "usage": "Magie secondaire"
+      },
+      "007": {
+        "name": "Violet clair",
+        "hex": "#dfbcff",
+        "description": "Violet pâle",
+        "usage": "Texte violet"
+      },
+      "008": {
+        "name": "Magenta clair",
+        "hex": "#ffdbff",
+        "description": "Magenta pâle",
+        "usage": "Texte magenta"
+      },
+      "010": {
+        "name": "Rose clair (alt)",
+        "hex": "#ffbcd5",
+        "description": "Rose pâle alternatif",
+        "usage": "Texte rose alternatif"
+      },
+      "011": {
+        "name": "Rose standard",
+        "hex": "#ff9cb3",
+        "description": "Rose moyen",
+        "usage": "Texte rose moyen"
+      },
+      "012": {
+        "name": "Rose magenta (alt)",
+        "hex": "#ff9eff",
+        "description": "Rose-magenta alternatif",
+        "usage": "Texte coloré alternatif"
+      },
+      "016": {
+        "name": "Magenta clair (alt)",
+        "hex": "#ffdbff",
+        "description": "Magenta pâle alternatif",
+        "usage": "Texte magenta alternatif"
+      },
+      "025": {
+        "name": "Magenta rosé",
+        "hex": "#ffbdef",
+        "description": "Magenta rose",
+        "usage": "Texte magenta rosé"
+      },
+      "028": {
+        "name": "Rose vif",
+        "hex": "#ff69a6",
+        "description": "Rose brillant",
+        "usage": "Erreurs critiques"
+      },
+      "030": {
+        "name": "Vert vif",
+        "hex": "#25ff59",
+        "description": "Vert brillant",
+        "usage": "Succès, excellent"
+      },
+      "037": {
+        "name": "Beige",
+        "hex": "#eeead5",
+        "description": "Beige clair",
+        "usage": "Texte neutre clair"
+      },
+      "038": {
+        "name": "Rose magenta vif",
+        "hex": "#ff78bf",
+        "description": "Rose-magenta vif",
+        "usage": "Texte coloré vif"
+      },
+      "050": {
+        "name": "Jaune vif",
+        "hex": "#ffff77",
+        "description": "Jaune brillant",
+        "usage": "Job Abilities, informations importantes"
+      },
+      "056": {
+        "name": "Cyan électrique",
+        "hex": "#25f2ff",
+        "description": "Cyan électrique",
+        "usage": "Magie puissante"
+      },
+      "057": {
+        "name": "Orange vif",
+        "hex": "#ff7f5a",
+        "description": "Orange brillant",
+        "usage": "Avertissements, attention"
+      },
+      "160": {
+        "name": "Gris-violet",
+        "hex": "#9d9cd2",
+        "description": "Gris teinté violet",
+        "usage": "Texte secondaire"
+      },
+      "163": {
+        "name": "Rose pâle",
+        "hex": "#ffc8fa",
+        "description": "Rose très pâle",
+        "usage": "Texte délicat"
+      },
+      "166": {
+        "name": "Beige gris",
+        "hex": "#e8e7d2",
+        "description": "Beige grisâtre",
+        "usage": "Texte neutre"
+      },
+      "167": {
+        "name": "Rouge-rose",
+        "hex": "#ff6096",
+        "description": "Rouge rosé",
+        "usage": "Erreurs, weapon skills"
+      },
+      "170": {
+        "name": "Jaune pâle",
+        "hex": "#ffffd2",
+        "description": "Jaune très pâle",
+        "usage": "Background jaune"
+      },
+      "201": {
+        "name": "Violet vif",
+        "hex": "#b65eff",
+        "description": "Violet brillant",
+        "usage": "Capacités spéciales"
+      },
+      "205": {
+        "name": "Violet vif (alt)",
+        "hex": "#b65eff",
+        "description": "Violet brillant alternatif",
+        "usage": "Capacités spéciales alternatives"
+      },
+      "206": {
+        "name": "Crème",
+        "hex": "#ffffeb",
+        "description": "Blanc crémeux",
+        "usage": "Background clair"
+      },
+      "207": {
+        "name": "Bleu clair",
+        "hex": "#99b5ff",
+        "description": "Bleu pâle",
+        "usage": "Informations bleues"
+      },
+      "211": {
+        "name": "Jaune crème",
+        "hex": "#ffffd0",
+        "description": "Jaune crémeux",
+        "usage": "Background jaune pâle"
+      }
+    },
+    "action_types": {
+      "magic": {
+        "suggested_colors": ["005", "056", "006"],
+        "description": "Pour les sorts de magie - cyan vif (#63ffff) comme FFXI"
+      },
+      "weaponskill": {
+        "suggested_colors": ["167", "028"],
+        "description": "Pour les weapon skills - rouge-rose (#ff6096)"
+      },
+      "jobability": {
+        "suggested_colors": ["050", "057"],
+        "description": "Pour les job abilities - jaune vif (#ffff77) comme FFXI"
+      },
+      "equipment": {
+        "suggested_colors": ["160", "166", "001"],
+        "description": "Pour l'équipement - gris-violet ou beige"
+      },
+      "success": {
+        "suggested_colors": ["030"],
+        "description": "Pour les succès - vert vif (#25ff59)"
+      },
+      "error": {
+        "suggested_colors": ["167", "028"],
+        "description": "Pour les erreurs - rouge-rose (#ff6096)"
+      },
+      "warning": {
+        "suggested_colors": ["057"],
+        "description": "Pour les avertissements - orange vif (#ff7f5a)"
+      },
+      "info": {
+        "suggested_colors": ["001", "037", "166"],
+        "description": "Pour les informations - blanc ou beige"
+      }
+    },
+    "performance_scale": {
+      "excellent": "030",
+      "good": "050", 
+      "average": "057",
+      "poor": "167",
+      "bad": "028"
+    }
+  }
+}

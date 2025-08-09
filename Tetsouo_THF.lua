@@ -71,10 +71,15 @@
 function get_sets()
     mote_include_version = 2             -- Specifies the version of the Mote library to use
     include('Mote-Include.lua')          -- Mote library for GearSwap
+    include('core/globals.lua')
     include('modules/automove.lua')      -- Module for movement speed gear management
-    include('modules/shared.lua') -- Shared functions across jobs
-    include('jobs/thf/THF_SET.lua')           -- Thief specific gear sets
-    include('jobs/thf/THF_FUNCTION.lua')     -- Advanced functions specific to Thief
+    include('modules/shared.lua')        -- Shared functions across jobs
+    include('jobs/thf/THF_SET.lua')      -- Thief specific gear sets
+    include('jobs/thf/THF_FUNCTION.lua') -- Advanced functions specific to Thief
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 --- Initialize gear sets for Thief.
@@ -162,7 +167,7 @@ end
 ---   - Range lock validation for distance-dependent abilities
 ---
 --- @param spell table The spell or ability being used
---- @param action table The action being performed  
+--- @param action table The action being performed
 --- @param spellMap string The type/classification of the spell or ability
 --- @param eventArgs table Additional event arguments
 --- @usage Automatically called by GearSwap after precast gear selection
@@ -170,8 +175,12 @@ end
 function job_post_precast(spell, action, spellMap, eventArgs)
     -- Equip AeolianTH gear set if 'Aeolian Edge' is being used and Treasure Hunter is active.
     if spell.english == 'Aeolian Edge' and treasureHunter ~= 'None' then
-        -- Equip TreasureHunter gear set if 'Sneak Attack' or 'Trick Attack' is being used and Treasure Mode is 'SATA' or 'Fulltime'.
+        -- Preserve the ear2 that was set by adjust_Gear_Based_On_TP_For_WeaponSkill
+        local saved_ear2 = sets.precast.WS[spell.english] and sets.precast.WS[spell.english].ear2
         equip(sets.AeolianTH)
+        if saved_ear2 then
+            equip({ ear2 = saved_ear2 })
+        end
     elseif spell.english == 'Sneak Attack' or spell.english == 'Trick Attack' then
         if state.TreasureMode.value == 'SATA' or state.TreasureMode.value == 'Fulltime' then
             equip(sets.TreasureHunter)
@@ -189,7 +198,7 @@ end
 --- - Buff state tracking and updates
 --- - Range validation for distance-dependent abilities
 ---
---- @param spell table The spell or ability being cast  
+--- @param spell table The spell or ability being cast
 --- @param action table The action object containing execution details
 --- @param spellMap string Mote's spell classification mapping
 --- @param eventArgs table Event arguments with cancel/handled flags
@@ -197,6 +206,10 @@ end
 --- @see handle_spell For comprehensive spell processing
 --- @see adjust_Gear_Based_On_TP_For_WeaponSkill For WS optimization
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     handle_spell(spell, eventArgs, auto_abilities) -- Handles the spell based on its type and the current state.
     checkDisplayCooldown(spell, eventArgs)         -- Checks and displays the cooldown for the spell.
     refine_Utsusemi(spell, eventArgs)              -- Refines the Utsusemi spell if it's being cast.
@@ -205,8 +218,8 @@ function job_precast(spell, action, spellMap, eventArgs)
     if state.Buff[spell.english] ~= nil then
         state.Buff[spell.english] = true
     end
-    
-    
+
+
     Ws_range(spell)
 end
 
@@ -247,7 +260,18 @@ end
 --- @param eventArgs table Event arguments with cancel/handled flags
 --- @usage Automatically called by GearSwap after spell/ability completion
 --- @see handleSpellAftercast For shared aftercast processing
+-- Add midcast function for metrics tracking
+function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+end
+
 function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
+    
     -- If a buff corresponding to the spell exists, update its state based on whether the spell was interrupted or the buff is active.
     if state.Buff[spell.english] ~= nil then
         state.Buff[spell.english] = not spell.interrupted or buffactive[spell.english]
@@ -275,7 +299,7 @@ end
 ---
 --- Macro Page Selection:
 ---   - DNC subjob: Page 1, Book 1 (Evasion and TP management)
----   - WAR subjob: Page 1, Book 2 (Physical damage focus) 
+---   - WAR subjob: Page 1, Book 2 (Physical damage focus)
 ---   - NIN subjob: Page 1, Book 3 (Dual wield and shadows)
 ---   - Default:    Page 1, Book 1 (General thief abilities)
 ---   - Lockstyle set 1 applied with timing delay
@@ -288,14 +312,47 @@ end
 --- @see user_setup For initialization context
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- THF macro pages based on subjob
     local macro_page = ({ DNC = 1, WAR = 2, NIN = 3 })[player.sub_job] or 1
     set_macro_page(1, macro_page)
-    
+
     -- THF lockstyle
     send_command('wait 3; input /lockstyleset 1')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
+end
+
+---============================================================================
+--- SELF COMMAND HANDLER
+---============================================================================
+
+--- Handle custom console commands for Thief.
+--- Provides specialized command handling for THF-specific operations and testing.
+---
+--- Available Commands:
+---   test : Execute GearSwap module unit tests
+---
+--- @param cmdParams table Array of command parameters
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+function job_self_command(cmdParams, eventArgs)
+    -- Universal metrics system commands - TEMPORAIREMENT DESACTIVE
+    --[[
+    local MetricsIntegration = require('core/metrics_integration')
+    if MetricsIntegration.handle_command(cmdParams, eventArgs) then
+        return
+    end
+    --]]
+    
+    -- Run unit tests
+    if cmdParams[1] == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other THF-specific commands here as needed
 end

@@ -27,7 +27,7 @@
 --- @usage
 ---   local jug_data = require('jobs/bst/broth_pet_data')
 ---   local pet_info = jug_data[pet_name]
----   
+---
 --- @see jobs/bst/BST_FUNCTION.lua for ecosystem management logic
 ---============================================================================
 

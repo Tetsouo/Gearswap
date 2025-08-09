@@ -68,10 +68,15 @@ function get_sets()
     mote_include_version = 2             -- Specifies the version of the Mote library to use
     -- Include necessary libraries and modules
     include('Mote-Include.lua')          -- Mote library for GearSwap
+    include('core/globals.lua')
     include('modules/automove.lua')      -- Module for movement speed gear management
-    include('modules/shared.lua') -- Shared functions across jobs
-    include('jobs/pld/PLD_SET.lua')          -- Paladin specific gear sets
-    include('jobs/pld/PLD_FUNCTION.lua')     -- Advanced functions specific to Paladin
+    include('modules/shared.lua')        -- Shared functions across jobs
+    include('jobs/pld/PLD_SET.lua')      -- Paladin specific gear sets
+    include('jobs/pld/PLD_FUNCTION.lua') -- Advanced functions specific to Paladin
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 --- Initialize gear sets for Paladin.
@@ -106,7 +111,7 @@ end
 ---   - Dynamic weapon set switching (Burtgang, Shining One, Naegling, Malevo)
 ---   - Shield/sub weapon configurations (Duban, Aegis, Alber)
 ---   - Experience point optimization toggle
----   - Rune element selection for RUN subjob compatibility  
+---   - Rune element selection for RUN subjob compatibility
 ---   - Dual-boxing mage coordination states
 ---   - Function key bindings for quick mode switching
 ---
@@ -159,6 +164,37 @@ function file_unload()
     send_command('unbind F11') -- Unbind key for cycling sub weapon set
 end
 
+---============================================================================
+--- SELF COMMAND HANDLER
+---============================================================================
+
+--- Handle custom console commands for Paladin.
+--- Provides specialized command handling for PLD-specific operations and testing.
+---
+--- Available Commands:
+---   test : Execute GearSwap module unit tests
+---
+--- @param cmdParams table Array of command parameters
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+function job_self_command(cmdParams, eventArgs)
+    -- Universal metrics system commands
+    local MetricsIntegration = require('core/metrics_integration')
+    if MetricsIntegration.handle_command(cmdParams, eventArgs) then
+        return
+    end
+    
+    -- Run unit tests
+    if cmdParams[1] == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other PLD-specific commands here as needed
+end
+
 --- Initialize gear sets for Paladin (duplicate function - legacy support).
 --- This duplicate function exists for legacy compatibility but is not used.
 --- The primary init_gear_sets() function above handles all initialization.
@@ -192,6 +228,10 @@ end
 --- @see handle_phalanx_while_xp For Phalanx-specific optimization
 --- @see track_spell_precast For spell usage tracking
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     -- If the spell is Phalanx, call the handle_phalanx_while_xp function
     if spell.name == 'Phalanx' then
         handle_phalanx_while_xp(spell, eventArgs)
@@ -220,6 +260,10 @@ end
 --- @param eventArgs table Event arguments with cancel/handled flags
 --- @usage Automatically called by GearSwap during spell casting
 function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+    
     -- Check if the player is incapacitated
     --[[ incapacitated(spell, eventArgs) ]]
 end
@@ -241,6 +285,10 @@ end
 --- @see handleSpellAftercast For shared aftercast processing
 --- @see track_spell_aftercast For spell usage analytics
 function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
+    
     -- Perform actions specific to the spell that was cast
     handleSpellAftercast(spell, eventArgs)
     -- AJOUTER: Suivi du sort en aftercast
@@ -272,15 +320,14 @@ end
 --- @see user_setup For initialization context
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- PLD macro pages based on subjob
     local macro_page = ({ BLU = 23, WAR = 21, RDM = 28, RUN = 21 })[player.sub_job] or 23
     set_macro_page(1, macro_page)
-    
+
     -- PLD lockstyle
     send_command('wait 3; input /lockstyleset 3')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
 end
-

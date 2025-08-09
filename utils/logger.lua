@@ -26,19 +26,19 @@
 ---
 --- Usage:
 ---   local log = require('utils/logger')
----   
+---
 ---   -- Using default logger
 ---   log.info('Player health: %d%%', player.hp/player.max_hp*100)
 ---   log.error('Failed to cast %s', spell.name)
 ---   log.table(equipment, 'Current Equipment')
----   
+---
 ---   -- Creating custom logger
 ---   local custom_log = log.Logger.new('MyModule')
 ---   custom_log:debug('Module initialized')
----   
+---
 ---   -- Performance monitoring
 ---   local result = log.timed('spell_cast', cast_spell, spell_name)
----   
+---
 ---   -- Safe execution
 ---   log.safe_call('equip_gear', equip, gear_set)
 ---
@@ -66,10 +66,10 @@ local config = require('config/config')
 --- Numeric log level definitions for severity comparison
 --- @type table<string, number> Mapping of level names to numeric values
 Logger.levels = {
-    ERROR = 1,  -- Critical errors that may break functionality
-    WARN = 2,   -- Warning conditions that should be addressed
-    INFO = 3,   -- General informational messages
-    DEBUG = 4   -- Detailed debugging information
+    ERROR = 1, -- Critical errors that may break functionality
+    WARN = 2,  -- Warning conditions that should be addressed
+    INFO = 3,  -- General informational messages
+    DEBUG = 4  -- Detailed debugging information
 }
 
 ---============================================================================
@@ -321,7 +321,7 @@ local default_logger = Logger.new()
 return {
     --- Logger class for creating custom logger instances
     Logger = Logger,
-    
+
     --- Default logger instance for immediate use
     default = default_logger,
 

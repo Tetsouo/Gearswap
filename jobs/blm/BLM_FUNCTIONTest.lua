@@ -649,7 +649,7 @@ function TestJobSelfCommand:setUp()
     commandFunctions = { mockCommand = function() end }
     handle_blm_commands = function() end
     handle_sch_subjob_commands = function() end
-    update_altState = function() end  -- Stub for update_altState
+    update_altState = function() end -- Stub for update_altState
 end
 
 --- Tears down the test environment after each test.
@@ -659,7 +659,7 @@ function TestJobSelfCommand:tearDown()
     handle_blm_commands = self.originalHandleBlmCommands
     handle_sch_subjob_commands = self.originalHandleSchSubjobCommands
     player.sub_job = self.originalPlayerSubJob
-    update_altState = self.originalUpdateAltState  -- Restore original update_altState
+    update_altState = self.originalUpdateAltState -- Restore original update_altState
 end
 
 --- Tests the job_self_command function with a defined command.

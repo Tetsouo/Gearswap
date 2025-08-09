@@ -90,7 +90,7 @@ function get_custom_wsmode(spell, spellMap, default_wsmode)
     if state.Buff['Climactic Flourish'] then
         wsmode = (wsmode or '') .. 'Clim'
     end
-    
+
     -- Check if 'TpBonus' state is active. If so, add 'Tpbonus' to the mode.
     if state.TpBonus then
         wsmode = (wsmode or '') .. 'Tpbonus'
@@ -134,6 +134,12 @@ function job_self_command(cmdParams, eventArgs, spell)
     -- Update the altState object
     update_altState()
     local command = cmdParams[1]:lower()
+
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
 
     -- If the command is defined, execute it
     if commandFunctions[command] then

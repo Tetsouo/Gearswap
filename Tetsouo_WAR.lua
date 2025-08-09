@@ -42,7 +42,10 @@
 --- Console Commands:
 ---   //gs c cycle HybridMode : Toggle defense mode
 ---   //gs c cycle WeaponSet  : Change main weapon configuration
----   //gs r                  : Reload GearSwap configuration
+---   //gs c metrics [command] : Metrics system management
+---   //gs c test              : Run module unit tests
+---   //gs c cache [command]   : Cache management
+---   //gs r                   : Reload GearSwap configuration
 ---============================================================================
 
 ---============================================================================
@@ -56,6 +59,11 @@
 ---   //gs r : Reload GearSwap configuration and reset all bindings
 ---   //gs c cycle HybridMode : Manual hybrid mode toggle
 ---   //gs c cycle WeaponSet  : Manual weapon set cycling
+---   //gs c metrics show     : Display performance metrics dashboard
+---   //gs c metrics export   : Export metrics to JSON file
+---   //gs c metrics toggle   : Enable/disable metrics collection
+---   //gs c metrics reset    : Reset all collected metrics
+---   //gs c test             : Execute module unit tests
 ---
 --- Automatic Features:
 ---   - Retaliation auto-cancellation on extended movement
@@ -79,7 +87,7 @@
 --- Initialization Order:
 ---   1. Mote-Include v2 framework
 ---   2. Movement automation module
----   3. Shared utility functions  
+---   3. Shared utility functions
 ---   4. WAR equipment sets
 ---   5. WAR advanced functions
 ---   6. Retaliation movement handler
@@ -89,11 +97,17 @@
 function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua')
+    include('core/globals.lua')
+    include('utils/equipment_factory.lua')
     include('modules/automove.lua')
     include('modules/shared.lua')
     include('jobs/war/WAR_SET.lua')
     include('jobs/war/WAR_FUNCTION.lua')
     removeRetaliationOnLongMovement()
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 --- Initialize gear sets for Warrior.
@@ -114,15 +128,9 @@ end
 --- Handles core Warrior mechanics and internal state management.
 --- User preferences and keybindings are handled separately in user_setup().
 ---
---- This separation follows Mote v2 best practices:
----   - job_setup(): Core job mechanics and calculations
----   - user_setup(): User preferences, states, and keybindings
----
 --- @usage Automatically called by Mote framework after dependency loading
---- @see user_setup For user preference configuration
 function job_setup()
-    -- Job-specific variables and logic here
-    -- User states and keybinds are now in user_setup()
+    -- WAR-specific job logic initialization
 end
 
 --- Configure user-specific preferences and state management.
@@ -138,11 +146,11 @@ end
 --- @usage Automatically called by Mote framework after job_setup
 --- @see select_default_macro_book For macro and appearance setup
 function user_setup()
-    -- Mote v2 standard states (use :options() syntax)
+    -- Mote v2 standard states
     state.HybridMode:options('PDT', 'Normal')
 
-    -- Custom states (keep original syntax)
-    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Ukonvasara','Chango', 'Shining'; "Loxotic", "Ikenga", "Naegling" }
+    -- Custom states for weapon and ammunition management
+    state.WeaponSet = M { ['description'] = 'Main Weapon', 'Ukonvasara', 'Chango', 'Shining', "Loxotic", "Ikenga", "Naegling" }
     state.ammoSet = M { ['description'] = 'Ammo', 'Aurgelmir Orb +1' }
 
     -- Keybindings
@@ -178,6 +186,123 @@ function file_unload()
 end
 
 ---============================================================================
+--- CUSTOM COMMAND HANDLER
+---============================================================================
+
+--- Handle custom GearSwap commands including metrics and testing.
+--- Processes user commands sent via //gs c <command>
+---
+--- Available commands:
+---   - metrics show/export/toggle/reset: Metrics system management
+---   - test: Run unit tests for all modules
+---   - cache stats/cleanup/clear: Cache management
+---   - notify test: Test notification system
+---
+--- @param cmdParams table Command parameters split by spaces
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+function job_self_command(cmdParams, eventArgs)
+    local command = cmdParams[1]:lower()
+    
+
+    -- Run unit tests
+    if command == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+    
+    -- Metrics and performance commands - delegate to universal system
+    if command == 'metrics' then
+        local MetricsIntegration = require('core/metrics_integration')
+        if MetricsIntegration.handle_command(cmdParams, eventArgs) then
+            return
+        end
+    end
+    
+    -- Cache management commands
+    if command == 'cache' then
+        local subcommand = cmdParams[2] and cmdParams[2]:lower() or 'stats'
+        
+        if subcommand == 'stats' then
+            local EquipmentCache = require('core/equipment_cache')
+            local stats = EquipmentCache.get_statistics()
+            windower.add_to_chat(050, string.format('═══ Cache Statistics ═══'))
+            windower.add_to_chat(050, string.format('Entries: %d/%d', stats.entries, stats.max_entries))
+            windower.add_to_chat(050, string.format('Hit Rate: %.1f%% (%d hits, %d misses)', stats.hit_rate, stats.hits, stats.misses))
+            windower.add_to_chat(050, string.format('Avg Access: %.2fms', stats.avg_access_time_ms))
+        elseif subcommand == 'cleanup' then
+            local EquipmentCache = require('core/equipment_cache')
+            EquipmentCache.cleanup()
+            windower.add_to_chat(050, 'Cache cleanup completed')
+        elseif subcommand == 'clear' then
+            local EquipmentCache = require('core/equipment_cache')
+            EquipmentCache.clear()
+            windower.add_to_chat(050, 'Cache cleared')
+        end
+        eventArgs.handled = true
+        return
+    end
+    
+    -- Module loader commands
+    if command == 'modules' then
+        local subcommand = cmdParams[2] and cmdParams[2]:lower() or 'stats'
+        
+        if subcommand == 'stats' then
+            local ModuleLoader = require('utils/module_loader')
+            local stats = ModuleLoader.get_statistics()
+            windower.add_to_chat(050, string.format('═══ Module Loader Statistics ═══'))
+            windower.add_to_chat(050, string.format('Cached Modules: %d', stats.cached_modules))
+            windower.add_to_chat(050, string.format('Memory Usage: %.2fKB', stats.total_memory_kb))
+            windower.add_to_chat(050, string.format('Hit Rate: %.1f%%', stats.hit_rate))
+            windower.add_to_chat(050, string.format('Avg Load Time: %.2fms', stats.avg_load_time_ms))
+        elseif subcommand == 'cleanup' then
+            local ModuleLoader = require('utils/module_loader')
+            ModuleLoader.cleanup_unused_modules()
+            windower.add_to_chat(050, 'Module cleanup completed')
+        end
+        eventArgs.handled = true
+        return
+    end
+    
+    -- Notification system commands  
+    if command == 'notify' then
+        local subcommand = cmdParams[2] and cmdParams[2]:lower() or 'test'
+        
+        if subcommand == 'test' then
+            local Notify = require('utils/notifications')
+            Notify.show("Test notification successful!", "success", 3)
+            Notify.show("Warning test message", "warning", 3) 
+            Notify.show("Error test message", "error", 3)
+        end
+        eventArgs.handled = true
+        return
+    end
+    
+    -- Performance benchmarks
+    if command == 'benchmark' then
+        local Benchmark = require('tests/performance/benchmark')
+        windower.add_to_chat(050, 'Starting performance benchmark...')
+        
+        coroutine.schedule(function()
+            local results = Benchmark.run_all_benchmarks()
+            windower.add_to_chat(050, string.format('Benchmark completed: %d/%d passed (%.1f%%)', 
+                results.passed_benchmarks, results.total_benchmarks, results.success_rate))
+        end, 1)
+        
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other WAR-specific commands here as needed
+    
+    -- Important: Let other commands pass through to the default GearSwap system
+    -- This allows commands like "gs equip sets.precast.JA['Provoke']" to work
+    -- Do NOT set eventArgs.handled = true here so GearSwap processes the command
+end
+
+---============================================================================
 --- SPELL CASTING EVENT HANDLERS
 ---============================================================================
 
@@ -200,6 +325,10 @@ end
 --- @see get_custom_wsmode For TP-based weapon skill mode calculation
 --- @see core/equipment.safe_equip For safe gear swapping
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     handle_spell(spell, eventArgs, auto_abilities)
     checkDisplayCooldown(spell, eventArgs)
     Ws_range(spell)
@@ -230,6 +359,10 @@ end
 --- @param eventArgs table Event arguments with cancel/handled flags
 --- @usage Automatically called by GearSwap during spell casting
 function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+    
     -- Midcast logic here if needed
 end
 
@@ -245,6 +378,10 @@ end
 --- @see handleSpellAftercast For shared aftercast processing
 function job_aftercast(spell, action, spellMap, eventArgs)
     handleSpellAftercast(spell, eventArgs)
+    
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
 end
 
 ---============================================================================
@@ -265,35 +402,12 @@ end
 --- @usage Called automatically by Mote-Include v2 framework
 --- @see equip_weapons For WAR-specific weapon logic
 --- @see SharedFunctions.job_handle_equipping_gear For shared equipment handling
-function job_handle_equipping_gear(playerStatus, eventArgs)
-    -- Call the weapon equipping function from WAR_FUNCTION.lua
-    if equip_weapons then
-        equip_weapons()
-    end
-    
-    -- Let SharedFunctions handle the rest of the equipment logic
-    if job_handle_equipping_gear then
-        -- Use the SharedFunctions version for complete gear handling
-        local shared_gear_handler = _G['job_handle_equipping_gear']
-        if shared_gear_handler and shared_gear_handler ~= job_handle_equipping_gear then
-            shared_gear_handler(playerStatus, eventArgs)
-        end
-    end
-end
 
---- Legacy compatibility for state change handling.
---- Provides backward compatibility with older Mote versions that use
---- job_state_change instead of job_handle_equipping_gear.
----
---- @param stateField string The state field that changed
---- @param newValue any The new value of the state field
---- @param oldValue any The previous value of the state field
---- @usage Called automatically by legacy Mote versions
---- @deprecated Use job_handle_equipping_gear for Mote v2+
-function job_state_change(stateField, newValue, oldValue)
-    -- Trigger equipment update when state changes
-    handle_equipping_gear(player.status)
-end
+---============================================================================
+--- ENGAGED SET CUSTOMIZATION
+---============================================================================
+--- The customize_melee_set function is defined in jobs/war/WAR_FUNCTION.lua
+--- to avoid conflicts and maintain modular organization.
 
 ---============================================================================
 --- MACRO AND APPEARANCE MANAGEMENT
@@ -319,14 +433,64 @@ end
 --- @see user_setup For initialization context
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- WAR macro pages based on subjob
     local macro_page = ({ DRG = 32, SAM = 30, DNC = 37 })[player.sub_job] or 30
     set_macro_page(1, macro_page)
-    
+
     -- WAR lockstyle
     send_command('wait 3; input /lockstyleset 5')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
+end
+
+---============================================================================
+--- COMMAND HELP DISPLAY
+---============================================================================
+
+--- Display brief command reference that fits in console
+function display_command_help()
+    print("=============== COMMANDES GEARSWAP TETSOUO ===============")
+    print(" RACCOURCIS: F5=HybridMode F6=WeaponSet //gs r=Reload")
+    print("")
+    print(" METRIQUES (desactivees par defaut):")
+    print("   //gs c metrics toggle   | Activer/desactiver")  
+    print("   //gs c metrics show     | Dashboard performance")
+    print("   //gs c metrics export   | Exporter vers JSON")
+    print("")
+    print(" AUTRES:")
+    print("   //gs c cache stats      | Stats cache")
+    print("   //gs c test             | Tests unitaires")
+    print("   //gs c cmd full         | Aide complete")
+    print("=======================================================")
+end
+
+--- Display full command reference (longer version)
+function display_full_help()
+    print("================== AIDE COMPLETE GEARSWAP ==================")
+    print("")
+    print("RACCOURCIS CLAVIER:")
+    print("  F5 = Cycle HybridMode (PDT <-> Normal)")
+    print("  F6 = Cycle WeaponSet (changer arme)")
+    print("")
+    print("SYSTEME METRIQUES:")
+    print("  //gs c metrics status   | Voir etat (actif/inactif)")
+    print("  //gs c metrics toggle   | Activer/desactiver")
+    print("  //gs c metrics show     | Dashboard coloré")
+    print("  //gs c metrics export   | Sauver en JSON")
+    print("  //gs c metrics reset    | Remettre a zero")
+    print("")
+    print("CACHE & SYSTEME:")
+    print("  //gs c cache stats      | Statistiques cache")
+    print("  //gs c cache clear      | Vider cache")
+    print("  //gs c modules stats    | Info modules")
+    print("  //gs c test             | Tests unitaires")
+    print("")
+    print("GEARSWAP:")
+    print("  //gs r                  | Recharger config")
+    print("  //gs c cycle HybridMode | Toggle defense")
+    print("  //gs c cycle WeaponSet  | Changer arme")
+    print("")
+    print("=========================================================")
 end

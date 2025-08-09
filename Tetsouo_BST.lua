@@ -72,7 +72,11 @@
 local sc = send_command
 
 --- @type table Windower resource tables for spells, items, etc.
-local res = require('resources')
+local res_success, res = pcall(require, 'resources')
+if not res_success then
+    windower.add_to_chat(167, "BST Config: Resources module not found")
+    return
+end
 
 ---============================================================================
 --- CORE INITIALIZATION FUNCTIONS
@@ -99,6 +103,7 @@ function get_sets()
 
     -- external include files (order matters)
     include('Mote-Include.lua')
+    include('core/globals.lua')
     include('modules/automove.lua')
     include('modules/shared.lua')
     include('jobs/bst/BST_SET.lua')
@@ -106,6 +111,10 @@ function get_sets()
 
     -- HUD overlay
     sc('lua load BST-HUD')
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 --- Initialize gear sets for Beastmaster.
@@ -145,13 +154,13 @@ function init_gear_sets() end
 function job_setup()
     -- State definitions: name, description, possible values
     local state_defs = {
-        { n = "AutoPetEngage",   d = "AutoPetEngage", v = { "Off", "On" } },
-        { n = "petIdleMode",     d = "PetIdleMode",   v = { "MasterPDT", "PetPDT" } },
-        { n = "HybridMode",      d = "HybridMode",    v = { "PDT", "Normal" } },
-        { n = "WeaponSet",       d = "WeaponSet",     v = { "Aymur" } },
-        { n = "SubSet",          d = "SubSet",        v = { "Agwu's axe", "Adapa", "Diamond Aspis" } },
-        { n = "ecosystem",       d = "Ecosystem",     v = { "All", "Aquan", "Amorph", "Beast", "Bird", "Lizard", "Plantoid", "Vermin" } },
-        { n = "species",         d = "Species",       v = { "All" } },
+        { n = "AutoPetEngage", d = "AutoPetEngage", v = { "Off", "On" } },
+        { n = "petIdleMode",   d = "PetIdleMode",   v = { "MasterPDT", "PetPDT" } },
+        { n = "HybridMode",    d = "HybridMode",    v = { "PDT", "Normal" } },
+        { n = "WeaponSet",     d = "WeaponSet",     v = { "Aymur" } },
+        { n = "SubSet",        d = "SubSet",        v = { "Agwu's axe", "Adapa", "Diamond Aspis" } },
+        { n = "ecosystem",     d = "Ecosystem",     v = { "All", "Aquan", "Amorph", "Beast", "Bird", "Lizard", "Plantoid", "Vermin" } },
+        { n = "species",       d = "Species",       v = { "All" } },
         {
             n = "ammoSet",
             d = "ammo",
@@ -182,17 +191,17 @@ function job_setup()
         "Indi-Haste")
     state.altPlayerEntrust = M("Indi-Refresh", "Indi-Haste", "Indi-INT", "Indi-STR", "Indi-VIT")
 
-    -- Keybindings: F2–F10 cycle through states
+    -- Keybindings: F1–F7 cycle through states
     for _, b in ipairs {
-        { "F2", "HybridMode" }, { "F3", "WeaponSet" }, { "F4", "SubSet" }, 
-        { "F7", "petIdleMode" }, { "F9", "AutoPetEngage" }
+        { "F1", "AutoPetEngage" }, { "F2", "HybridMode" }, { "F3", "WeaponSet" }, 
+        { "F4", "SubSet" }, { "F7", "petIdleMode" }
     } do
         sc(("bind %s gs c cycle %s"):format(b[1], b[2]))
     end
-    
+
     -- BST unified commands (same logic for binds and macros)
-    sc("bind F5 gs c bst_ecosystem")   -- Change ecosystem + update everything
-    sc("bind F6 gs c bst_species")     -- Change species + equip broth
+    sc("bind F5 gs c bst_ecosystem") -- Change ecosystem + update everything
+    sc("bind F6 gs c bst_species")   -- Change species + equip broth
 end
 
 --- Configure user-specific settings and preferences.
@@ -223,6 +232,37 @@ function file_unload()
 end
 
 ---============================================================================
+--- SELF COMMAND HANDLER
+---============================================================================
+
+--- Handle custom console commands for Beastmaster.
+--- Provides specialized command handling for BST-specific operations and testing.
+---
+--- Available Commands:
+---   test : Execute GearSwap module unit tests
+---
+--- @param cmdParams table Array of command parameters
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+function job_self_command(cmdParams, eventArgs)
+    -- Universal metrics system commands
+    local MetricsIntegration = require('core/metrics_integration')
+    if MetricsIntegration.handle_command(cmdParams, eventArgs) then
+        return
+    end
+    
+    -- Run unit tests
+    if cmdParams[1] == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other BST-specific commands here as needed
+end
+
+---============================================================================
 --- SPELL CASTING EVENT HANDLERS
 ---============================================================================
 
@@ -243,6 +283,10 @@ end
 --- @see job_pet_precast For pet-specific precast handling
 --- @see update_ready_moves For ready move database management
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     job_pet_precast(spell, action, spellMap, eventArgs)
     update_ready_moves()
 end
@@ -257,6 +301,10 @@ end
 --- @param eventArgs table Event arguments with cancel/handled flags
 --- @usage Automatically called by GearSwap during spell casting
 function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+    
     -- Add mid-cast logic here if required.
 end
 
@@ -280,6 +328,10 @@ end
 --- @usage Automatically called by GearSwap after spell/ability completion
 --- @see bst_change_ecosystem For ecosystem initialization
 function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
+    
     -- Initialize BST on first aftercast if not already done
     if not _bst_initialized then
         _bst_initialized = true
@@ -317,14 +369,14 @@ end
 --- @see user_setup For initialization context
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- BST macro pages based on subjob
     local macro_page = ({ DNC = 15, SCH = 16, WHM = 15 })[player.sub_job] or 15
     set_macro_page(1, macro_page)
-    
+
     -- BST lockstyle
     send_command('wait 3; input /lockstyleset 11')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
 end

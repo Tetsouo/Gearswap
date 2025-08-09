@@ -267,7 +267,9 @@ local AOE_SPELLS = { 'Sheep Song', 'Stinking Gas', 'Geist Wall', 'Frightful Roar
 -- Basic chat logger
 --------------------------------------------------------------------------------
 local function logMessage(msg, isError)
-    add_to_chat(isError and 123 or 158, msg)
+    -- Use createFormattedMessage for better formatting
+    local formattedMsg = createFormattedMessage(isError and '[PLD Error]' or '[PLD]', msg, nil, nil, false, true)
+    add_to_chat(isError and 123 or 158, formattedMsg)
 end
 
 --------------------------------------------------------------------------------
@@ -376,7 +378,8 @@ local commandFunctions = {
     rune = function()
         -- Vérifie que l'on est bien sub RUN
         if player.sub_job ~= 'RUN' then
-            add_to_chat(123, "[Erreur] Vous n'êtes pas sub RUN.")
+            local msg = createFormattedMessage('[Erreur]', 'Vous n\'êtes pas sub RUN', nil, nil, true, true)
+            add_to_chat(123, msg)
             return
         end
         -- Lance la Rune actuellement sélectionnée
@@ -386,11 +389,13 @@ local commandFunctions = {
     -- Optionnel: commande "cyclerune" pour faire défiler la liste
     cyclerune = function()
         if player.sub_job ~= 'RUN' then
-            add_to_chat(123, "[Erreur] Vous n'êtes pas sub RUN.")
+            local msg = createFormattedMessage('[Erreur]', 'Vous n\'êtes pas sub RUN', nil, nil, true, true)
+            add_to_chat(123, msg)
             return
         end
         state.RuneElement:cycle()
-        add_to_chat(122, "Rune actuelle : " .. state.RuneElement.value)
+        local msg = createFormattedMessage('Rune actuelle:', state.RuneElement.value, nil, nil, false, true)
+        add_to_chat(122, msg)
     end,
 }
 
@@ -405,6 +410,23 @@ function job_self_command(cmdParams, eventArgs, spell)
 
     local command = cmdParams[1]:lower():gsub("%s+", "")
     cleanupSpellTracking()
+
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
+    
+    -- Debug commands for troubleshooting
+    if command == 'debug' then
+        local DebugSets = require('debug_sets')
+        if cmdParams[2] then
+            DebugSets.debug_command(cmdParams[2])
+        else
+            DebugSets.test_common_sets()
+        end
+        return
+    end
 
     -- Exemple: commande aoe déjà gérée directement
     if command == 'aoe' then

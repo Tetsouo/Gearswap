@@ -35,6 +35,9 @@ local config = require('config/config')          -- Centralized configuration sy
 local log = require('utils/logger')              -- Professional logging framework  
 local WeaponUtils = require('core/weapons')      -- Weapon management utilities
 
+--- @type table Validation utilities for parameter checking
+local ValidationUtils = require('utils/validation')
+
 -- ===========================================================================================================
 --                                     Alt State Management
 -- ===========================================================================================================
@@ -45,8 +48,8 @@ StateUtils.altState = {}
 --- Updates the alt state object with the current state values.
 -- This function synchronizes the alternate state with the main state variables.
 function StateUtils.update_alt_state()
-    if type(state) ~= 'table' then
-        log.error("State object not available for alt state update")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_state() then
         return
     end
 
@@ -80,8 +83,16 @@ end
 -- @param field (string): Field name to set
 -- @param value (any): Value to set
 function StateUtils.set_alt_state_field(field, value)
-    if type(field) ~= 'string' then
-        log.error("Alt state field name must be a string")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(field, 'field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(field, 'field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(value, 'value') then
         return false
     end
     
@@ -97,13 +108,12 @@ end
 --- Resets the player's equipment to its default state based on current conditions.
 -- @return (boolean): True if successful, false otherwise
 function StateUtils.reset_to_default_equipment()
-    if not (sets and sets.engaged and sets.idle and sets.MoveSpeed) then
-        log.error("Required equipment sets not available")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_sets({'engaged', 'idle', 'MoveSpeed'}) then
         return false
     end
 
-    if not player then
-        log.error("Player object not available")
+    if not ValidationUtils.validate_player() then
         return false
     end
 
@@ -135,8 +145,12 @@ end
 -- @param baseSet (table): Base equipment set to modify
 -- @return (boolean): True if successful, false otherwise
 function StateUtils.apply_hybrid_mode_gear(baseSet)
-    if not baseSet then
-        log.error("Base set required for hybrid mode application")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(baseSet, 'baseSet') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(baseSet, 'table', 'baseSet') then
         return false
     end
 
@@ -173,6 +187,15 @@ end
 -- @param baseSet (table): Base equipment set
 -- @return (table): PDT equipment set
 function StateUtils.get_pdt_set(baseSet)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(baseSet, 'baseSet') then
+        return {}
+    end
+    
+    if not ValidationUtils.validate_type(baseSet, 'table', 'baseSet') then
+        return {}
+    end
+    
     if state and state.Xp and state.Xp.value == 'True' then
         return baseSet.PDT_XP or baseSet.PDT or baseSet
     elseif state and state.OffenseMode and state.OffenseMode.value == 'Acc' then
@@ -186,6 +209,15 @@ end
 -- @param baseSet (table): Base equipment set
 -- @return (table): MDT equipment set
 function StateUtils.get_mdt_set(baseSet)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(baseSet, 'baseSet') then
+        return {}
+    end
+    
+    if not ValidationUtils.validate_type(baseSet, 'table', 'baseSet') then
+        return {}
+    end
+    
     return baseSet.MDT or baseSet
 end
 
@@ -198,19 +230,16 @@ end
 -- @param eventArgs (table or nil): Additional event arguments.
 -- @return (boolean): True if successful, false otherwise
 function StateUtils.job_handle_equipping_gear(playerStatus, eventArgs)
-    -- Validation
-    if playerStatus ~= nil and type(playerStatus) ~= 'string' then
-        log.error("playerStatus must be string or nil")
+    -- Parameter validation using ValidationUtils
+    if playerStatus ~= nil and not ValidationUtils.validate_type(playerStatus, 'string', 'playerStatus') then
         return false
     end
 
-    if eventArgs ~= nil and type(eventArgs) ~= 'table' then
-        log.error("eventArgs must be table or nil")
+    if eventArgs ~= nil and not ValidationUtils.validate_type(eventArgs, 'table', 'eventArgs') then
         return false
     end
 
-    if not state then
-        log.error("State object not available")
+    if not ValidationUtils.validate_state() then
         return false
     end
 
@@ -267,18 +296,20 @@ end
 -- @param old_value (any): The old value of the changed field.
 -- @return (boolean): True if successful, false otherwise
 function StateUtils.job_state_change(field, new_value, old_value)
-    if not field then
-        log.error("State change field cannot be nil")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(field, 'field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(field, 'field') then
         return false
     end
 
-    if new_value == nil then
-        log.error("State change new_value cannot be nil")
+    if not ValidationUtils.validate_not_nil(new_value, 'new_value') then
         return false
     end
 
-    if old_value == nil then
-        log.error("State change old_value cannot be nil")
+    if not ValidationUtils.validate_not_nil(old_value, 'old_value') then
         return false
     end
 
@@ -339,11 +370,6 @@ end
 --- Validates that required state variables exist
 -- @return (boolean): True if state is valid, false otherwise
 function StateUtils.validate_state()
-    if not state then
-        log.error("Global state object missing")
-        return false
-    end
-
     local required_fields = {
         'Moving', 'HybridMode'
     }
@@ -403,6 +429,19 @@ end
 -- @param expected_value (any): Expected value
 -- @return (boolean): True if state matches expected value
 function StateUtils.is_in_state(state_field, expected_value)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(state_field, 'state_field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(state_field, 'state_field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(expected_value, 'expected_value') then
+        return false
+    end
+    
     if not state or not state[state_field] then
         return false
     end
@@ -415,8 +454,20 @@ end
 -- @param value (any): Value to set
 -- @return (boolean): True if successful, false otherwise
 function StateUtils.set_state_field(state_field, value)
-    if not state then
-        log.error("State object not available")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(state_field, 'state_field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(state_field, 'state_field') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_not_nil(value, 'value') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_state() then
         return false
     end
 

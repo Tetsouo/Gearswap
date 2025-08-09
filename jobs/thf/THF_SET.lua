@@ -23,7 +23,7 @@
 --- @version 2.0
 --- @date Created: 2023-07-10 | Modified: 2025-08-05
 --- @requires Windower FFXI, GearSwap addon
---- @requires utils/equipment.lua for equipment creation utilities
+--- @requires utils/equipment_factory for standardized equipment creation
 ---
 --- @usage
 ---   All sets automatically loaded by Mote framework
@@ -33,22 +33,8 @@
 --- @see Tetsouo_THF.lua for job configuration and TH mode management
 ---============================================================================
 
--- Creates an equipment item with the given name, priority, bag, and augments.
--- Parameters:
---   name (string): The name of the equipment item
---   priority (number, optional): The priority of the equipment item. Defaults to 0.
---   bag (number, optional): The bag where the equipment item is located. Defaults to 0.
---   augments (table, optional): The augments of the equipment item. Defaults to an empty table.
--- Returns:
---   A table representing the equipment item
-function createEquipment(name, priority, bag, augments)
-    return {
-        name = name,
-        priority = priority or 0,
-        bag = bag or 0,
-        augments = augments or {}
-    }
-end
+-- Load the centralized equipment factory for standardized equipment creation
+require('utils/equipment_factory')
 
 -- =========================================================================================================
 --                                           Equipments - Unique Items
@@ -279,7 +265,7 @@ sets.engaged.Acc.PDT = set_combine(sets.engaged.PDT, {
 
 -- Engaged sets with TH+SA/TA for tagging period
 sets.engaged.TH = set_combine(sets.engaged, sets.TreasureHunter)
-sets.engaged.TH.SA = set_combine(sets.engaged, sets.TreasureHunter.SA) 
+sets.engaged.TH.SA = set_combine(sets.engaged, sets.TreasureHunter.SA)
 sets.engaged.TH.TA = set_combine(sets.engaged, sets.TreasureHunter.TA)
 sets.engaged.TH.SATA = set_combine(sets.engaged, sets.TreasureHunter.SATA)
 
@@ -319,7 +305,7 @@ sets.buff['Sneak Attack'] = {
     body = createEquipment("Pillager's Vest +4"),
     hands = createEquipment("Skulker's Armlets +3"),
     legs = "Lustr. Subligar +1",
-    feet = createEquipment('Pill. Poulaines +3'),
+    feet = createEquipment("Skulker's Poulaines +3"),
     neck = createEquipment('Asn. Gorget +2'),
     waist = createEquipment('Kentarch belt +1'),
     ear1 = createEquipment('Mache Earring +1'),
@@ -335,7 +321,7 @@ sets.buff['Trick Attack'] = {
     body = PlundererVest,
     hands = createEquipment('Pill. armlets +4'),
     legs = createEquipment("Pillager's culottes +3"),
-    feet = createEquipment('Pill. Poulaines +3'),
+    feet = createEquipment("Skulker's Poulaines +3"),
     neck = createEquipment('Asn. Gorget +2'),
     waist = createEquipment('Svelt. Gouriz +1'),
     ear1 = createEquipment('Dawn Earring'),
@@ -373,7 +359,12 @@ sets.precast.JA['Animated Flourish'] = {
 }
 sets.precast.JA['Flee'] = { feet = createEquipment('Pill. Poulaines +3') }
 
-sets.precast.JA['Hide'] = { body = createEquipment("Pill. Vest +3") }
+-- S'assurer que la structure existe
+sets.precast = sets.precast or {}
+sets.precast.JA = sets.precast.JA or {}
+
+-- Utiliser la syntaxe sans crochets pour éviter les problèmes de parsing
+sets.precast.JA.Hide = { body = createEquipment("Pill. Vest +4") }
 
 sets.precast.JA['Steal'] = {
     neck = createEquipment('Pentalagus Charm'),
@@ -437,7 +428,7 @@ sets.precast.JA.Provoke = {
     ear1 = createEquipment('Friomisi Earring'),
     ear2 = createEquipment('Eabani Earring'),
     ring1 = createEquipment('Provocare Ring'),
-    ring2 = createEquipment('Supershear Ring'),
+    ring2 = createEquipment('Supershear Ring'), 
     back = createEquipment('Solemnity Cape')
 }
 sets.precast.Flourish1 = sets.precast.JA.Provoke
@@ -578,7 +569,7 @@ sets.precast.WS['Evisceration'].SATA = set_combine(sets.precast.WS['Evisceration
 })
 
 sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {
-    head = createEquipment('Pill. Bonnet +3'),
+    head = createEquipment('Pill. Bonnet +4'),
     body = createEquipment("skulker's Vest +3"),
     hands = createEquipment('Meg. Gloves +2'),
     legs = createEquipment('Plun. Culottes +3'),
@@ -684,7 +675,7 @@ sets.precast.WS['Mandalic Stab'].SA = set_combine(sets.precast.WS['Mandalic Stab
 
 sets.precast.WS['Mandalic Stab'].TA = set_combine(sets.precast.WS['Mandalic Stab'].Mid, {
     ammo = "Yetshila +1",
-    head = "Skulker2's Bonnet +3",
+    head = "Skulker's Bonnet +3",
     body = "Skulker's Vest +3",
     hands = "Malignance Gloves",
     legs = "Plun. Culottes +3",
@@ -768,8 +759,8 @@ sets.precast.WS['Aeolian Edge'] = {
     legs = "Nyame Flanchard",
     hands = "Nyame Gauntlets",
     feet = "Nyame Sollerets",
-    ear1 = createEquipment('Friomisi Earring'),
-    ear2 = createEquipment('Moonshade Earring'),
+    ear1 = createEquipment('Sortiarius Earring'),
+    ear2 = createEquipment('Friomisi Earring'),
     ring1 = createEquipment("Epaminondas's Ring"),
     ring2 = createEquipment("Cornelia's Ring"),
     waist = createEquipment("Orpheus's Sash"),
@@ -845,6 +836,6 @@ sets.midcast.Utsusemi = sets.midcast.FastRecast
 
 sets.buff.Doom = {
     neck = createEquipment("Nicander's Necklace"), -- Reduces Doom effects
-    ring1 = createEquipment("Purity Ring"),    -- Additional Doom resistance
+    ring1 = createEquipment("Purity Ring"),        -- Additional Doom resistance
     waist = createEquipment("Gishdubar Sash"),     -- Enhances Doom recovery effects
 }

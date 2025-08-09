@@ -116,53 +116,17 @@ end
 --- Returns the number of available Scholar (SCH) stratagems.
 -- @return (number): The number of available SCH stratagems.
 function ScholarUtils.get_available_stratagem_count()
-    local ability_recasts = windower.ffxi.get_ability_recasts()
-    if not ability_recasts then
-        log.error("Could not get ability recasts")
-        return 0
-    end
-
-    local recastTime = ability_recasts[231] or 0
-    if type(recastTime) ~= 'number' then
-        log.error("Recast time is not a number")
-        return 0
-    end
-
-    local maxStrats = ScholarUtils.get_max_stratagem_count()
-    if type(maxStrats) ~= 'number' then
-        log.error("Max stratagems is not a number")
-        return 0
-    end
-
-    if maxStrats == 0 then
-        return 0
-    end
-
-    local stratagemRecastTime = ScholarUtils.get_stratagem_recast_time()
-    if type(stratagemRecastTime) ~= 'number' then
-        log.error("Stratagem recast time is not a number")
-        return 0
-    end
-
-    local stratsUsed = recastTime > stratagemRecastTime and math.ceil(recastTime / stratagemRecastTime) or 0
-
-    if recastTime == stratagemRecastTime then
-        stratsUsed = math.floor(recastTime / stratagemRecastTime)
-    end
-
-    return math.max(0, maxStrats - stratsUsed)
+    -- Use the new unified charge system
+    local ChargesUtils = require('utils/ability_charges')
+    return ChargesUtils.get_stratagem_count()
 end
 
 --- Checks if there are any Scholar (SCH) stratagems available for use.
 -- @return (boolean): True if there are stratagems available, false otherwise.
 function ScholarUtils.stratagems_available()
-    local stratagem_count = ScholarUtils.get_available_stratagem_count()
-    if type(stratagem_count) ~= 'number' then
-        log.error("get_available_stratagem_count did not return a number")
-        return false
-    end
-
-    return stratagem_count > 0
+    -- Use the new unified charge system
+    local ChargesUtils = require('utils/ability_charges')
+    return ChargesUtils.has_stratagems()
 end
 
 -- ===========================================================================================================

@@ -59,10 +59,15 @@
 function get_sets()
     mote_include_version = 2
     include('Mote-Include.lua')          -- Utility functions and structures for GearSwap
+    include('core/globals.lua')
     include('modules/automove.lua')      -- Automatic movement speed gear swapping
-    include('modules/shared.lua') -- Functions shared across multiple jobs
-    include('jobs/blm/BLM_SET.lua')          -- Gear sets specific to Black Mage
-    include('jobs/blm/BLM_FUNCTION.lua')     -- Advanced functions specific to Black Mage
+    include('modules/shared.lua')        -- Functions shared across multiple jobs
+    include('jobs/blm/BLM_SET.lua')      -- Gear sets specific to Black Mage
+    include('jobs/blm/BLM_FUNCTION.lua') -- Advanced functions specific to Black Mage
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 -------------------------------------------------------------------------------------------------------------
@@ -182,6 +187,10 @@ end
 --- @see refine_various_spells For spell optimization
 --- @see checkArts For arts buff validation
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     -- If the player is currently performing an action, immediately return and do nothing else.
     if midaction() then
         return
@@ -198,12 +207,16 @@ end
 --- and prepare for potential interruptions.
 ---
 --- @param spell table The spell object being cast
---- @param action table The action object containing cast information  
+--- @param action table The action object containing cast information
 --- @param spellMap string Mote's spell classification mapping
 --- @param eventArgs table Event arguments with cancel/handled flags
 --- @usage Automatically called by GearSwap during spell casting
 --- @see SaveMP For mana conservation logic
 function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+    
     SaveMP()
 end
 
@@ -219,7 +232,7 @@ end
 ---
 --- @param spell table The spell object that was cast
 --- @param action table The action object that was performed
---- @param spellMap string Mote's spell classification mapping  
+--- @param spellMap string Mote's spell classification mapping
 --- @param eventArgs table Event arguments with cancel/handled flags
 --- @usage Automatically called by GearSwap after spell completion
 --- @see handleSpellAftercast For actual aftercast processing
@@ -227,25 +240,29 @@ end
 --- @type table Tracking structure for duplicate call prevention
 --- @field spell_id number Last processed spell ID
 --- @field timestamp number Timestamp of last processed spell (milliseconds)
-local last_aftercast = {spell_id = nil, timestamp = 0}
+local last_aftercast = { spell_id = nil, timestamp = 0 }
 
 function job_aftercast(spell, action, spellMap, eventArgs)
     -- Get current time in milliseconds
     local current_time = os.clock() * 1000
-    
+
     -- Check if this is a duplicate call (same spell within 100ms)
-    if last_aftercast.spell_id == spell.id and 
-       (current_time - last_aftercast.timestamp) < 100 then
+    if last_aftercast.spell_id == spell.id and
+        (current_time - last_aftercast.timestamp) < 100 then
         -- Ignore duplicate call
         return
     end
-    
+
     -- Update tracking
     last_aftercast.spell_id = spell.id
     last_aftercast.timestamp = current_time
-    
+
     -- Process aftercast normally
     handleSpellAftercast(spell, eventArgs)
+    
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
 end
 
 ---============================================================================
@@ -266,14 +283,52 @@ end
 --- @see user_setup For initialization context
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- BLM macro pages based on subjob
     local macro_page = ({ SCH = 14, RDM = 14, WHM = 14 })[player.sub_job] or 14
     set_macro_page(1, macro_page)
-    
+
     -- BLM lockstyle
     send_command('wait 3; input /lockstyleset 6')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
+end
+
+---============================================================================
+--- CUSTOM COMMAND HANDLER
+---============================================================================
+
+--- Handle custom GearSwap commands including test execution.
+--- Processes user commands sent via //gs c <command>
+---
+--- Available commands:
+---   - test: Run unit tests for all modules
+---   - buffself: Execute BuffSelf function
+---   - mainlight: Cast main light element spell
+---   - maindark: Cast main dark element spell
+---   - mainaja: Cast main -ja spell
+---   - storm: Cast storm spell
+---
+--- @param cmdParams table Command parameters split by spaces
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+--- @usage //gs c buffself (casts self buffs)
+function job_self_command(cmdParams, eventArgs)
+    -- Run unit tests
+    if cmdParams[1] == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+
+    -- Existing BLM commands (if any exist in BLM_FUNCTION.lua)
+    if cmdParams[1] == 'buffself' then
+        BuffSelf()
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other BLM-specific commands here as needed
 end

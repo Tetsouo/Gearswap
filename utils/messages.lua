@@ -36,8 +36,11 @@
 local MessageUtils = {}
 
 -- Load critical dependencies for message operations
-local config = require('config/config')              -- Centralized configuration system
-local log = require('utils/logger')                  -- Professional logging framework
+local config = require('config/config') -- Centralized configuration system
+local log = require('utils/logger')     -- Professional logging framework
+
+--- @type table Validation utilities for parameter checking
+local ValidationUtils = require('utils/validation')
 
 -- Color constants (from config)
 MessageUtils.colors = {
@@ -56,8 +59,12 @@ MessageUtils.colors = {
 -- @param recast (number or nil): The recast time value in seconds.
 -- @return (string or nil): The formatted recast time string, or nil if the recast time is nil.
 function MessageUtils.format_recast_duration(recast)
-    if recast ~= nil and type(recast) ~= 'number' then
-        log.error("recast must be a number or nil")
+    -- Parameter validation using ValidationUtils (allow nil)
+    if recast ~= nil and not ValidationUtils.validate_type(recast, 'number', 'recast') then
+        return nil
+    end
+
+    if recast ~= nil and not ValidationUtils.validate_number_range(recast, 0, math.huge, 'recast') then
         return nil
     end
 
@@ -76,13 +83,16 @@ end
 -- @param color The color value.
 -- @return The color code.
 function MessageUtils.create_color_code(color)
-    if not color then
-        log.error("color must not be nil")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(color, 'color') then
         return ""
     end
 
-    if type(color) ~= "number" then
-        log.error("color must be a number")
+    if not ValidationUtils.validate_type(color, 'number', 'color') then
+        return ""
+    end
+
+    if not ValidationUtils.validate_number_range(color, 0, 255, 'color') then
         return ""
     end
 
@@ -98,34 +108,40 @@ end
 -- @param isColored (boolean): If true, the message will be colored.
 -- @return (string): The formatted message.
 function MessageUtils.create_formatted_message(startMessage, spellName, recastTime, endMessage, isLastMessage, isColored)
-    -- Input validation
-    if type(startMessage) ~= "string" and startMessage ~= nil then
-        log.error("startMessage must be a string or nil")
+    -- Parameter validation using ValidationUtils (most parameters are optional)
+    if startMessage ~= nil and not ValidationUtils.validate_type(startMessage, 'string', 'startMessage') then
         return ""
     end
 
     -- Handle nil or empty spell name
     if spellName == nil or spellName == "" then
         spellName = "N/A"
+    elseif not ValidationUtils.validate_type(spellName, 'string', 'spellName') then
+        return ""
     end
 
     -- Handle nil recast time
     if recastTime == nil then
         recastTime = 0
-    end
-
-    -- Validate other parameters
-    if endMessage ~= nil and type(endMessage) ~= "string" then
-        log.error("endMessage must be a string or nil")
+    elseif not ValidationUtils.validate_type(recastTime, 'number', 'recastTime') then
         return ""
     end
 
-    if type(isLastMessage) ~= "boolean" then
-        isLastMessage = false
+    -- Validate other optional parameters
+    if endMessage ~= nil and not ValidationUtils.validate_type(endMessage, 'string', 'endMessage') then
+        return ""
     end
 
-    if type(isColored) ~= "boolean" then
+    if isLastMessage ~= nil and not ValidationUtils.validate_type(isLastMessage, 'boolean', 'isLastMessage') then
+        isLastMessage = false
+    else
+        isLastMessage = isLastMessage or false
+    end
+
+    if isColored ~= nil and not ValidationUtils.validate_type(isColored, 'boolean', 'isColored') then
         isColored = true
+    else
+        isColored = isColored or true
     end
 
     -- Format recast time
@@ -140,44 +156,29 @@ function MessageUtils.create_formatted_message(startMessage, spellName, recastTi
     -- Build message parts
     local messageParts = {}
 
-    -- Start message and spell name
-    table.insert(messageParts, string.format('%s%s[',
-        startMessage and startMessage .. ' ' or '',
-        colorGray))
-    table.insert(messageParts, string.format('%s%s%s',
-        colorGreen,
-        spellName,
-        colorGray))
+    -- Start message and spell name (optimized string concatenation)
+    table.insert(messageParts, startMessage and (startMessage .. ' ' .. colorGray .. '[') or (colorGray .. '['))
+    table.insert(messageParts, colorGreen .. spellName .. colorGray)
 
-    -- Recast time or end message
+    -- Recast time or end message (optimized string concatenation)
     if recastTime and recastTime > 0 then
-        table.insert(messageParts, string.format('%s] Recast: %s(%s%s%s)',
-            colorGray,
-            colorGray,
-            colorOrange,
-            formattedRecastTime,
-            colorGray))
+        table.insert(messageParts, colorGray .. '] Recast: ' .. colorGray .. '(' .. colorOrange .. formattedRecastTime .. colorGray .. ')')
     else
-        table.insert(messageParts, string.format('%s]', colorGray))
+        table.insert(messageParts, colorGray .. ']')
 
         if endMessage then
-            local endMessageFormatted
             if isColored then
-                endMessageFormatted = string.format(' Due to: %s[%s%s%s]',
-                    colorGray,
-                    colorRed,
-                    string.upper(string.sub(endMessage, 1, 1)) .. string.sub(endMessage, 2),
-                    colorGray)
+                local capitalizedEnd = string.upper(string.sub(endMessage, 1, 1)) .. string.sub(endMessage, 2)
+                table.insert(messageParts, ' Due to: ' .. colorGray .. '[' .. colorRed .. capitalizedEnd .. colorGray .. ']')
             else
-                endMessageFormatted = string.format(' %s', endMessage)
+                table.insert(messageParts, ' ' .. endMessage)
             end
-            table.insert(messageParts, endMessageFormatted)
         end
     end
 
-    -- Add separator if last message
+    -- Add separator if last message (optimized)
     if isLastMessage then
-        table.insert(messageParts, string.format('\n%s=================================================', colorGray))
+        table.insert(messageParts, '\n' .. colorGray .. '=================================================')
     end
 
     return table.concat(messageParts)
@@ -188,6 +189,23 @@ end
 -- @param format (string): Format string
 -- @param ... Variable arguments for formatting
 function MessageUtils.add_to_chat_formatted(color, format, ...)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(color, 'color') then
+        return
+    end
+
+    if not ValidationUtils.validate_type(color, 'number', 'color') then
+        return
+    end
+
+    if not ValidationUtils.validate_not_nil(format, 'format') then
+        return
+    end
+
+    if not ValidationUtils.validate_string_not_empty(format, 'format') then
+        return
+    end
+
     local success, message = pcall(string.format, format, ...)
     if success then
         windower.add_to_chat(color, message)
@@ -200,6 +218,23 @@ end
 -- @param status (string): Status type (success, error, warning, info)
 -- @param message (string): The message to display
 function MessageUtils.status_message(status, message)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(status, 'status') then
+        return
+    end
+
+    if not ValidationUtils.validate_string_not_empty(status, 'status') then
+        return
+    end
+
+    if not ValidationUtils.validate_not_nil(message, 'message') then
+        return
+    end
+
+    if not ValidationUtils.validate_string_not_empty(message, 'message') then
+        return
+    end
+
     local colors = {
         success = MessageUtils.colors.GREEN,
         error = MessageUtils.colors.RED,
@@ -215,6 +250,27 @@ end
 -- @param ability_name (string): Name of the ability
 -- @param cooldown (number): Cooldown in seconds
 function MessageUtils.cooldown_message(ability_name, cooldown)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(ability_name, 'ability_name') then
+        return
+    end
+
+    if not ValidationUtils.validate_string_not_empty(ability_name, 'ability_name') then
+        return
+    end
+
+    if not ValidationUtils.validate_not_nil(cooldown, 'cooldown') then
+        return
+    end
+
+    if not ValidationUtils.validate_type(cooldown, 'number', 'cooldown') then
+        return
+    end
+
+    if not ValidationUtils.validate_number_range(cooldown, 0, math.huge, 'cooldown') then
+        return
+    end
+
     local message = MessageUtils.create_formatted_message(nil, ability_name, cooldown, nil, true)
     windower.add_to_chat(123, message)
 end
@@ -222,7 +278,18 @@ end
 --- Creates a spell interrupted message with multiple colors based on spell type
 -- @param spell (table): The spell that was interrupted
 function MessageUtils.spell_interrupted_message(spell)
-    if not spell or not spell.name then
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        MessageUtils.status_message('warning', '[Spell interrupted]: Invalid spell parameter')
+        return
+    end
+
+    if not ValidationUtils.validate_type(spell, 'table', 'spell') then
+        MessageUtils.status_message('warning', '[Spell interrupted]: Invalid spell parameter')
+        return
+    end
+
+    if not spell.name then
         MessageUtils.status_message('warning', '[Spell interrupted]: Unknown spell')
         return
     end
@@ -230,21 +297,21 @@ function MessageUtils.spell_interrupted_message(spell)
     -- Define colors for different spell types/skills and names
     local type_colors = {
         -- Magic skills - toutes les magies en 005 (bleu cyan)
-        ['Healing Magic'] = 030,        -- Soins en 030 (vert clair)
-        ['Enhancing Magic'] = 005,      -- Magie en 005 (bleu cyan)
-        ['Enfeebling Magic'] = 005,     -- Magie en 005 (bleu cyan)
-        ['Elemental Magic'] = 005,      -- Magie en 005 (bleu cyan)
-        ['Dark Magic'] = 005,           -- Magie en 005 (bleu cyan)
-        ['Divine Magic'] = 005,         -- Magie en 005 (bleu cyan)
-        ['Ninjutsu'] = 005,             -- Magie en 005 (bleu cyan)
-        ['Songs'] = 005,                -- Magie en 005 (bleu cyan)
-        ['Blue Magic'] = 005,           -- Magie en 005 (bleu cyan)
-        ['Geomancy'] = 005,             -- Magie en 005 (bleu cyan)
-        ['Handbell'] = 005,             -- Magie en 005 (bleu cyan)
-        ['Trust'] = 005,                -- Magie en 005 (bleu cyan)
+        ['Healing Magic'] = 030,    -- Soins en 030 (vert clair)
+        ['Enhancing Magic'] = 005,  -- Magie en 005 (bleu cyan)
+        ['Enfeebling Magic'] = 005, -- Magie en 005 (bleu cyan)
+        ['Elemental Magic'] = 005,  -- Magie en 005 (bleu cyan)
+        ['Dark Magic'] = 005,       -- Magie en 005 (bleu cyan)
+        ['Divine Magic'] = 005,     -- Magie en 005 (bleu cyan)
+        ['Ninjutsu'] = 005,         -- Magie en 005 (bleu cyan)
+        ['Songs'] = 005,            -- Magie en 005 (bleu cyan)
+        ['Blue Magic'] = 005,       -- Magie en 005 (bleu cyan)
+        ['Geomancy'] = 005,         -- Magie en 005 (bleu cyan)
+        ['Handbell'] = 005,         -- Magie en 005 (bleu cyan)
+        ['Trust'] = 005,            -- Magie en 005 (bleu cyan)
         -- Types d'actions
-        ['WeaponSkill'] = 028,          -- WS en 028 (rouge)
-        ['JobAbility'] = 050,           -- JA en 050 (jaune)
+        ['WeaponSkill'] = 028,      -- WS en 028 (rouge)
+        ['JobAbility'] = 050,       -- JA en 050 (jaune)
         -- Sorts de soins spécifiques (priorité haute)
         ['Cure'] = 030,
         ['Cure II'] = 030,
@@ -289,37 +356,52 @@ function MessageUtils.spell_interrupted_message(spell)
 
     -- Build multi-colored message like createFormattedMessage
     local messageParts = {}
-    
-    -- Add prefix with orange color and gray brackets
-    table.insert(messageParts, string.format('%s[%s%s%s]:', 
-        colorGray,
-        colorOrange,
-        message_prefix,
-        colorGray))
-    
-    -- Add spell name with its specific color
-    table.insert(messageParts, string.format(' %s%s', 
-        spellColor,
-        spell.name))
-    
-    -- Add separator line in gray
-    table.insert(messageParts, string.format('\n%s=================================================', colorGray))
+
+    -- Add prefix with orange color and gray brackets (optimized)
+    table.insert(messageParts, colorGray .. '[' .. colorOrange .. message_prefix .. colorGray .. ']:')
+
+    -- Add spell name with its specific color (optimized)
+    table.insert(messageParts, ' ' .. spellColor .. spell.name)
+
+    -- Add separator line in gray (optimized)
+    table.insert(messageParts, '\n' .. colorGray .. '=================================================')
 
     local final_message = table.concat(messageParts)
-    
+
     -- Send to chat using default color (the message already contains all color codes)
     windower.add_to_chat(123, final_message)
-    
+
     -- Debug info
-    log.debug("Interrupted %s (spell_color=%d, prefix=%s) - message: %s", spell.name, spell_color, message_prefix, final_message)
+    log.debug("Interrupted %s (spell_color=%d, prefix=%s) - message: %s", spell.name, spell_color, message_prefix,
+        final_message)
 end
 
 --- Creates an error message for incapacitated state
 -- @param action_name (string): Name of the action attempted
 -- @param reason (string): Reason for incapacitation
 function MessageUtils.incapacitated_message(action_name, reason)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(action_name, 'action_name') then
+        return
+    end
+
+    if not ValidationUtils.validate_string_not_empty(action_name, 'action_name') then
+        return
+    end
+
+    if not ValidationUtils.validate_not_nil(reason, 'reason') then
+        return
+    end
+
+    if not ValidationUtils.validate_string_not_empty(reason, 'reason') then
+        return
+    end
+
     local message = MessageUtils.create_formatted_message('Cannot Use:', action_name, nil, reason, true, true)
     windower.add_to_chat(167, message)
 end
+
+-- Export the main function globally for backward compatibility
+_G.createFormattedMessage = MessageUtils.create_formatted_message
 
 return MessageUtils

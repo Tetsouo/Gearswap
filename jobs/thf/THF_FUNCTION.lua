@@ -141,25 +141,9 @@ function customize_idle_set(idleSet)
         idleSet = set_combine(idleSet, sets.idle.Regen)
     end
 
-    -- THF-specific: Handle SA/TA buffs in idle (configurable and persistent)
-    local config = require('config/config')
-    local thf_config = config.get_job_config('THF')
-    
-    -- Apply SA/TA sets in idle mode (always, including when moving)
-    if buffactive['sneak attack'] and sets.buff['Sneak Attack'] then
-        idleSet = set_combine(idleSet, sets.buff['Sneak Attack'])
-        -- Also add movement speed if moving
-        if state.Moving and state.Moving.value == 'true' and sets.MoveSpeed and sets.MoveSpeed.feet then
-            idleSet = set_combine(idleSet, {feet = sets.MoveSpeed.feet})
-        end
-    elseif buffactive['trick attack'] and sets.buff['Trick Attack'] then
-        idleSet = set_combine(idleSet, sets.buff['Trick Attack'])
-        -- Also add movement speed if moving
-        if state.Moving and state.Moving.value == 'true' and sets.MoveSpeed and sets.MoveSpeed.feet then
-            idleSet = set_combine(idleSet, {feet = sets.MoveSpeed.feet})
-        end
-    elseif state.Moving and state.Moving.value == 'true' and sets.MoveSpeed then
-        -- No SA/TA active, apply normal movement set
+    -- CHANGED: SA/TA buffs no longer change equipment in idle - maintain normal behavior
+    -- Only change feet for movement (completely neutral, no SA/TA interference)
+    if state.Moving and state.Moving.value == 'true' and sets.MoveSpeed then
         idleSet = set_combine(idleSet, sets.MoveSpeed)
     end
 
@@ -187,6 +171,7 @@ end
 -- @param meleeSet table: The base melee set defined in gear sets.
 -- @return table: The final, conditionally customized melee set.
 function customize_melee_set(meleeSet)
+    
     -- Initialize with base melee set and load configuration
     local finalSet = meleeSet
     local config = require('config/config')
@@ -336,63 +321,34 @@ local function update_TH_set_for_buffs()
     end
 end
 
--- Function called when status changes to update both TH and movement sets
+-- Function called when status changes to update TH sets (movement sets no longer affected by buffs)
 function job_handle_equipping_gear(playerStatus, eventArgs)
     -- Update TH set when engaging
     if playerStatus == 'Engaged' then
         update_TH_set_for_buffs()
     end
-    
-    -- Always update movement sets based on buffs
-    update_movement_set_for_buffs()
 end
 
 -- Function called when buffs change (SA/TA gained/lost)
 function job_buff_change(buff, gain)
     if buff == 'Sneak Attack' or buff == 'Trick Attack' then
-        -- Update both TH and movement sets when SA/TA changes
+        -- Update only TH sets when SA/TA changes (movement sets remain neutral)
         update_TH_set_for_buffs()
-        update_movement_set_for_buffs()
     end
 end
 
--- Create intelligent movement sets that combine with SA/TA
-local function create_intelligent_movement_sets()
-    -- Store the original MoveSpeed set
-    local base_move_set = {
-        feet = createEquipment('Pill. Poulaines +3'),
-        ring1 = createEquipment('Defending Ring')
-    }
-    
-    -- Create combined movement sets with SA/TA - but keep SA/TA feet, only add movement speed elsewhere
-    sets.MoveSpeed.SA = set_combine(sets.buff['Sneak Attack'], {ring1 = createEquipment('Defending Ring')})
-    sets.MoveSpeed.TA = set_combine(sets.buff['Trick Attack'], {ring1 = createEquipment('Defending Ring')}) 
-    sets.MoveSpeed.SATA = set_combine(sets.buff['Sneak Attack'], sets.buff['Trick Attack'], {ring1 = createEquipment('Defending Ring')})
-    
-    -- Store base for restoration
-    sets.MoveSpeed.base = base_move_set
-    
-end
-
--- Function to update MoveSpeed set based on active buffs
-function update_movement_set_for_buffs()
-    if not sets.MoveSpeed.base then
-        create_intelligent_movement_sets()
-    end
-    
-    if buffactive['sneak attack'] and buffactive['trick attack'] then
-        sets.MoveSpeed = sets.MoveSpeed.SATA
-    elseif buffactive['sneak attack'] then
-        sets.MoveSpeed = sets.MoveSpeed.SA
-    elseif buffactive['trick attack'] then
-        sets.MoveSpeed = sets.MoveSpeed.TA
-    else
-        sets.MoveSpeed = sets.MoveSpeed.base
+-- Simple movement set - no SA/TA interference
+local function ensure_base_movement_set()
+    if not sets.MoveSpeed then
+        sets.MoveSpeed = {
+            feet = createEquipment('Pill. Poulaines +3'),
+            ring1 = createEquipment('Defending Ring')
+        }
     end
 end
 
--- Initialize systems
-create_intelligent_movement_sets()
+-- Initialize neutral movement set
+ensure_base_movement_set()
 
 -- ===========================================================================================================
 --                                   Job-Specific Command Handling Functions
@@ -405,6 +361,12 @@ function job_self_command(cmdParams, eventArgs, spell)
     -- Update the alternate state.
     update_altState()
     local command = cmdParams[1]:lower()
+
+    -- Try universal commands first (test, modules, cache, metrics, help)
+    local UniversalCommands = require('core/universal_commands')
+    if UniversalCommands.handle_command(cmdParams, eventArgs) then
+        return -- Command handled by universal system
+    end
 
     -- If the command is predefined, execute it.
     if commandFunctions[command] then

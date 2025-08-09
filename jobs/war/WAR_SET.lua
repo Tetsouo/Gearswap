@@ -147,7 +147,7 @@ sets.idle = {
     head = "Hjarrandi Helm",
     body = "Boii Lorica +3",
     hands = "Sakpata's Gauntlets",
-    legs = "pumm. Cuisses +4",
+    legs = "Pumm. Cuisses +4",
     feet = "Pumm. Calligae +4",
     neck = "War. Beads +2",
     waist = "Sailfi Belt +1",
@@ -162,19 +162,19 @@ sets.idle = {
 -- Combines the default idle set and adds specific gear for physical damage reduction
 sets.idle.PDT = set_combine(sets.idle, {
     head = "Sakpata's Helm",
-    body = "Sakpata's Breastplate", 
+    body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Sakpata's Cuisses",
     feet = "Sakpata's Leggings",
     ring1 = "Defending Ring",
     ring2 = "Gelatinous Ring +1",
-    back = "Moonbeam Cape", -- PDT-focused back piece
+    back = "Moonlight Cape", -- PDT-focused back piece
 })
 
 -- Town Idle Set
 -- Combines the default idle set with town-specific gear for movement and aesthetics
 sets.idle.Town = set_combine(sets.idle, {
-    neck = 'Elite royal collar',
+    neck = 'Elite Royal Collar',
     feet = "Hermes' Sandals"
 })
 
@@ -182,13 +182,33 @@ sets.idle.Town = set_combine(sets.idle, {
 --                                           Equipments - Engaged Sets
 -- =========================================================================================================
 
--- Base Engaged Set
-sets.engaged = set_combine(sets.idle, {
+-- Base Engaged Set - Not directly used, serves as foundation
+sets.engaged = {
     ammo = "Coiste Bodhar",
     head = "Hjarrandi Helm",
     body = "Boii Lorica +3",
     hands = "Sakpata's Gauntlets",
-    legs = "pumm. Cuisses +4",
+    legs = "Pumm. Cuisses +4",
+    feet = "Pumm. Calligae +4",
+    neck = "War. Beads +2",
+    waist = "Sailfi Belt +1",
+    ear1 = "Dedition Earring",
+    ear2 = "Boii Earring +1",
+    ring1 = "Niqmaddu Ring",
+    ring2 = "Moonlight Ring",
+    back = Cichol.stp,
+}
+
+-- Normal Mode Engaged Set - TP-focused for maximum damage output
+sets.engaged.Normal = sets.engaged
+
+-- Physical Damage Taken TP (PDTTP) Engaged Set - Balanced PDT+TP for survivability
+sets.engaged.PDTTP = set_combine(sets.engaged, {
+    ammo = "Coiste Bodhar",
+    head = "Hjarrandi Helm",
+    body = "Boii Lorica +3",
+    hands = "Sakpata's Gauntlets",
+    legs = "Pumm. Cuisses +4",
     feet = "Pumm. Calligae +4",
     neck = "War. Beads +2",
     waist = "Sailfi Belt +1",
@@ -199,32 +219,14 @@ sets.engaged = set_combine(sets.idle, {
     back = Cichol.stp,
 })
 
--- Normal Mode Engaged Set
-sets.engaged.Normal = sets.engaged
+-- Legacy PDT set (not used by customize_melee_set logic)
+sets.engaged.PDT = sets.engaged.PDTTP
 
--- Physical Damage Taken (PDT) Engaged Set
-sets.engaged.PDT = set_combine(sets.engaged, {
-    head = "Sakpata's Helm",
-    body = "Sakpata's Breastplate",
-    hands = "Sakpata's Gauntlets",
-    legs = "Sakpata's Cuisses",  
-    feet = "Sakpata's Leggings",
-    ring1 = "Defending Ring",
-    ring2 = "Gelatinous Ring +1",
-})
-
--- Physical Damage Taken TP (PDTTP) Engaged Set - balanced PDT with some TP gear
-sets.engaged.PDTTP = set_combine(sets.engaged.PDT, {
-    ear1 = "Dedition Earring",
-    ear2 = "Boii Earring +1",
-    waist = "Sailfi Belt +1",
-})
-
--- Physical Damage Taken with Aftermath Level 3 (PDTAFM3) Set
-sets.engaged.PDTAFM3 = set_combine(sets.engaged.PDT, {
+-- Ukonvasara + Aftermath Level 3 Specialized Set - Used for both Normal and PDT modes
+sets.engaged.PDTAFM3 = set_combine(sets.engaged.PDTTP, {
     ammo = "Crepuscular Pebble",
     head = "Sakpata's Helm",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Boii Cuisses +3",
     feet = "Boii Calligae +3",
@@ -236,6 +238,7 @@ sets.engaged.PDTAFM3 = set_combine(sets.engaged.PDT, {
     ring2 = "Moonlight Ring",
     back = Cichol.stp,
 })
+
 
 -- =========================================================================================================
 --                                           Equipments - Movement Sets
@@ -281,8 +284,8 @@ sets.precast.JA['High Jump'] = sets.engaged.PDTTP
 -- "Berserk" Ability Set
 -- Enhances attack power and mitigates Berserk penalties.
 sets.precast.JA['Berserk'] = set_combine(sets.engaged, {
-    body = 'Pumm. Lorica +3',  -- Duration + 18 Secs
-    feet = 'Agoge Calligae' -- Duration + 30 Secs
+    body = 'Pumm. Lorica +3', -- Duration + 18 Secs
+    feet = 'Agoge Calligae +4'   -- Duration + 30 Secs
 })
 
 -- "Defender" Ability Set
@@ -324,7 +327,7 @@ sets.precast.JA['Tomahawk'] = {
 sets.precast.WS = {
     ammo = 'Knobkierrie',
     head = "Sakpata's Helm",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = 'Boii Mufflers +3',
     legs = 'Boii Cuisses +3',
     feet = "Sakpata's Leggings",
@@ -353,7 +356,7 @@ sets.precast.WS["Armor Break"].TPBonus = set_combine(sets.precast.WS["Armor Brea
 sets.precast.WS["Ukko's Fury"] = set_combine(sets.precast.WS, {
     ammo = "Crepuscular Pebble",
     head = "Boii Mask +3",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Boii Cuisses +3",
     feet = "Boii Calligae +3",
@@ -372,7 +375,7 @@ sets.precast.WS["Ukko's Fury"].TPBonus = set_combine(sets.precast.WS["Ukko's Fur
 sets.precast.WS["Upheaval"] = set_combine(sets.precast.WS, {
     ammo = "Knobkierrie",
     head = "Boii Mask +3",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Boii Cuisses +3",
     feet = "Sakpata's Leggings",
@@ -391,7 +394,7 @@ sets.precast.WS["Upheaval"].TPBonus = set_combine(sets.precast.WS["Upheaval"], s
 sets.precast.WS["Fell Cleave"] = set_combine(sets.precast.WS, {
     ammo = "Crepuscular Pebble",
     head = "Boii Mask +3",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Boii Mufflers +3",
     legs = "Boii Cuisses +3",
     feet = "Nyame Sollerets",
@@ -409,7 +412,7 @@ sets.precast.WS["Fell Cleave"].TPBonus = set_combine(sets.precast.WS["Fell Cleav
 sets.precast.WS["King's Justice"] = set_combine(sets.precast.WS, {
     ammo = "Crepuscular Pebble",
     head = "Boii Mask +3",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Boii Mufflers +3",
     legs = "Boii Cuisses +3",
     feet = "Sakpata's Leggings",
@@ -430,7 +433,7 @@ sets.precast.WS["Impulse Drive"] = set_combine(sets.precast.WS, {
     neck = "War. Beads +2",
     ear1 = "Thrud Earring",
     ear2 = "Boii Earring +1",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Boii Mufflers +3",
     ring1 = "Defending Ring",
     ring2 = "Cornelia's Ring",
@@ -448,7 +451,7 @@ sets.precast.WS["Stardiver"] = set_combine(sets.precast.WS, {
     neck = "War. Beads +2",
     ear1 = "Schere Earring",
     ear2 = "Boii Earring +1",
-    body = "Sakpata's Breastplate",
+    body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     ring1 = "Niqmaddu Ring",
     ring2 = "Cornelia's Ring",
@@ -462,7 +465,7 @@ sets.precast.WS["Stardiver"].TPBonus = set_combine(sets.precast.WS["Stardiver"],
 -- "Savage Blade" Weapon Skill
 sets.precast.WS["Savage Blade"] = set_combine(sets.precast.WS, {
     ammo = "Crepuscular Pebble",
-    head = "Agoge mask +4",
+    head = "Agoge Mask +4",
     body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Sakpata's Cuisses",
@@ -475,10 +478,10 @@ sets.precast.WS["Savage Blade"] = set_combine(sets.precast.WS, {
     ring2 = "Cornelia's ring",
 })
 
--- "Calamity" Weapon Skill  
+-- "Calamity" Weapon Skill
 sets.precast.WS["Calamity"] = set_combine(sets.precast.WS, {
     ammo = "Crepuscular Pebble",
-    head = "Agoge mask +4",
+    head = "Agoge Mask +4",
     body = "Sakpata's Plate",
     hands = "Sakpata's Gauntlets",
     legs = "Sakpata's Cuisses",

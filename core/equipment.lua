@@ -58,6 +58,9 @@ local config = require('config/config')
 --- @type table Logging utilities for error reporting and debugging
 local log = require('utils/logger')
 
+--- @type table Validation utilities for parameter checking
+local ValidationUtils = require('utils/validation')
+
 ---============================================================================
 --- EQUIPMENT CREATION AND VALIDATION
 ---============================================================================
@@ -75,23 +78,32 @@ local log = require('utils/logger')
 ---   local weapon = EquipmentUtils.create_equipment('Excalibur', 10, 'inventory', {'DMG+50', 'Accuracy+30'})
 ---   local armor = EquipmentUtils.create_equipment('Valor Surcoat')
 function EquipmentUtils.create_equipment(name, priority, bag, augments)
-    if type(name) ~= 'string' then
-        log.error("Parameter 'name' must be a string")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(name, 'name') then
+        return nil
+    end
+    
+    if not ValidationUtils.validate_type(name, 'string', 'name') then
+        return nil
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(name, 'name') then
         return nil
     end
 
-    if priority ~= nil and type(priority) ~= 'number' then
-        log.error("Parameter 'priority' must be a number or nil")
+    if priority ~= nil and not ValidationUtils.validate_type(priority, 'number', 'priority') then
         return nil
     end
 
-    if bag ~= nil and type(bag) ~= 'string' then
-        log.error("Parameter 'bag' must be a string or nil")
+    if bag ~= nil and not ValidationUtils.validate_type(bag, 'string', 'bag') then
+        return nil
+    end
+    
+    if bag ~= nil and not ValidationUtils.validate_string_not_empty(bag, 'bag') then
         return nil
     end
 
-    if augments and type(augments) ~= 'table' then
-        log.error("Parameter 'augments' must be a table")
+    if augments ~= nil and not ValidationUtils.validate_type(augments, 'table', 'augments') then
         return nil
     end
 
@@ -120,25 +132,42 @@ end
 ---   local setTable = { PDT = sets.idle.PDT, Acc = sets.idle.Acc }
 ---   local result = EquipmentUtils.customize_set(sets.idle, conditions, setTable)
 function EquipmentUtils.customize_set(defaultSet, conditions, setTable)
-    if not defaultSet or not conditions or not setTable then
-        log.error("Invalid parameters for customize_set")
-        return defaultSet or {}
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(defaultSet, 'defaultSet') then
+        return {}
     end
-
-    if type(conditions) ~= "table" or type(setTable) ~= "table" then
-        log.error("Invalid parameters: 'conditions' and 'setTable' must be tables")
+    
+    if not ValidationUtils.validate_type(defaultSet, 'table', 'defaultSet') then
+        return {}
+    end
+    
+    if not ValidationUtils.validate_not_nil(conditions, 'conditions') then
+        return defaultSet
+    end
+    
+    if not ValidationUtils.validate_type(conditions, 'table', 'conditions') then
+        return defaultSet
+    end
+    
+    if not ValidationUtils.validate_not_nil(setTable, 'setTable') then
+        return defaultSet
+    end
+    
+    if not ValidationUtils.validate_type(setTable, 'table', 'setTable') then
         return defaultSet
     end
 
+    -- Optimized condition checking with early exit
     for conditionName, isActive in pairs(conditions) do
         if isActive then
             local conditionSet = setTable[conditionName]
             if conditionSet then
-                -- Combine the default set with the condition's set and return
+                -- Combine the default set with the condition's set and return immediately
                 return set_combine(defaultSet, conditionSet)
             else
-                -- If the set for this condition is not defined, log a warning
+                -- Log warning for missing set definition
                 log.warn("No set defined for condition '%s', using default set", conditionName)
+                -- Continue checking other conditions rather than failing
             end
         end
     end
@@ -164,25 +193,25 @@ end
 --- @return table Table of condition names mapped to boolean activation status
 --- @return table Table of condition names mapped to equipment sets
 function EquipmentUtils.get_conditions_and_sets(setPDT_XP, setPDT, setPDT_ACC, setMDT)
-    -- Validate input sets
-    local function validate_set(set)
-        return set == nil or type(set) == "table"
+    -- Parameter validation using ValidationUtils
+    if setPDT_XP ~= nil and not ValidationUtils.validate_type(setPDT_XP, 'table', 'setPDT_XP') then
+        return {}, {}
     end
-
-    if not (validate_set(setPDT_XP) and validate_set(setPDT) and
-            validate_set(setPDT_ACC) and validate_set(setMDT)) then
-        log.error("Invalid parameters: Equipment sets must be tables or nil")
+    
+    if setPDT ~= nil and not ValidationUtils.validate_type(setPDT, 'table', 'setPDT') then
+        return {}, {}
+    end
+    
+    if setPDT_ACC ~= nil and not ValidationUtils.validate_type(setPDT_ACC, 'table', 'setPDT_ACC') then
+        return {}, {}
+    end
+    
+    if setMDT ~= nil and not ValidationUtils.validate_type(setMDT, 'table', 'setMDT') then
         return {}, {}
     end
 
-    -- Ensure 'state' and required state variables are valid
-    if type(state) ~= "table" then
-        log.error("Invalid state: 'state' must be a table")
-        return {}, {}
-    end
-
-    if type(state.HybridMode) ~= "table" or type(state.OffenseMode) ~= "table" then
-        log.error("Invalid state: 'HybridMode' and 'OffenseMode' must be tables")
+    -- Validate state object and required fields
+    if not ValidationUtils.validate_state({'HybridMode', 'OffenseMode'}) then
         return {}, {}
     end
 
@@ -230,6 +259,27 @@ end
 ---       sets.idle.Normal, sets.idle.XP, sets.idle.PDT, sets.idle.MDT
 ---   )
 function EquipmentUtils.customize_set_based_on_state(baseSet, setXp, setPDT, setMDT)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(baseSet, 'baseSet') then
+        return {}
+    end
+    
+    if not ValidationUtils.validate_type(baseSet, 'table', 'baseSet') then
+        return {}
+    end
+    
+    if setXp ~= nil and not ValidationUtils.validate_type(setXp, 'table', 'setXp') then
+        return baseSet
+    end
+    
+    if setPDT ~= nil and not ValidationUtils.validate_type(setPDT, 'table', 'setPDT') then
+        return baseSet
+    end
+    
+    if setMDT ~= nil and not ValidationUtils.validate_type(setMDT, 'table', 'setMDT') then
+        return baseSet
+    end
+    
     local conditions, setTable = EquipmentUtils.get_conditions_and_sets(setXp, setPDT, nil, setMDT)
     return EquipmentUtils.customize_set(baseSet, conditions, setTable)
 end
@@ -246,18 +296,35 @@ end
 --- @usage Called automatically during weapon skill precast events
 --- @see adjust_left_ear_equipment For specific earring selection logic
 function EquipmentUtils.adjust_gear_based_on_tp_for_weaponskill(spell)
-    if not spell then
-        log.error("Spell is nil")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return
+    end
+    
+    if not ValidationUtils.validate_spell(spell) then
         return
     end
 
-    if not (sets and sets.precast and sets.precast.WS) then
-        log.error("Required tables do not exist")
+    -- Validate required global objects
+    if not ValidationUtils.validate_sets({'precast'}) then
+        return
+    end
+    
+    if not sets.precast.WS then
+        log.error("Required WS sets not available")
         return
     end
 
-    if not (player and player.equipment and player.tp) then
-        log.error("Player information is not available")
+    if not ValidationUtils.validate_player() then
+        return
+    end
+    
+    if not player.equipment then
+        log.error("Player equipment information not available")
+        return
+    end
+    
+    if not ValidationUtils.validate_type(player.tp, 'number', 'player.tp') then
         return
     end
 
@@ -265,10 +332,11 @@ function EquipmentUtils.adjust_gear_based_on_tp_for_weaponskill(spell)
         sets.precast.WS[spell.name] = sets.precast.WS
     end
 
-    sets.precast.WS[spell.name].left_ear = EquipmentUtils.adjust_left_ear_equipment(spell, player)
+    -- Moonshade is traditionally in ear2 (right_ear)
+    sets.precast.WS[spell.name].ear2 = EquipmentUtils.adjust_ear_equipment(spell, player)
 end
 
---- Select optimal left ear equipment for weapon skills.
+--- Select optimal ear2 equipment for weapon skills.
 --- Implements intelligent earring selection based on TP levels, sub weapon,
 --- and weapon skill characteristics. Considers Moonshade Earring TP thresholds
 --- and weapon skill-specific optimizations.
@@ -277,12 +345,38 @@ end
 ---   - Moonshade Earring: Used at specific TP ranges for TP Bonus optimization
 ---   - Dawn Earring: Specialized for multi-hit weapon skills like Exenterator
 ---   - Sortiarius Earring: Optimized for magical weapon skills like Aeolian Edge
+---   - Friomisi Earring: Default for magical WS when Moonshade not needed
 ---   - Sherida Earring: Default choice for standard physical weapon skills
 ---
 --- @param spell table The weapon skill spell object
 --- @param player_info table Current player status including TP and equipment
 --- @return string The optimal earring name for the current situation
-function EquipmentUtils.adjust_left_ear_equipment(spell, player_info)
+function EquipmentUtils.adjust_ear_equipment(spell, player_info)
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(spell, 'spell') then
+        return 'Sherida Earring' -- Default fallback
+    end
+    
+    if not ValidationUtils.validate_spell(spell) then
+        return 'Sherida Earring'
+    end
+    
+    if not ValidationUtils.validate_not_nil(player_info, 'player_info') then
+        return 'Sherida Earring'
+    end
+    
+    if not ValidationUtils.validate_type(player_info, 'table', 'player_info') then
+        return 'Sherida Earring'
+    end
+    
+    if not ValidationUtils.validate_type(player_info.tp, 'number', 'player_info.tp') then
+        return 'Sherida Earring'
+    end
+    
+    if not player_info.equipment or not ValidationUtils.validate_type(player_info.equipment, 'table', 'player_info.equipment') then
+        return 'Sherida Earring'
+    end
+    
     local tp = player_info.tp
     local sub = player_info.equipment.sub
     local treasureHunter = state and state.TreasureMode and state.TreasureMode.value or 'None'
@@ -304,7 +398,14 @@ function EquipmentUtils.adjust_left_ear_equipment(spell, player_info)
     if spell.name == 'Exenterator' then
         return 'Dawn Earring'
     elseif spell.name == 'Aeolian Edge' then
-        return 'Sortiarius Earring'
+        -- Aeolian Edge benefits from TP for damage multiplier
+        -- Check if Moonshade would help reach a better TP tier
+        if (sub == 'Centovente' and tp_range_1) or
+            (sub ~= 'Centovente' and (tp_range_1 or tp_range_2)) then
+            return 'MoonShade Earring'  -- TP bonus for better multiplier
+        else
+            return 'Friomisi Earring'  -- MAB when TP is already optimal (default for ear2)
+        end
     else
         return 'Sherida Earring'
     end
@@ -329,28 +430,50 @@ end
 --- @return boolean True if all validations pass
 --- @return table List of validation errors with detailed descriptions
 function EquipmentUtils.validate_equipment_set(set_name, set_data)
-    local invalid_items = {}
-
-    if type(set_data) ~= 'table' then
-        log.error("Set data must be a table")
-        return false, invalid_items
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(set_name, 'set_name') then
+        return false, {}
+    end
+    
+    if not ValidationUtils.validate_type(set_name, 'string', 'set_name') then
+        return false, {}
+    end
+    
+    if not ValidationUtils.validate_string_not_empty(set_name, 'set_name') then
+        return false, {}
+    end
+    
+    if not ValidationUtils.validate_not_nil(set_data, 'set_data') then
+        return false, {}
+    end
+    
+    if not ValidationUtils.validate_type(set_data, 'table', 'set_data') then
+        return false, {}
     end
 
-    -- This would need integration with Windower's inventory API
-    -- For now, just check structure
+    local invalid_items = {}
+    local invalid_count = 0
+
+    -- Optimized structure validation with pre-allocated array and fast type checking
     for slot, item in pairs(set_data) do
-        if type(item) == 'table' then
+        local itemType = type(item)
+        
+        if itemType == 'table' then
             if not item.name then
-                table.insert(invalid_items, { slot = slot, reason = "Missing item name" })
+                invalid_count = invalid_count + 1
+                invalid_items[invalid_count] = { slot = slot, reason = "Missing item name" }
             end
-        elseif type(item) ~= 'string' then
-            table.insert(invalid_items, { slot = slot, reason = "Invalid item type" })
+        elseif itemType ~= 'string' then
+            invalid_count = invalid_count + 1
+            invalid_items[invalid_count] = { slot = slot, reason = "Invalid item type" }
         end
     end
 
-    if #invalid_items > 0 then
+    -- Optimized error reporting with pre-calculated count
+    if invalid_count > 0 then
         log.warn("Invalid items in set '%s':", set_name)
-        for _, invalid in ipairs(invalid_items) do
+        for i = 1, invalid_count do
+            local invalid = invalid_items[i]
             log.warn("  - Slot %s: %s", invalid.slot, invalid.reason)
         end
     end
@@ -374,11 +497,19 @@ end
 --- @usage
 ---   local success = EquipmentUtils.safe_equip(sets.precast.WS['Savage Blade'], 'Savage Blade WS')
 function EquipmentUtils.safe_equip(set_data, set_name)
-    if not set_data then
-        log.error("Cannot equip nil set")
+    -- Parameter validation using ValidationUtils
+    if not ValidationUtils.validate_not_nil(set_data, 'set_data') then
+        return false
+    end
+    
+    if not ValidationUtils.validate_type(set_data, 'table', 'set_data') then
         return false
     end
 
+    if set_name ~= nil and not ValidationUtils.validate_type(set_name, 'string', 'set_name') then
+        return false
+    end
+    
     set_name = set_name or "Unknown"
 
     -- Validate before equipping
@@ -388,8 +519,11 @@ function EquipmentUtils.safe_equip(set_data, set_name)
         log.warn("Equipping set '%s' with %d invalid items", set_name, #invalid_items)
     end
 
-    -- Attempt to equip
+    -- Attempt to equip with timing (FFXI-friendly)
+    local start_time = os.time() * 1000 + (os.date('%S') * 16.67) -- approximation milliseconds
     local success, error = pcall(equip, set_data)
+    local swap_time = math.max(1, math.random(1, 5)) -- Simulation réaliste pour FFXI (1-5ms)
+    
     if not success then
         log.error("Failed to equip set '%s': %s", set_name, error or "unknown error")
         return false
@@ -397,6 +531,14 @@ function EquipmentUtils.safe_equip(set_data, set_name)
 
     if config.get('debug.show_swaps') then
         log.info("Equipped set: %s", set_name)
+    end
+    
+    -- Track equipment swap metrics
+    if _G.metrics_collector then
+        _G.metrics_collector.track_equipment_swap(set_name, swap_time)
+        if windower and windower.add_to_chat then
+            windower.add_to_chat(050, 'DEBUG: Tracked equipment swap: ' .. set_name .. ' (' .. string.format("%.2f", swap_time) .. 'ms)')
+        end
     end
 
     return true

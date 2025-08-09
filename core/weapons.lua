@@ -446,7 +446,20 @@ end
 -- @return (number): TP bonus for this weapon
 function WeaponUtils.get_weapon_tp_bonus(weapon_name)
     local weapon_tp_bonuses = {
-        ['Chango'] = 500,  -- Used by WAR
+        -- WAR Great Axes
+        ['Chango'] = 500,           -- Aeonic weapon
+        ['Ukonvasara'] = 0,          -- Mythic (TP bonus varies with aftermath)
+        ['Lycurgos'] = 0,            -- Ambuscade weapon
+        
+        -- WAR Swords  
+        ['Naegling'] = 0,            -- No inherent TP bonus
+        ['Loxotic Mace +1'] = 0,     -- No inherent TP bonus
+        
+        -- WAR Polearms
+        ['Shining One'] = 0,         -- No inherent TP bonus
+        
+        -- Other notable weapons
+        ['Dolichenus'] = 100,        -- Relic fist weapon (MNK/PUP)
         -- Add other weapons as needed
     }
     

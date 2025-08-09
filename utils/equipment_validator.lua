@@ -19,6 +19,7 @@ local EquipmentValidator = {}
 -- Load dependencies
 local ValidationUtils = require('utils/validation')
 local logger = require('utils/logger')
+local res = require('resources')
 
 -- Cache des validations pour optimiser les performances
 local validation_cache = {}
@@ -205,7 +206,7 @@ function EquipmentValidator.validate_equipment_set(equipment_set, set_name)
     
     -- Obtenir les données actuelles
     local items = windower.ffxi.get_items()
-    local current_equipment = windower.ffxi.get_equipment()
+    local current_equipment = windower.ffxi.get_items().equipment  -- Correct API call
     
     if not items or not current_equipment then
         return {
@@ -449,11 +450,11 @@ end
 --- @param report_valid (boolean): Signaler aussi les sets valides
 function EquipmentValidator.validate_all_sets(sets_table, report_valid)
     if not sets_table or type(sets_table) ~= 'table' then
-        windower.add_to_chat(167, "[Equipment Validator] Aucun set trouvé à valider")
+        windower.add_to_chat(167, "[Equipment Validator] No sets found to validate")
         return
     end
     
-    windower.add_to_chat(160, "=== VALIDATION COMPLETE DES EQUIPEMENTS ===")
+    windower.add_to_chat(160, "=== COMPLETE EQUIPMENT VALIDATION ===")
     
     local total_sets = 0
     local valid_sets = 0
@@ -481,11 +482,11 @@ function EquipmentValidator.validate_all_sets(sets_table, report_valid)
                     if result.valid then
                         valid_sets = valid_sets + 1
                         if report_valid then
-                            windower.add_to_chat(030, string.format("✓ %s", current_path))
+                            windower.add_to_chat(030, string.format("OK %s", current_path))
                         end
                     else
                         invalid_sets = invalid_sets + 1
-                        windower.add_to_chat(167, string.format("✗ %s (%d erreurs)", current_path, #result.errors))
+                        windower.add_to_chat(167, string.format("X %s (%d errors)", current_path, #result.errors))
                         
                         -- Afficher quelques erreurs
                         for i = 1, math.min(3, #result.errors) do
@@ -493,7 +494,7 @@ function EquipmentValidator.validate_all_sets(sets_table, report_valid)
                         end
                         
                         if #result.errors > 3 then
-                            windower.add_to_chat(001, string.format("    ... et %d autres erreurs", #result.errors - 3))
+                            windower.add_to_chat(001, string.format("    ... and %d more errors", #result.errors - 3))
                         end
                     end
                 else

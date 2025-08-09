@@ -25,7 +25,7 @@ local TEMPLATES = {
 --- %s
 ---
 --- @file %s
---- @author Tetsouo  
+--- @author Tetsouo
 --- @version 2.0
 --- @date Created: %s | Modified: 2025-08-05
 --- @requires %s
@@ -34,7 +34,7 @@ local TEMPLATES = {
 ---   %s
 ---============================================================================
 ]],
-    
+
     function_doc = [[
 --- %s
 --- %s
@@ -50,50 +50,66 @@ local TEMPLATES = {
 local JOB_DOCS = {
     BLM = {
         title = "Black Mage",
-        description = "Professional Black Mage configuration with elemental magic mastery,\nMagic Burst optimization, and advanced spell timing management.",
-        features = "• Elemental spell optimization with tier selection\n• Magic Burst mode for skillchain coordination\n• Mana conservation and efficiency algorithms\n• Weather and day bonus calculations"
+        description =
+        "Professional Black Mage configuration with elemental magic mastery,\nMagic Burst optimization, and advanced spell timing management.",
+        features =
+        "• Elemental spell optimization with tier selection\n• Magic Burst mode for skillchain coordination\n• Mana conservation and efficiency algorithms\n• Weather and day bonus calculations"
     },
-    
+
     BST = {
-        title = "Beastmaster", 
-        description = "Professional Beastmaster configuration with intelligent pet management,\necosystem filtering, and automated broth handling.",
-        features = "• Ecosystem-based pet filtering with species selection\n• Automated broth equipment and usage tracking\n• Pet engagement and disengagement management\n• Jug pet data integration with combat optimization"
+        title = "Beastmaster",
+        description =
+        "Professional Beastmaster configuration with intelligent pet management,\necosystem filtering, and automated broth handling.",
+        features =
+        "• Ecosystem-based pet filtering with species selection\n• Automated broth equipment and usage tracking\n• Pet engagement and disengagement management\n• Jug pet data integration with combat optimization"
     },
-    
+
     THF = {
         title = "Thief",
-        description = "Professional Thief configuration with advanced Treasure Hunter management,\nSneak Attack/Trick Attack optimization, and stealth mechanics.",
-        features = "• Intelligent TH tagging with minimal gear swapping\n• SA/TA preservation during movement\n• Ranged attack TH integration\n• Stealth and positioning assistance"
+        description =
+        "Professional Thief configuration with advanced Treasure Hunter management,\nSneak Attack/Trick Attack optimization, and stealth mechanics.",
+        features =
+        "• Intelligent TH tagging with minimal gear swapping\n• SA/TA preservation during movement\n• Ranged attack TH integration\n• Stealth and positioning assistance"
     },
-    
+
     WAR = {
         title = "Warrior",
-        description = "Professional Warrior configuration with advanced weapon skill optimization,\nretaliation management, and multi-weapon support.",
-        features = "• TP-based weapon skill gear selection\n• Automatic retaliation cancellation on movement\n• Multi-weapon configuration with stat optimization\n• Berserker and aggressive stance management"
+        description =
+        "Professional Warrior configuration with advanced weapon skill optimization,\nretaliation management, and multi-weapon support.",
+        features =
+        "• TP-based weapon skill gear selection\n• Automatic retaliation cancellation on movement\n• Multi-weapon configuration with stat optimization\n• Berserker and aggressive stance management"
     },
-    
+
     PLD = {
         title = "Paladin",
-        description = "Professional Paladin configuration with advanced tanking capabilities,\nspell casting optimization, and defensive stance management.",  
-        features = "• Intelligent tank gear swapping for threat management\n• Spell casting gear with cure potency optimization\n• Defensive cooldown timing and management\n• Enmity generation and control algorithms"
+        description =
+        "Professional Paladin configuration with advanced tanking capabilities,\nspell casting optimization, and defensive stance management.",
+        features =
+        "• Intelligent tank gear swapping for threat management\n• Spell casting gear with cure potency optimization\n• Defensive cooldown timing and management\n• Enmity generation and control algorithms"
     },
-    
+
     DRG = {
         title = "Dragoon",
-        description = "Professional Dragoon configuration with wyvern support, jump abilities,\nand advanced weapon skill optimization.",
-        features = "• Wyvern-aware pet management and gear optimization\n• Jump ability timing with recast management\n• Advanced weapon skill customization with TP scaling\n• Polearm mastery with multi-weapon support"
+        description =
+        "Professional Dragoon configuration with wyvern support, jump abilities,\nand advanced weapon skill optimization.",
+        features =
+        "• Wyvern-aware pet management and gear optimization\n• Jump ability timing with recast management\n• Advanced weapon skill customization with TP scaling\n• Polearm mastery with multi-weapon support"
     },
-    
+
     RUN = {
         title = "Rune Fencer",
-        description = "Professional Rune Fencer configuration with elemental resistance management,\nrune enhancement optimization, and hybrid tanking capabilities.",
-        features = "• Elemental rune management with resistance calculations\n• Ward and barrier spell optimization\n• Hybrid physical/magical damage mitigation\n• Elemental weapon skill enhancement"
+        description =
+        "Professional Rune Fencer configuration with elemental resistance management,\nrune enhancement optimization, and hybrid tanking capabilities.",
+        features =
+        "• Elemental rune management with resistance calculations\n• Ward and barrier spell optimization\n• Hybrid physical/magical damage mitigation\n• Elemental weapon skill enhancement"
     },
-    
+
     DNC = {
         title = "Dancer",
-        description = "Professional Dancer configuration with step/flourish management,\nTP conservation, and support ability timing.",
-        features = "• Intelligent step targeting and debuff management\n• Flourish timing with optimal effect duration\n• TP conservation strategies for ability usage\n• Support ability coordination with party members"
+        description =
+        "Professional Dancer configuration with step/flourish management,\nTP conservation, and support ability timing.",
+        features =
+        "• Intelligent step targeting and debuff management\n• Flourish timing with optimal effect duration\n• TP conservation strategies for ability usage\n• Support ability coordination with party members"
     }
 }
 
@@ -106,7 +122,7 @@ function generate_job_documentation(job_code, file_path)
         log.warn("No documentation template found for job: %s", job_code)
         return
     end
-    
+
     local header = string.format(TEMPLATES.header,
         job_info.title,
         job_code,
@@ -117,7 +133,7 @@ function generate_job_documentation(job_code, file_path)
         "Mote-Include.lua, modules/automove.lua, modules/shared.lua",
         "F9-F11: Mode cycling, //gs c cycle [mode] for manual control"
     )
-    
+
     log.info("Generated documentation header for %s (%s)", job_code, job_info.title)
     print(header)
 end
@@ -127,7 +143,7 @@ log.info("🔧 Auto-Documentation Script Started")
 log.info("📝 Professional documentation standards applied")
 
 -- Generate documentation for all supported jobs
-local jobs = {"BLM", "BST", "THF", "WAR", "PLD", "DRG", "RUN", "DNC"}
+local jobs = { "BLM", "BST", "THF", "WAR", "PLD", "DRG", "RUN", "DNC" }
 
 for _, job in ipairs(jobs) do
     generate_job_documentation(job, string.format("Tetsouo_%s.lua", job))

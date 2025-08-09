@@ -50,10 +50,21 @@ sets['Utu grip'] = { sub = 'Utu Grip'}
 -- =========================================================================================================
 --                                           Equipments - Idle and Defense Sets
 -- =========================================================================================================
-sets.idle = {}
+-- Set de base avec équipement minimal pour éviter l'erreur "set does not exist"
+sets.idle = {
+    main = "Epeolatry",  -- Remplace par ton équipement RUN
+    sub = "Utu Grip",
+    head = "Meghanada Visor +2",
+    body = "Meghanada Cuirie +2", 
+    hands = "Meghanada Gloves +2",
+    legs = "Meghanada Chausses +2",
+    feet = "Meghanada Jambeaux +2"
+}
 
 sets.idle.PDT = sets.idle
-sets.idle.MDT = {}
+sets.idle.MDT = set_combine(sets.idle, {
+    sub = "Ammurapi Shield"  -- Bouclier MDT
+})
 
 sets.idleNormal = set_combine(sets.idle, {})
 
@@ -63,12 +74,15 @@ sets.idle.Town = set_combine(sets.idle, {})
 
 sets.resting = set_combine(sets.idleNormal, {})
 
-sets.latent_refresh = {}
+sets.latent_refresh = set_combine(sets.idle, {})
 
 -- =========================================================================================================
 --                                           Equipments - FullEnmity Sets
 -- =========================================================================================================
-sets.FullEnmity = {}
+sets.FullEnmity = set_combine(sets.idle, {
+    -- Équipement enmity de base
+    ammo = "Sapience Orb"
+})
 
 -- =========================================================================================================
 --                                           Equipments - Job Ability Sets
@@ -82,7 +96,10 @@ sets.precast.JA['Provoke'] = set_combine(sets.FullEnmity, {})
 -- =========================================================================================================
 --                                           Equipments - Fast Cast Sets
 -- =========================================================================================================
-sets.precast.FC = {}
+sets.precast.FC = set_combine(sets.idle, {
+    -- Fast Cast de base
+    ammo = "Sapience Orb"
+})
 
 sets.precast.FC['Healing Magic'] = sets.precast.FC
 sets.precast.FC['Enhancing Magic'] = sets.precast.FC
@@ -103,7 +120,10 @@ sets.precast.FC['Frightful Roar'] = sets.precast.FC
 -- =========================================================================================================
 sets.midcast.Enmity = sets.FullEnmity
 
-sets.midcast.SIRDEnmity = {}
+sets.midcast.SIRDEnmity = set_combine(sets.idle, {
+    -- SIRD + Enmity
+    ammo = "Staunch Tathlum +1"
+})
 -- Gear Enmity 115
 -- Crusade Enmity 145
 
@@ -112,9 +132,9 @@ sets.midcast.SIRDEnmity = {}
 -- =========================================================================================================
 
 -- ================================================ Phalanx Sets ===========================================
-sets.midcast.PhalanxPotency = {}
+sets.midcast.PhalanxPotency = set_combine(sets.idle, {})
 
-sets.midcast.SIRDPhalanx = {}
+sets.midcast.SIRDPhalanx = set_combine(sets.midcast.SIRDEnmity, {})
 
 -- ================================================ Enlight Sets ==========================================
 sets.midcast['Enlight'] = set_combine(sets.midcast.SIRDEnmity, {})
@@ -140,19 +160,19 @@ sets.midcast['Refresh'] = sets.midcast.SIRDEnmity
 sets.midcast['Haste'] = sets.midcast.SIRDEnmity
 
 -- ================================================ Cure Sets ==============================================
-sets.Cure = {}
+sets.Cure = set_combine(sets.idle, {})
 
 -- =========================================================================================================
 --                                           Equipments - Weapon Skill Sets
 -- =========================================================================================================
-sets.precast.WS = {}
+sets.precast.WS = set_combine(sets.idle, {})
 sets.precast.WS.Acc = set_combine(sets.precast.WS, {})
 sets.precast.WS['Aeolian Edge'] = set_combine(sets.precast.WS, {})
 
 -- =========================================================================================================
 --                                           Equipments - Magic Defense Sets
 -- =========================================================================================================
-sets.defense.MDT = {}
+sets.defense.MDT = set_combine(sets.idle.MDT, {})
 
 -- =========================================================================================================
 --                                           Equipments - Engaged Sets
@@ -168,9 +188,20 @@ sets.meleeXp = set_combine(sets.idleXp, {})
 -- =========================================================================================================
 --                                           Equipments - Movement Sets
 -- =========================================================================================================
-sets.MoveSpeed = {}
+sets.MoveSpeed = set_combine(sets.idle, {
+    -- Vitesse de déplacement
+    feet = "Herald's Gaiters"  -- Remplace par tes bottes de vitesse
+})
+
+-- Set spécial pour Adoulin avec le body pour vitesse supplémentaire
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"  -- Bonus de vitesse en ville d'Adoulin
+})
 
 -- =========================================================================================================
 --                                           Equipments - Custom Buff Sets
 -- =========================================================================================================
-sets.buff.Doom = {}
+sets.buff.Doom = set_combine(sets.idle, {
+    -- Set anti-doom si nécessaire
+    neck = "Nicander's Necklace"
+})

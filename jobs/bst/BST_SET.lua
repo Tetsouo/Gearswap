@@ -23,7 +23,7 @@
 --- @version 2.0
 --- @date Created: 2023-07-10 | Modified: 2025-08-05
 --- @requires Windower FFXI, GearSwap addon
---- @requires utils/equipment.lua for equipment creation utilities
+--- @requires utils/equipment_factory for standardized equipment creation
 ---
 --- @usage
 ---   All sets automatically loaded by Mote framework
@@ -35,24 +35,12 @@
 
 ---@diagnostic disable: lowercase-global
 
+-- Load the centralized equipment factory for standardized equipment creation
+require('utils/equipment_factory')
+
 --============================================================--
 --                    UTILITY FUNCTIONS                        --
 --============================================================--
-
---- Builds a GearSwap-compatible equipment table.
----@param name string                  Item name
----@param priority? number             Swap priority (optional)
----@param bag? string                  Bag/container (optional)
----@param augments? string[]           Augments (optional)
----@return table<string, any>
-function createEquipment(name, priority, bag, augments)
-    return {
-        name = name,
-        priority = priority,
-        bag = bag,
-        augments = augments or {},
-    }
-end
 
 --============================================================--
 --                  COMMON GEAR DEFINITIONS                    --
@@ -183,10 +171,7 @@ Gleti_Boots_mab                      = MabGear.feet
 
 -- Main/Sub weapon definitions
 sets["Aymur"]                        = { main = createEquipment("Aymur") }
-sets["Charmer"]                      = { sub = createEquipment("Charmer's Merlin") }
 sets["Agwu's axe"]                   = { sub = createEquipment("Agwu's Axe") }
-sets["Arktoi"]                       = { main = createEquipment("Arktoi") }
-sets["Izizoeksi"]                    = { sub = createEquipment("Izizoeksi") }
 sets["Tauret"]                       = { main = createEquipment("Tauret") }
 sets["Blur Knife"]                   = { sub = createEquipment("Blurred Knife +1") }
 sets["Adapa"]                        = { sub = createEquipment("Adapa Shield") }
@@ -223,14 +208,16 @@ sets["Weevil Familiar (Weevil)"]     = { ammo = createEquipment("T. Pristine Sap
 --============================================================--
 -- Single-hit physical moves
 petPhysicalMoves                     = S {
-    "Sic", "Foot Kick", "Whirl Claws", "Wild Carrot", "Sheep Charge", "Lamb Chop",
-    "Head Butt", "Wild Oats", "Leaf Dagger", "Claw Cyclone", "Razor Fang", "Nimble Snap",
+    "Foot Kick", "Whirl Claws", "Sheep Charge", "Lamb Chop",
+    "Head Butt", "Leaf Dagger", "Claw Cyclone", "Razor Fang", "Nimble Snap",
     "Cyclotail", "Rhino Attack", "Power Attack", "Mandibular Bite", "Big Scissors", "Grapple",
     "Spinning Top", "Double Claw", "Frogkick", "Blockhead", "Brain Crush", "Tail Blow",
     "??? Needles", "Needleshot", "Scythe Tail", "Ripper Fang", "Recoil Dive", "Sudden Lunge",
     "Spiral Spin", "Beak Lunge", "Suction", "Back Heel", "Choke Breath", "Fantod",
-    "Tortoise Stomp", "Harden Shell", "Sensilla Blades", "Tegmina Buffet", "Swooping Frenzy",
-    "Zealous Snort", "Somersault", "Sickle Slash", "Mega Scissors"
+    "Tortoise Stomp", "Sensilla Blades", "Tegmina Buffet", "Swooping Frenzy",
+    "Zealous Snort", "Somersault", "Sickle Slash",
+    -- Tiger moves
+    "Crossthrash"
 }
 
 -- Multi-hit physical moves
@@ -241,27 +228,30 @@ petPhysicalMultiMoves                = S {
 
 -- Magical nukes / damage-based spells
 petMagicAtkMoves                     = S {
-    "Dust Cloud", "Cursed Sphere", "Venom", "Toxic Spit", "Bubble Shower",
-    "Drainkiss", "Silence Gas", "Dark Spore", "Fireball", "Plague Breath",
-    "Snow Cloud", "Charged Whisker", "Purulent Ooze", "Corrosive Ooze", "Aqua Breath",
+    "Cursed Sphere", "Venom", "Toxic Spit", "Bubble Shower",
+    "Drainkiss", "Fireball", "Snow Cloud", "Charged Whisker", 
+    "Purulent Ooze", "Corrosive Ooze", "Aqua Breath", "Choke Breath",
     "Stink Bomb", "Nectarous Deluge", "Nepenthic Plunge", "Pestilent Plume",
-    "Foul Waters", "Infected Leech", "Gloom Spray", "Fluid Spread", "Fluid Toss",
-    "Venom Shower"
+    "Foul Waters", "Acid Spray"
 }
 
--- Magical accuracy-based moves (debuffs, status effects)
+-- Magical accuracy-based moves (debuffs, status effects, buffs)
 petMagicAccMoves                     = S {
+    -- Debuffs
     "Sheep Song", "Scream", "Dream Flower", "Roar", "Gloeosuccus", "Palsy Pollen", "Soporific",
-    "Geist Wall", "Toxic Spit", "Numbing Noise", "Spoil", "Hi-Freq Field", "Sandpit", "Sandblast",
+    "Geist Wall", "Numbing Noise", "Spoil", "Hi-Freq Field", "Sandpit", "Sandblast",
     "Venom Spray", "Filamented Hold", "Queasyshroom", "Numbshroom", "Spore", "Shakeshroom",
     "Infrasonics", "Chaotic Eye", "Blaster", "Intimidate", "Noisome Powder", "Acid Mist",
-    "TP Drainkiss", "Jettatura", "Nihility Song", "Molting Plumage", "Spider Web", "Digest"
-}
-
--- Pet TP-generating abilities
-petTpMoves                           = S {
-    "Sic", "Foot Kick", "Dust Cloud", "Snow Cloud", "Wild Carrot", "Sheep Song", "Sheep Charge",
-    "Gloom Spray" -- More moves can be added as needed
+    "TP Drainkiss", "Jettatura", "Nihility Song", "Molting Plumage", "Spider Web", "Digest",
+    "Silence Gas", "Dark Spore",
+    -- Tiger moves
+    "Predatory Glare",
+    -- Healing/regen moves
+    "Wild Carrot", "Wild Oats",
+    -- Defensive buffs
+    "Bubble Curtain", "Scissor Guard", "Metallic Body", "Rhino Guard", "Water Wall", "Harden Shell",
+    -- Status enhancement
+    "Secretion", "Rage"
 }
 
 --============================================================--
@@ -418,7 +408,7 @@ local summonSet                      = {
     hands = "Ankusa Gloves +3",
     ear2 = EARRINGS.Nukumi,
     legs = "Acro Breeches",
-    feet = "Armada Sollerets"
+    --[[ feet = "Armada Sollerets" ]]
 }
 
 -- Configure JA sets
@@ -509,7 +499,7 @@ sets.midcast.pet_magicAtk_moves      = {
     back = Artio.PETMB
 }
 
--- Magical accuracy Ready moves (debuffs)
+-- Magical accuracy Ready moves (debuffs, buffs)
 sets.midcast.pet_magicAcc_moves      = set_combine(sets.midcast.pet_magicAtk_moves, {})
 
 -- Set for when pet uses magic while wielding a weapon (defined in BST_FUNCTION.lua)

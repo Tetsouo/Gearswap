@@ -1,7 +1,7 @@
 ---============================================================================
 --- FFXI GearSwap Configuration - Rune Fencer (RUN)
 ---============================================================================
---- Professional Rune Fencer job configuration with elemental resistance 
+--- Professional Rune Fencer job configuration with elemental resistance
 --- management, rune enhancement optimization, and hybrid tanking capabilities.
 --- Features include:
 ---
@@ -36,12 +36,17 @@
 ---
 --- @usage Called automatically on script load - no manual invocation needed
 function get_sets()
-    mote_include_version = 2                    -- Target Motenten Include v2 for compatibility
-    include('Mote-Include.lua')                 -- Core GearSwap framework with RUN support
-    include('modules/automove.lua')             -- Automatic movement speed gear management
-    include('modules/shared.lua')               -- Shared utility functions across all jobs
-    include('jobs/run/RUN_SET.lua')            -- RUN-specific equipment sets and resistances
-    include('jobs/run/RUN_FUNCTION.lua')       -- Advanced RUN job mechanics and rune logic
+    mote_include_version = 2             -- Target Motenten Include v2 for compatibility
+    include('Mote-Include.lua')          -- Core GearSwap framework with RUN support
+    include('core/globals.lua')
+    include('modules/automove.lua')      -- Automatic movement speed gear management
+    include('modules/shared.lua')        -- Shared utility functions across all jobs
+    include('jobs/run/RUN_SET.lua')      -- RUN-specific equipment sets and resistances
+    include('jobs/run/RUN_FUNCTION.lua') -- Advanced RUN job mechanics and rune logic
+    
+    -- Initialize universal metrics system
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.initialize()
 end
 
 --- Initialize equipment sets for Rune Fencer
@@ -101,9 +106,40 @@ end
 -- This function is called once when the script is unloaded.
 function file_unload()
     -- Unbind the keys associated with the hybrid mode, weapon set, and sub weapon set.
-    send_command('unbind F2')  -- Unbind key for cycling hybrid mode
+    send_command('unbind F2') -- Unbind key for cycling hybrid mode
     send_command('unbind F3') -- Unbind key for cycling main weapon set
     send_command('unbind F4') -- Unbind key for cycling sub weapon set
+end
+
+---============================================================================
+--- SELF COMMAND HANDLER
+---============================================================================
+
+--- Handle custom console commands for Rune Fencer.
+--- Provides specialized command handling for RUN-specific operations and testing.
+---
+--- Available Commands:
+---   test : Execute GearSwap module unit tests
+---
+--- @param cmdParams table Array of command parameters
+--- @param eventArgs table Event arguments for command handling
+--- @usage //gs c test (runs unit tests)
+function job_self_command(cmdParams, eventArgs)
+    -- Universal metrics system commands
+    local MetricsIntegration = require('core/metrics_integration')
+    if MetricsIntegration.handle_command(cmdParams, eventArgs) then
+        return
+    end
+    
+    -- Run unit tests
+    if cmdParams[1] == 'test' then
+        windower.add_to_chat(050, "Executing GearSwap module tests...")
+        include('test_runner.lua')
+        eventArgs.handled = true
+        return
+    end
+
+    -- Add other RUN-specific commands here as needed
 end
 
 -- Initializes the gear sets for the Paladin job.
@@ -119,6 +155,10 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_precast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for precast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_precast(spell, action, spellMap, eventArgs)
+    
     -- If the spell is Phalanx, call the handle_phalanx_while_xp function
     if spell.name == 'Phalanx' then
         handle_phalanx_while_xp(spell, eventArgs)
@@ -137,6 +177,10 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_midcast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking for midcast
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.universal_job_midcast(spell, action, spellMap, eventArgs)
+    
     -- Check if the player is incapacitated
     --[[ incapacitated(spell, eventArgs) ]]
 end
@@ -149,6 +193,10 @@ end
 --   spellMap (table): The spell mapping table
 --   eventArgs (table): Additional event arguments
 function job_aftercast(spell, action, spellMap, eventArgs)
+    -- Universal metrics tracking
+    local MetricsIntegration = require('core/metrics_integration')
+    MetricsIntegration.track_action(spell, eventArgs)
+    
     -- Perform actions specific to the spell that was cast
     handleSpellAftercast(spell, eventArgs)
 end
@@ -156,14 +204,14 @@ end
 -- Sets the default macro book and lockstyle for RUN
 function select_default_macro_book()
     send_command('lua unload dressup')
-    
+
     -- RUN macro pages based on subjob
     local macro_page = ({ BLU = 23, WAR = 21, RDM = 28 })[player.sub_job] or 23
     set_macro_page(1, macro_page)
-    
+
     -- RUN lockstyle
     send_command('wait 3; input /lockstyleset 3')
-    
+
     -- Reload dressup with delay to avoid macro loss
     send_command('wait 20; lua load dressup')
 end

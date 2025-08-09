@@ -37,7 +37,15 @@
 --                             IDLE SETS                           --
 --=================================================================--
 
-sets.idle = {}
+sets.idle = {
+    main = "Trishula",  -- Remplace par ton arme DRG
+    sub = "Utu Grip",
+    head = "Meghanada Visor +2",
+    body = "Meghanada Cuirie +2", 
+    hands = "Meghanada Gloves +2",
+    legs = "Meghanada Chausses +2",
+    feet = "Meghanada Jambeaux +2"
+}
 sets.idle.PDT = set_combine(sets.idle, {})
 sets.idle.Town = set_combine(sets.idle, {})
 
@@ -66,7 +74,9 @@ sets['Hagneia Stone'] = { ammo = createEquipment('Hagneia Stone') }
 --                           MOVEMENT SET                         --
 --=================================================================--
 
-sets.MoveSpeed = {}
+sets.MoveSpeed = set_combine(sets.idle, {
+    feet = "Herald's Gaiters"  -- Bottes de vitesse
+})
 
 --=================================================================--
 --                          JOB ABILITIES                         --

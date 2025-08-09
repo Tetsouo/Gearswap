@@ -136,6 +136,38 @@ function CommandUtils.handle_blm_commands(cmdParams)
                 log.debug("Update command called but job_handle_equipping_gear not available")
                 return true  -- Don't show error, this is normal
             end
+        end,
+        altlight = function()
+            if handle_altNuke and state and state.MainLightSpell and state.TierSpell then
+                -- RDM can only cast up to tier V, so limit the tier
+                local tierToUse = state.TierSpell.value
+                if tierToUse == 'VI' then
+                    tierToUse = 'V'
+                    log.debug("Limiting spell tier to V for RDM alt")
+                end
+                handle_altNuke(state.MainLightSpell.value, tierToUse, false)
+                log.info("Alt casting Light spell: %s %s", state.MainLightSpell.value, tierToUse)
+                return true
+            else
+                log.error("handle_altNuke or state not available for altlight")
+                return false
+            end
+        end,
+        altdark = function()
+            if handle_altNuke and state and state.MainDarkSpell and state.TierSpell then
+                -- RDM can only cast up to tier V, so limit the tier
+                local tierToUse = state.TierSpell.value
+                if tierToUse == 'VI' then
+                    tierToUse = 'V'
+                    log.debug("Limiting spell tier to V for RDM alt")
+                end
+                handle_altNuke(state.MainDarkSpell.value, tierToUse, false)
+                log.info("Alt casting Dark spell: %s %s", state.MainDarkSpell.value, tierToUse)
+                return true
+            else
+                log.error("handle_altNuke or state not available for altdark")
+                return false
+            end
         end
     }
 

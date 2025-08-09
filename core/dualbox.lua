@@ -38,6 +38,7 @@ local DualBoxUtils = {}
 local config = require('config/config')              -- Centralized configuration system
 local log = require('utils/logger')                  -- Professional logging framework
 local MessageUtils = require('utils/messages')       -- Message formatting utilities
+local UtilityUtils = require('utils/helpers')        -- Utility functions (optimized: moved to module level)
 
 -- Get player names from config
 local mainPlayerName = config.get_main_player()
@@ -196,7 +197,6 @@ function DualBoxUtils.handle_alt_nuke(altSpell, altTier, isRaSpell)
 
     local spellToCast = altSpell .. (isRaSpell and ' III' or altTier or '')
 
-    local UtilityUtils = require('utils/helpers')
     local targetid, targetname = UtilityUtils.get_current_target_id_and_name()
 
     if player.status == 'Engaged' then
@@ -248,7 +248,6 @@ function DualBoxUtils.apply_spell_sequence_to_target(spells)
         return false
     end
 
-    local UtilityUtils = require('utils/helpers')
     local success, targetid, targetname = pcall(UtilityUtils.get_current_target_id_and_name)
     if not success then
         log.error("Failed to get target information")
@@ -318,7 +317,6 @@ function DualBoxUtils.buffer_role_for_alt_rdm(commandType)
         return false
     end
 
-    local UtilityUtils = require('utils/helpers')
     local success, targetid, targetname = pcall(UtilityUtils.get_current_target_id_and_name)
     if not success then
         log.error("Failed to get target information for RDM buffing")
@@ -375,7 +373,6 @@ end
 -- @param name (string): The name to search for
 -- @return (boolean): True if found, false otherwise
 function DualBoxUtils.find_member_and_pet_in_party(name)
-    local UtilityUtils = require('utils/helpers')
     return UtilityUtils.find_member_and_pet_in_party(name)
 end
 
