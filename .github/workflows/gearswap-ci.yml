@@ -239,35 +239,10 @@ jobs:
             echo "status=failure" >> $GITHUB_OUTPUT
             echo "emoji=❌" >> $GITHUB_OUTPUT
         fi
-    - name: "\U0001F4AC Discord Notification (Optional)"
-      if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main')
-      continue-on-error: true
-      run: |
-        # Optional Discord notification - skipped if webhook not configured
-        WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK }}"
-        if [ -z "$WEBHOOK_URL" ]; then
-          echo "⚠️ Discord webhook not configured, skipping notification"
-          exit 0
-        fi
-        
-        status="${{ steps.results.outputs.status }}"
-        emoji="${{ steps.results.outputs.emoji }}"
-        
-        curl -H "Content-Type: application/json" \
-             -d "{
-                \"embeds\": [{
-                    \"title\": \"$emoji GearSwap CI/CD - $status\",
-                    \"description\": \"Pipeline completed for commit \`${{ github.sha }}\`\",
-                    \"fields\": [
-                        {\"name\": \"Validate\", \"value\": \"${{ needs.validate.result }}\", \"inline\": true},
-                        {\"name\": \"Tests\", \"value\": \"${{ needs.tests.result }}\", \"inline\": true},
-                        {\"name\": \"Build\", \"value\": \"${{ needs.build.result }}\", \"inline\": true}
-                    ],
-                    \"color\": $([ "$status" = "success" ] && echo "3066993" || echo "15158332"),
-                    \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
-                }]
-             }" \
-             "$WEBHOOK_URL" || echo "⚠️ Discord notification failed"
+    # Discord notification removed - configure manually if needed
+    # To enable Discord notifications:
+    # 1. Add DISCORD_WEBHOOK secret in repository settings
+    # 2. Uncomment and configure the notification step below
     - name: "\U0001F4C8 Update Status Badge (Optional)"
       run: "echo \"\U0001F4C8 Updating status badge...\"\n# Logic to update custom status badge\necho \"Status: ${{ steps.results.outputs.status }}\"\n"
 
