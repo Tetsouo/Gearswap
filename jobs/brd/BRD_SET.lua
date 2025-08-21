@@ -146,7 +146,7 @@ sets.midcast = {
         head = "Fili Calot +3",
         neck = "Mnbw. Whistle +1",
         ear1 = "Musical Earring",
-        ear2 = "Fili Earring +1",
+        ear2 = "Fili Earring",
         body = "Fili Hongreline +3",
         hands = "Fili Manchettes +3",
         ring1 = StikiRing1,
@@ -168,7 +168,7 @@ sets.midcast.HonorMarch = {
     head = "Fili Calot +3",
     neck = "Mnbw. Whistle +1",
     ear1 = "Musical Earring",
-    ear2 = "Fili Earring +1",
+    ear2 = "Fili Earring",
     body = "Fili Hongreline +3",
     hands = "Fili Manchettes +3",
     ring1 = StikiRing1,
@@ -192,7 +192,7 @@ sets.midcast.AriaOfPassion = {
     head = "Fili Calot +3",
     neck = "Mnbw. Whistle +1",
     ear1 = "Musical Earring",
-    ear2 = "Fili Earring +1",
+    ear2 = "Fili Earring",
     body = "Fili Hongreline +3",
     hands = "Fili Manchettes +3",
     ring1 = StikiRing1,
@@ -522,20 +522,20 @@ sets.defense = {
     PDT = sets.engaged.PDT -- Points to engaged.PDT for consistency
 }
 
---- Magical damage taken reduction set
+--- Magical damage taken reduction set (same as idle)
 sets.defense.MDT = {
-    head = "Aya. Zucchetto +2",
-    neck = "Warder\'s Charm +1",
-    ear1 = "Odnowa Earring +1",
-    ear2 = "Sanare Earring",
-    body = "Ayanmo Corazza +2",
-    hands = "Aya. Manopolas +2",
-    ring1 = "Defending Ring",
-    ring2 = "Dark Ring",
-    back = "Engulfer Cape +1",
-    waist = "Lieutenant\'s Sash",
-    legs = "Aya. Cosciales +2",
-    feet = "Aya. Gambieras +2"
+    head = "Fili Calot +3",
+    neck = "Wiglen Gorget",
+    ear1 = "Infused Earring",
+    ear2 = "Odnowa Earring +1",
+    body = "Fili Hongreline +3",
+    hands = "Fili Manchettes +3",
+    ring1 = StikiRing1,
+    ring2 = "Defending Ring",
+    back = "Moonlight Cape",
+    waist = "Flume Belt",
+    legs = "Fili Rhingrave +3",
+    feet = "Fili Cothurnes +3"
 }
 
 ---============================================================================
@@ -559,7 +559,6 @@ sets.engaged.Acc.Hybrid = {
 
 --- Legacy weapon sets (kept for compatibility)
 sets.Naegling = { main = "Naegling" }
-sets.Carnwenhan = { main = "Carnwenhan" }
 sets.Tauret = { main = "Tauret" }
 
 --- Main weapon sets for F4 cycling
