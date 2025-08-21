@@ -240,10 +240,33 @@ jobs:
             echo "emoji=❌" >> $GITHUB_OUTPUT
         fi
     - name: "\U0001F4AC Discord Notification (Optional)"
-      if: ${{ secrets.DISCORD_WEBHOOK != '' }}
+      if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main')
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      run: "status=\"${{ steps.results.outputs.status }}\"\nemoji=\"${{ steps.results.outputs.emoji }}\"\n\ncurl -H \"Content-Type: application/json\" \\\n     -d \"{\n        \\\"embeds\\\": [{\n            \\\"title\\\": \\\"$emoji GearSwap CI/CD - $status\\\",\n            \\\"description\\\": \\\"Pipeline completed for commit \\`${{ github.sha }}\\`\\\",\n            \\\"fields\\\": [\n                {\\\"name\\\": \\\"Validate\\\", \\\"value\\\": \\\"${{ needs.validate.result }}\\\", \\\"inline\\\": true},\n                {\\\"name\\\": \\\"Tests\\\", \\\"value\\\": \\\"${{ needs.tests.result }}\\\", \\\"inline\\\": true},\n                {\\\"name\\\": \\\"Build\\\", \\\"value\\\": \\\"${{ needs.build.result }}\\\", \\\"inline\\\": true}\n            ],\n            \\\"color\\\": $([ \\\"$status\\\" = \\\"success\\\" ] && echo \\\"3066993\\\" || echo \\\"15158332\\\"),\n            \\\"url\\\": \\\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\\\"\n        }]\n     }\" \\\n     \"$DISCORD_WEBHOOK\" || echo \"⚠️ Discord notification failed\"\n     \n"
+      run: |
+        if [ -z "$DISCORD_WEBHOOK" ]; then
+          echo "⚠️ Discord webhook not configured, skipping notification"
+          exit 0
+        fi
+        
+        status="${{ steps.results.outputs.status }}"
+        emoji="${{ steps.results.outputs.emoji }}"
+        
+        curl -H "Content-Type: application/json" \
+             -d "{
+                \"embeds\": [{
+                    \"title\": \"$emoji GearSwap CI/CD - $status\",
+                    \"description\": \"Pipeline completed for commit \`${{ github.sha }}\`\",
+                    \"fields\": [
+                        {\"name\": \"Validate\", \"value\": \"${{ needs.validate.result }}\", \"inline\": true},
+                        {\"name\": \"Tests\", \"value\": \"${{ needs.tests.result }}\", \"inline\": true},
+                        {\"name\": \"Build\", \"value\": \"${{ needs.build.result }}\", \"inline\": true}
+                    ],
+                    \"color\": $([ "$status" = "success" ] && echo "3066993" || echo "15158332"),
+                    \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+                }]
+             }" \
+             "$DISCORD_WEBHOOK" || echo "⚠️ Discord notification failed"
     - name: "\U0001F4C8 Update Status Badge (Optional)"
       run: "echo \"\U0001F4C8 Updating status badge...\"\n# Logic to update custom status badge\necho \"Status: ${{ steps.results.outputs.status }}\"\n"
 
