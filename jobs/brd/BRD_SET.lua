@@ -112,9 +112,9 @@ sets.precast['Honor March'] = set_combine(sets.precast.FC, {
 })
 
 --- Aria of Passion precast (MUST have Loughnashade equipped to cast)
-sets.precast['Aria of Passion'] = set_combine(sets.precast.FC, {
+--[[ sets.precast['Aria of Passion'] = set_combine(sets.precast.FC, {
     range = "Loughnashade"
-})
+}) ]]
 
 --- Nightingale precast set (enhances song effect +1)
 sets.precast.Nightingale = {
@@ -188,7 +188,7 @@ sets.midcast.AriaOfPassion = {
     -- Copy all BardSong equipment but force Loughnashade
     main = "Kali",
     sub = "Legato Dagger",
-    range = "Loughnashade", -- MUST be Loughnashade for Aria of Passion
+    --[[  range = "Loughnashade", -- MUST be Loughnashade for Aria of Passion ]]
     head = "Fili Calot +3",
     neck = "Mnbw. Whistle +1",
     ear1 = "Musical Earring",
@@ -238,7 +238,7 @@ sets.midcast.Threnody = set_combine(sets.midcast.BardSong, {
 
 --- Carol specific sets for resistance enhancement songs
 sets.midcast.Carol = set_combine(sets.midcast.BardSong, {
-    hands = "Mousai Gages +1" -- NOT OWNED YET - Enhances Carol effect
+    --[[ hands = "Mousai Gages +1" -- NOT OWNED YET - Enhances Carol effect ]]
 })
 
 --- Scherzo specific set for evasion songs
@@ -248,7 +248,7 @@ sets.midcast.Scherzo = set_combine(sets.midcast.BardSong, {
 
 --- Mambo specific sets for evasion songs
 sets.midcast.Mambo = set_combine(sets.midcast.BardSong, {
-    feet = "Mousai Crackows +1" -- NOT OWNED YET - Enhances Mambo effect
+    --[[ feet = "Mousai Crackows +1" -- NOT OWNED YET - Enhances Mambo effect ]]
 })
 
 --- Dummy song set - for practicing or non-party situations
@@ -372,18 +372,20 @@ sets.idle.Town = set_combine(sets.idle, {
 
 --- Melee TP set for engaged combat (weapons managed automatically)
 sets.engaged = {
+    ranged = "Linos",
+    ammo = empty,
     head = "Aya. Zucchetto +2",
-    neck = "Asperity Necklace",
-    ear1 = "Cessance Earring",
-    ear2 = "Telos Earring",
     body = "Ayanmo Corazza +2",
-    hands = "Aya. Manopolas +2",
-    ring1 = "Petrov Ring",
-    ring2 = "Epona\'s Ring",
-    back = Intarabus.stp,
-    waist = "Windbuffet Belt +1",
-    legs = "Aya. Cosciales +2",
-    feet = "Aya. Gambieras +2"
+    hands = "Bunzi\'s Gloves",
+    legs = "Fili Rhingrave +3",
+    feet = "Fili Cothurnes +3",
+    neck = "Bard\'s Charm +2",
+    waist = "Sailfi Belt +1",
+    ear1 = "Dedition Earring",
+    ear2 = "Telos Earring",
+    ring1 = MoonlightRing1,
+    ring2 = MoonlightRing2,
+    back = Intarabus.stp
 }
 
 --- Accuracy focused melee set
