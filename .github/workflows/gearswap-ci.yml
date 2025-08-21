@@ -241,10 +241,11 @@ jobs:
         fi
     - name: "\U0001F4AC Discord Notification (Optional)"
       if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main')
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      continue-on-error: true
       run: |
-        if [ -z "$DISCORD_WEBHOOK" ]; then
+        # Optional Discord notification - skipped if webhook not configured
+        WEBHOOK_URL="${{ secrets.DISCORD_WEBHOOK }}"
+        if [ -z "$WEBHOOK_URL" ]; then
           echo "⚠️ Discord webhook not configured, skipping notification"
           exit 0
         fi
@@ -266,7 +267,7 @@ jobs:
                     \"url\": \"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
                 }]
              }" \
-             "$DISCORD_WEBHOOK" || echo "⚠️ Discord notification failed"
+             "$WEBHOOK_URL" || echo "⚠️ Discord notification failed"
     - name: "\U0001F4C8 Update Status Badge (Optional)"
       run: "echo \"\U0001F4C8 Updating status badge...\"\n# Logic to update custom status badge\necho \"Status: ${{ steps.results.outputs.status }}\"\n"
 
