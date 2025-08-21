@@ -196,6 +196,14 @@ function job_self_command(cmdParams, eventArgs)
     local command = cmdParams[1] and cmdParams[1]:lower() or ''
     -- MessageUtils now available globally via shared.lua
     
+    -- First, try universal commands (equiptest, validate_all, etc.)
+    local success_UniversalCommands, UniversalCommands = pcall(require, 'core/UNIVERSAL_COMMANDS')
+    if success_UniversalCommands and UniversalCommands then
+        if UniversalCommands.handle_command(cmdParams, eventArgs) then
+            return
+        end
+    end
+    
     -- MacroCommands now available globally via shared.lua
     if MacroCommands.handle_macro_command(cmdParams, eventArgs, 'BRD') then
         return

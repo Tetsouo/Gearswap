@@ -382,6 +382,14 @@ end
 --- @usage //gs c test (runs unit tests)
 --- @usage //gs c buffself (casts self buffs)
 function job_self_command(cmdParams, eventArgs)
+    -- First, try universal commands (equiptest, validate_all, etc.)
+    local success_UniversalCommands, UniversalCommands = pcall(require, 'core/UNIVERSAL_COMMANDS')
+    if success_UniversalCommands and UniversalCommands then
+        if UniversalCommands.handle_command(cmdParams, eventArgs) then
+            return
+        end
+    end
+    
     -- Handle macro commands using centralized system
     -- MacroCommands now available globally via shared.lua
     if MacroCommands.handle_macro_command(cmdParams, eventArgs, 'BLM') then
