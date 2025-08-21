@@ -1,0 +1,22 @@
+# Development settings and documentation - local only
+.dev/
+.local/
+*.local.json
+INTERNAL.md
+
+# Backup files
+backups/
+*.bak
+
+# Temporary files
+*.tmp
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+.vscode/settings.json

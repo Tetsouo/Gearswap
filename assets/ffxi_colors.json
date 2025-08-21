@@ -1,0 +1,255 @@
+{
+  "ffxi_colors": {
+    "description": "Valid FFXI/Windower color codes for windower.add_to_chat() - Exact codes",
+    "last_updated": "2025-08-07",
+    "source": "assets/color.png - Official FFXI color codes",
+    "colors": {
+      "001": {
+        "name": "White",
+        "hex": "#ffffff",
+        "description": "Pure white",
+        "usage": "Neutral text, general information"
+      },
+      "002": {
+        "name": "Light Pink",
+        "hex": "#ffbcd5",
+        "description": "Pale pink",
+        "usage": "Delicate text"
+      },
+      "003": {
+        "name": "Pink",
+        "hex": "#ff9eb6",
+        "description": "Standard pink",
+        "usage": "Pink text"
+      },
+      "004": {
+        "name": "Pink Magenta",
+        "hex": "#ff9eff",
+        "description": "Pink-magenta",
+        "usage": "Colored text"
+      },
+      "005": {
+        "name": "Bright Cyan",
+        "hex": "#63ffff",
+        "description": "Brilliant cyan",
+        "usage": "Magic, spells"
+      },
+      "006": {
+        "name": "Pale Cyan",
+        "hex": "#c0ffff",
+        "description": "Light cyan",
+        "usage": "Secondary magic"
+      },
+      "007": {
+        "name": "Light Violet",
+        "hex": "#dfbcff",
+        "description": "Pale violet",
+        "usage": "Violet text"
+      },
+      "008": {
+        "name": "Light Magenta",
+        "hex": "#ffdbff",
+        "description": "Pale magenta",
+        "usage": "Magenta text"
+      },
+      "010": {
+        "name": "Light Pink (alt)",
+        "hex": "#ffbcd5",
+        "description": "Alternative pale pink",
+        "usage": "Alternative pink text"
+      },
+      "011": {
+        "name": "Standard Pink",
+        "hex": "#ff9cb3",
+        "description": "Medium pink",
+        "usage": "Medium pink text"
+      },
+      "012": {
+        "name": "Pink Magenta (alt)",
+        "hex": "#ff9eff",
+        "description": "Alternative pink-magenta",
+        "usage": "Alternative colored text"
+      },
+      "016": {
+        "name": "Light Magenta (alt)",
+        "hex": "#ffdbff",
+        "description": "Alternative pale magenta",
+        "usage": "Alternative magenta text"
+      },
+      "025": {
+        "name": "Rosy Magenta",
+        "hex": "#ffbdef",
+        "description": "Rose magenta",
+        "usage": "Rosy magenta text"
+      },
+      "028": {
+        "name": "Bright Pink",
+        "hex": "#ff69a6",
+        "description": "Brilliant pink",
+        "usage": "Critical errors"
+      },
+      "030": {
+        "name": "Bright Green",
+        "hex": "#25ff59",
+        "description": "Brilliant green",
+        "usage": "Success, excellent"
+      },
+      "037": {
+        "name": "Beige",
+        "hex": "#eeead5",
+        "description": "Light beige",
+        "usage": "Light neutral text"
+      },
+      "038": {
+        "name": "Bright Pink Magenta",
+        "hex": "#ff78bf",
+        "description": "Vivid pink-magenta",
+        "usage": "Vivid colored text"
+      },
+      "050": {
+        "name": "Bright Yellow",
+        "hex": "#ffff77",
+        "description": "Brilliant yellow",
+        "usage": "Job Abilities, important information"
+      },
+      "056": {
+        "name": "Electric Cyan",
+        "hex": "#25f2ff",
+        "description": "Electric cyan",
+        "usage": "Powerful magic"
+      },
+      "057": {
+        "name": "Bright Orange",
+        "hex": "#ff7f5a",
+        "description": "Brilliant orange",
+        "usage": "Warnings, attention"
+      },
+      "160": {
+        "name": "Gray-Violet",
+        "hex": "#9d9cd2",
+        "description": "Gray tinted violet",
+        "usage": "Secondary text"
+      },
+      "163": {
+        "name": "Pale Pink",
+        "hex": "#ffc8fa",
+        "description": "Very pale pink",
+        "usage": "Delicate text"
+      },
+      "166": {
+        "name": "Gray Beige",
+        "hex": "#e8e7d2",
+        "description": "Grayish beige",
+        "usage": "Neutral text"
+      },
+      "167": {
+        "name": "Red-Pink",
+        "hex": "#ff6096",
+        "description": "Rosy red",
+        "usage": "Errors, weapon skills"
+      },
+      "170": {
+        "name": "Pale Yellow",
+        "hex": "#ffffd2",
+        "description": "Very pale yellow",
+        "usage": "Yellow background"
+      },
+      "201": {
+        "name": "Bright Violet",
+        "hex": "#b65eff",
+        "description": "Brilliant violet",
+        "usage": "Special abilities"
+      },
+      "205": {
+        "name": "Bright Violet (alt)",
+        "hex": "#b65eff",
+        "description": "Alternative brilliant violet",
+        "usage": "Alternative special abilities"
+      },
+      "206": {
+        "name": "Cream",
+        "hex": "#ffffeb",
+        "description": "Creamy white",
+        "usage": "Light background"
+      },
+      "207": {
+        "name": "Light Blue",
+        "hex": "#99b5ff",
+        "description": "Pale blue",
+        "usage": "Blue information"
+      },
+      "211": {
+        "name": "Cream Yellow",
+        "hex": "#ffffd0",
+        "description": "Creamy yellow",
+        "usage": "Pale yellow background"
+      }
+    },
+    "action_types": {
+      "magic": {
+        "suggested_colors": [
+          "005",
+          "056",
+          "006"
+        ],
+        "description": "For magic spells - bright cyan (#63ffff) like FFXI"
+      },
+      "weaponskill": {
+        "suggested_colors": [
+          "167",
+          "028"
+        ],
+        "description": "For weapon skills - red-pink (#ff6096)"
+      },
+      "jobability": {
+        "suggested_colors": [
+          "050",
+          "057"
+        ],
+        "description": "For job abilities - bright yellow (#ffff77) like FFXI"
+      },
+      "equipment": {
+        "suggested_colors": [
+          "160",
+          "166",
+          "001"
+        ],
+        "description": "For equipment - gray-violet or beige"
+      },
+      "success": {
+        "suggested_colors": [
+          "030"
+        ],
+        "description": "For success - bright green (#25ff59)"
+      },
+      "error": {
+        "suggested_colors": [
+          "167",
+          "028"
+        ],
+        "description": "For errors - red-pink (#ff6096)"
+      },
+      "warning": {
+        "suggested_colors": [
+          "057"
+        ],
+        "description": "For warnings - bright orange (#ff7f5a)"
+      },
+      "info": {
+        "suggested_colors": [
+          "001",
+          "037",
+          "166"
+        ],
+        "description": "For information - white or beige"
+      }
+    },
+    "performance_scale": {
+      "excellent": "030",
+      "good": "050",
+      "average": "057",
+      "poor": "167",
+      "bad": "028"
+    }
+  }
+}
