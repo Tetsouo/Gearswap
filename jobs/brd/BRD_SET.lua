@@ -351,17 +351,17 @@ end
 
 sets.idle = {
     head = "Fili Calot +3",
-    neck = "Wiglen Gorget",
-    ear1 = "Infused Earring",
-    ear2 = "Odnowa Earring +1",
     body = "Fili Hongreline +3",
     hands = "Fili Manchettes +3",
-    ring1 = StikiRing1,
-    ring2 = "Defending Ring",
-    back = "Moonlight Cape",
-    waist = "Flume Belt",
     legs = "Fili Rhingrave +3",
-    feet = "Fili Cothurnes +3"
+    feet = "Fili Cothurnes +3",
+    neck = "Lissome Necklace",
+    waist = "Null Belt",
+    left_ear = "Infused Earring",
+    right_ear = "Eabani Earring",
+    left_ring = MoonlightRing1,
+    right_ring = MoonlightRing2,
+    back = Intarabus.stp
 }
 
 --- Town idle set for cities (excluded in Dynamis)
@@ -525,17 +525,17 @@ sets.defense = {
 --- Magical damage taken reduction set (same as idle)
 sets.defense.MDT = {
     head = "Fili Calot +3",
-    neck = "Wiglen Gorget",
-    ear1 = "Infused Earring",
-    ear2 = "Odnowa Earring +1",
     body = "Fili Hongreline +3",
     hands = "Fili Manchettes +3",
-    ring1 = StikiRing1,
-    ring2 = "Defending Ring",
-    back = "Moonlight Cape",
-    waist = "Flume Belt",
     legs = "Fili Rhingrave +3",
-    feet = "Fili Cothurnes +3"
+    feet = "Fili Cothurnes +3",
+    neck = "Lissome Necklace",
+    waist = "Null Belt",
+    left_ear = "Infused Earring",
+    right_ear = "Eabani Earring",
+    left_ring = MoonlightRing1,
+    right_ring = MoonlightRing2,
+    back = Intarabus.stp
 }
 
 ---============================================================================
