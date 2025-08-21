@@ -2,7 +2,8 @@
 
 ## Project Creator & Main Developer
 
-**Tetsouo**
+### Tetsouo
+
 - GitHub: [@Tetsouo](https://github.com/Tetsouo)
 - Role: Creator, Lead Developer, Maintainer
 - Contributions: Complete system architecture, all job implementations, performance optimization
