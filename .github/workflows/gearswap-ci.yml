@@ -240,7 +240,7 @@ jobs:
             echo "emoji=❌" >> $GITHUB_OUTPUT
         fi
     - name: "\U0001F4AC Discord Notification (Optional)"
-      if: env.DISCORD_WEBHOOK != ''
+      if: ${{ secrets.DISCORD_WEBHOOK != '' }}
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       run: "status=\"${{ steps.results.outputs.status }}\"\nemoji=\"${{ steps.results.outputs.emoji }}\"\n\ncurl -H \"Content-Type: application/json\" \\\n     -d \"{\n        \\\"embeds\\\": [{\n            \\\"title\\\": \\\"$emoji GearSwap CI/CD - $status\\\",\n            \\\"description\\\": \\\"Pipeline completed for commit \\`${{ github.sha }}\\`\\\",\n            \\\"fields\\\": [\n                {\\\"name\\\": \\\"Validate\\\", \\\"value\\\": \\\"${{ needs.validate.result }}\\\", \\\"inline\\\": true},\n                {\\\"name\\\": \\\"Tests\\\", \\\"value\\\": \\\"${{ needs.tests.result }}\\\", \\\"inline\\\": true},\n                {\\\"name\\\": \\\"Build\\\", \\\"value\\\": \\\"${{ needs.build.result }}\\\", \\\"inline\\\": true}\n            ],\n            \\\"color\\\": $([ \\\"$status\\\" = \\\"success\\\" ] && echo \\\"3066993\\\" || echo \\\"15158332\\\"),\n            \\\"url\\\": \\\"https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\\\"\n        }]\n     }\" \\\n     \"$DISCORD_WEBHOOK\" || echo \"⚠️ Discord notification failed\"\n     \n"
