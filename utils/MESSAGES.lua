@@ -120,7 +120,7 @@ MessageRouter.incapacitated_message = create_router_function(get_core_module, 'i
 MessageRouter.spell_interrupted_message = create_router_function(get_core_module, 'spell_interrupted_message')
 
 -- Legacy support
-MessageRouter.create_formatted_message = create_router_function(get_core_module, 'create_formatted_message')
+MessageRouter.create_formatted_message = create_router_function(get_formatting_module, 'create_formatted_message')
 
 -- ===========================================================================================================
 --                                     Formatting Functions

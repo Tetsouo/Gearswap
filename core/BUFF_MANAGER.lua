@@ -61,7 +61,7 @@ function BuffManagerUtils.handle_doom_buff(gain)
         -- Lock critical slots
         disable('neck', 'ring1', 'waist')
         -- Notifications
-        add_to_chat(123, MessageUtils.create_formatted_message('WARNING:', 'Doom', nil, 'is active!', true, nil))
+        MessageUtils.universal_message(nil, 'error', 'WARNING: Doom is active!', nil, nil, nil, 201)
         send_command('input /p [DOOM] <call21>')
         log.warn("Doom buff gained - critical slots locked")
     else
@@ -69,7 +69,7 @@ function BuffManagerUtils.handle_doom_buff(gain)
         enable('neck', 'ring1', 'waist')
         -- Update equipment
         send_command('gs c update')
-        add_to_chat(123, MessageUtils.create_formatted_message(nil, 'Doom', nil, 'is no longer active!', true, nil))
+        MessageUtils.universal_message(nil, 'info', 'Doom is no longer active!', nil, nil, nil, 069)
         send_command('input /p [Doom] Off !')
         log.info("Doom buff lost - equipment updated")
     end

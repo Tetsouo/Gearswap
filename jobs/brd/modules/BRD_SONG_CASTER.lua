@@ -425,9 +425,13 @@ function BRDSongCaster.cast_dummy_songs()
 
     local dummy_list = {}
     for i = 1, total_songs do
-        table.insert(dummy_list, dummy_songs[i])
+        table.insert(dummy_list, {
+            name = dummy_songs[i],
+            active = false,
+            recast = 0
+        })
     end
-    MessageUtils.brd_song_list_colored(dummy_list, "Dummy Rotation", MessageUtils.colors.CYAN)
+    MessageUtils.brd_song_list_message(dummy_list, "Dummy Rotation")
 end
 
 --- Cast threnody of the current element state

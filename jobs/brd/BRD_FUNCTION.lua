@@ -185,13 +185,20 @@ function refine_brd_songs(spell, eventArgs)
 
     -- If we found a replacement, use it
     if newSpell and newSpell ~= spell.english then
+        -- Validate spell name for command injection prevention
+        local safe_spell = newSpell:match("^[%w%s%-':.]+$") and newSpell or spell.english
+        if safe_spell ~= newSpell then
+            log.warning("[BRD] Invalid spell name detected, using original: %s", spell.english)
+            safe_spell = spell.english
+        end
+        
         -- Custom message with both spell names in cyan
         local cyan_code = string.char(0x1F, 005)
         local white_code = string.char(0x1F, 001)  
-        local formatted_message = cyan_code .. spell.english .. white_code .. " -> " .. cyan_code .. newSpell .. white_code
+        local formatted_message = cyan_code .. spell.english .. white_code .. " -> " .. cyan_code .. safe_spell .. white_code
         MessageUtils.brd_message("Song Refine", formatted_message, "Auto upgrade")
         send_command('wait ' ..
-            BRD_CONFIG.TIMINGS.fast_cast_delay .. '; input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
+            BRD_CONFIG.TIMINGS.fast_cast_delay .. '; input /ma "' .. safe_spell .. '" ' .. tostring(spell.target.raw))
         eventArgs.cancel = true
     elseif recast_time and recast_time > 0 then
         -- Show recast time if no replacement found
