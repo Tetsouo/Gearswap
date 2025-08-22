@@ -134,10 +134,10 @@ function job_setup()
     -- BLM Keybindings F1-F7 dans l'ordre demandé
     -- Use coroutine.schedule to ensure all dependencies are loaded before binding
     coroutine.schedule(function()
-        send_command('bind F1 gs c cycle MainLightSpell')
-        send_command('bind F2 gs c cycle MainDarkSpell')
-        send_command('bind F3 gs c cycle SubLightSpell')
-        send_command('bind F4 gs c cycle SubDarkSpell')
+        send_command('bind F1 gs c cyclemainlight')
+        send_command('bind F2 gs c cyclemaindark')
+        send_command('bind F3 gs c cyclesublight')
+        send_command('bind F4 gs c cyclesubdark')
         send_command('bind F5 gs c cycle Aja')
         send_command('bind F6 gs c cycle TierSpell')  -- TierSpell sur F6
         send_command('bind F7 gs c cycle Storm')
@@ -190,24 +190,35 @@ end
 --- Synchronize main states with alt player states when they change
 --- This ensures alt player spells match main spell selections
 function job_state_change(stateField, newValue, oldValue)
+    -- Debug to see if this is called
+    windower.add_to_chat(123, '[DEBUG] job_state_change: ' .. (stateField or 'nil') .. ' -> ' .. (newValue or 'nil'))
+    
     -- Synchronize MainLightSpell with altPlayerLight
     if stateField == 'MainLightSpell' then
         state.altPlayerLight:set(newValue)
+        -- Use the new BLM element message function (like PLD uses pld_rune_message)
+        MessageUtils.blm_element_message('MainLight', newValue)
         -- MessageUtils now available globally via shared.lua
         MessageUtils.blm_sync_message('light', newValue)
     -- Synchronize MainDarkSpell with altPlayerDark  
     elseif stateField == 'MainDarkSpell' then
         state.altPlayerDark:set(newValue)
+        -- Use the new BLM element message function
+        MessageUtils.blm_element_message('MainDark', newValue)
         -- MessageUtils now available globally via shared.lua
         MessageUtils.blm_sync_message('dark', newValue)
     -- Synchronize SubLightSpell with altPlayerLight
     elseif stateField == 'SubLightSpell' then
         state.altPlayerLight:set(newValue)
+        -- Use the new BLM element message function
+        MessageUtils.blm_element_message('SubLight', newValue)
         -- MessageUtils now available globally via shared.lua
         MessageUtils.blm_sync_message('light', newValue)
     -- Synchronize SubDarkSpell with altPlayerDark
     elseif stateField == 'SubDarkSpell' then
         state.altPlayerDark:set(newValue)
+        -- Use the new BLM element message function
+        MessageUtils.blm_element_message('SubDark', newValue)
         -- MessageUtils now available globally via shared.lua
         MessageUtils.blm_sync_message('dark', newValue)
     -- Synchronize TierSpell with altPlayerTier
@@ -382,6 +393,53 @@ end
 --- @usage //gs c test (runs unit tests)
 --- @usage //gs c buffself (casts self buffs)
 function job_self_command(cmdParams, eventArgs)
+    -- Custom BLM element cycling commands (like PLD's cyclerune)
+    local command = cmdParams[1] and cmdParams[1]:lower() or ""
+    
+    -- Helper function for colored element messages
+    local function show_element_message(state_type, element_name)
+        local element_colors = {
+            Fire = 057,      -- Orange
+            Thunder = 012,   -- Yellow  
+            Aero = 006,      -- Cyan
+            Stone = 010,     -- Brown
+            Water = 056,     -- Light Blue
+            Blizzard = 005,  -- Blue
+        }
+        local color_code = element_colors[element_name] or 001
+        local gray = string.char(0x1F, 160)
+        local job_color = string.char(0x1F, 207)
+        local element_color = string.char(0x1F, color_code)
+        
+        local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                       gray .. 'Current ' .. state_type .. ': ' .. 
+                       element_color .. element_name .. gray
+        windower.add_to_chat(001, message)
+    end
+    
+    -- Custom cycle commands like PLD's cyclerune
+    if command == 'cyclemainlight' then
+        state.MainLightSpell:cycle()
+        show_element_message('MainLight', state.MainLightSpell.value)
+        eventArgs.handled = true
+        return
+    elseif command == 'cyclemaindark' then
+        state.MainDarkSpell:cycle()
+        show_element_message('MainDark', state.MainDarkSpell.value)
+        eventArgs.handled = true
+        return
+    elseif command == 'cyclesublight' then
+        state.SubLightSpell:cycle()
+        show_element_message('SubLight', state.SubLightSpell.value)
+        eventArgs.handled = true
+        return
+    elseif command == 'cyclesubdark' then
+        state.SubDarkSpell:cycle()
+        show_element_message('SubDark', state.SubDarkSpell.value)
+        eventArgs.handled = true
+        return
+    end
+    
     -- First, try universal commands (equiptest, validate_all, etc.)
     local success_UniversalCommands, UniversalCommands = pcall(require, 'core/UNIVERSAL_COMMANDS')
     if success_UniversalCommands and UniversalCommands then

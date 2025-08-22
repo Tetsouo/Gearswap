@@ -350,10 +350,12 @@ BRD_CONFIG.SONG_REFINE = {
     tiers = {
         -- Lullaby tiers
         ['Horde Lullaby'] = {
-            ['II'] = { replace = '', name = 'Horde Lullaby' }
+            [''] = { replace = 'II', name = 'Horde Lullaby II' }, -- Escalate to II if I not available
+            ['II'] = nil -- No further escalation for Horde Lullaby II
         },
         ['Foe Lullaby'] = {
-            ['II'] = { replace = '', name = 'Foe Lullaby' }
+            [''] = { replace = 'II', name = 'Foe Lullaby II' }, -- Escalate to II if I not available  
+            ['II'] = nil -- No further escalation for Foe Lullaby II
         },
 
         -- Threnody tiers (all elements)

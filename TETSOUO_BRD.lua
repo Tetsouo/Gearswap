@@ -281,7 +281,7 @@ function job_self_command(cmdParams, eventArgs)
     end
     
     if command == 'lullaby' then
-        send_command('input /ma "Horde Lullaby II" <stnpc>')
+        send_command('input /ma "Horde Lullaby" <stnpc>')
         eventArgs.handled = true
         return
     elseif command == 'lullaby2' or command == 'foe' then

@@ -74,10 +74,10 @@ Intarabus = {
 }
 
 -- Ring Sets with Wardrobe Specification (for identical rings)
-StikiRing1 = EquipmentFactory.create('Stikini Ring +1', nil, 'wardrobe 6')
-StikiRing2 = EquipmentFactory.create('Stikini Ring +1', nil, 'wardrobe 7')
-MoonlightRing1 = EquipmentFactory.create('Moonlight Ring', nil, 'wardrobe 2')
-MoonlightRing2 = EquipmentFactory.create('Moonlight Ring', nil, 'wardrobe 4')
+StikiRing1 = success_EquipmentFactory and EquipmentFactory.create('Stikini Ring +1', nil, 'wardrobe 6') or { name = 'Stikini Ring +1', bag = 'wardrobe 6' }
+StikiRing2 = success_EquipmentFactory and EquipmentFactory.create('Stikini Ring +1', nil, 'wardrobe 7') or { name = 'Stikini Ring +1', bag = 'wardrobe 7' }
+MoonlightRing1 = success_EquipmentFactory and EquipmentFactory.create('Moonlight Ring', nil, 'wardrobe 2') or { name = 'Moonlight Ring', bag = 'wardrobe 2' }
+MoonlightRing2 = success_EquipmentFactory and EquipmentFactory.create('Moonlight Ring', nil, 'wardrobe 4') or { name = 'Moonlight Ring', bag = 'wardrobe 4' }
 
 ---============================================================================
 --- PRECAST SETS - Song Preparation and Fast Cast

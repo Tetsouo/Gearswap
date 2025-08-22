@@ -178,6 +178,7 @@ MessageRouter.blm_spell_cooldown_message = create_router_function(get_jobs_modul
 MessageRouter.blm_buff_status_message = create_router_function(get_jobs_module, 'blm_buff_status_message')
 MessageRouter.blm_sync_message = create_router_function(get_jobs_module, 'blm_sync_message')
 MessageRouter.blm_alt_cast_message = create_router_function(get_jobs_module, 'blm_alt_cast_message')
+MessageRouter.blm_element_message = create_router_function(get_jobs_module, 'blm_element_message')
 
 -- BST functions
 MessageRouter.bst_resource_error_message = create_router_function(get_jobs_module, 'bst_resource_error_message')
@@ -304,6 +305,7 @@ _G.blm_resource_error_message = MessageRouter.blm_resource_error_message
 _G.blm_spell_cooldown_message = MessageRouter.blm_spell_cooldown_message
 _G.blm_sync_message = MessageRouter.blm_sync_message
 _G.blm_alt_cast_message = MessageRouter.blm_alt_cast_message
+_G.blm_element_message = MessageRouter.blm_element_message
 _G.bst_resource_error_message = MessageRouter.bst_resource_error_message
 _G.bst_ecosystem_message = MessageRouter.bst_ecosystem_message
 _G.bst_pet_selection_message = MessageRouter.bst_pet_selection_message

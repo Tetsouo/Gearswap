@@ -563,7 +563,25 @@ function MessageJobs.pld_rune_message(action, rune_name)
     if action == 'error_not_run' then
         MessageCore.error("PLD", "You are not sub RUN")
     elseif action == 'current_rune' and rune_name then
-        MessageCore.info("PLD", "Current Rune: " .. rune_name)
+        -- Format rune name with color based on element
+        local rune_colors = {
+            Ignis = 167,   -- Red for Fire
+            Gelus = 207,   -- Blue for Ice
+            Flabra = 158,  -- Green for Wind
+            Tellus = 057,  -- Brown/Orange for Earth
+            Sulpor = 008,  -- Purple/Violet for Lightning
+            Unda = 039,    -- Light Blue for Water
+            Lux = 001,     -- White for Light
+            Tenebrae = 008 -- Purple/Dark for Dark
+        }
+        
+        local color_code = rune_colors[rune_name] or 001 -- Default to white if not found
+        local gray_code = string.char(0x1F, 160) -- Light gray/violet for "Current Rune:"
+        local colored_rune = string.char(0x1F, color_code) .. rune_name .. string.char(0x1F, 001)
+        
+        -- Create custom formatted message with colored "Current Rune:" text
+        local formatted_msg = gray_code .. "Current Rune: " .. colored_rune
+        MessageCore.info("PLD", formatted_msg)
     end
 end
 
@@ -616,14 +634,69 @@ end
 -- @param tier (string): Tier for cast actions
 function MessageJobs.blm_alt_cast_message(action, spell_name, tier)
     if action == 'cast_light' or action == 'cast_dark' then
-        local cast_text = "Alt casting: " .. spell_name .. " " .. tier
-        MessageCore.universal_message("BLM", "spell", cast_text, nil, nil, nil,
-            MessageFormatting.STANDARD_COLORS.BLM_SPELL)
+        -- Element color codes
+        local element_colors = {
+            FIRE = 057,      -- Orange
+            THUNDER = 012,   -- Yellow
+            AERO = 006,      -- Cyan
+            STONE = 050,     -- Yellow/Gold
+            WATER = 056,     -- Light Blue
+            BLIZZARD = 005,  -- Blue
+            ICE = 005,       -- Blue
+            LIGHT = 001,     -- White
+            DARK = 201       -- Purple
+        }
+        
+        -- Get color for element (uppercase for matching)
+        local element_upper = spell_name:upper()
+        local element_color_code = element_colors[element_upper] or 001
+        
+        -- Create colored message manually like other BLM messages
+        local gray = string.char(0x1F, 160)
+        local job_color = string.char(0x1F, 207)
+        local spell_color = string.char(0x1F, 056) -- Cyan for "spell:"
+        local element_color = string.char(0x1F, element_color_code)
+        local tier_color = string.char(0x1F, 050) -- Yellow for tier
+        
+        local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                       spell_color .. 'spell' .. gray .. ': Alt casting: ' ..
+                       element_color .. spell_name .. gray .. ' ' ..
+                       tier_color .. tier .. gray
+        windower.add_to_chat(001, message)
     elseif action == 'error_light' then
         MessageCore.error("BLM", "Alt light states not available")
     elseif action == 'error_dark' then
         MessageCore.error("BLM", "Alt dark states not available")
     end
+end
+
+--- Creates BLM element state message with colored element names (matching PLD rune format)
+-- @param state_type (string): State type ('MainLight', 'SubLight', 'MainDark', 'SubDark')
+-- @param element_name (string): Name of the element
+function MessageJobs.blm_element_message(state_type, element_name)
+    if not state_type or not element_name then return end
+    
+    -- Element color codes matching user specifications
+    local element_colors = {
+        Fire = 057,      -- Orange
+        Ice = 005,       -- Blue
+        Thunder = 012,   -- Yellow  
+        Aero = 006,      -- Cyan
+        Stone = 010,     -- Brown
+        Earth = 010,     -- Brown (alias for Stone)
+        Water = 056,     -- Light Blue
+        Blizzard = 005,  -- Blue (same as Ice)
+        Light = 001,     -- White
+        Dark = 201       -- Purple
+    }
+    
+    local color_code = element_colors[element_name] or 001 -- Default to white if not found
+    local gray_code = string.char(0x1F, 160) -- Light gray for "Current:"
+    local colored_element = string.char(0x1F, color_code) .. element_name .. string.char(0x1F, 001)
+    
+    -- Create custom formatted message matching PLD rune format
+    local formatted_msg = gray_code .. "Current " .. state_type .. ": " .. colored_element
+    MessageCore.info("BLM", formatted_msg)
 end
 
 -- ===========================================================================================================
@@ -862,6 +935,7 @@ _G.blm_resource_error_message = MessageJobs.blm_resource_error_message
 _G.blm_spell_cooldown_message = MessageJobs.blm_spell_cooldown_message
 _G.blm_sync_message = MessageJobs.blm_sync_message
 _G.blm_alt_cast_message = MessageJobs.blm_alt_cast_message
+_G.blm_element_message = MessageJobs.blm_element_message
 _G.bst_resource_error_message = MessageJobs.bst_resource_error_message
 _G.bst_ecosystem_message = MessageJobs.bst_ecosystem_message
 _G.bst_pet_selection_message = MessageJobs.bst_pet_selection_message

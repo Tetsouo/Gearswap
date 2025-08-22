@@ -721,6 +721,145 @@ function job_self_command(cmdParams, eventArgs, spell)
     -- Update the altState object
     update_altState()
     local command = cmdParams[1] and cmdParams[1]:lower() or ""
+    
+    -- Helper function for colored element messages (like PLD's rune messages)
+    local function show_element_message(state_type, element_name)
+        local element_colors = {
+            Fire = 057,      -- Orange
+            Thunder = 012,   -- Yellow  
+            Aero = 006,      -- Cyan
+            Stone = 050,     -- Yellow/Gold (changed from 010)
+            Earth = 050,     -- Yellow/Gold
+            Water = 056,     -- Light Blue
+            Blizzard = 005,  -- Blue
+            Ice = 005,       -- Blue
+            Light = 001,     -- White
+            Dark = 201,      -- Purple
+            -- Aja spells
+            Firaja = 057,    -- Orange
+            Thundaja = 012,  -- Yellow
+            Aeroja = 006,    -- Cyan
+            Stoneja = 050,   -- Yellow/Gold
+            Waterja = 056,   -- Light Blue
+            Blizzaja = 005,  -- Blue
+            -- -ra spells for alt player
+            Fira = 057,      -- Orange
+            Thundara = 012,  -- Yellow
+            Aera = 006,      -- Cyan
+            Stonera = 050,   -- Yellow/Gold
+            Watera = 056,    -- Light Blue
+            Blizzara = 005,  -- Blue
+        }
+        local color_code = element_colors[element_name] or 001
+        local gray = string.char(0x1F, 160)
+        local job_color = string.char(0x1F, 207)
+        local element_color = string.char(0x1F, color_code)
+        
+        local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                       gray .. 'Current ' .. state_type .. ': ' .. 
+                       element_color .. element_name .. gray
+        windower.add_to_chat(001, message)
+    end
+    
+    -- Custom cycle commands like PLD's cyclerune
+    if command == 'cyclemainlight' then
+        state.MainLightSpell:cycle()
+        show_element_message('MainLight', state.MainLightSpell.value)
+        eventArgs.handled = true
+        return
+    elseif command == 'cyclemaindark' then
+        state.MainDarkSpell:cycle()
+        show_element_message('MainDark', state.MainDarkSpell.value)
+        eventArgs.handled = true
+        return
+    elseif command == 'cyclesublight' then
+        state.SubLightSpell:cycle()
+        show_element_message('SubLight', state.SubLightSpell.value)
+        eventArgs.handled = true
+        return
+    elseif command == 'cyclesubdark' then
+        state.SubDarkSpell:cycle()
+        show_element_message('SubDark', state.SubDarkSpell.value)
+        eventArgs.handled = true
+        return
+    end
+    
+    -- Handle standard cycle commands with colored messages
+    if command == 'cycle' and cmdParams[2] then
+        local stateName = cmdParams[2]
+        
+        -- Aja cycle
+        if stateName == 'Aja' then
+            state.Aja:cycle()
+            show_element_message('Aja', state.Aja.value)
+            eventArgs.handled = true
+            return
+        -- Alt player cycles
+        elseif stateName == 'altPlayerLight' then
+            state.altPlayerLight:cycle()
+            show_element_message('AltLight', state.altPlayerLight.value)
+            eventArgs.handled = true
+            return
+        elseif stateName == 'altPlayerDark' then
+            state.altPlayerDark:cycle()
+            show_element_message('AltDark', state.altPlayerDark.value)
+            eventArgs.handled = true
+            return
+        elseif stateName == 'altPlayera' then
+            state.altPlayera:cycle()
+            show_element_message('AltAra', state.altPlayera.value)
+            eventArgs.handled = true
+            return
+        elseif stateName == 'altPlayerTier' then
+            state.altPlayerTier:cycle()
+            -- No color needed for tier, just show it normally
+            local gray = string.char(0x1F, 160)
+            local job_color = string.char(0x1F, 207)
+            local tier_color = string.char(0x1F, 050) -- Yellow for tier
+            local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                           gray .. 'Current AltTier: ' .. 
+                           tier_color .. state.altPlayerTier.value .. gray
+            windower.add_to_chat(001, message)
+            eventArgs.handled = true
+            return
+        elseif stateName == 'altPlayerGeo' then
+            state.altPlayerGeo:cycle()
+            -- Geo spells in green
+            local gray = string.char(0x1F, 160)
+            local job_color = string.char(0x1F, 207)
+            local geo_color = string.char(0x1F, 158) -- Green for geo
+            local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                           gray .. 'Current AltGeo: ' .. 
+                           geo_color .. state.altPlayerGeo.value .. gray
+            windower.add_to_chat(001, message)
+            eventArgs.handled = true
+            return
+        elseif stateName == 'altPlayerIndi' then
+            state.altPlayerIndi:cycle()
+            -- Indi spells in cyan
+            local gray = string.char(0x1F, 160)
+            local job_color = string.char(0x1F, 207)
+            local indi_color = string.char(0x1F, 056) -- Cyan for indi
+            local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                           gray .. 'Current AltIndi: ' .. 
+                           indi_color .. state.altPlayerIndi.value .. gray
+            windower.add_to_chat(001, message)
+            eventArgs.handled = true
+            return
+        elseif stateName == 'altPlayerEntrust' then
+            state.altPlayerEntrust:cycle()
+            -- Entrust spells in purple
+            local gray = string.char(0x1F, 160)
+            local job_color = string.char(0x1F, 207)
+            local entrust_color = string.char(0x1F, 201) -- Purple for entrust
+            local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
+                           gray .. 'Current AltEntrust: ' .. 
+                           entrust_color .. state.altPlayerEntrust.value .. gray
+            windower.add_to_chat(001, message)
+            eventArgs.handled = true
+            return
+        end
+    end
 
     -- Let standard GearSwap handle cycle commands for proper state management
     if command == 'cycle' then

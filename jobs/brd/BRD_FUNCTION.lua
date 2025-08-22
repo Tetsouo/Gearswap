@@ -99,10 +99,10 @@ function refine_brd_songs(spell, eventArgs)
     -- Special handling for compound names
     if spell.name:find('Horde Lullaby') then
         spellCategory = 'Horde Lullaby'
-        spellLevel = spell.name:match('II') or ''
+        spellLevel = spell.name:match('II') and 'II' or ''
     elseif spell.name:find('Foe Lullaby') then
         spellCategory = 'Foe Lullaby'
-        spellLevel = spell.name:match('II') or ''
+        spellLevel = spell.name:match('II') and 'II' or ''
     elseif spell.name:find('Carnage Elegy') then
         spellCategory = 'Carnage Elegy'
         spellLevel = ''
@@ -185,7 +185,11 @@ function refine_brd_songs(spell, eventArgs)
 
     -- If we found a replacement, use it
     if newSpell and newSpell ~= spell.english then
-        MessageUtils.brd_song_refine(spell.english, newSpell)
+        -- Custom message with both spell names in cyan
+        local cyan_code = string.char(0x1F, 005)
+        local white_code = string.char(0x1F, 001)  
+        local formatted_message = cyan_code .. spell.english .. white_code .. " -> " .. cyan_code .. newSpell .. white_code
+        MessageUtils.brd_message("Song Refine", formatted_message, "Auto upgrade")
         send_command('wait ' ..
             BRD_CONFIG.TIMINGS.fast_cast_delay .. '; input /ma "' .. newSpell .. '" ' .. tostring(spell.target.raw))
         eventArgs.cancel = true
