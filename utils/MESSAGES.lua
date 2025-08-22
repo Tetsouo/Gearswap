@@ -35,7 +35,12 @@ local function load_message_module(module_name)
         return module_cache[module_name]
     end
     
-    local module_path = 'messages/MESSAGE_' .. module_name:upper()
+    local module_path
+    if module_name == 'jobs' then
+        module_path = 'messages/MESSAGE_JOBS_LOADER'  -- Use new modular loader
+    else
+        module_path = 'messages/MESSAGE_' .. module_name:upper()
+    end
     local success, module = pcall(require, module_path)
     
     if success then
