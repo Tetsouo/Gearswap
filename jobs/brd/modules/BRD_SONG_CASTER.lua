@@ -434,6 +434,266 @@ function BRDSongCaster.cast_dummy_songs()
     MessageUtils.brd_song_list_message(dummy_list, "Dummy Rotation")
 end
 
+---============================================================================
+--- INDIVIDUAL SONG SLOT CASTING
+---============================================================================
+
+--- Cast a single song from the current pack based on slot number
+--- @param slot_number number The slot to cast (1-5)
+function BRDSongCaster.cast_single_song(slot_number)
+    -- Validate slot number
+    if not slot_number or slot_number < 1 or slot_number > 5 then
+        MessageUtils.error("BRD", "Invalid song slot: " .. tostring(slot_number))
+        return
+    end
+    
+    -- Get current pack
+    local pack_name = (state and state.BRDRotation and state.BRDRotation.value) or 'Dirge'
+    local pack = BRD_CONFIG.SONG_PACKS[pack_name]
+    
+    if not pack or not pack.songs then
+        MessageUtils.error("BRD", "Pack not found: " .. pack_name)
+        return
+    end
+    
+    -- Get the song for this slot
+    local song = pack.songs[slot_number]
+    
+    -- Special handling for slot 5 (Victory March replacement)
+    if slot_number == 5 then
+        -- Check if Haste is active and get replacement
+        if buffactive['Haste'] or buffactive['Haste II'] then
+            local replacement = state.VictoryMarchReplace and state.VictoryMarchReplace.value
+            
+            -- Map replacement to actual song name
+            local replacement_songs = {
+                Madrigal = 'Blade Madrigal',
+                Minne = 'Knight\'s Minne V',
+                Scherzo = 'Sentinel\'s Scherzo'
+            }
+            
+            if replacement and replacement_songs[replacement] then
+                -- Check if replacement would be duplicate of slot 4
+                if pack.songs[4] == replacement_songs[replacement] then
+                    song = 'Adventurer\'s Dirge'  -- Use Dirge if duplicate
+                else
+                    song = replacement_songs[replacement]
+                end
+            end
+        end
+    end
+    
+    if not song then
+        MessageUtils.error("BRD", "No song in slot " .. slot_number)
+        return
+    end
+    
+    -- INTELLIGENT DUMMY HANDLING for slots 3 and 4
+    if slot_number == 3 or slot_number == 4 then
+        local active_songs
+        local target_info = ""
+        
+        -- Check if we're targeting someone else - check THEIR songs
+        if player.target and player.target.id ~= player.id then
+            local target_song_count, found = BRDSongCounter.count_target_songs()
+            
+            if target_song_count == -1 then
+                -- Can't check buffs (windower limitation), skip the song count check for other players
+                MessageUtils.brd_message("Info", "Can't verify target buffs", "Casting anyway")
+                -- Skip the dummy handling entirely - just cast the song directly
+            elseif not found then
+                MessageUtils.error("BRD", "Unable to target: " .. (player.target and player.target.name or "Unknown"))
+                return
+            else
+                active_songs = target_song_count
+                target_info = " on " .. (player.target.name or "target")
+                
+                -- Normal check for when we can see buffs
+                if active_songs < 2 then
+                    MessageUtils.error("BRD", "Target needs 2 songs before slot " .. slot_number)
+                    MessageUtils.brd_message("Tip", "Cast song1 and song2" .. target_info .. " first", "Then use song" .. slot_number)
+                    return
+                end
+            end
+        else
+            -- Targeting self or no target - check MY songs (this works normally)
+            active_songs = BRDSongCounter.count_active_songs()
+            target_info = " on self"
+            
+            -- If we have at least 2 songs but no dummies, cast dummies first
+            if active_songs >= 2 then
+                -- For self, check if we already have dummy songs active
+                local has_dummies = buffactive['Gold Capriccio'] or buffactive['Goblin Gavotte'] or 
+                                   buffactive['Herb Pastoral'] or buffactive['Scop\'s Operetta']
+                
+                if not has_dummies then
+                    -- Cast 2 dummy songs first (only for self)
+                    MessageUtils.brd_message("Auto-Dummy", "Preparing slots", "For song " .. slot_number .. target_info)
+                    
+                    local dummy_songs = BRD_CONFIG.DUMMY_SONGS.standard
+                    local song_delay = BRDUtils.get_song_delay()
+                    
+                    -- Set to Dummy mode
+                    BRDUtils.set_song_mode('Dummy')
+                    
+                    -- Cast 2 dummies
+                    send_command('input /ma "' .. dummy_songs[1] .. '" <me>')
+                    send_command('wait ' .. song_delay .. '; input /ma "' .. dummy_songs[2] .. '" <me>')
+                    
+                    -- Then cast the real song after dummies
+                    local total_delay = song_delay * 2 + 1
+                    send_command('wait ' .. total_delay .. '; gs c song' .. slot_number .. '_real')
+                    
+                    return -- Exit here, will re-enter via song3_real or song4_real
+                end
+            elseif active_songs < 2 then
+                MessageUtils.error("BRD", "Need 2 songs active before slot " .. slot_number)
+                MessageUtils.brd_message("Tip", "Cast song1 and song2" .. target_info .. " first", "Then use song" .. slot_number)
+                return
+            end
+        end
+    end
+    
+    -- Set appropriate mode for real songs
+    BRDUtils.set_song_mode('Party')
+    
+    -- TARGET DETECTION: Check if targeting self or others with song counting
+    local target_cmd = "<stnpc>"  -- Default to sub-target NPC
+    local needs_pianissimo = false
+    
+    -- Check current target
+    if player.target then
+        if player.target.id == player.id then
+            -- Targeting self, cast on self
+            target_cmd = "<me>"
+            MessageUtils.brd_message("Self-target", song, "Direct cast")
+        else
+            -- Targeting someone else, need Pianissimo
+            target_cmd = "<stpc>"  -- Sub-target PC (the person you're targeting)
+            needs_pianissimo = true
+            
+            -- Count songs on target if they're in party
+            local target_song_count, target_name = BRDSongCounter.get_target_song_count()
+            if target_song_count > 0 then
+                MessageUtils.brd_message("Pianissimo", song, target_name .. " (" .. target_song_count .. " songs)")
+            else
+                MessageUtils.brd_message("Pianissimo", song, target_name)
+            end
+        end
+    else
+        -- No target, use stnpc (will prompt for target)
+        target_cmd = "<stnpc>"
+    end
+    
+    -- Special handling for slot 1 (Honor March with Marcato)
+    if slot_number == 1 and song == 'Honor March' then
+        -- Check if Marcato is available and use it
+        if BRDAbilities.is_marcato_available() then
+            MessageUtils.brd_message("Marcato", "Honor March", "Enhanced duration")
+            
+            if needs_pianissimo then
+                send_command('input /ja "Pianissimo" <me>')
+                send_command('wait 1.5; input /ja "Marcato" <me>')
+                send_command('wait 3; input /ma "' .. song .. '" ' .. target_cmd)
+            else
+                send_command('input /ja "Marcato" <me>')
+                send_command('wait 1.5; input /ma "' .. song .. '" ' .. target_cmd)
+            end
+        else
+            if needs_pianissimo then
+                send_command('input /ja "Pianissimo" <me>')
+                send_command('wait 1.5; input /ma "' .. song .. '" ' .. target_cmd)
+            else
+                MessageUtils.brd_message("Song " .. slot_number, song, pack_name .. " pack")
+                send_command('input /ma "' .. song .. '" ' .. target_cmd)
+            end
+        end
+    else
+        -- Normal song casting with target detection
+        if needs_pianissimo then
+            send_command('input /ja "Pianissimo" <me>')
+            send_command('wait 1.5; input /ma "' .. song .. '" ' .. target_cmd)
+        else
+            MessageUtils.brd_message("Song " .. slot_number, song, pack_name .. " pack")
+            send_command('input /ma "' .. song .. '" ' .. target_cmd)
+        end
+    end
+end
+
+--- Internal function to cast song 3 or 4 after dummies (called by delayed command)
+--- @param slot_number number The slot to cast (3 or 4)
+function BRDSongCaster.cast_single_song_real(slot_number)
+    -- This is called after dummies are cast, so just cast the real song
+    BRDUtils.set_song_mode('Party')
+    
+    local pack_name = (state and state.BRDRotation and state.BRDRotation.value) or 'Dirge'
+    local pack = BRD_CONFIG.SONG_PACKS[pack_name]
+    
+    if pack and pack.songs and pack.songs[slot_number] then
+        local song = pack.songs[slot_number]
+        
+        -- Same target detection as main function
+        local target_cmd = "<stnpc>"
+        local needs_pianissimo = false
+        
+        if player.target then
+            if player.target.id == player.id then
+                target_cmd = "<me>"
+            else
+                target_cmd = "<stpc>"  -- Sub-target PC
+                needs_pianissimo = true
+            end
+        end
+        
+        if needs_pianissimo then
+            send_command('input /ja "Pianissimo" <me>')
+            send_command('wait 1.5; input /ma "' .. song .. '" ' .. target_cmd)
+        else
+            MessageUtils.brd_message("Song " .. slot_number, song, "Replacing dummy")
+            send_command('input /ma "' .. song .. '" ' .. target_cmd)
+        end
+    end
+end
+
+--- Get the current song for a specific slot
+--- @param slot_number number The slot number (1-5)
+--- @return string The song name for that slot
+function BRDSongCaster.get_song_for_slot(slot_number)
+    if not slot_number or slot_number < 1 or slot_number > 5 then
+        return "Invalid Slot"
+    end
+    
+    -- Get current pack
+    local pack_name = (state and state.BRDRotation and state.BRDRotation.value) or 'Dirge'
+    local pack = BRD_CONFIG.SONG_PACKS[pack_name]
+    
+    if not pack or not pack.songs then
+        return "No Pack"
+    end
+    
+    local song = pack.songs[slot_number]
+    
+    -- Handle Victory March replacement for slot 5
+    if slot_number == 5 and (buffactive['Haste'] or buffactive['Haste II']) then
+        local replacement = state.VictoryMarchReplace and state.VictoryMarchReplace.value
+        local replacement_songs = {
+            Madrigal = 'Blade Madrigal',
+            Minne = 'Knight\'s Minne V',
+            Scherzo = 'Sentinel\'s Scherzo'
+        }
+        
+        if replacement and replacement_songs[replacement] then
+            if pack.songs[4] == replacement_songs[replacement] then
+                song = 'Adventurer\'s Dirge'
+            else
+                song = replacement_songs[replacement]
+            end
+        end
+    end
+    
+    return song or "Empty"
+end
+
 --- Cast threnody of the current element state
 function BRDSongCaster.cast_threnody_element()
     if not state or not state.ThrenodyElement then
