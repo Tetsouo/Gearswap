@@ -360,6 +360,81 @@ function job_self_command(cmdParams, eventArgs)
         cast_dummy_songs()
         eventArgs.handled = true
         return
+    -- Individual song slot commands
+    elseif command == 'song1' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song(1)
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'song2' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song(2)
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'song3' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song(3)
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'song4' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song(4)
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'song5' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song(5)
+        end
+        eventArgs.handled = true
+        return
+    -- Internal commands for song3/4 after dummies
+    elseif command == 'song3_real' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song_real(3)
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'song4_real' then
+        local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+        if success_BRDSongCaster then
+            BRDSongCaster.cast_single_song_real(4)
+        end
+        eventArgs.handled = true
+        return
+    -- Debug command to check target's songs
+    elseif command == 'checksongs' or command == 'targetsongs' then
+        local success_BRDSongCounter, BRDSongCounter = pcall(require, 'jobs/brd/modules/BRD_SONG_COUNTER')
+        if success_BRDSongCounter then
+            local count, name = BRDSongCounter.get_target_song_count()
+            windower.add_to_chat(220, '[BRD] Target: ' .. name .. ' - Songs: ' .. count)
+            
+            -- Detailed debug info
+            local debug_info = BRDSongCounter.debug_party_info()
+            
+    elseif command == 'testbuffs' then
+        local success_BRDSongCounter, BRDSongCounter = pcall(require, 'jobs/brd/modules/BRD_SONG_COUNTER')
+        if success_BRDSongCounter then
+            local debug_info = BRDSongCounter.test_target_buff_access()
+            windower.add_to_chat(200, '[DEBUG] Testing target buff access APIs:')
+            windower.add_to_chat(200, '[DEBUG] Target: ' .. debug_info.target_name .. ' (ID: ' .. debug_info.target_id .. ')')
+            
+            for api_name, result in pairs(debug_info.api_results) do
+                local color = result:find("SUCCESS") and 158 or 167
+                windower.add_to_chat(color, '[DEBUG] ' .. api_name .. ': ' .. result)
+            end
+        end
+        eventArgs.handled = true
+        return
     -- Pianissimo commands for single target
     elseif command == 'meleepiano' or command == 'meleeP' then
         cast_melee_pianissimo()

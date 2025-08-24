@@ -53,6 +53,12 @@ local function get_current_job_keybinds()
             { key = "F5", desc = "Threnody Element", state = "ThrenodyElement" },
             { key = "F6", desc = "Main Weapon",      state = "MainWeapon" },
             { key = "F7", desc = "Sub Weapon",       state = "SubSet" },
+            -- Add song slots display (not keybinds, just display)
+            { key = "", desc = "Slot 1", state = "BRDSong1" },
+            { key = "", desc = "Slot 2", state = "BRDSong2" },
+            { key = "", desc = "Slot 3", state = "BRDSong3" },
+            { key = "", desc = "Slot 4", state = "BRDSong4" },
+            { key = "", desc = "Slot 5", state = "BRDSong5" },
         }
     elseif job == "THF" then
         keybinds = {
@@ -140,6 +146,19 @@ end
 
 --- Get current value of a state
 local function get_state_value(state_name, keybind_key)
+    -- Special handling for BRD song slots
+    if state_name and state_name:match("^BRDSong(%d)$") then
+        local slot = tonumber(state_name:match("^BRDSong(%d)$"))
+        if slot then
+            -- Load BRDSongCaster to get song for slot
+            local success, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
+            if success and BRDSongCaster and BRDSongCaster.get_song_for_slot then
+                return BRDSongCaster.get_song_for_slot(slot)
+            end
+        end
+        return "Empty"
+    end
+    
     if not _G.state or not _G.state[state_name] then
         return "N/A"
     end
@@ -237,8 +256,10 @@ local function create_centered_title(title)
     -- Fixed padding values that work well visually for each title
     local padding_map = {
         ["── Spells ──"] = 18,
+        ["── Songs ──"] = 19,
         ["── Pet Abilities ──"] = 15,
         ["── JA ──"] = 20,
+        ["── Song Slots ──"] = 16,
         ["── Weapons ──"] = 18,
         ["── Modes ──"] = 19
     }
@@ -337,8 +358,8 @@ local function update_display()
     local spell_keys, weapon_keys, mode_keys, ja_keys
 
     if job == "BRD" then
-        -- For BRD, songs/abilities, weapons, no modes (no hybrid/treasure)
-        spell_keys = { "F1", "F2", "F3", "F4", "F5" } -- BRD songs and abilities
+        -- For BRD, all F1-F5 are song-related settings, empty keys are actual songs
+        spell_keys = { "F1", "F2", "F3", "F4", "F5", "", "", "", "", "" } -- All song-related (empty keys for slots)
         ja_keys = {} -- No JA for BRD
         weapon_keys = { "F6", "F7" } -- Main Weapon and Sub Weapon
         mode_keys = {} -- No modes for BRD
@@ -408,7 +429,7 @@ local function update_display()
         for _, spell_key in ipairs(spell_keys) do
             if bind.key == spell_key then
                 if not spell_found then
-                    local section_title = job == "BST" and "── Pet Abilities ──" or "── Spells ──"
+                    local section_title = job == "BST" and "── Pet Abilities ──" or "── Songs ──"
                     text = text .. "\n\\cs(100,150,255)" .. create_centered_title(section_title) .. "\\cr\n"
                     spell_found = true
                 end
@@ -428,7 +449,8 @@ local function update_display()
         for _, ja_key in ipairs(ja_keys) do
             if bind.key == ja_key then
                 if not ja_found then
-                    text = text .. "\n\\cs(255,255,100)" .. create_centered_title("── JA ──") .. "\\cr\n"
+                    local section_title = job == "BRD" and "── Song Slots ──" or "── JA ──"
+                    text = text .. "\n\\cs(255,255,100)" .. create_centered_title(section_title) .. "\\cr\n"
                     ja_found = true
                 end
                 local value = get_state_value(bind.state, bind.key)

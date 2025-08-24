@@ -101,40 +101,89 @@ function BRDSongCounter.count_target_songs(player_id)
         end
     end
     
-    -- Method 1: Direct target access using windower API
-    local target_buffs = nil
     local target_name = "Unknown"
     
     if not player_id then
         -- Use current target
         local success, target = pcall(windower.ffxi.get_mob_by_target, 't')
-        if success and target then
-            target_buffs = target.buffs
-            target_name = target.name or "Unknown"
-        else
+        if not success or not target then
             return 0, false
         end
-    else
-        -- Use specific player ID
-        local success, target = pcall(windower.ffxi.get_mob_by_id, player_id)
-        if success and target then
-            target_buffs = target.buffs
-            target_name = target.name or "Unknown"
+        target_name = target.name or "Unknown"
+        player_id = target.id
+    end
+    
+    -- If targeting self, use player.buffs
+    if player_id == player.id then
+        if player and player.buffs then
+            for _, buff_id in pairs(player.buffs) do
+                if brd_buff_ids_set[buff_id] then
+                    song_count = song_count + 1
+                end
+            end
+            return song_count, true
         else
-            return 0, false
+            return -1, true
         end
     end
     
-    -- Count BRD songs in target's buffs
-    if target_buffs then
-        for _, buff_id in pairs(target_buffs) do
+    -- For other players, try to get party data
+    local party = windower.ffxi.get_party()
+    if not party then
+        return -1, true
+    end
+    
+    -- Search in all party positions
+    local search_positions = {
+        'p0', 'p1', 'p2', 'p3', 'p4', 'p5',
+        'a10', 'a11', 'a12', 'a13', 'a14', 'a15',
+        'a20', 'a21', 'a22', 'a23', 'a24', 'a25'
+    }
+    
+    local target_member = nil
+    for _, pos in ipairs(search_positions) do
+        local member = party[pos]
+        if member and member.id == player_id then
+            target_member = member
+            break
+        end
+    end
+    
+    if not target_member then
+        -- Try alternative method: use windower.ffxi.get_mob_by_id to get entity data
+        local success, entity = pcall(windower.ffxi.get_mob_by_id, player_id)
+        if success and entity and entity.buffs then
+            for _, buff_id in pairs(entity.buffs) do
+                if brd_buff_ids_set[buff_id] then
+                    song_count = song_count + 1
+                end
+            end
+            return song_count, true
+        end
+        return -1, true -- Can't find or access target buffs
+    end
+    
+    -- Try to get buffs from party member data
+    if target_member.buffs then
+        for _, buff_id in pairs(target_member.buffs) do
             if brd_buff_ids_set[buff_id] then
                 song_count = song_count + 1
             end
         end
         return song_count, true
     else
-        return -1, true -- Special return value indicating "can't check buffs"
+        -- Try windower.ffxi.get_player_info for party members
+        local success, player_info = pcall(windower.ffxi.get_player_info, player_id)
+        if success and player_info and player_info.buffs then
+            for _, buff_id in pairs(player_info.buffs) do
+                if brd_buff_ids_set[buff_id] then
+                    song_count = song_count + 1
+                end
+            end
+            return song_count, true
+        end
+        
+        return -1, true -- Can't access target buffs
     end
 end
 
@@ -163,6 +212,87 @@ function BRDSongCounter.get_target_song_count()
     end
     
     return count, name
+end
+
+--- Test different windower APIs to access target buffs
+--- @return table Debug information about available APIs
+function BRDSongCounter.test_target_buff_access()
+    local debug_info = {
+        target_found = false,
+        target_name = "None",
+        target_id = "None",
+        api_results = {}
+    }
+    
+    -- Get current target
+    local success, target = pcall(windower.ffxi.get_mob_by_target, 't')
+    if not success or not target then
+        debug_info.api_results["get_mob_by_target"] = "FAILED - No target"
+        return debug_info
+    end
+    
+    debug_info.target_found = true
+    debug_info.target_name = target.name or "Unknown"
+    debug_info.target_id = tostring(target.id or "Unknown")
+    
+    -- Test 1: Direct target.buffs access
+    if target.buffs then
+        debug_info.api_results["target.buffs"] = "SUCCESS - " .. #target.buffs .. " buffs found"
+    else
+        debug_info.api_results["target.buffs"] = "FAILED - No buffs property"
+    end
+    
+    -- Test 2: get_mob_by_id
+    local success2, entity = pcall(windower.ffxi.get_mob_by_id, target.id)
+    if success2 and entity then
+        if entity.buffs then
+            debug_info.api_results["get_mob_by_id"] = "SUCCESS - " .. #entity.buffs .. " buffs found"
+        else
+            debug_info.api_results["get_mob_by_id"] = "FAILED - Entity found but no buffs"
+        end
+    else
+        debug_info.api_results["get_mob_by_id"] = "FAILED - No entity data"
+    end
+    
+    -- Test 3: Party data
+    local party = windower.ffxi.get_party()
+    if party then
+        local found_in_party = false
+        local search_positions = {'p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'a10', 'a11', 'a12', 'a13', 'a14', 'a15', 'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
+        
+        for _, pos in ipairs(search_positions) do
+            local member = party[pos]
+            if member and member.id == target.id then
+                found_in_party = true
+                if member.buffs then
+                    debug_info.api_results["party_data"] = "SUCCESS - Found in " .. pos .. " with " .. #member.buffs .. " buffs"
+                else
+                    debug_info.api_results["party_data"] = "FAILED - Found in " .. pos .. " but no buffs"
+                end
+                break
+            end
+        end
+        
+        if not found_in_party then
+            debug_info.api_results["party_data"] = "FAILED - Target not found in party"
+        end
+    else
+        debug_info.api_results["party_data"] = "FAILED - No party data"
+    end
+    
+    -- Test 4: get_player_info (if it exists)
+    local success4, player_info = pcall(windower.ffxi.get_player_info, target.id)
+    if success4 and player_info then
+        if player_info.buffs then
+            debug_info.api_results["get_player_info"] = "SUCCESS - " .. #player_info.buffs .. " buffs found"
+        else
+            debug_info.api_results["get_player_info"] = "FAILED - Player info found but no buffs"
+        end
+    else
+        debug_info.api_results["get_player_info"] = "FAILED - No player info available"
+    end
+    
+    return debug_info
 end
 
 --- Debug function to check party data
