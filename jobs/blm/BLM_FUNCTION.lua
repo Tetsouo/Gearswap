@@ -725,31 +725,52 @@ function job_self_command(cmdParams, eventArgs, spell)
     -- Helper function for colored element messages (like PLD's rune messages)
     local function show_element_message(state_type, element_name)
         local element_colors = {
-            Fire = 057,      -- Orange
-            Thunder = 012,   -- Yellow  
-            Aero = 006,      -- Cyan
-            Stone = 050,     -- Yellow/Gold (changed from 010)
-            Earth = 050,     -- Yellow/Gold
-            Water = 056,     -- Light Blue
-            Blizzard = 005,  -- Blue
-            Ice = 005,       -- Blue
-            Light = 001,     -- White
-            Dark = 201,      -- Purple
-            -- Aja spells
-            Firaja = 057,    -- Orange
-            Thundaja = 012,  -- Yellow
-            Aeroja = 006,    -- Cyan
-            Stoneja = 050,   -- Yellow/Gold
-            Waterja = 056,   -- Light Blue
-            Blizzaja = 005,  -- Blue
-            -- -ra spells for alt player
-            Fira = 057,      -- Orange
-            Thundara = 012,  -- Yellow
-            Aera = 006,      -- Cyan
-            Stonera = 050,   -- Yellow/Gold
-            Watera = 056,    -- Light Blue
-            Blizzara = 005,  -- Blue
+            -- MAIN LIGHT SPELL: Fire, Thunder, Aero
+            ['Fire'] = 167,      -- Red/Orange (rouge vif)
+            ['Thunder'] = 200,   -- Yellow (jaune vif)
+            ['Aero'] = 120,      -- Green/Cyan (vert vif)
+            
+            -- MAIN DARK SPELL: Stone, Blizzard, Water
+            ['Stone'] = 36,      -- Brown (brun visible)
+            ['Blizzard'] = 4,    -- Blue (bleu basique visible)
+            ['Water'] = 6,       -- Cyan (cyan basique visible)
+            
+            -- SUB LIGHT: Thunder, Fire, Aero (mêmes couleurs)
+            -- SUB DARK: Blizzard, Stone, Water (mêmes couleurs)
+            
+            -- AJA SPELLS: Firaja, Stoneja, Blizzaja, Aeroja, Thundaja, Waterja
+            ['Firaja'] = 167,    -- Red/Orange
+            ['Stoneja'] = 215,   -- Brown/Orange
+            ['Blizzaja'] = 159,  -- Light Blue
+            ['Aeroja'] = 120,    -- Green/Cyan
+            ['Thundaja'] = 200,  -- Yellow
+            ['Waterja'] = 207,   -- Blue
+            
+            -- STORM SPELLS: FireStorm, Sandstorm, Thunderstorm, HailStorm, Rainstorm, Windstorm, Voidstorm, Aurorastorm
+            ['FireStorm'] = 167,     -- Red/Orange
+            ['Sandstorm'] = 215,     -- Brown/Orange
+            ['Thunderstorm'] = 200,  -- Yellow
+            ['HailStorm'] = 159,     -- Light Blue
+            ['Rainstorm'] = 207,     -- Blue
+            ['Windstorm'] = 120,     -- Green/Cyan
+            ['Voidstorm'] = 201,     -- Purple
+            ['Aurorastorm'] = 001,   -- White
+            
+            -- ALT PLAYER -RA SPELLS: Fira, Stonera, Blizzara, Aera, Thundara, Watera
+            ['Fira'] = 167,      -- Red/Orange
+            ['Stonera'] = 215,   -- Brown/Orange
+            ['Blizzara'] = 159,  -- Light Blue
+            ['Aera'] = 120,      -- Green/Cyan
+            ['Thundara'] = 200,  -- Yellow
+            ['Watera'] = 207,    -- Blue
+            
+            -- FALLBACK pour autres éléments
+            ['Ice'] = 159,       -- Light Blue
+            ['Earth'] = 215,     -- Brown/Orange
+            ['Light'] = 001,     -- White
+            ['Dark'] = 201,      -- Purple
         }
+        
         local color_code = element_colors[element_name] or 001
         local gray = string.char(0x1F, 160)
         local job_color = string.char(0x1F, 207)
@@ -784,9 +805,20 @@ function job_self_command(cmdParams, eventArgs, spell)
         return
     end
     
-    -- Handle standard cycle commands with colored messages
+    -- Try universal commands FIRST for UI updates (like BRD does)
+    local success_UniversalCommands, UniversalCommands = pcall(require, 'core/UNIVERSAL_COMMANDS')
+    if success_UniversalCommands and UniversalCommands then
+        if UniversalCommands.handle_command(cmdParams, eventArgs) then
+            return -- Command handled by universal system
+        end
+    end
+
+    -- Handle standard cycle commands with colored messages (AFTER universal commands)
     if command == 'cycle' and cmdParams[2] then
         local stateName = cmdParams[2]
+        
+        -- Main spell states (F1-F6) - No custom messages, let GearSwap handle them
+        -- Custom messages were causing desync issues, GearSwap default messages work fine
         
         -- Aja cycle
         if stateName == 'Aja' then
@@ -861,19 +893,6 @@ function job_self_command(cmdParams, eventArgs, spell)
         end
     end
 
-    -- Let standard GearSwap handle cycle commands for proper state management
-    if command == 'cycle' then
-        return -- Let GearSwap handle this natively
-    end
-
-    -- Try universal commands first (test, modules, cache, metrics, help)
-    local success_UniversalCommands, UniversalCommands = pcall(require, 'core/UNIVERSAL_COMMANDS')
-    if not success_UniversalCommands then
-        error("Failed to load core/universal_commands: " .. tostring(UniversalCommands))
-    end
-    if UniversalCommands.handle_command(cmdParams, eventArgs) then
-        return -- Command handled by universal system
-    end
 
     -- Handle alt player spell commands directly (case insensitive)
     if command == 'altlight' then

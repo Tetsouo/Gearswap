@@ -212,6 +212,11 @@ function bst_change_ecosystem()
         error("Failed to load utils/messages: " .. tostring(MessageUtils))
     end
     MessageUtils.bst_ecosystem_message(eco, #pets)
+    
+    -- Update KeybindUI display after state change
+    if _G.KeybindUI and _G.KeybindUI.update then
+        _G.KeybindUI.update()
+    end
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -269,6 +274,11 @@ function bst_change_species()
             error("Failed to load utils/messages: " .. tostring(MessageUtils))
         end
         MessageUtils.bst_pet_not_found_message(species)
+    end
+    
+    -- Update KeybindUI display after state change
+    if _G.KeybindUI and _G.KeybindUI.update then
+        _G.KeybindUI.update()
     end
 end
 

@@ -103,6 +103,12 @@ function user_setup()
         send_command('bind F3 gs c cycle SubSet')
     end, 0.5)
     
+    -- Initialize Keybind UI
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        KeybindUI.init()
+    end
+    
     select_default_macro_book() -- Selects the default macro book based on sub-job
 end
 
@@ -145,6 +151,11 @@ function job_setup()
     coroutine.schedule(function()
         send_command('bind F1 gs c cycle HybridMode')
         
+        -- Add F4 for RuneElement cycling if sub RUN (with safety check)
+        if player and player.sub_job == 'RUN' then
+            send_command('bind F4 gs c cyclerune')
+        end
+        
         -- Keep F10-F11 binds for compatibility
         send_command('bind F10 gs c cycle WeaponSet')
         send_command('bind F11 gs c cycle SubSet')
@@ -162,7 +173,7 @@ function job_setup()
 
     state.RuneElement = M {
         ['description'] = 'Rune Element',
-        'Sulpor', 'Lux'
+        'Ignis', 'Gelus', 'Flabra', 'Tellus', 'Sulpor', 'Unda', 'Lux', 'Tenebrae'
     }
 end
 

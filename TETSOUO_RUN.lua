@@ -70,6 +70,12 @@ end
 ---
 --- @usage Called automatically by Mote-Include framework
 function user_setup()
+    -- Initialize Keybind UI
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        KeybindUI.init()
+    end
+    
     select_default_macro_book() -- Initialize macro book and lockstyle for current subjob
 end
 

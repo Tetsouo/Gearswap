@@ -438,9 +438,26 @@ end
 ---============================================================================
 
 --- Simple Honor March protection - only during casting
+--- Override midcast sets to use correct sub weapon based on subjob
+function job_post_midcast(spell, action, spellMap, eventArgs)
+    -- For song casting, use Genmei Shield if subjob can't dual wield
+    if spell.type == 'BardSong' and (player.sub_job ~= 'DNC' and player.sub_job ~= 'NIN') then
+        equip({sub = "Genmei Shield"})
+    end
+end
+
 function job_aftercast(spell, action, spellMap, eventArgs)
     if spell.name == 'Honor March' then
         _G.casting_honor_march = false
+    end
+    
+    -- Force correct sub weapon after any spell (respects F7 SubSet choice)
+    if state and state.SubSet then
+        if state.SubSet.value == 'Genmei Shield' and sets.Shield then
+            windower.send_command('gs equip sets.Shield')
+        elseif state.SubSet.value == 'Demers. Degen +1' and sets.DualWield then
+            windower.send_command('gs equip sets.DualWield')
+        end
     end
 end
 
@@ -450,13 +467,24 @@ function job_customize_idle_set(idleSet)
     if not success_EquipmentUtils then
         error("Failed to load core/equipment: " .. tostring(EquipmentUtils))
     end
-    return EquipmentUtils.customize_idle_set_standard(
+    local finalSet = EquipmentUtils.customize_idle_set_standard(
         idleSet,        -- Base idle set
         sets.idle.Town, -- Town set (used in cities, excluded in Dynamis)
         nil,            -- No XP set for BRD
         nil,            -- No PDT set for BRD idle
         nil             -- No MDT set for BRD idle
     )
+    
+    -- Override sub weapon based on SubSet state (respects F7 manual choice)
+    if state and state.SubSet then
+        if state.SubSet.value == 'Genmei Shield' and sets.Shield then
+            finalSet.sub = sets.Shield.sub
+        elseif state.SubSet.value == 'Demers. Degen +1' and sets.DualWield then
+            finalSet.sub = sets.DualWield.sub
+        end
+    end
+    
+    return finalSet
 end
 
 ---============================================================================

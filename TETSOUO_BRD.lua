@@ -86,6 +86,11 @@ function get_sets()
     
     -- Macro and lockstyle management is now handled by the centralized MACRO_LOCKSTYLE_MANAGER.lua system
     -- No need for job-specific macro code here
+    
+    -- Initialize Keybind UI automatically (toggle with //gs c kb)
+    local KeybindUI = require('ui/KEYBIND_UI')
+    KeybindUI.init()
+    
     include('core/GLOBALS.lua')
     include('features/DUALBOX.lua')          -- Dual-boxing utilities for alt job detection
     include('monitoring/SIMPLE_JOB_MONITOR.lua') -- Kaories job monitoring
@@ -178,7 +183,7 @@ function job_setup()
     
     -- Weapon management states (required by Mote-Include)
     state.WeaponSet = M { ['description'] = 'Main Weapon', 'Naegling', 'Carnwenhan', 'Tauret' }
-    state.SubSet = M { ['description'] = 'Sub Weapon', 'Shield', 'DualWield' }
+    state.SubSet = M { ['description'] = 'Sub Weapon', 'Genmei Shield', 'Demers. Degen +1' }
     
     -- Main weapon state for F4 cycling (Naegling vs Twashtar)
     state.MainWeapon = M { ['description'] = 'Main Weapon', 'Naegling', 'Twashtar' }
@@ -260,10 +265,12 @@ function job_self_command(cmdParams, eventArgs)
     elseif command == 'cycle' and cmdParams[2] and cmdParams[2]:lower() == 'subweapon' then
         state.SubSet:cycle()
         MessageUtils.brd_message("Weapon", "Sub Weapon", state.SubSet.value)
-        -- Force weapon equip immediately
-        -- WeaponUtils now available globally via shared.lua
-        WeaponUtils.check_weaponset('main')
-        WeaponUtils.check_weaponset('sub')
+        -- Force equip correct sub weapon immediately
+        if state.SubSet.value == 'Genmei Shield' and sets.Shield then
+            equip(sets.Shield)
+        elseif state.SubSet.value == 'Demers. Degen +1' and sets.DualWield then
+            equip(sets.DualWield)
+        end
         eventArgs.handled = true
         return
     elseif command == 'cycle' and cmdParams[2] and cmdParams[2]:lower() == 'victorymarchreplace' then
@@ -402,6 +409,13 @@ function job_self_command(cmdParams, eventArgs)
         return
     end
 end
+
+---============================================================================
+--- STATE CHANGE HANDLING
+---============================================================================
+
+-- DISABLED: job_state_change was causing stack overflow
+-- UI updates are now manual only via //gs c forceupdate
 
 ---============================================================================
 --- MACRO MANAGEMENT

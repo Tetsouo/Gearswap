@@ -466,6 +466,12 @@ local commandFunctions = {
         end
         state.RuneElement:cycle()
         MessageUtils.pld_rune_message('current_rune', state.RuneElement.value)
+        
+        -- Update UI when rune changes
+        local success_KeybindUI, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+        if success_KeybindUI and KeybindUI then
+            KeybindUI.update()
+        end
     end,
 }
 

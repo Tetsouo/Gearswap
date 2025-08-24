@@ -141,7 +141,7 @@ sets.midcast = {
     BardSong = {
         -- Add your song enhancement gear here
         main = "Kali",
-        sub = "Legato Dagger", -- Increases song effect duration (dual wield if NIN/DNC)
+        sub = "Legato Dagger", -- Will be overridden by job_post_midcast if needed
         range = "Gjallarhorn", -- Default instrument for all buff songs
         head = "Fili Calot +3",
         neck = "Mnbw. Whistle +1",
@@ -332,19 +332,36 @@ sets.midcast['Pining Nocturne'] = sets.midcast.DebuffSong
 
 --- Idle set for when not engaged
 --- Optimizes for refresh, movement speed, and survivability
---- Get default weapon configuration based on current subjob.
---- Selects optimal weapon combination for BRD based on subjob abilities.
+
+--- Get default weapon configuration based on manual SubSet state first, then subjob.
+--- Respects player's manual choice via F7 SubSet cycling before falling back to subjob logic.
 --- @return table Weapon configuration with main and sub weapon names
 function get_default_weapons()
-    if player.sub_job == 'DNC' then
+    -- First check if player has manually set SubSet state (F7 choice takes priority)
+    if state and state.SubSet then
+        if state.SubSet.value == 'Genmei Shield' then
+            return {
+                main = "Naegling",
+                sub = "Genmei Shield" -- Manual choice: Shield
+            }
+        elseif state.SubSet.value == 'Demers. Degen +1' then
+            return {
+                main = "Naegling", 
+                sub = "Demers. Degen +1" -- Manual choice: DualWield
+            }
+        end
+    end
+    
+    -- Fallback to automatic subjob logic if no manual choice
+    if player.sub_job == 'DNC' or player.sub_job == 'NIN' then
         return {
             main = "Naegling",
-            sub = "Demers. Degen +1" -- Dual wield for DNC subjob
+            sub = "Demers. Degen +1" -- Auto: Dual wield for DNC/NIN subjob
         }
     else
         return {
             main = "Naegling",
-            sub = "Genmei Shield" -- Shield for non-DW subjobs
+            sub = "Genmei Shield" -- Auto: Shield for non-DW subjobs
         }
     end
 end
@@ -559,16 +576,30 @@ sets.engaged.Acc.Hybrid = {
 --- WEAPON SETS
 ---============================================================================
 
---- Legacy weapon sets (kept for compatibility)
+--- Main weapon sets for F6 cycling
 sets.Naegling = { main = "Naegling" }
-sets.Tauret = { main = "Tauret" }
-
---- Main weapon sets for F4 cycling
 sets.Twashtar = { main = "Twashtar" }
+sets.Tauret = { main = "Tauret" } -- Legacy weapon set
 
 --- Sub weapon sets (managed automatically based on subjob)
 sets.Shield = { sub = "Genmei Shield" }       -- For non-DW subjobs
 sets.DualWield = { sub = "Demers. Degen +1" } -- For DNC/NIN subjobs
+
+--- Basic engaged (melee) set
+sets.engaged = {
+    head = "Nyame Helm",
+    body = "Nyame Mail", 
+    hands = "Nyame Gauntlets",
+    legs = "Nyame Flanchard",
+    feet = "Nyame Sollerets",
+    neck = "Lissome Necklace",
+    ear1 = "Cessance Earring",
+    ear2 = "Telos Earring",
+    ring1 = "Petrov Ring",
+    ring2 = "Hetairoi Ring",
+    back = "Intarabus's Cape",
+    waist = "Windbuffet Belt +1"
+}
 
 ---============================================================================
 --- MOVEMENT SETS

@@ -224,6 +224,13 @@ end
 --- @usage Automatically called by Mote framework after job_setup
 --- @see select_default_macro_book For macro and appearance configuration
 function user_setup()
+    -- Initialize Keybind UI and make it globally accessible
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        _G.KeybindUI = KeybindUI -- Make it globally accessible
+        KeybindUI.init()
+    end
+    
     select_default_macro_book()
 end
 

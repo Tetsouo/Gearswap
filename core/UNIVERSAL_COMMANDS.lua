@@ -499,6 +499,37 @@ function UniversalCommands.handle_command(cmdParams, eventArgs)
         return true
     end
 
+    -- UI Commands (more intuitive)
+    if command == 'ui' then
+        local KeybindUI = require('ui/KEYBIND_UI')
+        KeybindUI.toggle()
+        eventArgs.handled = true
+        return true
+    end
+    
+    -- UI position save (if needed manually)
+    if command == 'uisave' then
+        local KeybindUI = require('ui/KEYBIND_UI')
+        KeybindUI.save_position()
+        eventArgs.handled = true
+        return true
+    end
+    
+    -- Auto-update UI when cycling states (safe version)
+    if command == 'cycle' and cmdParams[2] then
+        -- Use windower.send_command_delayed to avoid recursion
+        windower.send_command('wait 0.1; gs c ui_update_silent')
+    end
+    
+    -- Silent update command (no recursion)
+    if command == 'ui_update_silent' then
+        local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+        if success and KeybindUI then
+            KeybindUI.auto_update()
+        end
+        eventArgs.handled = true
+        return true
+    end
 
     return false
 end

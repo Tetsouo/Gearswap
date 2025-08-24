@@ -149,6 +149,22 @@ function job_setup()
 end
 
 function user_setup()
+    -- DNC Keybindings for state cycling
+    coroutine.schedule(function()
+        send_command('bind F1 gs c cycle WeaponSet')    -- Main weapon cycling
+        send_command('bind F2 gs c cycle SubSet')       -- Sub weapon cycling
+        send_command('bind F3 gs c cycle MainStep')     -- Main step cycling
+        send_command('bind F4 gs c cycle AltStep')      -- Alt step cycling
+        send_command('bind F5 gs c cycle HybridMode')   -- Hybrid mode
+        send_command('bind F6 gs c cycle TreasureMode') -- Treasure mode
+    end, 0.5)
+    
+    -- Initialize Keybind UI
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        KeybindUI.init()
+    end
+    
     select_default_macro_book() -- Selects the default macro book based on sub-job
 end
 
@@ -167,7 +183,13 @@ function file_unload()
         stop_all_macro_lockstyle_operations()
     end
     
-    -- Add any DNC-specific cleanup here if needed
+    -- Unbind DNC keybinds
+    send_command('unbind F1') -- WeaponSet
+    send_command('unbind F2') -- SubSet  
+    send_command('unbind F3') -- MainStep
+    send_command('unbind F4') -- AltStep
+    send_command('unbind F5') -- HybridMode
+    send_command('unbind F6') -- TreasureMode
 end
 
 --- Handle custom console commands for Dancer.

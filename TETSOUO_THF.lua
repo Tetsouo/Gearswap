@@ -111,6 +111,12 @@ function user_setup()
         send_command('bind F6 gs c cycle TreasureMode')  -- Cycle TH mode (None/Tag/SATA/Fulltime)
     end, 0.5)
     
+    -- Initialize Keybind UI
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        KeybindUI.init()
+    end
+    
     select_default_macro_book() -- Selects the default macro book based on sub-job
     
     -- Initialize dual-box alt job detection with delay

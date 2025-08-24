@@ -183,6 +183,12 @@ function user_setup()
         'Indi-Precision', 'Indi-Haste')
     state.altPlayerEntrust = M('Indi-Refresh', 'Indi-Barrier', 'Indi-Haste', 'Indi-INT', 'Indi-STR', 'Indi-VIT')
 
+    -- Initialize Keybind UI
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        KeybindUI.init()
+    end
+
     select_default_macro_book()
 end
 

@@ -95,20 +95,14 @@ function job_setup()
     state.CastingMode:options('MagicBurst', 'Normal')
     state.Xp = M { ['description'] = 'XP', 'False', 'True' }
     -- Command to change MainLight mode: /console gs c cycle mainLightSpell
-    state.MainLightSpell = M('Fire', 'Thunder', 'Aero')
-    -- Command to change SubLight mode: /console gs c cycle subLightSpell
-    state.SubLightSpell = M('Thunder', 'Fire', 'Aero')
-    -- Command to change MainDark mode: /console gs c cycle mainDarkSpell
-    state.MainDarkSpell = M('Stone', 'Blizzard', 'Water')
-    -- Command to change SubDark mode: /console gs c cycle subDarkSpell
-    state.SubDarkSpell = M('Blizzard', 'Stone', 'Water')
+    state.MainLightSpell = M { ['description'] = 'Main Light', 'Fire', 'Thunder', 'Aero' }
+    state.SubLightSpell = M { ['description'] = 'Sub Light', 'Thunder', 'Fire', 'Aero' }
+    state.MainDarkSpell = M { ['description'] = 'Main Dark', 'Stone', 'Blizzard', 'Water' }
+    state.SubDarkSpell = M { ['description'] = 'Sub Dark', 'Blizzard', 'Stone', 'Water' }
     -- Command to change TierSpell mode: /console gs c cycle tierSpell
-    state.TierSpell = M('VI', 'V', 'IV', 'III', 'II', '')
-    -- Command to change Aja mode: /console gs c cycle Aja
-    state.Aja = M('Firaja', 'Stoneja', 'Blizzaja', 'Aeroja', 'Thundaja', 'Waterja')
-    -- Command to change Storm mode: /console gs c cycle Storm
-    state.Storm = M('FireStorm', 'Sandstorm', 'Thunderstorm', 'HailStorm', 'Rainstorm', 'Windstorm', 'Voidstorm',
-        'Aurorastorm')
+    state.TierSpell = M { ['description'] = 'Tier Spell', '6', '5', '4', '3', '2', '1' }
+    state.Aja = M { ['description'] = 'Aja Spell', 'Firaja', 'Stoneja', 'Blizzaja', 'Aeroja', 'Thundaja', 'Waterja' }
+    state.Storm = M { ['description'] = 'Storm', 'FireStorm', 'Sandstorm', 'Thunderstorm', 'HailStorm', 'Rainstorm', 'Windstorm', 'Voidstorm', 'Aurorastorm' }
     Manawall = buffactive['Mana Wall'] or false
 
     --------------------------------------------------------------------------------------------
@@ -134,10 +128,10 @@ function job_setup()
     -- BLM Keybindings F1-F7 dans l'ordre demandé
     -- Use coroutine.schedule to ensure all dependencies are loaded before binding
     coroutine.schedule(function()
-        send_command('bind F1 gs c cyclemainlight')
-        send_command('bind F2 gs c cyclemaindark')
-        send_command('bind F3 gs c cyclesublight')
-        send_command('bind F4 gs c cyclesubdark')
+        send_command('bind F1 gs c cycle MainLightSpell')
+        send_command('bind F2 gs c cycle MainDarkSpell')
+        send_command('bind F3 gs c cycle SubLightSpell')
+        send_command('bind F4 gs c cycle SubDarkSpell')
         send_command('bind F5 gs c cycle Aja')
         send_command('bind F6 gs c cycle TierSpell')  -- TierSpell sur F6
         send_command('bind F7 gs c cycle Storm')
@@ -154,6 +148,12 @@ end
 --- @usage Automatically called by Mote framework
 --- @see select_default_macro_book For macro configuration
 function user_setup()
+    -- Initialize Keybind UI
+    local success, KeybindUI = pcall(require, 'ui/KEYBIND_UI')
+    if success then
+        KeybindUI.init()
+    end
+    
     -- Calls a function to select the default macro book based on the sub-job
     select_default_macro_book()
 end
@@ -376,149 +376,5 @@ end
 ---============================================================================
 --- CUSTOM COMMAND HANDLER
 ---============================================================================
-
---- Handle custom GearSwap commands including test execution.
---- Processes user commands sent via //gs c <command>
----
---- Available commands:
----   - test: Run unit tests for all modules
----   - buffself: Execute BuffSelf function
----   - mainlight: Cast main light element spell
----   - maindark: Cast main dark element spell
----   - mainaja: Cast main -ja spell
----   - storm: Cast storm spell
----
---- @param cmdParams table Command parameters split by spaces
---- @param eventArgs table Event arguments for command handling
---- @usage //gs c test (runs unit tests)
---- @usage //gs c buffself (casts self buffs)
-function job_self_command(cmdParams, eventArgs)
-    -- Custom BLM element cycling commands (like PLD's cyclerune)
-    local command = cmdParams[1] and cmdParams[1]:lower() or ""
-    
-    -- Helper function for colored element messages
-    local function show_element_message(state_type, element_name)
-        local element_colors = {
-            Fire = 057,      -- Orange
-            Thunder = 012,   -- Yellow  
-            Aero = 006,      -- Cyan
-            Stone = 010,     -- Brown
-            Water = 056,     -- Light Blue
-            Blizzard = 005,  -- Blue
-        }
-        local color_code = element_colors[element_name] or 001
-        local gray = string.char(0x1F, 160)
-        local job_color = string.char(0x1F, 207)
-        local element_color = string.char(0x1F, color_code)
-        
-        local message = gray .. '[' .. job_color .. 'BLM' .. gray .. '] ' ..
-                       gray .. 'Current ' .. state_type .. ': ' .. 
-                       element_color .. element_name .. gray
-        windower.add_to_chat(001, message)
-    end
-    
-    -- Custom cycle commands like PLD's cyclerune
-    if command == 'cyclemainlight' then
-        state.MainLightSpell:cycle()
-        show_element_message('MainLight', state.MainLightSpell.value)
-        eventArgs.handled = true
-        return
-    elseif command == 'cyclemaindark' then
-        state.MainDarkSpell:cycle()
-        show_element_message('MainDark', state.MainDarkSpell.value)
-        eventArgs.handled = true
-        return
-    elseif command == 'cyclesublight' then
-        state.SubLightSpell:cycle()
-        show_element_message('SubLight', state.SubLightSpell.value)
-        eventArgs.handled = true
-        return
-    elseif command == 'cyclesubdark' then
-        state.SubDarkSpell:cycle()
-        show_element_message('SubDark', state.SubDarkSpell.value)
-        eventArgs.handled = true
-        return
-    end
-    
-    -- First, try universal commands (equiptest, validate_all, etc.)
-    local success_UniversalCommands, UniversalCommands = pcall(require, 'core/UNIVERSAL_COMMANDS')
-    if success_UniversalCommands and UniversalCommands then
-        if UniversalCommands.handle_command(cmdParams, eventArgs) then
-            return
-        end
-    end
-    
-    -- Handle macro commands using centralized system
-    -- MacroCommands now available globally via shared.lua
-    if MacroCommands.handle_macro_command(cmdParams, eventArgs, 'BLM') then
-        return
-    end
-
-    -- Handle Kaories dual-box commands (debuff, bufftank, etc.)
-    if handle_kaories_command and cmdParams[1] then
-        local command = cmdParams[1]:lower()
-        if handle_kaories_command(command) then
-            eventArgs.handled = true
-            return
-        end
-    end
-
-    -- Run unit tests
-    if cmdParams[1] == 'test' then
-        -- MessageUtils now available globally via shared.lua
-        MessageUtils.system_action_message('Executing GearSwap module tests...')
-        include('test_runner.lua')
-        eventArgs.handled = true
-        return
-    end
-
-    -- Existing BLM commands (if any exist in BLM_FUNCTION.lua)
-    if cmdParams[1] == 'buffself' then
-        BuffSelf()
-        eventArgs.handled = true
-        return
-    end
-    
-    -- Alt player spell commands (case insensitive)
-    local cmd = cmdParams[1] and cmdParams[1]:lower() or ""
-    
-    if cmd == 'altlight' then
-        -- Cast light spell on alt character using synchronized states
-        if state.altPlayerLight and state.altPlayerTier then
-            local tierToUse = state.altPlayerTier.value
-            -- RDM can only cast up to tier V, so limit if needed
-            if tierToUse == 'VI' then
-                tierToUse = 'V'
-            end
-            handle_altNuke(state.altPlayerLight.value, tierToUse, false)
-            -- MessageUtils now available globally via shared.lua
-            MessageUtils.blm_alt_cast_message('cast_light', state.altPlayerLight.value, tierToUse)
-        else
-            -- MessageUtils now available globally via shared.lua
-            MessageUtils.blm_alt_cast_message('error_light')
-        end
-        eventArgs.handled = true
-        return
-    end
-    
-    if cmd == 'altdark' then
-        -- Cast dark spell on alt character using synchronized states
-        if state.altPlayerDark and state.altPlayerTier then
-            local tierToUse = state.altPlayerTier.value
-            -- RDM can only cast up to tier V, so limit if needed
-            if tierToUse == 'VI' then
-                tierToUse = 'V'
-            end
-            handle_altNuke(state.altPlayerDark.value, tierToUse, false)
-            -- MessageUtils now available globally via shared.lua
-            MessageUtils.blm_alt_cast_message('cast_dark', state.altPlayerDark.value, tierToUse)
-        else
-            -- MessageUtils now available globally via shared.lua
-            MessageUtils.blm_alt_cast_message('error_dark')
-        end
-        eventArgs.handled = true
-        return
-    end
-
-    -- Add other BLM-specific commands here as needed
-end
+-- BLM command handling is now done in jobs/blm/BLM_FUNCTION.lua
+-- This removes the duplicate job_self_command function to prevent conflicts
