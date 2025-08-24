@@ -283,6 +283,16 @@ function cast_dummy_songs()
     BRDSongCaster.cast_dummy_songs()
 end
 
+-- Cast dummy1 song (Gold Capriccio) with intelligent targeting
+function cast_dummy1_song()
+    BRDSongCaster.cast_dummy1_song()
+end
+
+-- Cast dummy2 song (Goblin Gavotte) with intelligent targeting
+function cast_dummy2_song()
+    BRDSongCaster.cast_dummy2_song()
+end
+
 --- Cast tank songs with Pianissimo (single target full rotation)
 function cast_tank_pianissimo()
     BRDSongCaster.cast_tank_pianissimo()

@@ -20,6 +20,78 @@ end
 
 local BRDSongCounter = {}
 
+-- Cache for player buffs (from packet 0x076)
+local party_member_buffs = {}
+local packet_event_id = nil
+
+
+---============================================================================
+--- PACKET MONITORING FOR TARGET BUFFS
+---============================================================================
+
+--- Parse party buff packet (0x076) exactly like PartyBuffs addon
+--- @param data string Raw packet data
+local function parse_party_buffs(data)
+    -- Reset buffs for all party members
+    for k = 0, 4 do
+        local id = data:unpack('I', k*48+5)
+        party_member_buffs[id] = {}
+        
+        if id ~= 0 then
+            -- Extract 32 buff slots for this party member (PartyBuffs method)
+            for i = 1, 32 do
+                local buff = data:byte(k*48+5+16+i-1) + 256 * (math.floor(data:byte(k*48+5+8+math.floor((i-1)/4)) / 4^((i-1)%4)) % 4)
+                
+                -- Store buffs exactly like PartyBuffs (direct indexing)
+                if buff > 0 and buff ~= 255 then
+                    party_member_buffs[id][i] = buff
+                end
+            end
+        end
+    end
+end
+
+--- Start packet monitoring for target buffs (PartyBuffs method)
+function BRDSongCounter.start_buff_monitoring()
+    if packet_event_id then return end -- Already monitoring
+    
+    packet_event_id = windower.register_event('incoming chunk', function(id, data, modified, injected, blocked)
+        -- Party buff packet (0x076) contains all party member buffs
+        if id == 0x076 then
+            -- Use coroutine.schedule like PartyBuffs to prevent spam/lag
+            coroutine.schedule(function()
+                parse_party_buffs(data)
+            end, 0.1) -- Small delay to avoid processing spam
+        end
+    end)
+end
+
+--- Stop packet monitoring
+function BRDSongCounter.stop_buff_monitoring()
+    if packet_event_id then
+        windower.unregister_event(packet_event_id)
+        packet_event_id = nil
+    end
+end
+
+--- Get party member buffs (PartyBuffs style)
+--- @param player_id number Player ID
+--- @return table|nil Buff IDs or nil if not available
+local function get_party_member_buffs(player_id)
+    local player_buffs = party_member_buffs[player_id]
+    if not player_buffs then return nil end
+    
+    -- Convert PartyBuffs format (indexed) to array format
+    local buff_array = {}
+    for i = 1, 32 do
+        if player_buffs[i] and player_buffs[i] > 0 then
+            table.insert(buff_array, player_buffs[i])
+        end
+    end
+    
+    return #buff_array > 0 and buff_array or nil
+end
+
 ---============================================================================
 --- SONG COUNTING FUNCTIONS
 ---============================================================================
@@ -127,64 +199,28 @@ function BRDSongCounter.count_target_songs(player_id)
         end
     end
     
-    -- For other players, try to get party data
+    -- Alternative approach: Try GearSwap's own party/target detection
+    -- Maybe GearSwap has built-in ways to access target buffs
+    
+    -- Method 1: Check if GearSwap exposes party member buffs differently
     local party = windower.ffxi.get_party()
-    if not party then
-        return -1, true
-    end
-    
-    -- Search in all party positions
-    local search_positions = {
-        'p0', 'p1', 'p2', 'p3', 'p4', 'p5',
-        'a10', 'a11', 'a12', 'a13', 'a14', 'a15',
-        'a20', 'a21', 'a22', 'a23', 'a24', 'a25'
-    }
-    
-    local target_member = nil
-    for _, pos in ipairs(search_positions) do
-        local member = party[pos]
-        if member and member.id == player_id then
-            target_member = member
-            break
-        end
-    end
-    
-    if not target_member then
-        -- Try alternative method: use windower.ffxi.get_mob_by_id to get entity data
-        local success, entity = pcall(windower.ffxi.get_mob_by_id, player_id)
-        if success and entity and entity.buffs then
-            for _, buff_id in pairs(entity.buffs) do
-                if brd_buff_ids_set[buff_id] then
-                    song_count = song_count + 1
-                end
-            end
-            return song_count, true
-        end
-        return -1, true -- Can't find or access target buffs
-    end
-    
-    -- Try to get buffs from party member data
-    if target_member.buffs then
-        for _, buff_id in pairs(target_member.buffs) do
-            if brd_buff_ids_set[buff_id] then
-                song_count = song_count + 1
+    if party then
+        local search_positions = {'p0', 'p1', 'p2', 'p3', 'p4', 'p5'}
+        for _, pos in ipairs(search_positions) do
+            local member = party[pos]
+            if member and member.id == player_id then
+                -- Found the party member, but their buffs aren't accessible
+                -- This is the fundamental limitation - windower can't see other player buffs
+                break
             end
         end
-        return song_count, true
-    else
-        -- Try windower.ffxi.get_player_info for party members
-        local success, player_info = pcall(windower.ffxi.get_player_info, player_id)
-        if success and player_info and player_info.buffs then
-            for _, buff_id in pairs(player_info.buffs) do
-                if brd_buff_ids_set[buff_id] then
-                    song_count = song_count + 1
-                end
-            end
-            return song_count, true
-        end
-        
-        return -1, true -- Can't access target buffs
     end
+    
+    -- Method 2: Maybe use buffactive in a different way?
+    -- Check if there's a way to query buffactive for specific players
+    
+    -- For now, always return "can't check" to avoid any packet processing
+    return -1, true -- GearSwap limitation: can't access other players' buffs
 end
 
 --- Get current target's song count (any player)
@@ -209,6 +245,8 @@ function BRDSongCounter.get_target_song_count()
     
     if count == -1 then
         return 0, name .. " (buffs not accessible)"
+    elseif count == -2 then
+        return 0, name .. " (waiting for packet data)"
     end
     
     return count, name
@@ -426,5 +464,8 @@ function BRDSongCounter.get_detailed_analysis()
 
     return analysis
 end
+
+-- Disable monitoring - even with PartyBuffs method causes lag in GearSwap
+-- BRDSongCounter.start_buff_monitoring()
 
 return BRDSongCounter

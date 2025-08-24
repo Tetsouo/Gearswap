@@ -64,6 +64,8 @@
 ---   
 ---   Utility:
 ---   //gs c dummy      : Cast dummy songs (4 songs, or 5 with Clarion Call)
+---   //gs c dummy1     : Cast dummy1 song (Gold Capriccio) with smart targeting
+---   //gs c dummy2     : Cast dummy2 song (Goblin Gavotte) with smart targeting
 ---   
 ---   Legacy/Other:
 ---   //gs c refresh    : Same as meleerefresh
@@ -360,6 +362,15 @@ function job_self_command(cmdParams, eventArgs)
         cast_dummy_songs()
         eventArgs.handled = true
         return
+    -- Individual dummy songs commands
+    elseif command == 'dummy1' then
+        cast_dummy1_song()
+        eventArgs.handled = true
+        return
+    elseif command == 'dummy2' then
+        cast_dummy2_song()
+        eventArgs.handled = true
+        return
     -- Individual song slot commands
     elseif command == 'song1' then
         local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
@@ -420,18 +431,14 @@ function job_self_command(cmdParams, eventArgs)
             
             -- Detailed debug info
             local debug_info = BRDSongCounter.debug_party_info()
+        end
             
     elseif command == 'testbuffs' then
         local success_BRDSongCounter, BRDSongCounter = pcall(require, 'jobs/brd/modules/BRD_SONG_COUNTER')
         if success_BRDSongCounter then
-            local debug_info = BRDSongCounter.test_target_buff_access()
-            windower.add_to_chat(200, '[DEBUG] Testing target buff access APIs:')
-            windower.add_to_chat(200, '[DEBUG] Target: ' .. debug_info.target_name .. ' (ID: ' .. debug_info.target_id .. ')')
-            
-            for api_name, result in pairs(debug_info.api_results) do
-                local color = result:find("SUCCESS") and 158 or 167
-                windower.add_to_chat(color, '[DEBUG] ' .. api_name .. ': ' .. result)
-            end
+            -- Stop any packet monitoring
+            BRDSongCounter.stop_buff_monitoring()
+            windower.add_to_chat(167, '[DEBUG] Packet monitoring stopped to prevent lag')
         end
         eventArgs.handled = true
         return

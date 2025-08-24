@@ -434,6 +434,96 @@ function BRDSongCaster.cast_dummy_songs()
     MessageUtils.brd_song_list_message(dummy_list, "Dummy Rotation")
 end
 
+--- Cast dummy1 song (Gold Capriccio) with intelligent targeting
+function BRDSongCaster.cast_dummy1_song()
+    local dummy_song = "Gold Capriccio"
+    
+    -- Set to Dummy mode
+    BRDUtils.set_song_mode('Dummy')
+    
+    -- TARGET DETECTION: Check if targeting self or others
+    local target_cmd = "<me>"  -- Default to self
+    local needs_pianissimo = false
+    
+    -- Check if we have a valid target that's not ourselves
+    if player.target and player.target.id and player.target.id ~= player.id then
+        -- Check if target is a player (spawn_type 13 = PC)
+        if player.target.spawn_type == 13 then
+            target_cmd = "<stpc>"  -- Sub-target PC
+            needs_pianissimo = true
+            MessageUtils.brd_message("Dummy1", "Targeting " .. (player.target.name or "Unknown"), dummy_song)
+        else
+            -- Not a player, target self instead
+            target_cmd = "<me>"
+            needs_pianissimo = false
+            MessageUtils.brd_message("Dummy1", "Invalid target - casting on self", dummy_song)
+        end
+    else
+        -- No target or targeting self
+        target_cmd = "<me>"
+        needs_pianissimo = false
+        MessageUtils.brd_message("Dummy1", "Casting on self", dummy_song)
+    end
+    
+    -- Cast with appropriate targeting
+    if needs_pianissimo then
+        send_command('input /ja "Pianissimo" <me>')
+        send_command('wait 1.5; input /ma "' .. dummy_song .. '" ' .. target_cmd)
+    else
+        send_command('input /ma "' .. dummy_song .. '" ' .. target_cmd)
+    end
+    
+    -- Return to Party mode after casting
+    coroutine.schedule(function()
+        BRDUtils.set_song_mode('Party')
+    end, 4)
+end
+
+--- Cast dummy2 song (Goblin Gavotte) with intelligent targeting
+function BRDSongCaster.cast_dummy2_song()
+    local dummy_song = "Goblin Gavotte"
+    
+    -- Set to Dummy mode
+    BRDUtils.set_song_mode('Dummy')
+    
+    -- TARGET DETECTION: Check if targeting self or others
+    local target_cmd = "<me>"  -- Default to self
+    local needs_pianissimo = false
+    
+    -- Check if we have a valid target that's not ourselves
+    if player.target and player.target.id and player.target.id ~= player.id then
+        -- Check if target is a player (spawn_type 13 = PC)
+        if player.target.spawn_type == 13 then
+            target_cmd = "<stpc>"  -- Sub-target PC
+            needs_pianissimo = true
+            MessageUtils.brd_message("Dummy2", "Targeting " .. (player.target.name or "Unknown"), dummy_song)
+        else
+            -- Not a player, target self instead
+            target_cmd = "<me>"
+            needs_pianissimo = false
+            MessageUtils.brd_message("Dummy2", "Invalid target - casting on self", dummy_song)
+        end
+    else
+        -- No target or targeting self
+        target_cmd = "<me>"
+        needs_pianissimo = false
+        MessageUtils.brd_message("Dummy2", "Casting on self", dummy_song)
+    end
+    
+    -- Cast with appropriate targeting
+    if needs_pianissimo then
+        send_command('input /ja "Pianissimo" <me>')
+        send_command('wait 1.5; input /ma "' .. dummy_song .. '" ' .. target_cmd)
+    else
+        send_command('input /ma "' .. dummy_song .. '" ' .. target_cmd)
+    end
+    
+    -- Return to Party mode after casting
+    coroutine.schedule(function()
+        BRDUtils.set_song_mode('Party')
+    end, 4)
+end
+
 ---============================================================================
 --- INDIVIDUAL SONG SLOT CASTING
 ---============================================================================
@@ -493,13 +583,19 @@ function BRDSongCaster.cast_single_song(slot_number)
         local active_songs
         local target_info = ""
         
+        -- Define dummy songs for each slot
+        local dummy_songs = {
+            [3] = "Gold Capriccio",
+            [4] = "Goblin Gavotte"
+        }
+        
         -- Check if we're targeting someone else - check THEIR songs
-        if player.target and player.target.id ~= player.id then
+        if player.target and player.target.id and player.target.id ~= player.id then
             local target_song_count, found = BRDSongCounter.count_target_songs()
             
             if target_song_count == -1 then
-                -- Can't check buffs (windower limitation), skip the song count check for other players
-                MessageUtils.brd_message("Info", "Can't verify target buffs", "Casting anyway")
+                -- Can't check buffs on other players - skip dummy logic and cast directly
+                -- This is normal behavior for targeting other players
                 -- Skip the dummy handling entirely - just cast the song directly
             elseif not found then
                 MessageUtils.error("BRD", "Unable to target: " .. (player.target and player.target.name or "Unknown"))
@@ -508,11 +604,53 @@ function BRDSongCaster.cast_single_song(slot_number)
                 active_songs = target_song_count
                 target_info = " on " .. (player.target.name or "target")
                 
-                -- Normal check for when we can see buffs
+                -- Intelligent dummy handling for target based on their song count
                 if active_songs < 2 then
                     MessageUtils.error("BRD", "Target needs 2 songs before slot " .. slot_number)
                     MessageUtils.brd_message("Tip", "Cast song1 and song2" .. target_info .. " first", "Then use song" .. slot_number)
                     return
+                elseif active_songs < slot_number then
+                    -- Need to fill target's slots with dummies up to the target slot
+                    local dummies_needed = slot_number - active_songs
+                    MessageUtils.brd_message("Info", "Target has " .. active_songs .. " songs - need " .. dummies_needed .. " dummies", "")
+                    
+                    if slot_number == 3 and active_songs == 2 then
+                        -- Need dummy for slot 3
+                        local dummy_song = dummy_songs[3]  -- Gold Capriccio
+                        send_command('input /ja "Pianissimo" <me>')
+                        send_command('wait 1.5; input /ma "' .. dummy_song .. '" ' .. target_cmd)
+                        send_command('wait 5; input /ja "Pianissimo" <me>')
+                        send_command('wait 6.5; input /ma "' .. song .. '" ' .. target_cmd)
+                        MessageUtils.brd_message("BRD", "Casting dummy then real song", song)
+                        return
+                        
+                    elseif slot_number == 4 and active_songs == 2 then
+                        -- Need dummy for slot 3 AND slot 4
+                        local dummy3 = dummy_songs[3]  -- Gold Capriccio
+                        local dummy4 = dummy_songs[4]  -- Goblin Gavotte
+                        send_command('input /ja "Pianissimo" <me>')
+                        send_command('wait 1.5; input /ma "' .. dummy3 .. '" ' .. target_cmd)
+                        send_command('wait 5; input /ja "Pianissimo" <me>')
+                        send_command('wait 6.5; input /ma "' .. dummy4 .. '" ' .. target_cmd)
+                        send_command('wait 11.5; input /ja "Pianissimo" <me>')
+                        send_command('wait 13; input /ma "' .. song .. '" ' .. target_cmd)
+                        MessageUtils.brd_message("BRD", "Casting 2 dummies then real song", song)
+                        return
+                        
+                    elseif slot_number == 4 and active_songs == 3 then
+                        -- Need dummy for slot 4 only
+                        local dummy_song = dummy_songs[4]  -- Goblin Gavotte
+                        send_command('input /ja "Pianissimo" <me>')
+                        send_command('wait 1.5; input /ma "' .. dummy_song .. '" ' .. target_cmd)
+                        send_command('wait 5; input /ja "Pianissimo" <me>')
+                        send_command('wait 6.5; input /ma "' .. song .. '" ' .. target_cmd)
+                        MessageUtils.brd_message("BRD", "Casting dummy then real song", song)
+                        return
+                    end
+                else
+                    -- active_songs >= slot_number, target has enough songs - cast directly
+                    MessageUtils.brd_message("Info", "Target has " .. active_songs .. " songs - casting directly", song)
+                    -- Continue to normal casting below (no return)
                 end
             end
         else
@@ -520,36 +658,46 @@ function BRDSongCaster.cast_single_song(slot_number)
             active_songs = BRDSongCounter.count_active_songs()
             target_info = " on self"
             
-            -- If we have at least 2 songs but no dummies, cast dummies first
-            if active_songs >= 2 then
-                -- For self, check if we already have dummy songs active
-                local has_dummies = buffactive['Gold Capriccio'] or buffactive['Goblin Gavotte'] or 
-                                   buffactive['Herb Pastoral'] or buffactive['Scop\'s Operetta']
-                
-                if not has_dummies then
-                    -- Cast 2 dummy songs first (only for self)
-                    MessageUtils.brd_message("Auto-Dummy", "Preparing slots", "For song " .. slot_number .. target_info)
-                    
-                    local dummy_songs = BRD_CONFIG.DUMMY_SONGS.standard
-                    local song_delay = BRDUtils.get_song_delay()
-                    
-                    -- Set to Dummy mode
-                    BRDUtils.set_song_mode('Dummy')
-                    
-                    -- Cast 2 dummies
-                    send_command('input /ma "' .. dummy_songs[1] .. '" <me>')
-                    send_command('wait ' .. song_delay .. '; input /ma "' .. dummy_songs[2] .. '" <me>')
-                    
-                    -- Then cast the real song after dummies
-                    local total_delay = song_delay * 2 + 1
-                    send_command('wait ' .. total_delay .. '; gs c song' .. slot_number .. '_real')
-                    
-                    return -- Exit here, will re-enter via song3_real or song4_real
-                end
-            elseif active_songs < 2 then
-                MessageUtils.error("BRD", "Need 2 songs active before slot " .. slot_number)
-                MessageUtils.brd_message("Tip", "Cast song1 and song2" .. target_info .. " first", "Then use song" .. slot_number)
+            -- Intelligent dummy handling based on current song count and target slot
+            if active_songs < 2 then
+                MessageUtils.error("BRD", "You need 2 songs before slot " .. slot_number)
+                MessageUtils.brd_message("Tip", "Cast song1 and song2 first", "Then use song" .. slot_number)
                 return
+            elseif active_songs < slot_number then
+                -- Need to fill slots with dummies up to the target slot
+                local dummies_needed = slot_number - active_songs
+                MessageUtils.brd_message("Info", "You have " .. active_songs .. " songs - need " .. dummies_needed .. " dummies", "")
+                
+                if slot_number == 3 and active_songs == 2 then
+                    -- Need dummy for slot 3
+                    local dummy_song = dummy_songs[3]  -- Gold Capriccio
+                    send_command('input /ma "' .. dummy_song .. '" <me>')
+                    send_command('wait 6; input /ma "' .. song .. '" <me>')
+                    MessageUtils.brd_message("BRD", "Casting dummy then real song", song)
+                    return
+                    
+                elseif slot_number == 4 and active_songs == 2 then
+                    -- Need dummy for slot 3 AND slot 4
+                    local dummy3 = dummy_songs[3]  -- Gold Capriccio
+                    local dummy4 = dummy_songs[4]  -- Goblin Gavotte
+                    send_command('input /ma "' .. dummy3 .. '" <me>')
+                    send_command('wait 6; input /ma "' .. dummy4 .. '" <me>')
+                    send_command('wait 12; input /ma "' .. song .. '" <me>')
+                    MessageUtils.brd_message("BRD", "Casting 2 dummies then real song", song)
+                    return
+                    
+                elseif slot_number == 4 and active_songs == 3 then
+                    -- Need dummy for slot 4 only
+                    local dummy_song = dummy_songs[4]  -- Goblin Gavotte
+                    send_command('input /ma "' .. dummy_song .. '" <me>')
+                    send_command('wait 6; input /ma "' .. song .. '" <me>')
+                    MessageUtils.brd_message("BRD", "Casting dummy then real song", song)
+                    return
+                end
+            else
+                -- active_songs >= slot_number, we can cast directly
+                MessageUtils.brd_message("Info", "You have " .. active_songs .. " songs - casting directly", song)
+                -- Continue to normal casting below (no return)
             end
         end
     end
@@ -561,11 +709,18 @@ function BRDSongCaster.cast_single_song(slot_number)
     local target_cmd = "<stnpc>"  -- Default to sub-target NPC
     local needs_pianissimo = false
     
-    -- Check current target
+    -- Check current target - be more careful about detection
+    windower.add_to_chat(200, '[DEBUG] player.target exists: ' .. tostring(player.target ~= nil))
     if player.target then
+        windower.add_to_chat(200, '[DEBUG] player.target.id: ' .. tostring(player.target.id))
+        windower.add_to_chat(200, '[DEBUG] player.id: ' .. tostring(player.id))
+    end
+    
+    if player.target and player.target.id and player.target.id ~= 0 then
         if player.target.id == player.id then
             -- Targeting self, cast on self
             target_cmd = "<me>"
+            needs_pianissimo = false
             MessageUtils.brd_message("Self-target", song, "Direct cast")
         else
             -- Targeting someone else, need Pianissimo
@@ -581,8 +736,10 @@ function BRDSongCaster.cast_single_song(slot_number)
             end
         end
     else
-        -- No target, use stnpc (will prompt for target)
-        target_cmd = "<stnpc>"
+        -- No valid target, cast on self
+        target_cmd = "<me>"
+        needs_pianissimo = false  -- Explicitly set to false
+        MessageUtils.brd_message("No target", "Casting on self", song)
     end
     
     -- Special handling for slot 1 (Honor March with Marcato)
@@ -610,6 +767,10 @@ function BRDSongCaster.cast_single_song(slot_number)
         end
     else
         -- Normal song casting with target detection
+        
+        -- Debug: show target and pianissimo status
+        windower.add_to_chat(200, '[DEBUG] target_cmd: ' .. target_cmd .. ', needs_pianissimo: ' .. tostring(needs_pianissimo))
+        
         if needs_pianissimo then
             send_command('input /ja "Pianissimo" <me>')
             send_command('wait 1.5; input /ma "' .. song .. '" ' .. target_cmd)
