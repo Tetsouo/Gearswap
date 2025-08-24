@@ -107,7 +107,7 @@ function BRDSongCounter.count_target_songs(player_id)
     
     if not player_id then
         -- Use current target
-        local success, target = pcall(windower.ffxi.get_mob_by_target, 'st')
+        local success, target = pcall(windower.ffxi.get_mob_by_target, 't')
         if success and target then
             target_buffs = target.buffs
             target_name = target.name or "Unknown"
@@ -142,7 +142,7 @@ end
 --- @return number Song count (0 if not found)
 --- @return string Target name or "No target"
 function BRDSongCounter.get_target_song_count()
-    local success, target = pcall(windower.ffxi.get_mob_by_target, 'st')
+    local success, target = pcall(windower.ffxi.get_mob_by_target, 't')
     if not success or not target then
         return 0, "No target"
     end
