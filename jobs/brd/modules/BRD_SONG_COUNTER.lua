@@ -157,7 +157,7 @@ function BRDSongCounter.can_refresh_song_count(target_count)
     return current_count >= target_count
 end
 
---- Count songs on a party member by ID or current target
+--- Count songs on a party member by ID or current target  
 --- @param player_id number Optional player ID, uses current target if nil
 --- @return number Song count on that player
 --- @return boolean true if player found
@@ -199,6 +199,12 @@ function BRDSongCounter.count_target_songs(player_id)
         end
     end
     
+    -- For other players, update the cache RIGHT NOW before checking
+    local success_monitor, BRDPartyMonitor = pcall(require, 'jobs/brd/modules/BRD_PARTY_MONITOR')
+    if success_monitor then
+        BRDPartyMonitor.update_now()  -- Update cache with latest packet
+    end
+    
     -- Alternative approach: Try GearSwap's own party/target detection
     -- Maybe GearSwap has built-in ways to access target buffs
     
@@ -216,11 +222,31 @@ function BRDSongCounter.count_target_songs(player_id)
         end
     end
     
-    -- Method 2: Maybe use buffactive in a different way?
-    -- Check if there's a way to query buffactive for specific players
+    -- Now check the updated cache from BRDPartyMonitor
+    if success_monitor then
+        local target = windower.ffxi.get_mob_by_id(player_id)
+        if target and target.name then
+            local count, songs = BRDPartyMonitor.count_member_songs(target.name)
+            if count >= 0 then
+                return count, true
+            end
+        end
+    end
     
-    -- For now, always return "can't check" to avoid any packet processing
-    return -1, true -- GearSwap limitation: can't access other players' buffs
+    -- Fallback: Try manual tracker
+    local success_tracker, BRDPartyTracker = pcall(require, 'jobs/brd/modules/BRD_PARTY_TRACKER')
+    if success_tracker then
+        local target = windower.ffxi.get_mob_by_id(player_id)
+        if target and target.name then
+            local count = BRDPartyTracker.get_member_songs(target.name)
+            if count >= 0 then
+                return count, true
+            end
+        end
+    end
+    
+    -- Unable to determine
+    return -1, true
 end
 
 --- Get current target's song count (any player)

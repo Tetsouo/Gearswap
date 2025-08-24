@@ -67,6 +67,13 @@
 ---   //gs c dummy1     : Cast dummy1 song (Gold Capriccio) with smart targeting
 ---   //gs c dummy2     : Cast dummy2 song (Goblin Gavotte) with smart targeting
 ---   
+---   Party Monitoring:
+---   //gs c partymonitor start  : Start monitoring party member buffs
+---   //gs c partymonitor stop   : Stop monitoring
+---   //gs c partymonitor status : Show all party members' song counts
+---   //gs c checkbuffs          : Check current target's buffs
+---   //gs c checkbuffs Kaories  : Check specific player's buffs
+---   
 ---   Legacy/Other:
 ---   //gs c refresh    : Same as meleerefresh
 ---   //gs c allsongs   : Same as meleesong
@@ -133,6 +140,10 @@ function user_setup()
     
     -- Setup macro book and lockstyle
     select_default_macro_book()
+    
+    -- DISABLED - Packet monitoring causes lag in GearSwap
+    -- GearSwap cannot handle real-time packet processing without performance issues
+    -- Use manual tracking instead with //gs c setsongs command
 end
 
 ---============================================================================
@@ -155,7 +166,7 @@ function job_setup()
         'Fire', 'Ice', 'Wind', 'Earth', 'Lightning', 'Water', 'Light', 'Dark' }
     
     -- Create completely new state with unique name
-    state.BRDRotation = M { ['description'] = 'BRD Rotation', 'Madrigal', 'Minne', 'Etude', 'Carol', 'Dirge', 'Scherzo' }
+    state.BRDRotation = M { ['description'] = 'BRD Rotation', 'Madrigal', 'Minne', 'Etude', 'Carol', 'Dirge', 'Scherzo', 'Tank', 'Healer' }
     
     -- New state for Victory March replacement when Haste is active
     state.VictoryMarchReplace = M { ['description'] = 'Victory March Replacement', 'Madrigal', 'Minne', 'Scherzo' }
@@ -168,7 +179,9 @@ function job_setup()
             Etude = 'Etude (Honor+Min5+4+Victory+Etude)',
             Carol = 'Carol (Honor+Min5+4+Victory+Carol)',
             Dirge = 'Dirge (Honor+Min5+4+Victory+Dirge)',
-            Scherzo = 'Scherzo (Honor+Min5+4+Victory+Scherzo)'
+            Scherzo = 'Scherzo (Honor+Min5+4+Victory+Scherzo)',
+            Tank = 'Tank (Victory+Minne5+Ballad3+Ballad2+Scherzo)',
+            Healer = 'Healer (Victory+Minne5+Ballad3+Ballad2+Scherzo)'
         }
         return descriptions[self.value] or self.value
     end
@@ -249,7 +262,9 @@ function job_self_command(cmdParams, eventArgs)
             Etude = 'Etude Pack (Honor+Min5+4+Victory+Etude)',
             Carol = 'Carol Pack (Honor+Min5+4+Victory+Carol)',
             Dirge = 'Dirge Pack (Honor+Min5+4+Victory+Dirge)',
-            Scherzo = 'Scherzo Pack (Honor+Min5+4+Victory+Scherzo)'
+            Scherzo = 'Scherzo Pack (Honor+Min5+4+Victory+Scherzo)',
+            Tank = 'Tank Pack (Victory+Minne5+Ballad3+Ballad2+Scherzo)',
+            Healer = 'Healer Pack (Victory+Minne5+Ballad3+Ballad2+Scherzo)'
         }
         local display_name = descriptions[current_value] or current_value
         MessageUtils.brd_message("Setting", "Song Pack", current_value)
@@ -371,6 +386,45 @@ function job_self_command(cmdParams, eventArgs)
         cast_dummy2_song()
         eventArgs.handled = true
         return
+    -- Manual song tracking commands (NO LAG)
+    elseif command == 'setsongs' then
+        local success_Tracker, BRDPartyTracker = pcall(require, 'jobs/brd/modules/BRD_PARTY_TRACKER')
+        if success_Tracker then
+            local player_name = cmdParams[2]  -- After 'gs c setsongs'
+            local song_count = cmdParams[3]   -- Third parameter
+            if player_name and song_count then
+                BRDPartyTracker.set_member_songs(player_name, song_count)
+            else
+                MessageUtils.error("Usage", "//gs c setsongs <name> <count>")
+                MessageUtils.brd_message("Example", "//gs c setsongs Kaories 2", "Sets Kaories to 2 songs")
+            end
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'checksongs' then
+        local success_Tracker, BRDPartyTracker = pcall(require, 'jobs/brd/modules/BRD_PARTY_TRACKER')
+        if success_Tracker then
+            local target_name = cmdParams[2]  -- After 'gs c checksongs'
+            if target_name then
+                local count = BRDPartyTracker.get_member_songs(target_name)
+                if count >= 0 then
+                    MessageUtils.brd_message("Tracker", target_name .. " has " .. count .. " songs", "(manually set)")
+                else
+                    MessageUtils.brd_message("Tracker", target_name .. " not tracked", "Use //gs c setsongs " .. target_name .. " <count>")
+                end
+            else
+                BRDPartyTracker.check_target()
+            end
+        end
+        eventArgs.handled = true
+        return
+    elseif command == 'showtracked' then
+        local success_Tracker, BRDPartyTracker = pcall(require, 'jobs/brd/modules/BRD_PARTY_TRACKER')
+        if success_Tracker then
+            BRDPartyTracker.show_tracked()
+        end
+        eventArgs.handled = true
+        return
     -- Individual song slot commands
     elseif command == 'song1' then
         local success_BRDSongCaster, BRDSongCaster = pcall(require, 'jobs/brd/modules/BRD_SONG_CASTER')
@@ -422,26 +476,7 @@ function job_self_command(cmdParams, eventArgs)
         end
         eventArgs.handled = true
         return
-    -- Debug command to check target's songs
-    elseif command == 'checksongs' or command == 'targetsongs' then
-        local success_BRDSongCounter, BRDSongCounter = pcall(require, 'jobs/brd/modules/BRD_SONG_COUNTER')
-        if success_BRDSongCounter then
-            local count, name = BRDSongCounter.get_target_song_count()
-            windower.add_to_chat(220, '[BRD] Target: ' .. name .. ' - Songs: ' .. count)
             
-            -- Detailed debug info
-            local debug_info = BRDSongCounter.debug_party_info()
-        end
-            
-    elseif command == 'testbuffs' then
-        local success_BRDSongCounter, BRDSongCounter = pcall(require, 'jobs/brd/modules/BRD_SONG_COUNTER')
-        if success_BRDSongCounter then
-            -- Stop any packet monitoring
-            BRDSongCounter.stop_buff_monitoring()
-            windower.add_to_chat(167, '[DEBUG] Packet monitoring stopped to prevent lag')
-        end
-        eventArgs.handled = true
-        return
     -- Pianissimo commands for single target
     elseif command == 'meleepiano' or command == 'meleeP' then
         cast_melee_pianissimo()
@@ -455,19 +490,6 @@ function job_self_command(cmdParams, eventArgs)
         cast_healer_pianissimo()
         eventArgs.handled = true
         return
-    -- Debug commands for packet analysis
-    elseif command == 'toggle_packet_debug' or command == 'packetdebug' then
-        toggle_packet_debug()
-        eventArgs.handled = true
-        return
-    elseif command == 'show_packet_song_status' or command == 'packetstatus' then
-        show_packet_song_status()
-        eventArgs.handled = true
-        return
-    elseif command == 'debug_all_packets' or command == 'debugpackets' then
-        debug_all_packets()
-        eventArgs.handled = true
-        return
     elseif command == 'songstatus' or command == 'songs' then
         get_current_song_status()
         eventArgs.handled = true
@@ -475,10 +497,6 @@ function job_self_command(cmdParams, eventArgs)
     elseif command == 'canrefresh' then
         local fifth_song_family = cmdParams[2] or 'MINNE' -- Default à MINNE
         can_refresh_fifth_song(fifth_song_family:upper())
-        eventArgs.handled = true
-        return
-    elseif command == 'debugbuffs' or command == 'showbuffs' then
-        debug_active_buffs()
         eventArgs.handled = true
         return
     elseif command == 'abilities' or command == 'ja' then

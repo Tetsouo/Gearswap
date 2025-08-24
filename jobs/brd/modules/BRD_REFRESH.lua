@@ -100,7 +100,7 @@ end
 --- @param pack_name string Song pack name ('Tank', 'Healer', etc.)
 --- @param display_name string Display name for messages
 local function refresh_pack_songs(pack_name, display_name)
-    MessageUtils.rotation("BRD", display_name .. " Refresh", "Starting...")
+    MessageUtils.brd_message("BRD", display_name .. " Refresh", "Starting...")
 
     -- Get specified pack
     local buff_songs = BRDUtils.get_song_pack(pack_name)
