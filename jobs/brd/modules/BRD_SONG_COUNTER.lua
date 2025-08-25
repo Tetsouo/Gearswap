@@ -227,7 +227,7 @@ function BRDSongCounter.count_target_songs(player_id)
         local target = windower.ffxi.get_mob_by_id(player_id)
         if target and target.name then
             local count, songs = BRDPartyMonitor.count_member_songs(target.name)
-            if count >= 0 then
+            if count > 0 then
                 return count, true
             end
         end

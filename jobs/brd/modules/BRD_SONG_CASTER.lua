@@ -616,36 +616,27 @@ function BRDSongCaster.cast_single_song(slot_number)
                     MessageUtils.brd_message("Info", "Target has " .. active_songs .. " songs - need " .. dummies_needed .. " dummies", "")
                     
                     if slot_number == 3 and active_songs == 2 then
-                        -- Need dummy for slot 3
+                        -- Need dummy for slot 3 - cast ONLY the dummy this time
                         local dummy_song = dummy_songs[3]  -- Gold Capriccio
                         send_command('input /ja "Pianissimo" <me>')
                         send_command('wait 1.5; input /ma "' .. dummy_song .. '" ' .. target_cmd)
-                        send_command('wait 8; input /ja "Pianissimo" <me>')
-                        send_command('wait 9.5; input /ma "' .. song .. '" ' .. target_cmd)
-                        MessageUtils.brd_message("BRD", "Casting dummy then real song", song)
+                        MessageUtils.brd_message("BRD", "Casting dummy for slot 3", dummy_song .. " → Next: use song3 again")
                         return
                         
                     elseif slot_number == 4 and active_songs == 2 then
-                        -- Need dummy for slot 3 AND slot 4
+                        -- Need dummy for slot 3 first - cast ONLY dummy3 this time
                         local dummy3 = dummy_songs[3]  -- Gold Capriccio
-                        local dummy4 = dummy_songs[4]  -- Goblin Gavotte
                         send_command('input /ja "Pianissimo" <me>')
                         send_command('wait 1.5; input /ma "' .. dummy3 .. '" ' .. target_cmd)
-                        send_command('wait 8; input /ja "Pianissimo" <me>')
-                        send_command('wait 9.5; input /ma "' .. dummy4 .. '" ' .. target_cmd)
-                        send_command('wait 16.5; input /ja "Pianissimo" <me>')
-                        send_command('wait 18; input /ma "' .. song .. '" ' .. target_cmd)
-                        MessageUtils.brd_message("BRD", "Casting 2 dummies then real song", song)
+                        MessageUtils.brd_message("BRD", "Casting dummy for slot 3", dummy3 .. " → Next: use song4 again")
                         return
                         
                     elseif slot_number == 4 and active_songs == 3 then
-                        -- Need dummy for slot 4 only
+                        -- Need dummy for slot 4 - cast ONLY the dummy this time
                         local dummy_song = dummy_songs[4]  -- Goblin Gavotte
                         send_command('input /ja "Pianissimo" <me>')
                         send_command('wait 1.5; input /ma "' .. dummy_song .. '" ' .. target_cmd)
-                        send_command('wait 8; input /ja "Pianissimo" <me>')
-                        send_command('wait 9.5; input /ma "' .. song .. '" ' .. target_cmd)
-                        MessageUtils.brd_message("BRD", "Casting dummy then real song", song)
+                        MessageUtils.brd_message("BRD", "Casting dummy for slot 4", dummy_song .. " → Next: use song4 again")
                         return
                     end
                 else

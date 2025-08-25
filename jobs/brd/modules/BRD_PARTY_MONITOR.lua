@@ -86,8 +86,8 @@ local function parse_party_buffs_optimized(data)
             -- Clear buffs
             party_buffs_cache[id].buffs = {}
             
-            -- Only check first 8 buffs (songs are always first)
-            for i = 1, 8 do
+            -- Check ALL 32 buffs (not just first 8 - songs can be anywhere)
+            for i = 1, 32 do
                 local buff = data:byte(k*48+5+16+i-1) + 256 * (math.floor(data:byte(k*48+5+8+math.floor((i-1)/4)) / 4^((i-1)%4)) % 4)
                 if buff > 0 and buff ~= 255 then
                     party_buffs_cache[id].buffs[#party_buffs_cache[id].buffs + 1] = buff
