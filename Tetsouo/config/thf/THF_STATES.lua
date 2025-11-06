@@ -68,13 +68,8 @@ function THFStates.configure()
     state.SubWeapon = M {
         ['description'] = 'Sub Weapon',
         'Centovente',   -- REMA dagger offhand (best)
-        'Tanmogayi',    -- High DPS dagger
-        'TwashtarS',    -- Empyrean dagger offhand
-        'Jugo',         -- Jugo Kukri +1
-        'Crepu',        -- Crepuscular Knife
-        'Blurred',      -- Blurred Knife +1
-        'Gleti',        -- Gleti's Knife
-        'Dagger2'       -- Generic dagger (for weapon sets)
+        'Tanmogayi',    -- High DPS sword offhand
+        'Kraken',  -- High magic damage club offhand
     }
     state.SubWeapon:set('Centovente')  -- Default to Centovente (REMA)
 

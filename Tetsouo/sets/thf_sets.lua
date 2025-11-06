@@ -84,6 +84,7 @@ sets.Crepu = {sub = 'Crepuscular Knife'}
 sets.Centovente = {sub = 'Centovente'}
 sets.Blurred = {sub = 'Blurred Knife +1'}
 sets.Gleti = {sub = "Gleti's Knife"}
+sets.Kraken = {sub = "Kraken Club"}
 
 -- Abyssea Proc Weapons (1-handed with dagger sub for DW)
 sets.Sword = {main = 'Excalipoor', sub = 'Qutrub Knife'}

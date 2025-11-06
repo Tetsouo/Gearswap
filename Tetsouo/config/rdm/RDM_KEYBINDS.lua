@@ -67,10 +67,10 @@ RDMKeybinds.binds = {
     { key = "^3", command = "saboteur",             desc = "Saboteur",      state = nil },
     { key = "^4", command = "composure",            desc = "Composure",     state = nil },
 
-    -- Quick Enhancing Spells
-    { key = "^5", command = "refresh",              desc = "Refresh",       state = nil },
-    { key = "^6", command = "phalanx",              desc = "Phalanx",       state = nil },
-    { key = "^7", command = "haste",                desc = "Haste",         state = nil },
+    -- Quick Enhancing Spells (using fallback spell cast)
+    { key = "^5", command = "Refresh II",           desc = "Refresh II",    state = nil },
+    { key = "^6", command = "Phalanx",              desc = "Phalanx",       state = nil },
+    { key = "^7", command = "Haste",                desc = "Haste",         state = nil },
 
     -- Cast Elemental Spells
     { key = "^8", command = "castlight",            desc = "Cast Main Light", state = nil },

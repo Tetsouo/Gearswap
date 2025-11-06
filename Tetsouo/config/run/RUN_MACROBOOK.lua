@@ -19,9 +19,9 @@
 --- @file    config/run/RUN_MACROBOOK.lua
 --- @author  Tetsouo
 --- @version 2.0 - Dual-boxing support
---- @date    Created: 2025-10-03 | Updated: 2025-10-22
+--- @date    Created: 2025-10-03 | Updated: 2025-11-04
 ---============================================================================
-local PLDMacroConfig = {}
+local RUNMacroConfig = {}
 
 ---============================================================================
 ---============================================================================
@@ -30,11 +30,11 @@ local PLDMacroConfig = {}
 ---============================================================================
 
 --- Default macro book (used if subjob not configured)
-PLDMacroConfig.default = {book = 15, page = 1}
+RUNMacroConfig.default = {book = 15, page = 1}
 
 --- RUN macro book assignments by subjob
 --- Format: ['SUBJOB'] = { book = NUMBER, page = NUMBER }
-PLDMacroConfig.solo = {
+RUNMacroConfig.solo = {
     ['RUN'] = {book = 15, page = 1}, -- RUN/RUN
     ['BLU'] = {book = 18, page = 1}, -- RUN/BLU
     ['RDM'] = {book = 20, page = 1}, -- RUN/WAR
@@ -51,7 +51,7 @@ PLDMacroConfig.solo = {
 --- Uncomment and customize sections below as needed:
 ---============================================================================
 
-PLDMacroConfig.dualbox = {
+RUNMacroConfig.dualbox = {
     -- Kaories playing RDM
     ['RDM'] = {
         ['RUN'] = {book = 15, page = 1}, -- RUN/RUN + RDM alt
@@ -75,4 +75,4 @@ PLDMacroConfig.dualbox = {
 --- MODULE EXPORT
 ---============================================================================
 
-return PLDMacroConfig
+return RUNMacroConfig

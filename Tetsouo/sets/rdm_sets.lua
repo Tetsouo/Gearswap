@@ -46,11 +46,30 @@ sets['Daybreak'] = {main = 'Daybreak'}
 sets['Colada'] = {main = 'Colada'}
 
 -- Sub Weapons (cycle via state.SubWeapon)
-sets['Ammurapi Shield'] = {sub = 'Ammurapi Shield'}
+sets['Ammurapi'] = {sub = 'Ammurapi Shield'}
 sets['Genmei'] = {sub = 'Genmei Shield'}
+sets['Malevolence'] = {sub = 'Malevolence'}
 
 -- Note: Weapons can be cycled via state.MainWeapon
 -- Equipment will automatically swap based on selection
+
+--============================================================--
+--                   SHIELD CONFIGURATION                     --
+--============================================================--
+
+-- Table des shields pour détection (modèle WAR Fencer)
+-- Used to determine if player is single wield (shield/empty) or dual wield (2 weapons)
+sets.shields = {
+    'Ammurapi',            -- Short name
+    'Ammurapi Shield',     -- Full name (FFXI uses both formats!)
+    'Genmei',              -- Short name
+    'Genmei Shield',       -- Full name
+    'Blurred Shield +1',
+    'Blurred Shield',
+    'Aegis',
+    'Ochain',
+    'Srivatsa'
+}
 
 --============================================================--
 --                      IDLE SETS                             --
@@ -140,8 +159,36 @@ sets.engaged.Refresh = sets.engaged.DT
 -- TP Engaged (maximize Store TP, TP gain)
 sets.engaged.TP = sets.engaged.DT
 
--- Dualwield Engaged (NIN subjob)
-sets.engaged.DW = sets.engaged.DT
+-- Acc Engaged (accuracy focus)
+sets.engaged.Acc = sets.engaged.DT
+
+--============================================================--
+--              DUAL WIELD ENGAGED SETS (2 WEAPONS)           --
+--============================================================--
+
+-- DT Dual Wield (defensive melee with dual wield gear)
+sets.engaged.DT.DW = set_combine(sets.engaged.DT, {
+    -- Dual Wield gear (Haste, DW+, etc.)
+    left_ear = 'Suppanomimi',  -- DW+5
+    right_ear = 'Eabani Earring',  -- DW+4
+    -- Add more DW gear here as needed
+})
+
+-- Enspell Dual Wield (enspell bonus with dual wield)
+sets.engaged.Enspell.DW = set_combine(sets.engaged.Enspell, {
+    head = "Nyame Helm",
+    left_ear = 'Suppanomimi',
+    right_ear = 'Eabani Earring',
+})
+
+-- Refresh Dual Wield (MP refresh while dual wielding)
+sets.engaged.Refresh.DW = sets.engaged.DT.DW
+
+-- TP Dual Wield (TP gain with dual wield)
+sets.engaged.TP.DW = sets.engaged.DT.DW
+
+-- Acc Dual Wield (accuracy focus with dual wield)
+sets.engaged.Acc.DW = sets.engaged.DT.DW
 
 --============================================================--
 --                     PRECAST SETS                           --
@@ -167,6 +214,13 @@ sets.precast.FC = {
         augments = {'MP+60', 'Mag. Acc+20 /Mag. Dmg.+20', 'Mag. Acc.+10', '"Fast Cast"+10'}
     }
 }
+
+-- Spell-specific Fast Cast sets (override generic FC)
+sets.precast.FC["Stoneskin"] = set_combine(sets.precast.FC, {
+    head = "Umuthi Hat",  -- Stoneskin-specific FC
+    waist = "Siegel Sash",
+    legs = "Nyame Flanchard",
+})
 
 -- Job Abilities
 sets.precast.JA['Chainspell'] = {

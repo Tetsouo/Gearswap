@@ -22,9 +22,21 @@ local MessageFormatter = require('shared/utils/messages/message_formatter')
 --- Keybind list with key, command, description, and state
 --- Key format: ! = Alt, ^ = Ctrl, @ = Windows, # = Shift
 GEOKeybinds.binds = {
-    -- Spell Selection (Geocolure & Indicolure)
+    ---========================================================================
+    --- GEOCOLURE & INDICOLURE
+    ---========================================================================
+
+    -- Cycle Spells
     { key = "!1", command = "cycle MainIndi", desc = "Main Indi", state = "MainIndi" },
     { key = "!2", command = "cycle MainGeo", desc = "Main Geo", state = "MainGeo" },
+
+    -- Cast Spells (Ctrl+1/2)
+    { key = "^1", command = "indi", desc = "Cast Indi (<me>)", state = nil },
+    { key = "^2", command = "geo", desc = "Cast Geo (auto target)", state = nil },
+
+    ---========================================================================
+    --- ELEMENTAL SPELLS
+    ---========================================================================
 
     -- Elemental Spells (Light then Dark)
     { key = "!3", command = "cycle MainLightSpell", desc = "Light Spell", state = "MainLightSpell" },

@@ -5,10 +5,9 @@
 --- Determines which gear to equip based on current TP to reach 2000/3000 TP thresholds.
 ---
 --- Features:
----   • TP bonus equipment configuration (accessories)
----   • Weapon-based TP bonus tracking (REMA weapons)
+---   • TP bonus equipment configuration (Moonshade Earring)
+---   • Weapon-based TP bonus tracking (Lionheart = Aeonic Great Sword)
 ---   • Automatic TP threshold optimization (2000/3000 TP)
----   • Shared configuration with RDM/BLU (Sequence sword)
 ---   • Intelligent minimum gear selection
 ---
 --- Usage:
@@ -18,10 +17,10 @@
 ---
 --- @file    config/run/RUN_TP_CONFIG.lua
 --- @author  Tetsouo
---- @version 1.0.0
---- @date    Created: 2025-10-08
+--- @version 2.0.0 - Updated for RUN weapons
+--- @date    Created: 2025-10-08 | Updated: 2025-11-04
 ---============================================================================
-local PLDTPConfig = {
+local RUNTPConfig = {
     ---============================================================================
     --- TP Bonus Equipment Pieces
     ---============================================================================
@@ -40,9 +39,9 @@ local PLDTPConfig = {
     -- These provide TP bonus when equipped as main weapon
 
     weapons = {{
-        name = "Sequence",
+        name = "Lionheart",
         bonus = 500
-    } -- REMA sword (shared with RDM/BLU)
+    } -- Aeonic Great Sword (RUN)
     }
 }
 
@@ -51,12 +50,12 @@ local PLDTPConfig = {
 --- @param  weapon_name string Name of the main weapon
 --- @return number TP bonus from weapon (0 or 500)
 ---============================================================================
-function PLDTPConfig.get_weapon_bonus(weapon_name)
+function RUNTPConfig.get_weapon_bonus(weapon_name)
     if not weapon_name then
         return 0
     end
 
-    for _, weapon in ipairs(PLDTPConfig.weapons) do
+    for _, weapon in ipairs(RUNTPConfig.weapons) do
         if weapon_name == weapon.name then
             return weapon.bonus
         end
@@ -69,7 +68,7 @@ end
 --- MODULE EXPORT
 ---============================================================================
 
--- Make globally available for backward compatibility
-_G.PLDTPConfig = PLDTPConfig
+-- Make globally available
+_G.RUNTPConfig = RUNTPConfig
 
-return PLDTPConfig
+return RUNTPConfig

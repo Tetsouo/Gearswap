@@ -96,7 +96,12 @@ sets['Ikenga'] = {
 sets['Naegling'] = {
     main = 'Naegling',
     sub = 'Blurred Shield +1'
-} -- Savage Blade
+} -- Savage Blade (Fencer build with shield)
+
+sets['NaeglingKC'] = {
+    main = 'Naegling',
+    sub = 'Kraken Club'
+} -- Naegling + Kraken Club (multi-attack focus)
 
 --- Maces (One-Handed, Fencer-compatible with shield)
 sets['Loxotic'] = {
@@ -257,6 +262,30 @@ sets.engaged.PDTAFM3 =
         ear2 = 'Boii Earring +1',
         ring1 = 'Niqmaddu Ring',
         ring2 = 'Moonlight Ring',
+        back = Cichol.stp
+    }
+)
+
+--- Kraken Club Specialized (Used when Kraken Club is in sub-weapon)
+--- Automatically selected when Kraken Club is equipped in sub-weapon slot.
+--- Focuses on Store TP reduction to leverage Kraken Club's multi-attack proc rate.
+--- See: set_builder.lua select_engaged_base()
+sets.engaged.PDTKC =
+    set_combine(
+    sets.engaged.PDTTP,
+    {
+        ammo = 'Aurgelmir Orb +1',
+        head = 'Boii Mask +3',
+        body = 'Boii Lorica +3',
+        hands = 'Tatena. Gote +1',
+        legs = 'Tatena. Haidate +1',
+        feet = 'Tatena. Sune. +1',
+        neck = "Combatant's Torque",
+        waist = 'Kentarch Belt +1',
+        ear1 = 'Dedition Earring',
+        ear2 = 'Crep. Earring',
+        ring1 = 'Defending Ring',
+        ring2 = MoonlightRing2,
         back = Cichol.stp
     }
 )

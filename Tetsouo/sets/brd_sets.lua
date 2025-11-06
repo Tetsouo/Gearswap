@@ -75,6 +75,7 @@ sets['Twashtar'] = {main = 'Twashtar'}
 sets['Carnwenhan'] = {main = 'Carnwenhan'}
 sets['Naegling'] = {main = 'Naegling'}
 sets['Mpu Gandring'] = {main = 'Mpu Gandring'}
+sets['Kraken'] = {sub = 'Kraken Club'}
 sets['Genmei'] = {sub = 'Genmei Shield'}
 sets['Demersal'] = {sub = 'Demers. Degen +1'}
 sets['Centovente'] = {sub = 'Centovente'}
@@ -137,6 +138,7 @@ sets.precast.JA.Marcato = {
 --============================================================--
 
 sets.midcast = {}
+sets.midcast['Enhancing Magic'] = {}
 
 --- Base Bard Song midcast
 sets.midcast.BardSong = {
@@ -358,22 +360,30 @@ sets.idle = {
 sets.idle.Refresh = sets.idle
 
 -- IdleMode: DT (Damage Taken reduction - Nyame)
-sets.idle.DT = set_combine(sets.idle, {
-    head = 'nyame helm',
-    body = ' nyame mail',
-    hands = 'nyame gauntlets',
-    legs = 'nyame flanchard',
-    feet = 'nyame sollerets'
-})
+sets.idle.DT =
+    set_combine(
+    sets.idle,
+    {
+        head = 'nyame helm',
+        body = 'nyame mail',
+        hands = 'nyame gauntlets',
+        legs = 'nyame flanchard',
+        feet = 'nyame sollerets'
+    }
+)
 
 -- IdleMode: Regen (HP regen focus - Nyame for now)
-sets.idle.Regen = set_combine(sets.idle, {
-    head = 'nyame helm',
-    body = ' nyame mail',
-    hands = 'nyame gauntlets',
-    legs = 'nyame flanchard',
-    feet = 'nyame sollerets'
-})
+sets.idle.Regen =
+    set_combine(
+    sets.idle,
+    {
+        head = 'nyame helm',
+        body = 'nyame mail',
+        hands = 'nyame gauntlets',
+        legs = 'nyame flanchard',
+        feet = 'nyame sollerets'
+    }
+)
 
 -- Town set (highest priority - overrides all modes)
 sets.idle.Town =
@@ -441,6 +451,30 @@ sets.engaged.PDT = {
     ring2 = ChirichRing2,
     back = Intarabus.stp
 }
+
+--- Kraken Club Specialized (Used when Kraken Club is in sub-weapon)
+--- Automatically selected when Kraken Club is equipped in sub-weapon slot.
+--- Reduces Store TP to leverage Kraken Club's multi-attack proc rate.
+--- See: set_builder.lua select_engaged_base()
+sets.engaged.PDTKC =
+    set_combine(
+    sets.engaged.PDT,
+    {
+        ranged = LinosTP,
+        head = 'Fili Calot +3',
+        body = 'Ayanmo Corazza +2',
+        hands = 'Fili Manchettes +3',
+        legs = 'Fili Rhingrave +3',
+        feet = 'Fili Cothurnes +3',
+        neck = "Bard's Charm +2",
+        waist = 'Sailfi Belt +1',
+        ear1 = 'Domin. Earring +1',
+        ear2 = 'Telos Earring',
+        ring1 = ChirichRing1,
+        ring2 = ChirichRing2,
+        back = Intarabus.stp
+    }
+)
 
 --============================================================--
 

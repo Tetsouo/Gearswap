@@ -141,7 +141,7 @@ end
 
 function user_setup()
     -- RUN-specific states (defines all states including HybridMode)
-    local RUNStates = require('Tetsouo/config/run/RUN_STATES_MINIMAL')
+    local RUNStates = require('Tetsouo/config/run/RUN_STATES')
     RUNStates.configure()
 
     if is_initial_setup then

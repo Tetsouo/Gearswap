@@ -54,6 +54,7 @@ function WARStates.configure()
         ['description'] = 'Main Weapon',
         'Ukonvasara', -- Relic Great Axe (Aftermath: TP reduction, best for AM3)
         'Naegling', -- Savage Blade sword (1H with shield for Fencer TP bonus)
+        'NaeglingKC', -- Naegling + Kraken Club (multi-attack focus)
         'Shining', -- Shining One (Great Sword)
         'Chango', -- Empyrean Great Axe (Aftermath: Multi-Attack, +500 TP bonus)
         'Ikenga', -- Ikenga's Axe (1H option)

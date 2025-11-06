@@ -17,21 +17,21 @@
 --- @file    config/run/RUN_LOCKSTYLE.lua
 --- @author  Tetsouo
 --- @version 1.0.0
---- @date    Created: 2025-10-03
+--- @date    Created: 2025-10-03 | Updated: 2025-11-04
 ---============================================================================
-local PLDLockstyleConfig = {}
+local RUNLockstyleConfig = {}
 
 ---============================================================================
 --- USER CONFIGURATION
 ---============================================================================
 
 --- Default lockstyle (used if no subjob-specific lockstyle is defined)
-PLDLockstyleConfig.default = 3
+RUNLockstyleConfig.default = 3
 
 --- Lockstyle by subjob (OPTIONAL)
 --- Configure different lockstyles per subjob here.
 --- If a subjob is not in this table, the default lockstyle will be used.
-PLDLockstyleConfig.by_subjob = {
+RUNLockstyleConfig.by_subjob = {
     -- Examples:
     ['RUN'] = 3, -- RUN/RUN uses lockstyle 3
     ['BLU'] = 3, -- RUN/BLU uses lockstyle 3
@@ -49,14 +49,14 @@ PLDLockstyleConfig.by_subjob = {
 ---
 --- @param  subjob string Current subjob code (RUN, BLU, RDM, WAR, NIN, etc.)
 --- @return number Lockstyle number (1-200)
-function PLDLockstyleConfig.get_style(subjob)
+function RUNLockstyleConfig.get_style(subjob)
     -- Check if subjob-specific lockstyle exists
-    if PLDLockstyleConfig.by_subjob and PLDLockstyleConfig.by_subjob[subjob] then
-        return PLDLockstyleConfig.by_subjob[subjob]
+    if RUNLockstyleConfig.by_subjob and RUNLockstyleConfig.by_subjob[subjob] then
+        return RUNLockstyleConfig.by_subjob[subjob]
     end
 
     -- Fallback to default
-    return PLDLockstyleConfig.default
+    return RUNLockstyleConfig.default
 end
 
 ---============================================================================
@@ -64,10 +64,10 @@ end
 ---============================================================================
 
 -- Legacy code may access .style directly instead of calling get_style()
-PLDLockstyleConfig.style = PLDLockstyleConfig.default
+RUNLockstyleConfig.style = RUNLockstyleConfig.default
 
 ---============================================================================
 --- MODULE EXPORT
 ---============================================================================
 
-return PLDLockstyleConfig
+return RUNLockstyleConfig

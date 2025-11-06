@@ -1,15 +1,14 @@
 ---============================================================================
 --- RUN State Configuration - Job States & Modes
 ---============================================================================
---- Defines all RUN job states (Combat Modes, Weapon Sets, XP Mode, Rune Mode).
+--- Defines all RUN job states (Combat Modes, Weapon Sets, Rune Mode).
 ---
 --- Features:
 ---   • HybridMode configuration (PDT/MDT)
 ---   • MainWeapon state with multiple weapon options
----   • SubWeapon state (shield selection: Duban/Aegis/Blurred)
----   • XP Mode for Phalanx optimization (SIRD vs Potency)
----   • RuneMode for RUN subjob (Ignis/Gelus/Flabra/Tellus/Sulpor/Unda/Lux/Tenebrae)
----   • Keybind integration (Alt+1/Alt+2/Alt+3/Alt+4/Alt+5)
+---   • SubWeapon state (grip selection: Utu/Refined)
+---   • RuneMode for Rune selection (Ignis/Gelus/Flabra/Tellus/Sulpor/Unda/Lux/Tenebrae)
+---   • Keybind integration (Alt+1/Alt+2/Alt+3/Alt+4)
 ---   • Validation function to verify state configuration
 ---
 --- Usage:
@@ -31,7 +30,7 @@ local RUNStates = {}
 
 --- Configure all RUN states
 --- Must be called from user_setup() after Mote-Include is loaded.
---- Defines HybridMode, MainWeapon, SubWeapon, Xp, and RuneMode states.
+--- Defines HybridMode, MainWeapon, SubWeapon, and RuneMode states.
 ---
 --- @return void
 function RUNStates.configure()
@@ -56,41 +55,27 @@ function RUNStates.configure()
     state.MainWeapon =
         M {
         ['description'] = 'Main Weapon',
-        'Burtgang', -- Relic sword (ultimate tank weapon)
-        'Naegling', -- Savage Blade sword
-        'Shining', -- Shining One (Great Sword)
-        'Malevo' -- Malevolence (Club)
+        'Epeolatry', -- Empyrean Great Sword
+        'Lionheart', -- Relic Great Sword
+        'Aettir' -- Aeonic Great Sword
     }
 
-    --- SubWeapon: Shield selection
+    --- SubWeapon: Sub weapon/grip selection
     --- Keybind: Alt+3 to cycle
     state.SubWeapon =
         M {
         ['description'] = 'Sub Weapon',
-        'Duban', -- Duban (general purpose shield)
-        'Aegis', -- Aegis (magic damage shield)
-        'Blurred' -- Blurred Shield +1 (PDT shield)
+        'Utu', -- Utu Grip
+        'Refined' -- Refined Grip +1
     }
-    state.SubWeapon:set('Duban') -- Default shield
+    state.SubWeapon:set('Utu') -- Default grip
 
     -- ==========================================================================
-    -- SUBJOB-SPECIFIC STATES
+    -- RUNE MODE
     -- ==========================================================================
 
-    --- XP Mode: Phalanx optimization (RDM subjob)
-    --- Options:
-    ---   • 'On'  - Phalanx with SIRD (Spell Interruption Rate Down) - for XP/low level
-    ---   • 'Off' - Phalanx with Potency (enhancing skill/duration) - for endgame
-    --- Keybind: Alt+4 to cycle (RDM subjob only)
-    state.Xp =
-        M {
-        ['description'] = 'Xp',
-        'Off', -- Potency Phalanx (default)
-        'On' -- SIRD Phalanx
-    }
-
-    --- RuneMode: Rune selection (RUN subjob)
-    --- Keybind: Alt+5 to cycle (RUN subjob only)
+    --- RuneMode: Rune selection for quick casting
+    --- Keybind: Alt+4 to cycle
     state.RuneMode =
         M {
         ['description'] = 'Rune Mode',
@@ -130,11 +115,6 @@ function RUNStates.validate()
     -- Check SubWeapon exists
     if not state.SubWeapon then
         return false, 'SubWeapon state not configured'
-    end
-
-    -- Check XP mode exists
-    if not state.Xp then
-        return false, 'Xp state not configured'
     end
 
     -- Check RuneMode exists
