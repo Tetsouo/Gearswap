@@ -18,6 +18,10 @@ function BSTStates.configure()
     state.AutoPetEngage = M{['description']='AutoPetEngage', 'Off', 'On'}
     state.AutoPetEngage:set('On')
 
+    -- Quick Ready mode (Charmer's Merlin for fastest Ready recast but loses TP)
+    state.QuickReady = M{['description']='QuickReady', 'Off', 'On'}
+    state.QuickReady:set('Off')
+
     -- Pet idle mode (MasterPDT/PetPDT focus)
     state.petIdleMode = M{['description']='PetIdleMode', 'MasterPDT', 'PetPDT'}
     state.petIdleMode:set('MasterPDT')

@@ -576,16 +576,26 @@ local summonSet = {
 }
 
 -- Configure JA sets
--- TEST CONFIG: BOTH Charmer's AND Gleti's to see if they stack
--- If stack: 30s - 10s (merits) - 5s (JP) - 5s (Charmer's) - 5s (Gleti's) = 5s
--- If NOT stack: 30s - 10s (merits) - 5s (JP) - 5s (one item) = 10s
+-- Ready/Sic recast gear:
+-- Base: 30s - 10s (merits) - 5s (JP) - 5s (Desultor) = 10s
+-- With QuickReady ON: + Charmer's Merlin -5s = 5s (but loses TP on Ready)
+-- With QuickReady OFF: Keep TP Store gear (Nukumi hands), no Charmer's = 10s
+
+-- Base Sic/Ready set (no Charmer's Merlin - preserves TP)
 sets.precast.JA['Sic'] = {
-    sub = "Charmer's Merlin", -- Ready Recast -5s
     hands = 'Nukumi Manoplas +3', -- Pet: Store TP +12
-    legs = "Gleti's Breeches" -- Ready Recast -5s (TEST if stack)
+    legs = "Desultor Tassets" -- Ready Recast -5s
+}
+
+-- QuickReady mode set (with Charmer's Merlin - fastest recast)
+sets.precast.JA.SicQuick = {
+    sub = "Charmer's Merlin", -- Ready Recast -5s (loses TP)
+    hands = 'Nukumi Manoplas +3', -- Pet: Store TP +12
+    legs = "Desultor Tassets" -- Ready Recast -5s
 }
 
 sets.precast.JA['Ready'] = sets.precast.JA['Sic']
+sets.precast.JA.ReadyQuick = sets.precast.JA.SicQuick
 sets.precast.JA['Call Beast'] = summonSet
 sets.precast.JA['Bestial Loyalty'] = summonSet
 

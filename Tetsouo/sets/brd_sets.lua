@@ -196,6 +196,16 @@ sets.midcast.HonorMarch =
 )
 sets.midcast['Honor March'] = sets.midcast.HonorMarch
 
+--- Aria of Passion specific (critical - requires Loughnashade throughout cast)
+sets.midcast.AriaPassion =
+    set_combine(
+    sets.midcast.BardSong,
+    {
+        range = 'Loughnashade'
+    }
+)
+sets.midcast['Aria of Passion'] = sets.midcast.AriaPassion
+
 --- Song-specific sets
 sets.midcast.Ballad =
     set_combine(
