@@ -44,6 +44,12 @@ function BSTStates.configure()
     -- Hybrid mode (PDT/Normal)
     state.HybridMode = M{['description']='Hybrid Mode', 'PDT', 'Normal'}
     state.HybridMode:set('PDT')
+
+    -- Moving state (manual toggle - no auto-detection for performance)
+    -- Note: AutoMove is disabled for BST to reduce overhead
+    -- Toggle manually if you want movement speed gear: //gs c toggle Moving
+    state.Moving = M{['description']='Moving', 'false', 'true'}
+    state.Moving:set('false')
 end
 
 return BSTStates

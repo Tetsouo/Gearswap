@@ -62,6 +62,10 @@ _G.ui_display_config = {
 function get_sets()
     mote_include_version = 2
 
+    -- DISABLE AUTOMOVE FOR BST (performance optimization)
+    -- BST has its own lightweight movement system in BST_IDLE.lua
+    _G.DISABLE_AUTOMOVE = true
+
     -- Load BST-specific configs BEFORE Mote-Include (needed by user_setup)
     _G.LockstyleConfig = LockstyleConfig
     _G.UIConfig = UIConfig
@@ -186,6 +190,15 @@ function user_setup()
         end
     end
 
+    -- ==========================================================================
+    -- START SMART MONITORING (pet status + movement)
+    -- ==========================================================================
+    -- Start monitoring immediately on load (doesn't require pet)
+    -- Will check pet status if pet exists, skip if no pet
+    coroutine.schedule(function()
+        start_pet_monitoring()
+    end, 3.0)  -- Start after 3s delay (let UI/keybinds load first)
+
     is_initial_setup = false
 end
 
@@ -244,38 +257,144 @@ function job_sub_job_change(newSubjob, oldSubjob)
 end
 
 ---============================================================================
---- PET MONITORING (TIME CHANGE EVENT)
+--- PET MONITORING (SMART BACKGROUND MONITORING)
 ---============================================================================
---- Monitor pet status and trigger auto-engage when conditions met
---- Runs every minute change in-game (FFXI time)
+--- Lightweight background monitoring that only runs when pet exists
+--- Checks every 3 seconds (vs 2.4s time change event)
+--- Stops automatically when no pet (vs constant polling)
 ---============================================================================
 
-windower.register_event('time change', function(new_time, old_time)
-    -- Only monitor if player is engaged
-    if player and player.status == 'Engaged' then
-        coroutine.schedule(function()
-            local PetManager = require('shared/jobs/bst/functions/logic/pet_manager')
-            if PetManager then
-                local pet = windower.ffxi.get_mob_by_target('pet')
-                PetManager.check_and_engage_pet(pet)
-            end
-        end, 0.1)
+local pet_monitor_active = false
+local last_monitor_check = 0
+
+-- Movement tracking (lightweight - no distance calculation)
+local last_position = {x = 0, y = 0, z = 0}
+
+-- Dirty flag tracking (Option 2: only update if states changed)
+local previous_states = {
+    petEngaged = 'false',
+    moving = 'false'
+}
+
+--- Smart pet monitoring loop - monitors pet status + movement
+--- Always active (checks every 1 second), works with or without pet
+local function smart_pet_monitor()
+    if not pet_monitor_active then
+        return  -- Monitoring stopped
     end
 
-    -- Monitor pet status (update petEngaged state)
-    coroutine.schedule(function()
-        local PetManager = require('shared/jobs/bst/functions/logic/pet_manager')
-        if PetManager then
+    -- DEBOUNCING: Prevent multiple simultaneous loops (strict 1 second minimum)
+    local current_time = os.clock()
+    if current_time - last_monitor_check < 1.0 then
+        return  -- Too soon, skip this call
+    end
+    last_monitor_check = current_time
+
+    -- ==========================================================================
+    -- CHECK 1: Pet Status (Idle/Engaged) + Auto-Engage
+    -- ==========================================================================
+    local pet = _G.pet
+    if pet and pet.id and pet.id ~= 0 then
+        -- Pet exists - check status
+        local success, PetManager = pcall(require, 'shared/jobs/bst/functions/logic/pet_manager')
+        if success and PetManager then
             PetManager.monitor_pet_status()
+
+            -- Auto-engage pet if conditions met
+            PetManager.check_and_engage_pet(pet)
         end
-    end, 0.1)
-end)
+    else
+        -- No pet - ensure petEngaged is false
+        if state and state.petEngaged and state.petEngaged.value ~= "false" then
+            state.petEngaged:set('false')
+        end
+    end
+
+    -- ==========================================================================
+    -- CHECK 2: Movement Detection (position tracking - checks every 1s)
+    -- ==========================================================================
+    if player and player.status == 'Idle' then
+        -- Get REAL-TIME position from windower API (not cached player global)
+        local player_mob = windower.ffxi.get_mob_by_target('me')
+        local current_x = player_mob and player_mob.x or 0
+        local current_y = player_mob and player_mob.y or 0
+        local current_z = player_mob and player_mob.z or 0
+
+        -- Check if position changed since last check
+        local moved = (current_x ~= last_position.x or
+                      current_y ~= last_position.y or
+                      current_z ~= last_position.z)
+
+        -- Update state.Moving if changed (silent)
+        if moved and state.Moving and state.Moving.value ~= "true" then
+            state.Moving:set('true')
+        elseif not moved and state.Moving and state.Moving.value ~= "false" then
+            state.Moving:set('false')
+        end
+
+        -- Save current position for next check
+        last_position.x = current_x
+        last_position.y = current_y
+        last_position.z = current_z
+    else
+        -- Not idle - ensure Moving is false
+        if state.Moving and state.Moving.value ~= "false" then
+            state.Moving:set('false')
+        end
+    end
+
+    -- ==========================================================================
+    -- REFRESH GEAR (ONLY if states changed - dirty flag optimization)
+    -- ==========================================================================
+    local current_petEngaged = state.petEngaged and state.petEngaged.value or 'false'
+    local current_moving = state.Moving and state.Moving.value or 'false'
+
+    -- Check if any state changed
+    local states_changed = (current_petEngaged ~= previous_states.petEngaged or
+                           current_moving ~= previous_states.moving)
+
+    if states_changed then
+        -- States changed - force gear refresh (silent)
+        windower.send_command('gs c update')
+
+        -- Update previous states
+        previous_states.petEngaged = current_petEngaged
+        previous_states.moving = current_moving
+    end
+
+    -- Schedule next check (1 second - balanced performance)
+    coroutine.schedule(smart_pet_monitor, 1.0)
+end
+
+--- Start pet monitoring (called when pet is summoned)
+function start_pet_monitoring()
+    if pet_monitor_active then
+        return  -- Already running
+    end
+
+    pet_monitor_active = true
+    coroutine.schedule(smart_pet_monitor, 1.0)
+end
+
+--- Stop pet monitoring (called on unload or pet release)
+function stop_pet_monitoring()
+    pet_monitor_active = false
+end
+
+-- Export for use in other modules
+_G.start_pet_monitoring = start_pet_monitoring
+_G.stop_pet_monitoring = stop_pet_monitoring
+
+---============================================================================
 
 ---============================================================================
 --- CLEANUP ON UNLOAD
 ---============================================================================
 
 function file_unload()
+    -- Stop pet monitoring
+    stop_pet_monitoring()
+
     -- Cancel all JobChangeManager operations
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
