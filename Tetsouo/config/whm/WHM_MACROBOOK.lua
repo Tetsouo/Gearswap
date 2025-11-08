@@ -38,7 +38,7 @@ WHMMacroConfig.default = {
 ---============================================================================
 
 --- Macrobook configuration organized by subjob
---- Maps subjob code → {book, page}
+--- Maps subjob code >> {book, page}
 --- Example: ['RDM'] = {book = 11, page = 1} means WHM/RDM uses book 11 page 1
 WHMMacroConfig.solo = {
     ['RDM'] = {book = 11, page = 1},  -- Red Mage subjob (most common)

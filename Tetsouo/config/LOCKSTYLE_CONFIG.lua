@@ -43,7 +43,7 @@ LockstyleConfig.cooldown = 15.0
 -- Testing Results (2025-10-03):
 -- - 5 seconds: Too short, causes "Style lock mode disabled" errors
 -- - 7 seconds: Still too short for rapid job switching
--- - 8 seconds: Optimal - works even with rapid WAR → PLD → WAR switching
+-- - 8 seconds: Optimal - works even with rapid WAR >> PLD >> WAR switching
 -- - 10+ seconds: Safe but unnecessarily slow
 
 -- DressUp Addon Management:

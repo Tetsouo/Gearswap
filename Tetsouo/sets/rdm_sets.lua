@@ -214,11 +214,11 @@ sets.precast.FC["Stoneskin"] = set_combine(sets.precast.FC, {
 -- Chainspell (2-hour ability - instant cast magic for 1 minute)
 -- Vitiation Tabard +3 enhances Chainspell effect (doubles duration to 2 minutes)
 sets.precast.JA['Chainspell'] = {
-    body = 'Vitiation Tabard +3'  -- Extends Chainspell duration 100% (1min -> 2min)
+    body = 'Vitiation Tabard +3'  -- Extends Chainspell duration 100% (1min >> 2min)
 }
 
 -- Convert (swaps HP and MP values - useful for emergency MP recovery)
--- Murgleis (Mythic) reduces Convert recast time (10min -> 5min)
+-- Murgleis (Mythic) reduces Convert recast time (10min >> 5min)
 sets.precast.JA['Convert'] = {
     -- main = "Murgleis",  -- Uncomment if you have Murgleis (Mythic RDM sword)
 }

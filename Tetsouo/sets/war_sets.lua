@@ -274,18 +274,18 @@ sets.engaged.PDTKC =
     set_combine(
     sets.engaged.PDTTP,
     {
-        ammo = 'Aurgelmir Orb +1',
-        head = 'Boii Mask +3',
-        body = 'Boii Lorica +3',
-        hands = 'Tatena. Gote +1',
-        legs = 'Tatena. Haidate +1',
-        feet = 'Tatena. Sune. +1',
-        neck = "Combatant's Torque",
-        waist = 'Kentarch Belt +1',
-        ear1 = 'Dedition Earring',
-        ear2 = 'Crep. Earring',
-        ring1 = 'Defending Ring',
-        ring2 = MoonlightRing2,
+        ammo="Seeth. Bomblet +1",
+        head="Boii Mask +3",
+        body="Boii Lorica +3",
+        hands="Tatena. Gote +1",
+        legs="Tatena. Haidate +1",
+        feet="Tatena. Sune. +1",
+        neck="Null Loop",
+        waist="Null Belt",
+        ear1="Crep. Earring",
+        ear2="Dedition Earring",
+        ring1="Moonlight Ring",
+        ring2="Moonlight Ring",
         back = Cichol.stp
     }
 )

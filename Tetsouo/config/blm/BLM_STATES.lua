@@ -169,7 +169,7 @@ function BLMStates.configure()
     -- AOETier: AOE spell tier (Aja/III/II/I)
     -- Aja = highest tier (Firaja, Stoneja, etc.) - no numeral
     -- III/II/I = -ga spell tiers (Firaga III, Firaga II, Firaga I)
-    -- Refinement chain: Firaja → Firaga III → Firaga II → Firaga I (handled by spell_refiner)
+    -- Refinement chain: Firaja >> Firaga III >> Firaga II >> Firaga I (handled by spell_refiner)
     state.AOETier = M {
         ['description'] = 'AOE Tier',
         "Aja",  -- Top tier: -ja spells (Firaja, Stoneja, etc.)

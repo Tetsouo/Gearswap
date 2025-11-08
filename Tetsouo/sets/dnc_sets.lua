@@ -79,13 +79,13 @@ Senuna.WS = {
 --                      WEAPON SETS                           --
 --============================================================--
 
--- Mpu Gandring → Centovente
+-- Mpu Gandring >> Centovente
 sets['Mpu Gandring'] = {
     main = 'Mpu Gandring',
     sub = 'Centovente'
 }
 
--- Demersal Degen +1 → Blurred Knife +1
+-- Demersal Degen +1 >> Blurred Knife +1
 sets['Demersal'] = {
     main = 'Demersal Degen +1',
     sub = 'Blurred Knife +1'

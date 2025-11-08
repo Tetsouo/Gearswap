@@ -35,7 +35,7 @@ WHMLockstyleConfig.default = 3
 ---============================================================================
 
 --- Lockstyle sets organized by subjob
---- Maps subjob code → lockstyle set number
+--- Maps subjob code >> lockstyle set number
 --- Example: ['RDM'] = 3 means WHM/RDM uses lockstyle set 3
 WHMLockstyleConfig.by_subjob = {
     ['RDM'] = 3,  -- Red Mage subjob (most common for WHM)

@@ -30,7 +30,7 @@ local WHMCureConfig = {}
 
 --- HP thresholds for Cure tier selection (based on HP missing)
 --- Format: {min_hp_missing, max_hp_missing, spell_name}
---- Logic: If target missing HP is in range → use this Cure tier
+--- Logic: If target missing HP is in range >> use this Cure tier
 WHMCureConfig.cure_tiers = {
     -- Cure I: 0-200 HP missing (base ~130 HP, potency ~160 HP)
     {min = 0, max = 200, spell = 'Cure'},
@@ -88,7 +88,7 @@ WHMCureConfig.safety_margin = 50
 ---============================================================================
 
 --- Show debug messages for Cure tier selection
---- Prints: "Target missing X HP → Selected Cure Y"
+--- Prints: "Target missing X HP >> Selected Cure Y"
 --- Note: Formatted WHM messages are shown regardless of this setting
 WHMCureConfig.debug_messages = false -- Set to true to enable verbose debug output
 

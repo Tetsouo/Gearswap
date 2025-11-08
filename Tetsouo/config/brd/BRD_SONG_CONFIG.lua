@@ -227,11 +227,11 @@ BRDSongConfig.SONG_REFINE = {
     -- Enable/disable the refine system
     enabled = true,
 
-    -- Song tier replacements (tier -> upgrade/downgrade mapping)
+    -- Song tier replacements (tier >> upgrade/downgrade mapping)
     tiers = {
         -- Lullaby spells
-        ['Horde Lullaby'] = 'Horde Lullaby II',    -- AOE: tier 1 → upgrade to tier 2 if tier 1 on cooldown
-        ['Foe Lullaby II'] = 'Foe Lullaby',        -- Single: tier 2 → downgrade to tier 1 if tier 2 on cooldown
+        ['Horde Lullaby'] = 'Horde Lullaby II',    -- AOE: tier 1 >> upgrade to tier 2 if tier 1 on cooldown
+        ['Foe Lullaby II'] = 'Foe Lullaby',        -- Single: tier 2 >> downgrade to tier 1 if tier 2 on cooldown
 
         -- Elegy spells
         ['Carnage Elegy'] = 'Battlefield Elegy',

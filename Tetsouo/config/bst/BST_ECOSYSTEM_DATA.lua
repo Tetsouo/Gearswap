@@ -17,11 +17,11 @@ local BSTEcosystemData = {}
 ---============================================================================
 
 --- Ecosystem strengths and weaknesses (circular and reciprocal)
---- First Group (Circular): Aquan → Amorph → Bird → Aquan
---- Second Group (Circular): Beast → Lizard → Plantoid → Beast
+--- First Group (Circular): Aquan >> Amorph >> Bird >> Aquan
+--- Second Group (Circular): Beast >> Lizard >> Plantoid >> Beast
 --- Third Group (Reciprocal): Vermin ↔ All Others (special case)
 BSTEcosystemData.correlation_matrix = {
-    -- FIRST GROUP: Aquan → Amorph → Bird → Aquan (Circular)
+    -- FIRST GROUP: Aquan >> Amorph >> Bird >> Aquan (Circular)
     ["Aquan"] = {
         strong_against = { "Amorph" },
         weak_to = { "Bird" },
@@ -41,7 +41,7 @@ BSTEcosystemData.correlation_matrix = {
         group = 1
     },
 
-    -- SECOND GROUP: Beast → Lizard → Plantoid → Beast (Circular)
+    -- SECOND GROUP: Beast >> Lizard >> Plantoid >> Beast (Circular)
     ["Beast"] = {
         strong_against = { "Lizard" },
         weak_to = { "Plantoid" },

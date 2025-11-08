@@ -22,10 +22,10 @@ GEOMacroConfig.default = { book = 5, page = 1 }
 -- Macro books per subjob (optional)
 -- If subjob not listed, uses default
 GEOMacroConfig.solo = {
-    ['WHM'] = { book = 5, page = 1 },  -- GEO/WHM → Book 1, Page 1
-    ['RDM'] = { book = 5, page = 1 },  -- GEO/RDM → Book 1, Page 2
-    ['BLM'] = { book = 5, page = 1 },  -- GEO/BLM → Book 1, Page 3
-    ['SCH'] = { book = 5, page = 1 },  -- GEO/SCH → Book 1, Page 4
+    ['WHM'] = { book = 5, page = 1 },  -- GEO/WHM >> Book 1, Page 1
+    ['RDM'] = { book = 5, page = 1 },  -- GEO/RDM >> Book 1, Page 2
+    ['BLM'] = { book = 5, page = 1 },  -- GEO/BLM >> Book 1, Page 3
+    ['SCH'] = { book = 5, page = 1 },  -- GEO/SCH >> Book 1, Page 4
 }
 
 

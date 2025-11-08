@@ -29,7 +29,7 @@ local WARTPConfig = {
     savagery_merits = 5,
 
     --- Do you own Agoge Mask? (any version: +1/+2/+3)
-    --- Agoge Mask adds +40 TP bonus per merit level (100 → 140 per merit).
+    --- Agoge Mask adds +40 TP bonus per merit level (100 >> 140 per merit).
     has_agoge_mask = true,
 
     --- Fencer Job Points Gifts (0-20)
@@ -160,13 +160,13 @@ function WARTPConfig.get_fencer_bonus(main_weapon, sub_weapon)
     --   ✓ Sub is empty OR sub is shield
     --   ✗ Sub is grip/strap OR sub is weapon (dual wield)
 
-    -- Case 1: No sub weapon (empty) → Fencer active
+    -- Case 1: No sub weapon (empty) >> Fencer active
     if not sub_weapon or sub_weapon == "" or sub_weapon == "empty" then
         local jp_bonus = WARTPConfig.fencer_jp_gifts * 11.5 -- 11.5 TP per JP Gift
         return 630 + jp_bonus
     end
 
-    -- Case 2: Sub is shield → Fencer active
+    -- Case 2: Sub is shield >> Fencer active
     for _, shield in ipairs(WARTPConfig.shields) do
         if sub_weapon == shield then
             local jp_bonus = WARTPConfig.fencer_jp_gifts * 11.5
@@ -174,14 +174,14 @@ function WARTPConfig.get_fencer_bonus(main_weapon, sub_weapon)
         end
     end
 
-    -- Case 3: Sub is grip/strap → Fencer inactive (Great Axes use grips)
+    -- Case 3: Sub is grip/strap >> Fencer inactive (Great Axes use grips)
     for _, grip in ipairs(WARTPConfig.grips) do
         if sub_weapon == grip then
             return 0
         end
     end
 
-    -- Case 4: Sub is anything else (probably a weapon for dual wield) → Fencer inactive
+    -- Case 4: Sub is anything else (probably a weapon for dual wield) >> Fencer inactive
     return 0
 end
 

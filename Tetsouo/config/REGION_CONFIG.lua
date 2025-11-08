@@ -10,7 +10,7 @@
 ---   "US" - North America / US PlayOnline accounts (NBCP)
 ---          - Code 057 = Orange (available)
 ---   "EU" - Europe PlayOnline accounts (BQJS)
----          - Code 057 = Does NOT exist (use 002 Rose instead)
+---          - Code 057 = Does NOT exist (use 003 instead)
 ---   "JP" - Japan PlayOnline accounts
 ---          - Code 057 = Orange (available)
 ---
@@ -28,7 +28,7 @@
 local RegionConfig = {}
 
 ---============================================================================
---- CHARACTER → REGION MAPPING
+--- CHARACTER >> REGION MAPPING
 ---============================================================================
 --- Add your character(s) below!
 --- Format: ["CharacterName"] = "US" or "EU" or "JP"
@@ -70,8 +70,8 @@ end
 --- @return number color_code FFXI color code for orange/warning
 function RegionConfig.get_orange_code(region)
     if region == "EU" then
-        -- EU: Code 057 does NOT exist, use 206 (Light Pink/Salmon) as closest to orange
-        return 206
+        -- EU: Code 057 does NOT exist, use 003 as orange equivalent
+        return 003
     else
         -- US/JP: Code 057 = Orange
         return 057
@@ -102,7 +102,7 @@ RegionConfig.region_info = {
         name = "Europe",
         pol_type = "BQJS",
         code_057 = "Does NOT exist",
-        warning_color = 206, -- Light Pink/Salmon (closest to orange)
+        warning_color = 003, -- Orange equivalent for EU
         example_chars = {"Kaories"}
     },
     JP = {

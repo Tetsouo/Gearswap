@@ -33,11 +33,11 @@ local BSTTPConfig = {
     ---   Rank 4 (2000 JP): +70 TP
     ---
     --- Examples:
-    ---   0 = No JP Gifts → Base only (+200/300/400)
-    ---   1 = Rank 150 only → Base +50
-    ---   2 = Ranks 150+500 → Base +100
-    ---   3 = Ranks 150+500+1125 → Base +160
-    ---   4 = All ranks → Base +230 (max)
+    ---   0 = No JP Gifts >> Base only (+200/300/400)
+    ---   1 = Rank 150 only >> Base +50
+    ---   2 = Ranks 150+500 >> Base +100
+    ---   3 = Ranks 150+500+1125 >> Base +160
+    ---   4 = All ranks >> Base +230 (max)
     fencer_jp_gifts = 4,
     ---==========================================================================
     --- TP BONUS EQUIPMENT PIECES
@@ -97,8 +97,8 @@ end
 function BSTTPConfig.get_fencer_bonus(weapon_name, sub_weapon)
     -- Fencer activation logic for BST:
     -- BST can ONLY dual-wield if subjob is NIN or DNC.
-    -- If subjob is NOT NIN/DNC → Fencer is ALWAYS active (cannot dual-wield)
-    -- If subjob IS NIN/DNC → Check equipment (must have sub weapon to dual-wield)
+    -- If subjob is NOT NIN/DNC >> Fencer is ALWAYS active (cannot dual-wield)
+    -- If subjob IS NIN/DNC >> Check equipment (must have sub weapon to dual-wield)
 
     local is_fencer_active = false
 
@@ -107,20 +107,20 @@ function BSTTPConfig.get_fencer_bonus(weapon_name, sub_weapon)
 
     -- Check if dual-wield is possible based on subjob
     if subjob ~= 'NIN' and subjob ~= 'DNC' then
-        -- Cannot dual-wield → Fencer ALWAYS active
+        -- Cannot dual-wield >> Fencer ALWAYS active
         is_fencer_active = true
     else
-        -- Can dual-wield (NIN or DNC subjob) → Check if actually dual-wielding
+        -- Can dual-wield (NIN or DNC subjob) >> Check if actually dual-wielding
         local sub_name = sub_weapon
         if not sub_name and player and player.equipment then
             sub_name = player.equipment.sub
         end
 
-        -- If no sub weapon OR sub is shield/grip → Fencer active
+        -- If no sub weapon OR sub is shield/grip >> Fencer active
         if not sub_name or sub_name == 'empty' or sub_name == '' then
             is_fencer_active = true
         else
-            -- Sub equipped: assume dual-wielding (weapon in sub) → Fencer inactive
+            -- Sub equipped: assume dual-wielding (weapon in sub) >> Fencer inactive
             is_fencer_active = false
         end
     end

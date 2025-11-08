@@ -420,27 +420,27 @@ sets.midcast.Cure = {
     main = {
         name = 'Queller Rod',
         augments = {'Healing magic skill +15', '"Cure" potency +10%', '"Cure" spellcasting time -7%'}
-    }, --Cure potency II -> 2
-    sub = 'Ammurapi Shield', --Cure potency II -> 0
-    ammo = 'Ombre Tathlum +1', --Cure potency II -> 0
-    head = 'Kaykaus Mitra +1', --Cure potency II -> 2 ensemble
-    body = 'Theo. Bliaut +3', --Cure potency II -> 6
-    hands = 'Theophany Mitts +3', --Cure potency II -> 4
-    legs = 'Ebers Pant. +3', --Cure potency II -> 0
-    feet = 'Kaykaus Boots +1', --Cure potency II -> 0
-    neck = {name = 'Clr. Torque +1', augments = {'Path: A'}}, --Cure potency II -> 0
-    waist = 'Eschan Stone', --Cure potency II -> 0
-    left_ear = 'Nourish. Earring +1', --Cure potency II -> 0
+    }, --Cure potency II >> 2
+    sub = 'Ammurapi Shield', --Cure potency II >> 0
+    ammo = 'Ombre Tathlum +1', --Cure potency II >> 0
+    head = 'Kaykaus Mitra +1', --Cure potency II >> 2 ensemble
+    body = 'Theo. Bliaut +3', --Cure potency II >> 6
+    hands = 'Theophany Mitts +3', --Cure potency II >> 4
+    legs = 'Ebers Pant. +3', --Cure potency II >> 0
+    feet = 'Kaykaus Boots +1', --Cure potency II >> 0
+    neck = {name = 'Clr. Torque +1', augments = {'Path: A'}}, --Cure potency II >> 0
+    waist = 'Eschan Stone', --Cure potency II >> 0
+    left_ear = 'Nourish. Earring +1', --Cure potency II >> 0
     right_ear = {
         name = 'Ebers Earring +2',
         augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+17', 'Mag. Acc.+17', 'Damage taken-6%', 'STR+9 MND+9'}
-    }, --Cure potency II -> 0
-    left_ring = "Naji's Loop", --Cure potency II -> 1
-    right_ring = {name = "Mephitas's Ring +1", augments = {'Path: A'}}, --Cure potency II -> 0
+    }, --Cure potency II >> 0
+    left_ring = "Naji's Loop", --Cure potency II >> 1
+    right_ring = {name = "Mephitas's Ring +1", augments = {'Path: A'}}, --Cure potency II >> 0
     back = {
         name = "Alaunus's Cape",
         augments = {'MND+20', 'Eva.+20 /Mag. Eva.+20', 'MND+10', '"Cure" potency +10%', 'Damage taken-5%'}
-    } --Cure potency II -> 0
+    } --Cure potency II >> 0
 } -- TOTAL Cure Potency II: 15
 
 -- Curaga (SIRD-focused for AOE healing - different from Cure!)
