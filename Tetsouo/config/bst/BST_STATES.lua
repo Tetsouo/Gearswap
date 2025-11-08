@@ -42,7 +42,7 @@ function BSTStates.configure()
     state.WeaponSet:set('Aymur')
 
     -- Sub set (sub/shield)
-    state.SubSet = M{['description']='Sub', "Agwu's Axe", 'Adapa Shield', 'Diamond Aspis'}
+    state.SubSet = M{['description']='Sub', "Agwu's Axe", 'Adapa Shield', 'Diamond Aspis', 'Kraken Club'}
     state.SubSet:set("Agwu's Axe")
 
     -- Hybrid mode (PDT/Normal)

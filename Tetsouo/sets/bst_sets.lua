@@ -214,6 +214,7 @@ sets['Tauret'] = {main = 'Tauret'}
 sets['Blur Knife'] = {sub = 'Blurred Knife +1'}
 sets['Adapa Shield'] = {sub = 'Adapa Shield'}
 sets['Diamond Aspis'] = {sub = 'Diamond Aspis'}
+sets['Kraken Club'] = {sub = 'Kraken Club'}
 
 -- JUG PET BROTH SETS (25 PETS - matches BST_PET_DATA.lua)
 sets['Amiable Roche (Fish)'] = {ammo = 'Airy Broth'}
