@@ -46,20 +46,13 @@ RUNKeybinds.binds = { -- Hybrid Mode (PDT/MDT)
     command = "cycle SubWeapon",
     desc = "Sub Weapon",
     state = "SubWeapon"
-}, -- XP Mode (RUN/RDM subjob only)
+}, -- Rune Mode (RUN main job - always available)
 {
     key = "!4",
-    command = "cycle Xp",
-    desc = "XP Mode",
-    state = "Xp",
-    subjob = "RDM"
-}, -- Rune Mode (RUN/RUN subjob only)
-{
-    key = "!5",
     command = "cycle RuneMode",
     desc = "Rune Mode",
-    state = "RuneMode",
-    subjob = "RUN"
+    state = "RuneMode"
+    -- No subjob filter - RuneMode is core RUN functionality
 }}
 
 ---============================================================================
