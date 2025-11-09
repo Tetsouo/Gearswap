@@ -3,8 +3,8 @@
 -- File: D:/Windower Tetsouo/addons/GearSwap/data/Tetsouo/config/ui_settings.lua
 return {
     -- Position
-    pos_x = 2050,
-    pos_y = -51,
+    pos_x = 1946,
+    pos_y = -30,
 
     -- Visibility
     enabled = true,

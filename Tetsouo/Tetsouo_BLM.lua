@@ -95,6 +95,11 @@ function get_sets()
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
 
+    -- ============================================
+    -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
+    -- ============================================
+    include('../shared/hooks/init_ws_messages.lua')
+
     _G.LockstyleConfig = LockstyleConfig
     _G.RECAST_CONFIG = require('Tetsouo/config/RECAST_CONFIG')
 
@@ -246,6 +251,12 @@ function job_update(cmdParams, eventArgs)
             -- Unlock all weapon slots
             enable('main', 'sub', 'range', 'ammo')
         end
+    end
+
+    -- Update UI when states change (F9, F10, etc.)
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI and KeybindUI.update then
+        KeybindUI.update()
     end
 end
 

@@ -72,13 +72,28 @@ RDMKeybinds.binds = {
     { key = "^6", command = "Phalanx",              desc = "Phalanx",       state = nil },
     { key = "^7", command = "Haste",                desc = "Haste",         state = nil },
 
-    -- Cast Elemental Spells
+    -- Cast Elemental Spells (Main)
     { key = "^8", command = "castlight",            desc = "Cast Main Light", state = nil },
     { key = "^9", command = "castdark",             desc = "Cast Main Dark",  state = nil },
 
+    -- Cast Elemental Spells (Sub)
+    { key = "^-", command = "castsublight",         desc = "Cast Sub Light",  state = nil },
+    { key = "^=", command = "castsubdark",          desc = "Cast Sub Dark",   state = nil },
+
+    ---========================================================================
+    --- CTRL+F-KEYS (Cast Enhancement Spells)
+    ---========================================================================
+
+    -- Cast Buff Spells (from states)
+    { key = "^f1", command = "castgain",            desc = "Cast Gain",       state = nil },
+    { key = "^f2", command = "castbar",             desc = "Cast BarElement", state = nil },
+    { key = "^f3", command = "castbarailment",      desc = "Cast BarAilment", state = nil },
+    { key = "!`", command = "castspike",            desc = "Cast Spike",      state = nil },  -- Alt+` (tilde key)
+    { key = "^f5", command = "caststorm",           desc = "Cast Storm",      state = nil, subjob = "SCH" },
+
     -- Cast Enspell & Nuke Tier
-    { key = "^-", command = "castenspell",          desc = "Cast Enspell",  state = nil },
-    { key = "^=", command = "cycle NukeTier",       desc = "Nuke Tier",     state = "NukeTier" },
+    { key = "^f6", command = "castenspell",         desc = "Cast Enspell",    state = nil },
+    { key = "^f7", command = "cycle NukeTier",      desc = "Nuke Tier",       state = "NukeTier" },
 }
 
 ---============================================================================

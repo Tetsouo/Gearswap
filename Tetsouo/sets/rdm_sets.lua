@@ -214,7 +214,7 @@ sets.precast.FC["Stoneskin"] = set_combine(sets.precast.FC, {
 -- Chainspell (2-hour ability - instant cast magic for 1 minute)
 -- Vitiation Tabard +3 enhances Chainspell effect (doubles duration to 2 minutes)
 sets.precast.JA['Chainspell'] = {
-    body = 'Vitiation Tabard +3'  -- Extends Chainspell duration 100% (1min >> 2min)
+    body = 'Vitiation Tabard +4'  -- Extends Chainspell duration 100% (1min >> 2min)
 }
 
 -- Convert (swaps HP and MP values - useful for emergency MP recovery)
@@ -227,15 +227,10 @@ sets.precast.JA['Convert'] = {
 --│ MIDCAST SETS                                                             │
 --╰──────────────────────────────────────────────────────────────────────────╯
 --╭──────────────────────────────────────────────────────────────────────────╮
---│ NAVIGATION TABLES - DO NOT MODIFY                                        │
---│ These empty tables enable Lua path navigation.                           │
---│ Keep them empty - define actual sets below.                              │
+--│ NAVIGATION TABLES (Removed - no longer needed)                           │
+--│ New architecture: spell_family sets created directly at root level       │
+--│ Example: sets.midcast.Refresh.Composure (no intermediate path needed)    │
 --╰──────────────────────────────────────────────────────────────────────────╯
-
--- Root level navigation (generic target-based)
--- Needed for paths like: sets.midcast.others.Refresh
-sets.midcast.others = {}  -- Path helper - KEEP EMPTY
-sets.midcast.self = {}    -- Path helper - KEEP EMPTY
 
 --╭──────────────────────────────────────────────────────────────────────────╮
 --│ ELEMENTAL MAGIC (NUKING)                                                 │
@@ -380,11 +375,8 @@ sets.midcast['Enhancing Magic'] = {
     right_ring = {name = 'Metamor. Ring +1', augments = {'Path: A'}},
     back = 'Ghostfyre Cape'}
 
--- Enhancing on Self (or no Composure active)
-sets.midcast['Enhancing Magic'].self = set_combine(sets.midcast['Enhancing Magic'], {})
-
--- Enhancing on Others (with Composure - duration bonus)
-sets.midcast['Enhancing Magic'].others = {
+-- Enhancing with Composure (on others - duration bonus)
+sets.midcast['Enhancing Magic'].Composure = {
     main = {name = 'Colada', augments = {'Enh. Mag. eff. dur. +4', 'STR+6', 'Mag. Acc.+11', 'DMG:+6'}},
     sub = 'Ammurapi Shield',
     ammo = 'Regal Gem',
@@ -402,37 +394,45 @@ sets.midcast['Enhancing Magic'].others = {
     back = 'Ghostfyre Cape'
 }
 
--- Refresh on Others (Composure + Empyrean bonus)
-sets.midcast['Enhancing Magic'].others.Refresh = set_combine(sets.midcast['Enhancing Magic'].others, {
-    body = 'Atrophy Tabard +4',
-    legs = 'Leth. Fuseau +3'
-})
-
--- Refresh on Self (potency)
+-- Refresh (base - potency)
 sets.midcast.Refresh = {
     body = 'Atrophy Tabard +4',
     legs = 'Leth. Fuseau +3'
 }
 
--- Stoneskin
-sets.midcast.Stoneskin = set_combine(sets.midcast['Enhancing Magic'].self, {
-    left_ear = 'Earthcry Earring',
-    neck = 'Nodens Gorget',
-    waist = 'Siegel Sash'
+-- Refresh with Composure (on others - Empyrean bonus)
+sets.midcast.Refresh.Composure = set_combine(sets.midcast['Enhancing Magic'].Composure, {
+    body = 'Atrophy Tabard +4',
+    legs = 'Leth. Fuseau +3'
 })
 
--- Regen (HP regen potency - Telchine Regen+3, Sacro Bulwark)
+-- Regen (base - HP regen potency)
 sets.midcast.Regen = {
     main = 'Bolelabunga',
     body = {name = 'Telchine Chas.', augments = {'"Conserve MP"+5', '"Regen" potency+3'}}
 }
 
--- Enspells (En-element spells - Enspell Damage+, add if needed)
--- Ice/Wind for Magic Damage, Fire/Thunder for melee damage
-sets.midcast.Enspell = set_combine(sets.midcast['Enhancing Magic'], {})
+-- Regen with Composure (on others - duration + potency)
+sets.midcast.Regen.Composure = set_combine(sets.midcast['Enhancing Magic'].Composure, {
+    main = 'Bolelabunga',
+    body = {name = 'Telchine Chas.', augments = {'"Conserve MP"+5', '"Regen" potency+3'}}
+})
 
--- Phalanx (Damage Taken -, add Phalanx+ gear if available)
+-- Phalanx (base - Damage Taken -)
 sets.midcast.Phalanx = set_combine(sets.midcast['Enhancing Magic'], {})
+
+-- Phalanx with Composure (on others - duration)
+sets.midcast.Phalanx.Composure = set_combine(sets.midcast['Enhancing Magic'].Composure, {})
+
+-- Stoneskin
+sets.midcast.Stoneskin = set_combine(sets.midcast['Enhancing Magic'], {
+    left_ear = 'Earthcry Earring',
+    neck = 'Nodens Gorget',
+    waist = 'Siegel Sash'
+})
+
+-- Enspells (En-element spells - Enspell Damage+)
+sets.midcast.Enspell = set_combine(sets.midcast['Enhancing Magic'], {})
 
 --╭──────────────────────────────────────────────────────────────────────────╮
 --│ DARK MAGIC                                                               │

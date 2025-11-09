@@ -90,6 +90,11 @@ function get_sets()
     include('../shared/hooks/init_ability_messages.lua')
 
     -- ============================================
+    -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
+    -- ============================================
+    include('../shared/hooks/init_ws_messages.lua')
+
+    -- ============================================
     -- LOAD CONFIGS INTO GLOBAL NAMESPACE
     -- ============================================
     _G.LockstyleConfig = LockstyleConfig
@@ -239,6 +244,16 @@ end
 
 --- Cleanup function called when GearSwap unloads this job file
 --- Cancels pending operations and unbinds resources
+--- Called by Mote-Include after state changes
+--- Updates the UI to reflect current state values
+function job_update(cmdParams, eventArgs)
+    -- Update UI when states change (F9, F10, etc.)
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI and KeybindUI.update then
+        KeybindUI.update()
+    end
+end
+
 --- @return void
 function file_unload()
     -- Cancel pending job change operations

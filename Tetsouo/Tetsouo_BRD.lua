@@ -105,6 +105,11 @@ function get_sets()
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
 
+    -- ============================================
+    -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
+    -- ============================================
+    include('../shared/hooks/init_ws_messages.lua')
+
     -- Cancel any pending operations from previous job (including ALL job lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then

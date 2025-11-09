@@ -1,6 +1,7 @@
 -- Message Display Modes (auto-generated)
--- File: shared/config/message_modes.lua
--- 
+-- Character: Tetsouo
+-- File: Tetsouo/config/message_modes.lua
+--
 -- spell_mode: ALL spell types (Enhancing, Enfeebling, Healing, Elemental, etc.)
 -- ja_mode: Job Abilities
 -- ws_mode: Weaponskills

@@ -170,7 +170,6 @@ function RDMStates.configure()
         M {
         ['description'] = 'Nuke Tier',
         'V',
-        'VI',
         'IV',
         'III',
         'II',
