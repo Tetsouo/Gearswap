@@ -243,6 +243,21 @@ sets.engaged.Liberator = {}
 sets.engaged.Liberator.Accu = sets.engaged.Caladbolg.Accu -- Same as Caladbolg (scythe)
 sets.engaged.Liberator.PDT = sets.engaged.Caladbolg.PDT
 
+-- Liberator AM3 (Aftermath Lv.3) - Optimized for crit damage + multi-attack
+-- AM3 provides +25% crit rate, so prioritize crit damage and TA/DA
+sets.engaged.Liberator.AM3 =
+    set_combine(
+    sets.engaged.Caladbolg.Accu,
+    {
+        -- Optimize for crit damage + multi-attack when AM3 active
+        -- TODO: Add crit damage pieces when available:
+        -- ammo = 'Yetshila +1',  -- Crit damage +4%
+        -- head = 'Blistering Sallet +1',  -- Crit damage +5%
+        -- body = 'Hjarrandi Breastplate',  -- Crit damage +5%, TA+4%
+        -- Keep high STP/multi-attack from Caladbolg.Accu as base
+    }
+)
+
 -- Apocalypse (Scythe Relic) - Catastrophe spam build
 sets.engaged.Apocalypse = {}
 sets.engaged.Apocalypse.Accu = sets.engaged.Caladbolg.Accu -- Same as Caladbolg (scythe)
