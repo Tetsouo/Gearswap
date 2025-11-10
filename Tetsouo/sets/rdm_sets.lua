@@ -24,7 +24,7 @@
 ---│   • Movement sets (Base speed, Adoulin)                                     │
 ---│                                                                             │
 ---│ @file    jobs/rdm/sets/rdm_sets.lua                                         │
----│ @author  Kaories                                                            │
+---│ @author  Tetsouo                                                            │
 ---│ @version 3.1 - Fancy Corner Headers + Navigation Tables                     │
 ---│ @date    Updated: 2025-11-08                                                │
 ---╰─────────────────────────────────────────────────────────────────────────────╯
@@ -105,9 +105,6 @@ sets.idle.Refresh = set_combine(sets.idle.DT, {
     left_ring = 'Woltaris Ring',
     right_ring = "Gurebu's Ring"
 })
-
--- Town Idle
-sets.idle.Town = set_combine(sets.idle.DT, {legs = 'Carmine Cuisses +1'})
 
 --╭──────────────────────────────────────────────────────────────────────────╮
 --│ ENGAGED SETS                                                             │
@@ -431,8 +428,19 @@ sets.midcast.Stoneskin = set_combine(sets.midcast['Enhancing Magic'], {
     waist = 'Siegel Sash'
 })
 
--- Enspells (En-element spells - Enspell Damage+)
+-- Spell Family Sets (Root-level sets for MidcastManager v2.0 PRIORITY 6)
+-- These sets use spell_family from ENHANCING_MAGIC_DATABASE
 sets.midcast.Enspell = set_combine(sets.midcast['Enhancing Magic'], {})
+sets.midcast.Gain = set_combine(sets.midcast['Enhancing Magic'], {})
+sets.midcast.BarElement = set_combine(sets.midcast['Enhancing Magic'], {})
+sets.midcast.BarAilment = set_combine(sets.midcast['Enhancing Magic'], {})
+sets.midcast.Spikes = set_combine(sets.midcast['Enhancing Magic'], {})
+sets.midcast.Aquaveil = set_combine(sets.midcast['Enhancing Magic'], {})
+-- Note: Phalanx already defined above (line 419) as PRIORITY 1 spell name set
+
+-- Spell Name Sets (Root-level sets for MidcastManager v2.0 PRIORITY 1)
+-- These sets use base spell name matching (no spell_family in database)
+sets.midcast.Temper = set_combine(sets.midcast['Enhancing Magic'], {})
 
 --╭──────────────────────────────────────────────────────────────────────────╮
 --│ DARK MAGIC                                                               │
@@ -511,6 +519,11 @@ sets.MoveSpeed = {
 
 -- Adoulin Movement (City-specific speed boost)
 sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb" -- Speed bonus in Adoulin city
+})
+
+-- Town Idle
+sets.idle.Town = set_combine(sets.idle.DT, sets.MoveSpeed, {
     body = "Councilor's Garb" -- Speed bonus in Adoulin city
 })
 

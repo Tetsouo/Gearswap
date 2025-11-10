@@ -35,7 +35,7 @@ RDMKeybinds.binds = {
     { key = "!p", command = "cycle SaboteurMode",   desc = "Saboteur Mode", state = "SaboteurMode" },
 
     -- Enspell
-    { key = "!7", command = "cycle Enspell",        desc = "Enspell",       state = "Enspell" },
+    { key = "!7", command = "cycle EnSpell",        desc = "Enspell",       state = "EnSpell" },
 
     -- Elemental Spells (Light/Dark)
     { key = "!8", command = "cycle MainLightSpell", desc = "Main Light",    state = "MainLightSpell" },

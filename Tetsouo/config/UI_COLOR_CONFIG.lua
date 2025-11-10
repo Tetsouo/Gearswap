@@ -1,13 +1,18 @@
 ---============================================================================
---- UI Color Configuration - Centralized Color Customization
+--- UI Color Configuration - Character-Specific Color Customization
 ---============================================================================
---- User-configurable color settings for all UI elements across all jobs.
---- Modify RGB values to customize colors according to your preferences.
+--- Character-specific color overrides for UI elements.
+--- Colors defined here override the default colors in shared/utils/ui/COLOR_SYSTEM.lua
+---
+--- Usage:
+---   1. Modify RGB values in this file to customize colors for this character
+---   2. Reload GearSwap (//lua reload gearswap) to apply changes
+---   3. Colors defined here take precedence over default shared colors
 ---
 --- @file config/UI_COLOR_CONFIG.lua
 --- @author Tetsouo
---- @version 1.0
---- @date Created: 2025-10-03
+--- @version 2.0
+--- @date Created: 2025-10-03 | Updated: 2025-11-10
 ---
 --- Color Format: { r, g, b }
 ---   r = Red   (0-255)
@@ -57,15 +62,10 @@ UIColorConfig.stats = {
 ---============================================================================
 
 UIColorConfig.bar_spells = {
-    -- Bar Element Spells (Barfira, Barblizzara, etc.)
-    element = {
-        Barfira = {255, 100, 100}, -- Fire
-        Barblizzara = {150, 200, 255}, -- Ice
-        Baraera = {150, 255, 150}, -- Wind
-        Barstonra = {200, 150, 100}, -- Earth
-        Barthundra = {255, 150, 255}, -- Lightning
-        Barwatera = {100, 150, 255} -- Water
-    },
+    -- Bar Element Spells
+    -- Note: Bar spells automatically use element colors (Fire, Ice, Wind, etc.)
+    -- You can override element colors in UIColorConfig.elements above
+    -- No need to define bar-specific colors unless you want them different
 
     -- Bar Ailment Spells (Barsilence, Barparalyze, etc.)
     ailment = {255, 200, 150} -- Light Orange (universal color)
@@ -111,27 +111,16 @@ UIColorConfig.spells = {
 ---============================================================================
 
 UIColorConfig.jobs = {
-    -- COR Quick Draw Shots
+    -- COR Quick Draw Shots (8 official shots only)
     quick_draw = {
-        ["Fire Shot"] = {255, 100, 100}, -- Fire
-        ["Ice Shot"] = {150, 200, 255}, -- Ice
-        ["Wind Shot"] = {150, 255, 150}, -- Wind
-        ["Earth Shot"] = {200, 150, 100}, -- Earth
-        ["Thunder Shot"] = {255, 150, 255}, -- Lightning
-        ["Water Shot"] = {100, 150, 255}, -- Water
-        ["Light Shot"] = {255, 255, 255}, -- Light
-        ["Dark Shot"] = {150, 100, 200}, -- Dark
-        ["Burning Shot"] = {255, 100, 100}, -- Fire
-        ["Freezing Shot"] = {150, 200, 255}, -- Ice
-        ["Flaming Shot"] = {255, 100, 100}, -- Fire
-        ["Lightning Shot"] = {255, 150, 255}, -- Lightning
-        ["Aqua Shot"] = {100, 150, 255}, -- Water
-        ["Blast Shot"] = {150, 255, 150}, -- Wind
-        ["Slug Shot"] = {200, 150, 100}, -- Earth
-        ["Sniper Shot"] = {255, 255, 255}, -- Light
-        ["Chaos Shot"] = {150, 100, 200}, -- Dark
-        ["Fiery Shot"] = {255, 100, 100}, -- Fire
-        ["Icy Shot"] = {150, 200, 255} -- Ice
+        ["Fire Shot"] = {255, 100, 100}, -- Fire (Burn)
+        ["Water Shot"] = {100, 150, 255}, -- Water (Poison, Drown)
+        ["Thunder Shot"] = {255, 150, 255}, -- Lightning (Shock)
+        ["Earth Shot"] = {200, 150, 100}, -- Earth (Slow, Rasp)
+        ["Wind Shot"] = {150, 255, 150}, -- Wind (Choke)
+        ["Ice Shot"] = {150, 200, 255}, -- Ice (Paralyze, Frost)
+        ["Light Shot"] = {255, 255, 255}, -- Light (Sleep, Dia)
+        ["Dark Shot"] = {150, 100, 200} -- Dark (Dispel, Bio, Blind)
     },
 
     -- RUN Runes (uses elements table, defined here for reference)

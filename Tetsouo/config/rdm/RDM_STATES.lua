@@ -181,7 +181,7 @@ function RDMStates.configure()
     -- BUFF SYSTEM
     -- ========================================
 
-    state.Enspell =
+    state.EnSpell =
         M {
         ['description'] = 'Enspell',
         'Enfire',
@@ -191,7 +191,7 @@ function RDMStates.configure()
         'Enthunder',
         'Enwater'
     }
-    state.Enspell:set('Enfire')
+    state.EnSpell:set('Enfire')
 
     state.GainSpell =
         M {
@@ -209,12 +209,12 @@ function RDMStates.configure()
     state.Barspell =
         M {
         ['description'] = 'Bar Spell',
-        'Barfira',
-        'Barblizzara',
-        'Baraera',
-        'Barstonra',
-        'Barthundra',
-        'Barwatera'
+        'Barfire',
+        'Barblizzard',
+        'Baraero',
+        'Barstone',
+        'Barthunder',
+        'Barwater'
     }
     state.Barspell:set('Barfira')
 
@@ -222,7 +222,7 @@ function RDMStates.configure()
         M {
         ['description'] = 'Bar Ailment',
         'Baramnesia',
-        'Barparalysis',
+        'Barparalyze',
         'Barsilence',
         'Barpetrify',
         'Barpoison',
@@ -253,7 +253,42 @@ function RDMStates.configure()
     }
     state.SaboteurMode:set('Off')
 
-    -- Note: Storm state is conditionally created in user_setup() for SCH subjob
+    -- ========================================
+    -- CONDITIONAL STORM (SCH Subjob Only)
+    -- ========================================
+
+    -- Create Storm state if SCH subjob is active (handles reload + subjob change)
+    RDMStates.configure_storm()
+end
+
+---============================================================================
+--- CONDITIONAL STATE CONFIGURATION (SCH Subjob)
+---============================================================================
+
+--- Configure Storm state based on current subjob
+--- Called during initial setup and subjob changes
+--- @return void
+function RDMStates.configure_storm()
+    local current_subjob = player and player.sub_job or nil
+
+    if current_subjob == 'SCH' and not state.Storm then
+        -- Create Storm state for SCH subjob
+        state.Storm = M {
+            ['description'] = 'Storm',
+            'Firestorm',
+            'Hailstorm',
+            'Windstorm',
+            'Sandstorm',
+            'Thunderstorm',
+            'Rainstorm',
+            'Aurorastorm',
+            'Voidstorm'
+        }
+        state.Storm:set('Firestorm')
+    elseif current_subjob ~= 'SCH' and state.Storm then
+        -- Destroy Storm state when leaving SCH
+        state.Storm = nil
+    end
 end
 
 ---============================================================================
@@ -300,8 +335,8 @@ function RDMStates.validate()
     if not state.NukeTier then
         return false, 'NukeTier not configured'
     end
-    if not state.Enspell then
-        return false, 'Enspell not configured'
+    if not state.EnSpell then
+        return false, 'EnSpell not configured'
     end
     if not state.GainSpell then
         return false, 'GainSpell not configured'

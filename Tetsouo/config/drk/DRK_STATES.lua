@@ -57,12 +57,12 @@ function DRKStates.configure()
         ['description'] = 'Main Weapon',
         'Caladbolg', -- Caladbolg (Great Sword REMA) + Utu Grip
         'Liberator', -- Liberator (Scythe Mythic) + Utu Grip
-        'Apocalypse', -- Apocalypse (Scythe Relic) + Utu Grip
         'Redemption', -- Redemption (Scythe Empyrrean) + Utu Grip
-        'Foenaria', -- Foenaria (Scythe) + Utu Grip
-        'Tokko', -- Tokko Chopper (Great Axe) + Utu Grip
-        'Naegling', -- Naegling (Sword) + Blurred Shield +1
+        'Lycurgos', -- Lycurgos (Great Axe) + Utu Grip
         'Loxotic' -- Loxotic Mace +1 (Club) + Blurred Shield +1
+        --'Apocalypse', -- Apocalypse (Scythe Relic) + Utu Grip
+        --'Foenaria', -- Foenaria (Scythe) + Utu Grip
+        --'Naegling', -- Naegling (Sword) + Blurred Shield +1
     }
     state.MainWeapon:set('Caladbolg') -- Default weapon
 

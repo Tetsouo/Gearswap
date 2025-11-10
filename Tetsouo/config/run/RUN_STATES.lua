@@ -56,8 +56,10 @@ function RUNStates.configure()
         M {
         ['description'] = 'Main Weapon',
         'Epeolatry', -- Empyrean Great Sword
-        'Lionheart', -- Relic Great Sword
-        'Aettir' -- Aeonic Great Sword
+        'Lycurgos', -- Lycurgos (Great Axe) + Utu Grip
+        --'Loxotic' -- Loxotic Mace +1 (Club) + Blurred Shield +1
+        --'Lionheart', -- Aeonic Great Sword
+        --'Aettir' -- Oboro Great Sword
     }
 
     --- SubWeapon: Sub weapon/grip selection
@@ -68,7 +70,7 @@ function RUNStates.configure()
         'Utu', -- Utu Grip
         'Refined' -- Refined Grip +1
     }
-    state.SubWeapon:set('Utu') -- Default grip
+    state.SubWeapon:set('Refined') -- Default grip
 
     -- ==========================================================================
     -- RUNE MODE

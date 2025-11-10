@@ -145,26 +145,19 @@ end
 function job_sub_job_change(newSubjob, oldSubjob)
     -- Note: Mote-Include already called user_setup() before this
 
-    -- Create/destroy Storm state based on SCH subjob
-    if newSubjob == 'SCH' and not state.Storm then
-        -- Create Storm state when switching to SCH
-        state.Storm = M {
-            ['description'] = 'Storm',
-            'Firestorm',
-            'Hailstorm',
-            'Windstorm',
-            'Sandstorm',
-            'Thunderstorm',
-            'Rainstorm',
-            'Aurorastorm',
-            'Voidstorm'
-        }
-        state.Storm:set('Firestorm')
-        add_to_chat(122, '[RDM] Storm spells enabled (SCH subjob)')
-    elseif oldSubjob == 'SCH' and state.Storm then
-        -- Destroy Storm state when leaving SCH
-        state.Storm = nil
-        add_to_chat(122, '[RDM] Storm spells disabled (no SCH subjob)')
+    -- Create/destroy Storm state based on SCH subjob (handled in RDM_STATES.lua)
+    local RDMStates = require('Tetsouo/config/rdm/RDM_STATES')
+    if RDMStates and RDMStates.configure_storm then
+        local had_storm = state.Storm ~= nil
+        RDMStates.configure_storm()
+        local has_storm = state.Storm ~= nil
+
+        -- Display messages only when state changes
+        if has_storm and not had_storm then
+            add_to_chat(122, '[RDM] Storm spells enabled (SCH subjob)')
+        elseif not has_storm and had_storm then
+            add_to_chat(122, '[RDM] Storm spells disabled (no SCH subjob)')
+        end
     end
 
     -- Re-initialize JobChangeManager with RDM-specific functions

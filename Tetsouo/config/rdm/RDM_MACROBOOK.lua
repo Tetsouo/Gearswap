@@ -12,15 +12,15 @@
 local RDMMacroConfig = {}
 
 -- Default macrobook settings (used if no subjob match)
-RDMMacroConfig.default = {book = 1, page = 1}
+RDMMacroConfig.default = {book = 2, page = 1}
 
 -- Macrobook settings per subjob
 RDMMacroConfig.solo = {
-    ['NIN'] = {book = 1, page = 1},  -- RDM/NIN - Dualwield melee
-    ['WHM'] = {book = 1, page = 2},  -- RDM/WHM - Support/healing
-    ['BLM'] = {book = 1, page = 3},  -- RDM/BLM - Nuking
-    ['SCH'] = {book = 1, page = 4},  -- RDM/SCH - Hybrid magic
-    ['DNC'] = {book = 1, page = 5},  -- RDM/DNC - Melee/support
+    ['NIN'] = {book = 2, page = 1},  -- RDM/NIN - Dualwield melee
+    ['WHM'] = {book = 2, page = 1},  -- RDM/WHM - Support/healing
+    ['BLM'] = {book = 2, page = 1},  -- RDM/BLM - Nuking
+    ['SCH'] = {book = 2, page = 1},  -- RDM/SCH - Hybrid magic
+    ['DNC'] = {book = 2, page = 1},  -- RDM/DNC - Melee/support
 }
 
 ---============================================================================
