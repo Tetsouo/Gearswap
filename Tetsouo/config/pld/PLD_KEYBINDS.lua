@@ -41,11 +41,6 @@ PLDKeybinds.binds = { -- Hybrid Mode (PDT/MDT)
     command = "cyclestate MainWeapon",
     desc = "Main Weapon",
     state = "MainWeapon"
-}, {
-    key = "!3",
-    command = "cyclestate SubWeapon",
-    desc = "Sub Weapon",
-    state = "SubWeapon"
 }, -- XP Mode (PLD/RDM subjob only)
 {
     key = "!4",

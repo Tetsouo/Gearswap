@@ -6,7 +6,6 @@
 --- Features:
 ---   • HybridMode configuration (PDT/MDT)
 ---   • MainWeapon state with multiple weapon options
----   • SubWeapon state (shield selection: Duban/Aegis/Blurred)
 ---   • XP Mode for Phalanx optimization (SIRD vs Potency)
 ---   • RuneMode for RUN subjob (Ignis/Gelus/Flabra/Tellus/Sulpor/Unda/Lux/Tenebrae)
 ---   • Keybind integration (Alt+1/Alt+2/Alt+3/Alt+4/Alt+5)
@@ -31,7 +30,6 @@ local PLDStates = {}
 
 --- Configure all PLD states
 --- Must be called from user_setup() after Mote-Include is loaded.
---- Defines HybridMode, MainWeapon, SubWeapon, Xp, and RuneMode states.
 ---
 --- @return void
 function PLDStates.configure()
@@ -62,21 +60,6 @@ function PLDStates.configure()
         'Shining', -- Shining One (Great Sword)
         'Malevo' -- Malevolence (Club)
     }
-
-    --- SubWeapon: Shield selection
-    --- Keybind: Alt+3 to cycle
-    state.SubWeapon =
-        M {
-        ['description'] = 'Sub Weapon',
-        'Duban', -- Duban (general purpose shield)
-        'Aegis', -- Aegis (magic damage shield)
-        'Blurred' -- Blurred Shield +1 (PDT shield)
-    }
-    state.SubWeapon:set('Duban') -- Default shield
-
-    -- ==========================================================================
-    -- SUBJOB-SPECIFIC STATES
-    -- ==========================================================================
 
     --- XP Mode: Phalanx optimization (RDM subjob)
     --- Options:
@@ -128,9 +111,6 @@ function PLDStates.validate()
         return false, 'MainWeapon state not configured'
     end
 
-    -- Check SubWeapon exists
-    if not state.SubWeapon then
-        return false, 'SubWeapon state not configured'
     end
 
     -- Check XP mode exists

@@ -210,12 +210,9 @@ sets.engaged =
 
 -- • PDT Engaged
 sets.engaged.PDT =
-    set_combine(
-    sets.engaged,
-    {
-        sub = 'Duban' -- PDT shield for engaged
-    }
-)
+    set_combine(sets.engaged,{
+        
+    })
 
 -- • MDT Engaged
 sets.engaged.MDT = sets.idle.MDT -- Already has Aegis shield
