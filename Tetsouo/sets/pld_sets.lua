@@ -94,7 +94,7 @@ Moonlight2 = {name = 'Moonlight Ring', priority = 12, bag = 'wardrobe 4'}
 -- • Main Weapons
 sets.Burtgang = {main = 'Burtgang'}
 sets.BurtgangKC = {main = 'Burtgang', sub = 'Kraken Club'} -- PLD/DNC multi-attack build
-sets.Shining = {main = 'Shining One'}  -- Polearm (uses Alber Strap grip)
+sets['Shining One'] = {main = 'Shining One'}
 sets.Naegling = {main = 'Naegling'}
 sets.Malevo = {
     main = {name = 'Malevolence', augments = {'INT+10', 'Mag. Acc.+10', '"Mag.Atk.Bns."+8', '"Fast Cast"+5'}}
@@ -210,9 +210,12 @@ sets.engaged =
 
 -- • PDT Engaged
 sets.engaged.PDT =
-    set_combine(sets.engaged,{
-        
-    })
+    set_combine(
+    sets.engaged,
+    {
+        sub = 'Duban' -- PDT shield for engaged
+    }
+)
 
 -- • MDT Engaged
 sets.engaged.MDT = sets.idle.MDT -- Already has Aegis shield
