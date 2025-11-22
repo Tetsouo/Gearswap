@@ -111,7 +111,6 @@ function PLDStates.validate()
         return false, 'MainWeapon state not configured'
     end
 
-    end
 
     -- Check XP mode exists
     if not state.Xp then
