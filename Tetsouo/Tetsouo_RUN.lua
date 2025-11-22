@@ -243,7 +243,7 @@ function job_update(cmdParams, eventArgs)
 end
 
 function init_gear_sets()
-    include('Tetsouo/sets/run_sets.lua')
+    include('sets/run_sets.lua')
     print('[RUN] init_gear_sets() - run_sets.lua loaded')
 end
 
