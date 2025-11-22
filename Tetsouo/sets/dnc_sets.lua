@@ -1,48 +1,48 @@
----============================================================================
---- DNC Equipment Sets - Complete Dancer Gear Configuration
----============================================================================
---- Comprehensive equipment configurations for Dancer job covering all combat
---- scenarios, weaponskills, job abilities, and defensive situations.
----
---- Features:
----   • Weapon sets (Mpu Gandring/Centovente, Demersal/Blurred)
----   • Idle sets (Normal, PDT, Town with movement speed)
----   • Engaged sets (Normal, PDT with 50% DT, FanDance with 30% DT, SaberDance variants)
----   • Step sets (Feather/Quick/Box with accuracy/macc optimization)
----   • Flourish sets (Violent, Animated, Desperate, Reverse)
----   • Waltz sets (healing potency optimization)
----   • Samba/Jig sets (duration and potency)
----   • Weaponskills with buff variants (Ruthless, Rudra's, Shark Bite)
----   • WS variant system (FanDance.Clim > FanDance > Clim > Base)
----   • Fast Cast sets (spell casting optimization)
----   • Jump sets (DRG subjob integration)
----   • Movement speed sets (Adoulin city-specific)
----   • Buff-specific sets (Saber Dance, Climactic Flourish)
----   • Treasure Hunter utility sets
----
---- Architecture:
----   • Cape augments (TP: DA+10/PDT-10%, WS: WSD+10%)
----   • Dual Chirich Rings (wardrobe 1/2 for haste/store TP)
----   • Dual Moonlight Rings (wardrobe 2/4 for HP/status resist)
----   • Fan Dance integration (20% buff + 30% gear = 50% DT cap)
----   • TP bonus automation (Moonshade handled by TPBonusCalculator)
----   • Set priority variants (4 tiers per major WS)
----
---- Dependencies:
----   • Mote-Include (set_combine for set inheritance)
----   • TPBonusCalculator (dynamic Moonshade at 1750-1999 TP)
----   • ws_variant_selector (buff-based WS set selection logic)
----   • set_builder (dynamic idle/engaged set construction)
----
---- @file    jobs/dnc/sets/dnc_sets.lua
---- @author  Tetsouo
---- @version 1.0
---- @date    Created: 2025-10-05
----============================================================================
---============================================================--
+---  ═══════════════════════════════════════════════════════════════════════════
+---   DNC Equipment Sets - Complete Dancer Gear Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Comprehensive equipment configurations for Dancer job covering all combat
+---   scenarios, weaponskills, job abilities, and defensive situations.
+---   Features:
+---     • Weapon sets (Mpu Gandring/Centovente, Demersal/Blurred)
+---     • Idle sets (Normal, PDT, Town with movement speed)
+---     • Engaged sets (Normal, PDT with 50% DT, FanDance with 30% DT, SaberDance variants)
+---     • Step sets (Feather/Quick/Box with accuracy/macc optimization)
+---     • Flourish sets (Violent, Animated, Desperate, Reverse)
+---     • Waltz sets (healing potency optimization)
+---     • Samba/Jig sets (duration and potency)
+---     • Weaponskills with buff variants (Ruthless, Rudra's, Shark Bite)
+---     • WS variant system (FanDance.Clim > FanDance > Clim > Base)
+---     • Fast Cast sets (spell casting optimization)
+---     • Jump sets (DRG subjob integration)
+---     • Movement speed sets (Adoulin city-specific)
+---     • Buff-specific sets (Saber Dance, Climactic Flourish)
+---     • Treasure Hunter utility sets
+---    Architecture:
+---     • Cape augments (TP: DA+10/PDT-10%, WS: WSD+10%)
+---     • Dual Chirich Rings (wardrobe 1/2 for haste/store TP)
+---     • Dual Moonlight Rings (wardrobe 2/4 for HP/status resist)
+---     • Fan Dance integration (20% buff + 30% gear = 50% DT cap)
+---     • TP bonus automation (Moonshade handled by TPBonusCalculator)
+---     • Set priority variants (4 tiers per major WS)
+---    Dependencies:
+---     • Mote-Include (set_combine for set inheritance)
+---     • TPBonusCalculator (dynamic Moonshade at 1750-1999 TP)
+---     • ws_variant_selector (buff-based WS set selection logic)
+---     • set_builder (dynamic idle/engaged set construction)
+---   @file    jobs/dnc/sets/dnc_sets.lua
+---   @author  Tetsouo
+---   @version 1.0
+---   @date    Updated: 2025-11-10
+---  ═════════════════════════════════════════════════════════════════════════
 
---                  EQUIPMENT DEFINITIONS                     --
---============================================================--
+sets = {}
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- • Chirich Rings (wardrobe management)
 ChirichRing1 = {
     name = 'Chirich Ring +1',
     priority = 0,
@@ -53,6 +53,8 @@ ChirichRing2 = {
     priority = 0,
     bag = 'wardrobe 2'
 }
+
+-- • Moonlight Rings (wardrobe management)
 Moonlight1 = {
     name = 'Moonlight Ring',
     priority = 13,
@@ -64,6 +66,7 @@ Moonlight2 = {
     bag = 'wardrobe 4'
 }
 
+-- • Senuna's Mantle (TP and WS augments)
 Senuna = {}
 Senuna.TP = {
     name = "Senuna's Mantle",
@@ -74,34 +77,32 @@ Senuna.WS = {
     augments = {'DEX+20', 'Accuracy+20 Attack+20', 'DEX+10', 'Weapon skill damage +10%'}
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      WEAPON SETS                           --
---============================================================--
-
--- Mpu Gandring >> Centovente
+-- • Mpu Gandring >> Centovente
 sets['Mpu Gandring'] = {
     main = 'Mpu Gandring',
     sub = 'Centovente'
 }
 
--- Demersal Degen +1 >> Blurred Knife +1
+-- • Demersal Degen +1 >> Blurred Knife +1
 sets['Demersal'] = {
     main = 'Demersal Degen +1',
     sub = 'Blurred Knife +1'
 }
 
--- Sub Weapon Override: Blurred Knife +1 (forces sub regardless of main weapon)
+-- • Sub Weapon Override: Blurred Knife +1 (forces sub regardless of main weapon)
 sets['Blurred'] = {
     sub = 'Blurred Knife +1'
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      IDLE SETS                             --
---============================================================--
-
--- Base Idle
+-- • Base Idle
 sets.idle = {
     ammo = 'Aurgelmir Orb +1',
     head = "Gleti's Mask",
@@ -118,7 +119,7 @@ sets.idle = {
     back = Senuna.TP
 }
 
--- PDT Idle (Physical damage reduction)
+-- • PDT Idle (Physical damage reduction)
 sets.idle.PDT =
     set_combine(
     sets.idle,
@@ -134,33 +135,14 @@ sets.idle.PDT =
     }
 )
 
--- Town Idle (Movement and aesthetics)
-sets.idle.Town =
-    set_combine(
-    sets.idle.PDT,
-    {
-        head = "Gleti's Mask",
-        body = "Gleti's Cuirass",
-        hands = "Gleti's Gauntlets",
-        legs = "Gleti's Breeches",
-        feet = 'Skd. Jambeaux +1',
-        neck = 'Elite Royal Collar',
-        waist = 'Flume Belt +1',
-        left_ear = 'Dawn Earring',
-        left_ring = ChirichRing1,
-        right_ring = ChirichRing2
-    }
-)
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---============================================================--
-
---                      ENGAGED SETS                          --
---============================================================--
-
--- Base Engaged
+-- • Base Engaged
 sets.engaged = {}
 
--- Standard Normal Engaged
+-- • Standard Normal Engaged
 sets.engaged.Normal = {
     ammo = 'Coiste Bodhar',
     head = 'Maculele Tiara +3',
@@ -177,7 +159,7 @@ sets.engaged.Normal = {
     back = Senuna.TP
 }
 
--- No Fan Dance: 50 equipment DT = 50 PDT (Base PDT set)
+-- • No Fan Dance: 50 equipment DT = 50 PDT (Base PDT set)
 sets.engaged.PDT = {
     ammo = 'Coiste Bodhar',
     head = 'Malignance Chapeau',
@@ -194,7 +176,7 @@ sets.engaged.PDT = {
     back = Senuna.TP
 }
 
--- Fan Dance: Minimum 20 DT + 30 equipment PDT = 50 PDT (With Fan Dance buff active)
+-- • Fan Dance: Minimum 20 DT + 30 equipment PDT = 50 PDT (With Fan Dance buff active)
 sets.engaged.FanDance = {
     ammo = 'C. Palug Stone',
     head = 'Maculele Tiara +3',
@@ -211,7 +193,7 @@ sets.engaged.FanDance = {
     back = 'Null Shawl'
 }
 
--- Saber Dance: Dual Wield -50%, optimize for Haste/STP/Multi-Attack instead of DW
+-- • Saber Dance: Dual Wield -50%, optimize for Haste/STP/Multi-Attack instead of DW
 sets.engaged.SaberDance = {
     ammo = 'Coiste Bodhar',
     head = 'Malignance Chapeau',
@@ -228,7 +210,7 @@ sets.engaged.SaberDance = {
     back = Senuna.TP
 }
 
--- Saber Dance + PDT: Hybrid defensive set with Saber Dance active
+-- • Saber Dance + PDT: Hybrid defensive set with Saber Dance active
 sets.engaged.SaberDance.PDT = {
     ammo = 'Coiste Bodhar',
     head = 'Malignance Chapeau',
@@ -245,14 +227,14 @@ sets.engaged.SaberDance.PDT = {
     back = Senuna.TP
 }
 
---============================================================--
---                   PRECAST: JOB ABILITIES                   --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: JOB ABILITIES
+-- ═══════════════════════════════════════════════════════════════════════════
 
+sets.precast = {}
 sets.precast.JA = {}
 
--- Steps --
-
+-- • Steps (Base set)
 sets.precast.Step = {
     ammo = 'Ginsen',
     head = 'Maxixi Tiara +3',
@@ -293,8 +275,7 @@ sets.precast.Step['Box Step'] =
     }
 )
 
--- Flourishes --
-
+-- • Flourishes (Flourish1 & Flourish2)
 sets.precast.Flourish1 = {}
 
 sets.precast.Flourish1['Violent Flourish'] = {
@@ -345,8 +326,7 @@ sets.precast.Flourish2['Reverse Flourish'] = {
     back = 'Toetapper Mantle'
 }
 
--- Waltzes --
-
+-- • Waltzes (Healing potency optimization)
 sets.precast.Waltz = {
     ammo = 'Staunch Tathlum +1',
     head = 'Anwig Salade',
@@ -365,8 +345,7 @@ sets.precast.Waltz = {
 
 sets.precast.Waltz['Healing Waltz'] = set_combine(sets.precast.Waltz, {})
 
--- Sambas / Jigs --
-
+-- • Sambas / Jigs (Duration and potency)
 sets.precast.Samba = {
     head = 'Maxixi Tiara +3',
     back = Senuna.TP
@@ -377,8 +356,7 @@ sets.precast.Jig = {
     feet = 'Maxixi Toe Shoes +3'
 }
 
--- Other Job Abilities --
-
+-- • Other Job Abilities (No Foot Rise, Trance, Provoke, Fan Dance, Jumps)
 sets.precast.JA['No Foot Rise'] = {
     body = 'Horos Casaque +3'
 }
@@ -445,10 +423,11 @@ sets.precast.JA['High Jump'] = {
     back = Senuna.TP
 }
 
---============================================================--
---                   PRECAST: FAST CAST                       --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: FAST CAST
+-- ═══════════════════════════════════════════════════════════════════════════
 
+-- • Fast Cast (spell casting optimization)
 sets.precast.FC = {
     ammo = 'Sapience Orb',
     head = {
@@ -470,13 +449,13 @@ sets.precast.FC = {
 
 sets.precast.FC.Utsusemi = sets.precast.FC
 
---============================================================--
---                   PRECAST: WEAPONSKILLS                    --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: WEAPONSKILLS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Base Weaponskill
--- NOTE: Moonshade Earring is managed dynamically by TPBonusCalculator
---       It will equip automatically at 1750-1999 TP to reach 2000 TP threshold
+-- • Base Weaponskill
+--   NOTE: Moonshade Earring is managed dynamically by TPBonusCalculator
+--   It will equip automatically at 1750-1999 TP to reach 2000 TP threshold
 sets.precast.WS = {
     ammo = "Oshasha's Treatise",
     head = {
@@ -499,9 +478,8 @@ sets.precast.WS = {
     back = Senuna.WS
 }
 
--- Ruthless Stroke --
-
--- Ruthless Stroke: No Fan Dance (50 equipment DT)
+-- • Ruthless Stroke (4 variants: base, Clim, FanDance, FanDance.Clim, SaberDance, SaberDance.Clim)
+--   No Fan Dance (50 equipment DT)
 sets.precast.WS['Ruthless Stroke'] = {
     ammo = 'C. Palug Stone',
     head = 'Maculele Tiara +3',
@@ -518,7 +496,7 @@ sets.precast.WS['Ruthless Stroke'] = {
     back = Senuna.WS
 }
 
--- Ruthless Stroke: Climactic Flourish (50 equipment DT)
+--   Climactic Flourish (50 equipment DT)
 sets.precast.WS['Ruthless Stroke'].Clim = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
@@ -535,7 +513,7 @@ sets.precast.WS['Ruthless Stroke'].Clim = {
     back = Senuna.WS
 }
 
--- Ruthless Stroke: Fan Dance (30 equipment DT)
+--   Fan Dance (30 equipment DT)
 sets.precast.WS['Ruthless Stroke'].FanDance = {
     ammo = 'C. Palug Stone',
     head = 'Maculele Tiara +3',
@@ -552,7 +530,7 @@ sets.precast.WS['Ruthless Stroke'].FanDance = {
     back = Senuna.WS
 }
 
--- Ruthless Stroke: Fan Dance + Climactic Flourish (30 equipment DT)
+--   Fan Dance + Climactic Flourish (30 equipment DT)
 sets.precast.WS['Ruthless Stroke'].FanDance.Clim = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
@@ -569,7 +547,7 @@ sets.precast.WS['Ruthless Stroke'].FanDance.Clim = {
     back = Senuna.WS
 }
 
--- Ruthless Stroke: Saber Dance (High Haste/STP build, no DW needed)
+--   Saber Dance (High Haste/STP build, no DW needed)
 sets.precast.WS['Ruthless Stroke'].SaberDance = {
     ammo = 'Crepuscular Pebble',
     head = 'Maculele Tiara +3',
@@ -586,7 +564,7 @@ sets.precast.WS['Ruthless Stroke'].SaberDance = {
     back = Senuna.WS
 }
 
--- Ruthless Stroke: Saber Dance + Climactic Flourish (Crit-focused with Haste)
+--   Saber Dance + Climactic Flourish (Crit-focused with Haste)
 sets.precast.WS['Ruthless Stroke'].SaberDance.Clim = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
@@ -603,7 +581,8 @@ sets.precast.WS['Ruthless Stroke'].SaberDance.Clim = {
     back = Senuna.WS
 }
 
--- Dancing Edge: No Fan Dance (50 equipment DT)
+-- • Dancing Edge (6 variants)
+--   No Fan Dance (50 equipment DT)
 sets.precast.WS['Dancing Edge'] = {
     ammo = 'Coiste Bodhar',
     head = 'Malignance Chapeau',
@@ -705,9 +684,8 @@ sets.precast.WS['Dancing Edge'].SaberDance.Clim = {
     back = Senuna.TP
 }
 
--- Rudra's Storm --
-
--- Rudra's Storm: No Fan Dance (50 equipment DT)
+-- • Rudra's Storm (6 variants)
+--   No Fan Dance (50 equipment DT)
 sets.precast.WS["Rudra's Storm"] = {
     ammo = 'Aurgelmir Orb +1',
     head = 'Maculele Tiara +3',
@@ -809,9 +787,8 @@ sets.precast.WS["Rudra's Storm"].SaberDance.Clim = {
     back = Senuna.WS
 }
 
--- Shark Bite --
-
--- Shark Bite: No Fan Dance (50 equipment DT)
+-- • Shark Bite (6 variants)
+--   No Fan Dance (50 equipment DT)
 sets.precast.WS['Shark Bite'] = {
     ammo = 'C. Palug Stone',
     head = 'Maculele Tiara +3',
@@ -913,8 +890,7 @@ sets.precast.WS['Shark Bite'].SaberDance.Clim = {
     back = Senuna.WS
 }
 
--- Other Weaponskills --
-
+-- • Other Weaponskills (Pyrrhic Kleos, Evisceration, Exenterator, Aeolian Edge)
 sets.precast.WS['Pyrrhic Kleos'] = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
@@ -979,26 +955,29 @@ sets.precast.WS['Aeolian Edge'] = {
     back = Senuna.WS
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      MIDCAST SETS                          --
---============================================================--
-
+-- • Fast Recast
+sets.midcast = {}
 sets.midcast.FastRecast = {}
 sets.midcast.Utsusemi = set_combine(sets.precast.FC, {})
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MOVEMENT SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      MOVEMENT SETS                         --
---============================================================--
-
--- Base Movement Speed
+-- • Base Movement Speed
 sets.MoveSpeed = {
     feet = "Skadi's Jambeaux +1",
     ring2 = 'Defending Ring'
 }
 
--- Adoulin Movement (City-specific speed boost)
+-- • Town Idle (Movement Speed)
+sets.idle.Town = sets.MoveSpeed
+
+-- • Adoulin Movement (City-specific speed boost)
 sets.Adoulin =
     set_combine(
     sets.MoveSpeed,
@@ -1007,10 +986,9 @@ sets.Adoulin =
     }
 )
 
---============================================================--
-
---                      BUFF SETS                             --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BUFF SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.buff = {}
 
@@ -1028,12 +1006,11 @@ sets.buff.Doom = {
     waist = {name = 'Gishdubar Sash'} -- Enhances Doom recovery effects
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- UTILITY SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      UTILITY SETS                          --
---============================================================--
-
--- Treasure Hunter
+-- • Treasure Hunter
 sets.TreasureHunter = {
     head = {
         name = 'Herculean Helm',

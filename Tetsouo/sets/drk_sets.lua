@@ -1,37 +1,36 @@
----╭─────────────────────────────────────────────────────────────────────────────╮
----│ DRK Equipment Sets - Dark Knight DPS Configuration                          │
----├─────────────────────────────────────────────────────────────────────────────┤
----│ Complete equipment configuration for Dark Knight DPS role with optimized    │
----│ offensive gear and Aftermath Lv.3 support.                                  │
----│                                                                             │
----│ Features:                                                                   │
----│   • Aftermath Lv.3 detection (Liberator mythic weapon)                      │
----│   • Store TP optimization for fast TP gain                                  │
----│   • Weaponskill optimization (Torcleaver, Entropy, Resolution, Cross Reaper)│
----│   • Dark Magic effectiveness (Drain, Aspir, Absorb spells)                  │
----│   • Last Resort enhancement                                                 │
----│   • Physical and Magical damage mitigation (PDT/MDT modes)                  │
----│                                                                             │
----│ Architecture:                                                               │
----│   • Equipment definitions (Ankou's Capes, rings, weapons)                   │
----│   • Weapon sets (Liberator, Caladbolg, Apocalypse, Naegling, etc.)          │
----│   • Idle sets (Normal, PDT, Town)                                           │
----│   • Engaged sets (Base DPS, PDT, Aftermath Lv.3)                            │
----│   • Precast sets (Job abilities, Fast Cast, Weaponskills)                   │
----│   • Midcast sets (Dark Magic, Absorb spells, Dread Spikes, Drain/Aspir)     │
----│   • Movement sets (Base speed, Adoulin)                                     │
----│                                                                             │
----│ @file    sets/drk_sets.lua                                                  │
----│ @author  Tetsouo                                                            │
----│ @version 3.0 - Simplified Engaged Structure + AM3 Support                   │
----│ @date    Updated: 2025-11-10                                                │
----╰─────────────────────────────────────────────────────────────────────────────╯
+---  ═══════════════════════════════════════════════════════════════════════════
+---   DRK Equipment Sets - Dark Knight DPS Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Complete equipment configuration for Dark Knight DPS role with optimized
+---   offensive gear and Aftermath Lv.3 support.
+---   Features:
+---     • Aftermath Lv.3 detection (Liberator mythic weapon)
+---     • Store TP optimization for fast TP gain
+---     • Weaponskill optimization (Torcleaver, Entropy, Resolution, Cross Reaper)
+---     • Dark Magic effectiveness (Drain, Aspir, Absorb spells)
+---     • Last Resort enhancement
+---     • Physical and Magical damage mitigation (PDT/MDT modes)
+---    Architecture:
+---     • Equipment definitions (Ankou's Capes, rings, weapons)
+---     • Weapon sets (Liberator, Caladbolg, Apocalypse, Naegling, etc.)
+---     • Idle sets (Normal, PDT, Town)
+---     • Engaged sets (Base DPS, PDT, Aftermath Lv.3)
+---     • Precast sets (Job abilities, Fast Cast, Weaponskills)
+---     • Midcast sets (Dark Magic, Absorb spells, Dread Spikes, Drain/Aspir)
+---     • Movement sets (Base speed, Adoulin)
+---   @file    sets/drk_sets.lua
+---   @author  Tetsouo
+---   @version 3.0 - Simplified Engaged Structure + AM3 Support
+---   @date    Updated: 2025-11-10
+---  ═════════════════════════════════════════════════════════════════════════
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ EQUIPMENT DEFINITIONS                                                        │
---╰──────────────────────────────────────────────────────────────────────────────╯
+sets = {}
 
--- Ankou's Capes (Multiple variants)
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- • Ankou's Capes (Multiple variants)
 Ankou = {
     -- STP/DA Cape (DEX+20, Acc+20 Atk+20, Acc+10, DA+10%, DT-5%)
     STP = {
@@ -71,37 +70,37 @@ Ankou = {
     }
 }
 
--- Rings (Wardrobe-specific)
+-- • Rings (Wardrobe-specific)
 ChirichRing1 = {name = 'Chirich Ring +1', bag = 'wardrobe 7'}
 ChirichRing2 = {name = 'Chirich Ring +1', bag = 'wardrobe 8'}
 Moonlight1 = {name = 'Moonlight Ring', bag = 'wardrobe 2'}
 Moonlight2 = {name = 'Moonlight Ring', bag = 'wardrobe 4'}
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ WEAPON SETS                                                                  │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Scythe weapons (Two-handed with Utu Grip)
+-- • Scythe weapons (Two-handed with Utu Grip)
 sets['Caladbolg'] = {main = 'Caladbolg', sub = 'Utu Grip'}
 sets['Liberator'] = {main = 'Liberator', sub = 'Utu Grip'}
 sets['Apocalypse'] = {main = 'Apocalypse', sub = 'Utu Grip'}
 sets['Redemption'] = {main = 'Redemption', sub = 'Utu Grip'}
 
--- Great Axe weapons (Two-handed with Utu Grip)
+-- • Great Axe weapons (Two-handed with Utu Grip)
 sets['Foenaria'] = {main = 'Foenaria', sub = 'Utu Grip'}
 sets['Tokko'] = {main = 'Tokko chopper', sub = 'Utu Grip'}
 sets['Lycurgos'] = {main = 'Lycurgos', sub = 'Utu Grip'}
 
--- Sword/Club weapons (One-handed with Blurred Shield +1)
+-- • Sword/Club weapons (One-handed with Blurred Shield +1)
 sets['Naegling'] = {main = 'Naegling', sub = 'Blurred Shield +1'}
 sets['Loxotic'] = {main = 'Loxotic Mace +1', sub = 'Blurred Shield +1'}
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ IDLE SETS                                                                    │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Base Idle Set (Refresh/Regen focus)
--- NOTE: main/sub will be applied by customize_idle_set based on state.MainWeapon
+-- • Base Idle Set (Refresh/Regen focus)
+--   NOTE: main/sub will be applied by customize_idle_set based on state.MainWeapon
 sets.idle = {
     ammo = {name = 'Seeth. Bomblet +1', augments = {'Path: A'}},
     head = "Sakpata's Helm",
@@ -118,7 +117,7 @@ sets.idle = {
     back = Ankou.STP
 }
 
--- PDT Idle (Physical Defense) - Full Heathen's Armor +3
+-- • PDT Idle (Physical Defense) - Full Heathen's Armor +3
 sets.idle.PDT =
     set_combine(
     sets.idle,
@@ -139,23 +138,14 @@ sets.idle.PDT =
     }
 )
 
--- Normal Idle
+-- • Normal Idle
 sets.idle.Normal = sets.idle
 
--- Town Idle (Movement speed)
-sets.idle.Town =
-    set_combine(
-    sets.idle,
-    {
-        legs = 'Carmine Cuisses +1'
-    }
-)
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ ENGAGED SETS                                                                 │
---╰──────────────────────────────────────────────────────────────────────────────╯
-
--- Base engaged (DPS mode)
+-- • Base engaged (DPS mode)
 sets.engaged = {
     ammo = {name = 'Coiste Bodhar', augments = {'Path: A'}},
     head = 'Flam. Zucchetto +2',
@@ -181,8 +171,8 @@ sets.engaged = {
     back = Ankou.STP
 }
 
--- PDT mode (Physical defense)
-sets.engaged.PDT = {
+-- • PDT mode (Physical defense)
+sets.engaged.PDT = set_combine(sets.engaged, {
     ammo = {name = 'Seeth. Bomblet +1', augments = {'Path: A'}},
     body = 'Heath. Cuirass +3',
     hands = {name = "Sakpata's Gauntlets", augments = {'Path: A'}},
@@ -191,24 +181,23 @@ sets.engaged.PDT = {
     waist = {name = 'Sailfi Belt +1', augments = {'Path: A'}},
     left_ring = 'Niqmaddu Ring',
     right_ring = ChirichRing2
-}
+})
 
--- Aftermath Lv.3 (Liberator mythic)
+-- • Aftermath Lv.3 (Liberator mythic)
 sets.engaged.AM3 = set_combine(sets.engaged, {})
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ PRECAST SETS                                                                 │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Job Abilities
 sets.precast = {}
 sets.precast.JA = {}
 
--- Jump (DRG subjob)
+-- • Jump (DRG subjob)
 sets.precast.JA['Jump'] = set_combine(sets.engaged)
 sets.precast.JA['High Jump'] = set_combine(sets.engaged)
 
--- DRK Job Abilities
+-- • DRK Job Abilities
 sets.precast.JA['Diabolic Eye'] = {hands = 'Fall. Fin. Gaunt. +3'}
 sets.precast.JA['Arcane Circle'] = {feet = 'Ignominy Sollerets +2'}
 sets.precast.JA['Nether Void'] = {legs = 'Heath. Flanchard +3'}
@@ -221,7 +210,7 @@ sets.precast.JA['Weapon Bash'] = {hands = 'Ig. Gauntlets +3'}
 sets.precast.JA['Blood Weapon'] = {body = "Fallen's Cuirass +3"}
 sets.precast.JA['Dark Seal'] = {head = "Fallen's Burgeonet +3"}
 
--- Fast Cast
+-- • Fast Cast
 sets.precast.FC = {
     ammo = 'Sapience Orb',
     head = {name = 'Carmine Mask +1', augments = {'Accuracy+20', 'Mag. Acc.+12', '"Fast Cast"+4'}},
@@ -244,13 +233,13 @@ sets.precast.FC = {
     back = Ankou.MAGIC
 }
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ MIDCAST SETS                                                                 │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.midcast = {}
 
--- Dark Magic (Base)
+-- • Dark Magic (Base)
 sets.midcast['Dark Magic'] = {
     ammo = 'Pemphredo Tathlum',
     head = 'Heath. Bur. +3',
@@ -267,7 +256,7 @@ sets.midcast['Dark Magic'] = {
     back = Ankou.MAGIC
 }
 
--- Enfeebling Magic
+-- • Enfeebling Magic
 sets.midcast['Enfeebling Magic'] =
     set_combine(
     sets.midcast['Dark Magic'],
@@ -277,7 +266,7 @@ sets.midcast['Enfeebling Magic'] =
     }
 )
 
--- Dread Spikes (HP-based)
+-- • Dread Spikes (HP-based)
 sets.midcast['Dread Spikes'] =
 set_combine(
     sets.midcast['Dark Magic'],
@@ -307,7 +296,7 @@ set_combine(
     }
 )
 
--- Absorb Spells
+-- • Absorb Spells
 sets.midcast.Absorb =
     set_combine(
     sets.midcast['Dark Magic'],
@@ -317,7 +306,7 @@ sets.midcast.Absorb =
     }
 )
 
--- Individual Absorb spells
+-- • Individual Absorb spells
 sets.midcast['Absorb-MND'] = sets.midcast.Absorb
 sets.midcast['Absorb-CHR'] = sets.midcast.Absorb
 sets.midcast['Absorb-VIT'] = sets.midcast.Absorb
@@ -329,7 +318,7 @@ sets.midcast['Absorb-TP'] = sets.midcast.Absorb
 sets.midcast['Absorb-ACC'] = sets.midcast.Absorb
 sets.midcast['Absorb-Attri'] = sets.midcast.Absorb
 
--- Drain/Aspir (Potency focus)
+-- • Drain/Aspir (Potency focus)
 sets.midcast.Drain =
     set_combine(
     sets.midcast['Dark Magic'],
@@ -345,14 +334,13 @@ sets.midcast.Drain =
 sets.midcast['Drain III'] = sets.midcast.Drain
 sets.midcast.Aspir = sets.midcast.Drain
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ WEAPONSKILL SETS                                                             │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPONSKILL SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Weaponskills
 sets.precast.WS = {}
 
--- Default WS (VIT-based)
+-- • Default WS (VIT-based)
 sets.precast.WS['default'] = {
     ammo = 'Knobkierrie',
     head = 'Heath. Bur. +3',
@@ -378,10 +366,10 @@ sets.precast.WS['default'] = {
     back = Ankou.WS_VIT
 }
 
--- Accuracy WS
+-- • Accuracy WS
 sets.precast.WS.Acc = set_combine(sets.precast.WS, {})
 
--- Entropy (STR 80% VIT 80%)
+-- • Entropy (STR 80% VIT 80%)
 sets.precast.WS['Entropy'] =
     set_combine(
     sets.precast.WS,
@@ -390,7 +378,7 @@ sets.precast.WS['Entropy'] =
     }
 )
 
--- Origin (STR 85% VIT 85%)
+-- • Origin (STR 85% VIT 85%)
 sets.precast.WS['Origin'] =
     set_combine(
     sets.precast.WS,
@@ -420,7 +408,7 @@ sets.precast.WS['Origin'] =
     }
 )
 
--- Resolution (STR 85% - Multihit)
+-- • Resolution (STR 85% - Multihit)
 sets.precast.WS['Resolution'] =
     set_combine(
     sets.precast.WS,
@@ -450,7 +438,7 @@ sets.precast.WS['Resolution'] =
     }
 )
 
--- Torcleaver (VIT 80%)
+-- • Torcleaver (VIT 80%)
 sets.precast.WS['Torcleaver'] = {
     ammo = 'Knobkierrie',
     head = {name = 'Nyame Helm', augments = {'Path: B'}},
@@ -476,7 +464,7 @@ sets.precast.WS['Torcleaver'] = {
     back = Ankou.WS_VIT
 }
 
--- Quietus (STR 60% INT 60%)
+-- • Quietus (STR 60% INT 60%)
 sets.precast.WS['Quietus'] =
     set_combine(
     sets.precast.WS,
@@ -506,7 +494,7 @@ sets.precast.WS['Quietus'] =
     }
 )
 
--- Judgment (MND 75% STR 75%)
+-- • Judgment (MND 75% STR 75%)
 sets.precast.WS['Judgment'] =
     set_combine(
     sets.precast.WS,
@@ -515,7 +503,7 @@ sets.precast.WS['Judgment'] =
     }
 )
 
--- Savage Blade (STR 50% MND 50%)
+-- • Savage Blade (STR 50% MND 50%)
 sets.precast.WS['Savage Blade'] = {
     ammo = 'Crepuscular Pebble',
     head = 'Heath. Bur. +3',
@@ -541,38 +529,41 @@ sets.precast.WS['Savage Blade'] = {
     back = Ankou.WS_STR
 }
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ MOVEMENT SETS                                                                │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MOVEMENT SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Base Movement Speed
+-- • Base Movement Speed
 sets.MoveSpeed = {
     legs = 'Carmine Cuisses +1'
 }
 
---╭──────────────────────────────────────────────────────────────────────────────╮
---│ BUFF SETS                                                                    │
---╰──────────────────────────────────────────────────────────────────────────────╯
+-- • Town Idle (Movement speed)
+sets.idle.Town = sets.MoveSpeed
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BUFF SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.buff = {}
 
--- Doom Resistance
+-- • Doom Resistance
 sets.buff.Doom = {
     right_ring = 'Purity Ring'
 }
 
--- Dark Seal (Buff ID 345)
--- Equip during Dark Magic midcast when Dark Seal buff is active
--- Effect: Dark Magic duration +10% per merit level
--- Affects: Dread Spikes, Absorb spells, Drain III
+-- • Dark Seal (Buff ID 345)
+--   Equip during Dark Magic midcast when Dark Seal buff is active
+--   Effect: Dark Magic duration +10% per merit level
+--   Affects: Dread Spikes, Absorb spells, Drain III
 sets.buff['Dark Seal'] = {
     head = "Fallen's Burgeonet +3"
 }
 
--- Nether Void (Buff ID 439)
--- Equip during Absorb/Drain midcast when Nether Void buff is active
--- Effect: Nether Void bonus +45% (total 95% absorption potency)
--- Affects: Absorb spells, Drain spells (not Absorb-TP)
+-- • Nether Void (Buff ID 439)
+--   Equip during Absorb/Drain midcast when Nether Void buff is active
+--   Effect: Nether Void bonus +45% (total 95% absorption potency)
+--   Affects: Absorb spells, Drain spells (not Absorb-TP)
 sets.buff['Nether Void'] = {
     legs = "Heathen's Flanchards +3"
 }

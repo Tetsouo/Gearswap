@@ -18,7 +18,7 @@ SAMKeybinds.binds = {
     -- MainWeapon cycling (Alt+1)
     {
         key = "!1",
-        command = "cycle MainWeapon",
+        command = "cyclestate MainWeapon",
         desc = "Main Weapon",
         state = "MainWeapon"
     },
@@ -26,7 +26,7 @@ SAMKeybinds.binds = {
     -- HybridMode cycling (Alt+2)
     {
         key = "!2",
-        command = "cycle HybridMode",
+        command = "cyclestate HybridMode",
         desc = "Hybrid Mode",
         state = "HybridMode"
     },

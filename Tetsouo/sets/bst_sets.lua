@@ -456,20 +456,20 @@ sets.pet.idle = {
     hands = 'Nukumi Manoplas +3',
     legs = 'Nukumi Quijotes +3',
     feet = 'Ankusa Gaiters +3',
-    neck = NECK.EliteRoyal,
+    neck = NECK.BstCollar,
     waist = 'Isa Belt',
     left_ear = EARRINGS.Enmerkar,
-    right_ear = EARRINGS.Odnowa,
-    left_ring = RINGS.Chirich1,
-    right_ring = RINGS.Chirich2,
+    right_ear = EARRINGS.Nukumi,
+    left_ring = RINGS.Varar2,
+    right_ring = RINGS.CPalug,
     back = Artio.PETMB
 }
 
 -- Pet PDT idle set (defensive variant)
 sets.pet.idle.PDT =
     set_combine(
-    sets.pet.idle,
-    petDTCore,
+        sets.pet.idle,
+        petDTCore,
     {
         neck = NECK.BstCollar,
         right_ear = EARRINGS.Nukumi,
@@ -481,6 +481,9 @@ sets.pet.idle.PDT =
 --============================================================--
 --                  ENGAGED (MELEE COMBAT) SETS               --
 --============================================================--
+
+-- Base engaged set (used by Mote-Include - will be customized by SetBuilder)
+sets.engaged = set_combine(sets.me.engaged, {})
 
 -- Master engaged set (balanced ACC/DT hybrid)
 sets.me.engaged =
@@ -512,52 +515,51 @@ sets.me.engaged.PDT =
 -- Pet engaged set (offensive focus)
 sets.pet.engaged = {
     ammo = 'Hesperiidae',
-    head = 'Nuk. Cabasset +3',
-    body = 'Nukumi Gausape +3',
-    hands = 'Nukumi Manoplas +3',
-    legs = 'Nukumi Quijotes +3',
-    feet = 'Ankusa Gaiters +3',
-    neck = NECK.BstCollar,
-    waist = 'Klouskap Sash',
-    left_ear = EARRINGS.Enmerkar,
+    head = "Emicho Coronet",
+    body = PhysMultiGear.body,
+    hands = "Nukumi Manoplas +3",
+    legs = PhysMultiGear.legs,
+    feet = "Gleti's Boots",
+    neck = "Shulmanu Collar",
+    waist = 'Incarnation Sash',
+    left_ear = EARRINGS.Sroda,
     right_ear = EARRINGS.Nukumi,
-    left_ring = RINGS.Chirich1,
-    right_ring = RINGS.Chirich2,
-    back = Pastoralist.petDT
+    left_ring = RINGS.Varar2,
+    right_ring = RINGS.CPalug,
+    back = Artio.PETSTP
 }
 
 -- Pet engaged PDT set (defensive variant)
-sets.pet.engaged.PDT =
-    set_combine(
-    sets.pet.engaged,
+sets.pet.engaged.PDT = set_combine(
+        sets.pet.idle,
     {
-        ammo = 'Hesperiidae',
         neck = NECK.BstCollar,
-        waist = 'Isa Belt',
-        left_ring = RINGS.Varar2,
-        right_ring = RINGS.CPalug,
-        back = Artio.PETMB
-    }
-)
-
--- Master + pet engaged set (used in synced combat)
-sets.pet.engagedBoth =
-    set_combine(
-    malignanceSet,
-    {
-        ammo = 'Hesperiidae',
-        neck = NECK.BstCollar,
-        waist = 'Kentarch Belt +1',
-        left_ear = EARRINGS.Telos,
         right_ear = EARRINGS.Nukumi,
-        left_ring = RINGS.Chirich1,
-        right_ring = RINGS.Chirich2,
-        back = Artio.STP
+        left_ring = RINGS.Varar2,
+        right_ring = RINGS.CPalug
     }
 )
 
--- Base engaged set (used by Mote-Include - will be customized by SetBuilder)
-sets.engaged = set_combine({}, sets.me.engaged)
+-- Master + pet engaged set (used in synced combat - balanced hybrid)
+sets.pet.engagedBoth = {
+    ammo="Hesperiidae",
+    head = PhysMultiGear.head,
+    body="Malignance Tabard",
+    legs = PhysMultiGear.legs,
+    feet = PhysMultiGear.feet,
+    waist="Klouskap Sash",
+    left_ear="Sroda Earring",
+    right_ear="Nukumi Earring +1",
+    left_ring="Varar Ring +1",
+    right_ring="C. Palug Ring",
+    hands = PhysMultiGear.hands,
+    neck = NECK.BstCollar,
+    back = Artio.PETSTP
+}
+
+-- Master + pet engaged PDT set (defensive variant for both engaged)
+-- TODO: Fill with defensive gear for both master + pet
+sets.pet.engagedBoth.PDT = set_combine(sets.pet.engagedBoth,{})
 
 --============================================================--
 --                  PRECAST JOB ABILITY SETS                  --
@@ -578,25 +580,16 @@ local summonSet = {
 
 -- Configure JA sets
 -- Ready/Sic recast gear:
--- Base: 30s - 10s (merits) - 5s (JP) - 5s (Desultor) = 10s
--- With QuickReady ON: + Charmer's Merlin -5s = 5s (but loses TP on Ready)
--- With QuickReady OFF: Keep TP Store gear (Nukumi hands), no Charmer's = 10s
+-- Base: 30s - 10s (merits) - 5s (JP) - 5s (Gleti's Breeches) = 10s
+-- Gleti's Breeches equipped in precast (snapshot), then swapped to pet damage gear in aftercast
 
--- Base Sic/Ready set (no Charmer's Merlin - preserves TP)
+-- Sic/Ready set (Gleti's Breeches for Ready Recast -5s)
 sets.precast.JA['Sic'] = {
     hands = 'Nukumi Manoplas +3', -- Pet: Store TP +12
-    legs = "Desultor Tassets" -- Ready Recast -5s
-}
-
--- QuickReady mode set (with Charmer's Merlin - fastest recast)
-sets.precast.JA.SicQuick = {
-    sub = "Charmer's Merlin", -- Ready Recast -5s (loses TP)
-    hands = 'Nukumi Manoplas +3', -- Pet: Store TP +12
-    legs = "Desultor Tassets" -- Ready Recast -5s
+    legs = "Gleti's Breeches" -- Ready Recast -5s
 }
 
 sets.precast.JA['Ready'] = sets.precast.JA['Sic']
-sets.precast.JA.ReadyQuick = sets.precast.JA.SicQuick
 sets.precast.JA['Call Beast'] = summonSet
 sets.precast.JA['Bestial Loyalty'] = summonSet
 
@@ -644,12 +637,12 @@ sets.precast.JA['Default'] = sets.precast.JA['Misc Idle']
 -- Single-hit physical Ready moves
 sets.midcast.pet_physical_moves = {
     ammo = 'Hesperiidae',
-    head = PhysMultiGear.head,
+    head = "Emicho Coronet",
     body = PhysMultiGear.body,
-    hands = PhysMultiGear.hands,
+    hands = "Nukumi Manoplas +3",
     legs = PhysMultiGear.legs,
-    feet = PhysMultiGear.feet,
-    neck = NECK.BstCollar,
+    feet = "Gleti's Boots",
+    neck = "Shulmanu Collar",
     waist = 'Incarnation Sash',
     left_ear = EARRINGS.Sroda,
     right_ear = EARRINGS.Nukumi,
@@ -659,7 +652,14 @@ sets.midcast.pet_physical_moves = {
 }
 
 -- Multi-hit physical Ready moves
-sets.midcast.pet_physicalMulti_moves = set_combine(sets.midcast.pet_physical_moves, {})
+sets.midcast.pet_physicalMulti_moves = set_combine(sets.midcast.pet_physical_moves, {
+    head = PhysMultiGear.head,
+    hands = PhysMultiGear.hands,
+    legs = PhysMultiGear.legs,
+    feet = PhysMultiGear.feet,
+    neck = NECK.BstCollar,
+    back = Artio.PETSTP
+})
 
 -- Magical attack Ready moves
 sets.midcast.pet_magicAtk_moves = {
@@ -681,7 +681,9 @@ sets.midcast.pet_magicAtk_moves = {
 -- Magical accuracy Ready moves (debuffs, buffs)
 sets.midcast.pet_magicAcc_moves = set_combine(sets.midcast.pet_magicAtk_moves, {})
 
--- Set for when pet uses magic while wielding a weapon
+-- Set for when wielding a weapon (weapon-wielding variants)
+sets.midcast.pet_physical_moves_ww = sets.midcast.pet_physical_moves
+sets.midcast.pet_physicalMulti_moves_ww = sets.midcast.pet_physicalMulti_moves
 sets.midcast.pet_magicAtk_moves_ww = sets.midcast.pet_magicAtk_moves
 sets.midcast.pet_magicAcc_moves_ww = sets.midcast.pet_magicAcc_moves
 

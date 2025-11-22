@@ -31,13 +31,13 @@ local WARKeybinds = {}
 WARKeybinds.binds = { -- Weapon Management
 {
     key = "!1",
-    command = "cycle MainWeapon",
+    command = "cyclestate MainWeapon",
     desc = "Main Weapon",
     state = "MainWeapon"
 }, -- Combat Mode Control
 {
     key = "!2",
-    command = "cycle HybridMode",
+    command = "cyclestate HybridMode",
     desc = "Hybrid Mode",
     state = "HybridMode"
 }}

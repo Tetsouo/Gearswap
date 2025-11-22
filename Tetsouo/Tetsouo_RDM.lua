@@ -74,29 +74,39 @@ if region_success and RegionConfig then
 end
 
 function get_sets()
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+
     mote_include_version = 2
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     _G.LockstyleConfig = LockstyleConfig
     _G.RECAST_CONFIG = require('Tetsouo/config/RECAST_CONFIG')
@@ -124,6 +134,7 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/rdm/functions/rdm_functions.lua')
+    Profiler.mark('After rdm_functions')
 
     -- Register RDM lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_rdm_lockstyle_operations then
@@ -132,6 +143,8 @@ function get_sets()
 
     -- Note: Macro/lockstyle are handled by JobChangeManager on job changes
     -- Initial load will be handled by JobChangeManager after initialization
+
+    Profiler.finish()
 end
 
 ---============================================================================
@@ -158,6 +171,14 @@ function job_sub_job_change(newSubjob, oldSubjob)
         elseif not has_storm and had_storm then
             add_to_chat(122, '[RDM] Storm spells disabled (no SCH subjob)')
         end
+    end
+
+    -- Re-apply weapon locking after subjob change (CombatMode)
+    -- This ensures disable() is maintained after JobChangeManager operations
+    if state.CombatMode and state.CombatMode.current == "On" then
+        disable('main', 'sub', 'range')
+    else
+        enable('main', 'sub', 'range')
     end
 
     -- Re-initialize JobChangeManager with RDM-specific functions
@@ -202,6 +223,16 @@ function user_setup()
     RDMStates.configure()
 
     -- Note: Storm state is conditionally created in job_sub_job_change() for SCH subjob
+
+    -- ==========================================================================
+    -- INITIAL WEAPON LOCKING (CombatMode)
+    -- ==========================================================================
+    -- Apply weapon lock IMMEDIATELY if CombatMode is On at load
+    -- This ensures disable() is active BEFORE any sets are equipped
+    if state.CombatMode and state.CombatMode.current == "On" then
+        disable('main', 'sub', 'range')
+        add_to_chat(122, '[RDM] CombatMode: Weapons locked')
+    end
 
     if is_initial_setup then
         -- KEYBIND LOADING

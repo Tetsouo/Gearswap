@@ -37,7 +37,8 @@ DNCWSConfig.climactic_ws = {
 
 --- Minimum TP required to auto-trigger Climactic Flourish
 --- Note: Lag causes GearSwap to see 800-950 TP when user launches at 1000 TP
-DNCWSConfig.min_tp = 1000
+--- Set to 900 to compensate for lag (ensures trigger even with network delay)
+DNCWSConfig.min_tp = 900
 
 --- Minimum target HP% to auto-trigger Climactic Flourish
 --- Prevents wasting Climactic Flourish on nearly dead mobs

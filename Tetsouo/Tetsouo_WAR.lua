@@ -70,29 +70,43 @@ local ConfigLoader = require('shared/utils/config/config_loader')
 local UIConfig = ConfigLoader.load_ui_config('Tetsouo', 'WAR')
 
 function get_sets()
+    -- ═══════════════════════════════════════════════════════════════════
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    -- ═══════════════════════════════════════════════════════════════════
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+    -- ═══════════════════════════════════════════════════════════════════
+
     mote_include_version = 2
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
+
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     -- ============================================
     -- LOAD CONFIGS INTO GLOBAL NAMESPACE
@@ -101,9 +115,9 @@ function get_sets()
     _G.UIConfig = UIConfig
     _G.RECAST_CONFIG = require('Tetsouo/config/RECAST_CONFIG')
 
-
     -- WAR-specific configs
     _G.WARTPConfig = require('Tetsouo/config/war/WAR_TP_CONFIG')
+    Profiler.mark('After configs')
 
     -- Cancel pending operations from previous job
     if jcm_success and JobChangeManager then
@@ -112,11 +126,16 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/war/functions/war_functions.lua')
+    Profiler.mark('After war_functions')
 
     -- Register WAR lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_war_lockstyle_operations then
         JobChangeManager.register_lockstyle_cancel("WAR", cancel_war_lockstyle_operations)
     end
+
+    -- ═══════════════════════════════════════════════════════════════════
+    Profiler.finish()
+    -- ═══════════════════════════════════════════════════════════════════
 end
 
 --- Load WAR equipment sets from external file

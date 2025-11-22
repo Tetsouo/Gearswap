@@ -118,6 +118,17 @@ BRDSongConfig.SONG_PACKS = {
             'Sentinel\'s Scherzo', -- [4] Critical hit evasion
             'Victory March',       -- [5] Haste + Attack
         }
+    },
+    Arebati = {
+        name = "Arebati",
+        description = "Critical hit evasion and defensive buffs",
+        songs = {
+            "Adventurer's Dirge",         -- [1] Haste + Attack + Accuracy
+            "Honor March",
+            'Valor Minuet V',      -- [2] Attack +112
+            'Valor Minuet IV',     -- [3] Attack +96
+            'Knight\'s Minne V', -- [4] Critical hit evasion
+        }
     }
 }
 

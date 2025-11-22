@@ -1,40 +1,40 @@
----============================================================================
---- GEO Equipment Sets - Ultimate Geomancer Bubble Configuration
----============================================================================
---- Complete equipment configuration for Geomancer support role with optimized
---- Luopan (pet bubble) survivability and geomancy effectiveness.
----
---- Features:
----   • Luopan survivability (Pet: DT-, Pet: Regen maximization with Telchine +3)
----   • Dual configuration system (sets.me.* vs sets.luopan.* for pet/no-pet)
----   • Geomancy skill maximization (Azimuth +3, Bagua +3, Idris relic club)
----   • Fast Cast optimization (Merlinic full set with FC+7 augments)
----   • Bolster enhancement (Bagua Tunic relic)
----   • Cure potency support (Daybreak main, Azimuth set)
----   • Elemental Magic Burst (Nantosuelta cape, Metamorph Ring +1)
----   • Movement speed optimization (Geomancy Sandals +3)
----
---- Architecture:
----   • Equipment definitions (Chirich rings, wardrobe management)
----   • Weapon sets (Idris club, Dunna bell, Genmei Shield)
----   • Idle sets (sets.me.idle, sets.luopan.idle with Pet gear)
----   • Engaged sets (sets.me.engaged, sets.luopan.engaged DT/DPS modes)
----   • Precast sets (Fast Cast, Job Abilities)
----   • Midcast sets (Geomancy, Cure, Enhancing, Enfeebling, Elemental)
----   • Weaponskill sets (Nyame full set for magic WS)
----   • Movement sets (Base speed, Adoulin)
----   • Buff sets (Doom resistance)
----
---- @file    jobs/geo/sets/geo_sets.lua
---- @author  Tetsouo
---- @version 3.0 - Standardized Organization
---- @date    Updated: 2025-10-15
----============================================================================
---============================================================--
+---  ═══════════════════════════════════════════════════════════════════════════
+---   GEO Equipment Sets - Ultimate Geomancer Bubble Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Complete equipment configuration for Geomancer support role with optimized
+---   Luopan (pet bubble) survivability and geomancy effectiveness.
+---   Features:
+---     • Luopan survivability (Pet: DT-, Pet: Regen maximization with Telchine +3)
+---     • Dual configuration system (sets.me.* vs sets.luopan.* for pet/no-pet)
+---     • Geomancy skill maximization (Azimuth +3, Bagua +3, Idris relic club)
+---     • Fast Cast optimization (Merlinic full set with FC+7 augments)
+---     • Bolster enhancement (Bagua Tunic relic)
+---     • Cure potency support (Daybreak main, Azimuth set)
+---     • Elemental Magic Burst (Nantosuelta cape, Metamorph Ring +1)
+---     • Movement speed optimization (Geomancy Sandals +3)
+---    Architecture:
+---     • Equipment definitions (Chirich rings, wardrobe management)
+---     • Weapon sets (Idris club, Dunna bell, Genmei Shield)
+---     • Idle sets (sets.me.idle, sets.luopan.idle with Pet gear)
+---     • Engaged sets (sets.me.engaged, sets.luopan.engaged DT/DPS modes)
+---     • Precast sets (Fast Cast, Job Abilities)
+---     • Midcast sets (Geomancy, Cure, Enhancing, Enfeebling, Elemental)
+---     • Weaponskill sets (Nyame full set for magic WS)
+---     • Movement sets (Base speed, Adoulin)
+---     • Buff sets (Doom resistance)
+---   @file    jobs/geo/sets/geo_sets.lua
+---   @author  Tetsouo
+---   @version 3.0 - Standardized Organization
+---   @date    Updated: 2025-11-10
+---  ═════════════════════════════════════════════════════════════════════════
 
---                  EQUIPMENT DEFINITIONS                     --
---============================================================--
--- Chirich Rings in different wardrobes (prevents "already equipped" errors)
+sets = {}
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- • Chirich Rings in different wardrobes (prevents "already equipped" errors)
 ChirichRing1 = {
     name = 'Chirich Ring +1',
     bag = 'wardrobe 1'
@@ -44,32 +44,30 @@ ChirichRing2 = {
     bag = 'wardrobe 2'
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      WEAPON SETS                          --
---============================================================--
-
--- Main Weapon Set (Idris only for now)
+-- • Main Weapon Set (Idris only for now)
 sets['Idris'] = {
     main = 'Idris', -- Best-in-slot Club (main weapon)
     range = 'Dunna' -- Bell (range instrument)
 }
 
--- Sub Weapon Sets (Shield - Genmei Shield only for now)
+-- • Sub Weapon Sets (Shield - Genmei Shield only for now)
 sets['Genmei Shield'] = {
     sub = 'Genmei Shield' -- Physical damage taken -5%
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      IDLE SETS                            --
---============================================================--
-
--- ME Sets (No Luopan active)
+-- • ME Sets (No Luopan active)
 sets.me = {}
 
 sets.me.idle = {
-    -- No pet active - Focus on refresh, defense, regen
+    -- • No pet active - Focus on refresh, defense, regen
     range = 'Dunna',
     head = 'Azimuth Hood +3',
     body = 'Azimuth Coat +3',
@@ -85,11 +83,11 @@ sets.me.idle = {
     back = "Aurist's Cape +1"
 }
 
--- LUOPAN Sets (Luopan active - Pet survival priority)
+-- • LUOPAN Sets (Luopan active - Pet survival priority)
 sets.luopan = {}
 
 sets.luopan.idle = {
-    -- Pet active - Focus on Pet: Damage Taken -, Pet: Regen
+    -- • Pet active - Focus on Pet: Damage Taken -, Pet: Regen
     main = 'Idris',
     range = 'Dunna',
     head = 'Azimuth Hood +3',
@@ -115,18 +113,18 @@ sets.luopan.idle = {
     }
 }
 
--- Legacy idle sets for compatibility (point to new structure)
+
+-- • Legacy idle sets for compatibility (point to new structure)
 sets.idle = {}
 sets.idle.Normal = sets.me.idle
 sets.idle.PDT = sets.me.idle -- GEO uses same for now
 sets.idle.Pet = sets.luopan.idle
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                     ENGAGED SETS                          --
---============================================================--
-
--- ME Engaged (No Luopan active)
+-- • ME Engaged (No Luopan active)
 sets.me.engaged = {
     head = 'Azimuth Hood +3',
     body = 'Nyame Mail',
@@ -142,10 +140,10 @@ sets.me.engaged = {
     back = 'Null Shawl'
 }
 
--- LUOPAN Engaged (Luopan active - varies by LuopanMode state)
+-- • LUOPAN Engaged (Luopan active - varies by LuopanMode state)
 sets.luopan.engaged = {}
 
--- DT Mode - Full Luopan protection (Pet: DT -, Pet: Regen priority)
+-- • DT Mode - Full Luopan protection (Pet: DT -, Pet: Regen priority)
 sets.luopan.engaged.DT = {
     head = 'Azimuth Hood +3',
     body = 'Adamantite Armor',
@@ -170,7 +168,7 @@ sets.luopan.engaged.DT = {
     }
 }
 
--- DPS Mode - DPS focus perso (less pet gear, more melee stats)
+-- • DPS Mode - DPS focus perso (less pet gear, more melee stats)
 sets.luopan.engaged.DPS = {
     head = 'Azimuth Hood +3',
     body = 'Nyame Mail',
@@ -186,18 +184,18 @@ sets.luopan.engaged.DPS = {
     back = 'Null Shawl'
 }
 
--- Legacy engaged sets for compatibility (point to new structure)
+-- • Legacy engaged sets for compatibility (point to new structure)
 sets.engaged = {}
 sets.engaged.Normal = sets.me.engaged
 sets.engaged.PDT = sets.me.engaged -- GEO uses same for now
 
---============================================================--
---                  PRECAST: FAST CAST                       --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: FAST CAST
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.precast = {}
 
--- Copy to main precast.FC (Mote uses this)
+-- • Fast Cast (Mote uses this)
 sets.precast.FC = {
     sub = 'Ammurapi Shield',
     range = {
@@ -236,68 +234,67 @@ sets.precast.FC = {
     }
 }
 
--- Cure Fast Cast
+-- • Cure Fast Cast
 sets.precast.FC.Cure = set_combine(sets.precast.FC, {})
 
---============================================================--
---                  PRECAST: JOB ABILITIES                   --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: JOB ABILITIES
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.precast.JA = {}
 
--- Bolster (+100% Geomancy effectiveness)
+-- • Bolster (+100% Geomancy effectiveness)
 sets.precast.JA['Bolster'] = {
     body = 'bagua tunic'
 }
 
--- Life Cycle (Convert pet HP to user HP)
+-- • Life Cycle (Convert pet HP to user HP)
 sets.precast.JA['Life Cycle'] = {
     body = 'geomancy tunic +2',
     back = "Nantosuelta's Cape"
 }
 
--- Blaze of Glory (+50% effectiveness, consumes HP)
+-- • Blaze of Glory (+50% effectiveness, consumes HP)
 sets.precast.JA['Blaze of Glory'] = {
     feet = 'Bagua Sandals +3'
 }
 
--- Dematerialization (Teleport to Luopan)
+-- • Dematerialization (Teleport to Luopan)
 sets.precast.JA['Dematerialization'] = {
     legs = 'Bagua Pants +3'
 }
 
--- Entrust (Indi spell on party member)
+-- • Entrust (Indi spell on party member)
 sets.precast.JA['Entrust'] = {
     legs = 'Bagua Pants +3'
 }
 
--- Ecliptic Attrition (Damage Luopan for player)
+-- • Ecliptic Attrition (Damage Luopan for player)
 sets.precast.JA['Ecliptic Attrition'] = {
     head = 'Bagua Galero +3'
 }
 
--- Radial Arcana (Restore MP + Luopan HP)
+-- • Radial Arcana (Restore MP + Luopan HP)
 sets.precast.JA['Radial Arcana'] = {
     feet = 'Bagua Sandals +3'
 }
 
---============================================================--
-
---                     MIDCAST SETS                          --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.midcast = {}
 
--- Geomancy (Indi + Geo spells)
+-- • Geomancy (Indi + Geo spells)
 sets.midcast.Geomancy = sets.luopan.idle
 
--- Indi spells (self bubble)
+-- • Indi spells (self bubble)
 sets.midcast.Indi = sets.luopan.idle
 
--- Geo spells (Luopan bubble)
+-- • Geo spells (Luopan bubble)
 sets.midcast.Geo = set_combine(sets.midcast.Geomancy, {})
 
--- Cure spells
+-- • Cure spells
 sets.midcast.Cure = {
     main = 'Daybreak',
     sub = 'Ammurapi Shield',
@@ -322,13 +319,13 @@ sets.midcast.Cure = {
     }
 }
 
--- Enhancing Magic
+-- • Enhancing Magic
 sets.midcast['Enhancing Magic'] = {}
 
--- Enfeebling Magic
+-- • Enfeebling Magic
 sets.midcast['Enfeebling Magic'] = {}
 
--- Elemental Magic
+-- • Elemental Magic
 sets.midcast['Elemental Magic'] = {
     main = 'Idris',
     sub = 'Ammurapi Shield',
@@ -353,10 +350,11 @@ sets.midcast['Elemental Magic'] = {
     }
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPONSKILL SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                   WEAPONSKILL SETS                        --
---============================================================--
+-- • Default WS (Magic damage)
 sets.precast.WS = {
     head = 'Nyame Helm',
     body = 'Nyame Mail',
@@ -375,6 +373,7 @@ sets.precast.WS = {
     }
 }
 
+-- • Exudation (Club magic WS)
 sets.precast.WS['Exudation'] =
     set_combine(
     sets.precast.WS,
@@ -395,17 +394,23 @@ sets.precast.WS['Exudation'] =
     }
 )
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MOVEMENT SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                     MOVEMENT SETS                         --
---============================================================--
-
--- Base Movement Speed
+-- • Base Movement Speed
 sets.MoveSpeed = {
     feet = 'Geo. Sandals +3' -- Movement +18%
 }
 
--- Adoulin Movement (City-specific speed boost)
+-- • Town Idle (Movement speed)
+sets.me.idle.Town = set_combine(sets.me.idle, {
+    feet = 'Geo. Sandals +3'
+})
+
+sets.idle.Town = sets.me.idle.Town
+
+-- • Adoulin Movement (City-specific speed boost)
 sets.Adoulin =
     set_combine(
     sets.MoveSpeed,
@@ -414,14 +419,13 @@ sets.Adoulin =
     }
 )
 
---============================================================--
-
---                       BUFF SETS                           --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BUFF SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.buff = {}
 
--- Doom removal
+-- • Doom removal
 sets.buff.Doom = {}
 
 print('[GEO] Equipment sets loaded')

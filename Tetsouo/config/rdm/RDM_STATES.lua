@@ -216,7 +216,7 @@ function RDMStates.configure()
         'Barthunder',
         'Barwater'
     }
-    state.Barspell:set('Barfira')
+    state.Barspell:set('Barfire')
 
     state.BarAilment =
         M {

@@ -1,63 +1,55 @@
----╭─────────────────────────────────────────────────────────────────────────────╮
----│ RDM Equipment Sets - Ultimate Red Mage Spellblade Configuration             │
----├─────────────────────────────────────────────────────────────────────────────┤
----│ Complete equipment configuration for Red Mage hybrid DPS/support role with  │
----│ optimized enfeebling, enhancing, and melee capabilities.                    │
----│                                                                             │
----│ Features:                                                                   │
----│   • Enfeebling Magic mastery (Vitiation +4, Lethargy +3, Magic Accuracy)    │
----│   • Enhancing Magic duration (Telchine, Atrophy Gloves +4, Ghostfyre cape)  │
----│   • Elemental Magic nuking (Bunzi's Rod, Lethargy full set, Magic Burst)    │
----│   • Cure support (Daybreak main, Revealer's Mitts, Cure Potency)            │
----│   • Melee DPS capability (Malignance hybrid, Store TP, Enspell bonus)       │
----│   • Fast Cast optimization (Merlinic set, Sucellos cape FC+10)              │
----│   • Movement speed optimization (Carmine Cuisses +1)                        │
----│                                                                             │
----│ Architecture:                                                               │
----│   • Equipment definitions (Chirich rings, wardrobe management)              │
----│   • Precast sets (Fast Cast, Job Abilities, Weaponskills)                   │
----│   • Midcast sets (Elemental, Enfeebling, Enhancing, Cure, Dark Magic)       │
----│   • Navigation tables (self/others path helpers for MidcastManager)         │
----│   • Idle sets (DT, Refresh, Town)                                           │
----│   • Engaged sets (DT, Enspell, Refresh, TP, Acc, Dual Wield)                │
----│   • Weapon sets (Naegling, Daybreak, Colada, Malevolence, Shields)          │
----│   • Movement sets (Base speed, Adoulin)                                     │
----│                                                                             │
----│ @file    jobs/rdm/sets/rdm_sets.lua                                         │
----│ @author  Tetsouo                                                            │
----│ @version 3.1 - Fancy Corner Headers + Navigation Tables                     │
----│ @date    Updated: 2025-11-08                                                │
----╰─────────────────────────────────────────────────────────────────────────────╯
+---  ═══════════════════════════════════════════════════════════════════════════
+---   RDM Equipment Sets - Ultimate Red Mage Spellblade Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Complete equipment configuration for Red Mage hybrid DPS/support role with
+---   optimized enfeebling, enhancing, and melee capabilities.
+---   Features:
+---     • Enfeebling Magic mastery (Vitiation +4, Lethargy +3, Magic Accuracy)
+---     • Enhancing Magic duration (Telchine, Atrophy Gloves +4, Ghostfyre cape)
+---     • Elemental Magic nuking (Bunzi's Rod, Lethargy full set, Magic Burst)
+---     • Cure support (Daybreak main, Revealer's Mitts, Cure Potency)
+---     • Melee DPS capability (Malignance hybrid, Store TP, Enspell bonus)
+---     • Fast Cast optimization (Merlinic set, Sucellos cape FC+10)
+---     • Movement speed optimization (Carmine Cuisses +1)
+---   Architecture:
+---     • Equipment definitions (Chirich rings, wardrobe management)
+---     • Precast sets (Fast Cast, Job Abilities, Weaponskills)
+---     • Midcast sets (Elemental, Enfeebling, Enhancing, Cure, Dark Magic)
+---     • Navigation tables (self/others path helpers for MidcastManager)
+---     • Idle sets (DT, Refresh, Town)
+---     • Engaged sets (DT, Enspell, Refresh, TP, Acc, Dual Wield)
+---     • Weapon sets (Naegling, Daybreak, Colada, Malevolence, Shields)
+---     • Movement sets (Base speed, Adoulin)
+---   @file    jobs/rdm/sets/rdm_sets.lua
+---   @author  Tetsouo
+---   @version 3.1 - Standardized Organization
+---   @date    Updated: 2025-11-10
+---  ═════════════════════════════════════════════════════════════════════════
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ EQUIPMENT DEFINITIONS                                                    │
---╰──────────────────────────────────────────────────────────────────────────╯
+sets = {}
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 local ChirichRing1 = {name = 'Chirich Ring +1', bag = 'wardrobe 1'}
 local ChirichRing2 = {name = 'Chirich Ring +1', bag = 'wardrobe 2'}
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ WEAPON SETS                                                              │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Main Weapons (cycle via state.MainWeapon)
+-- • Main Weapons (cycle via state.MainWeapon)
 sets['Naegling'] = {main = 'Naegling'}
 sets['Daybreak'] = {main = 'Daybreak'}
 sets['Colada'] = {main = 'Colada'}
 
--- Sub Weapons (cycle via state.SubWeapon)
+-- • Sub Weapons (cycle via state.SubWeapon)
 sets['Ammurapi'] = {sub = 'Ammurapi Shield'}
 sets['Genmei'] = {sub = 'Genmei Shield'}
 sets['Malevolence'] = {sub = 'Malevolence'}
 
--- Note: Weapons can be cycled via state.MainWeapon
--- Equipment will automatically swap based on selection
-
---╭──────────────────────────────────────────────────────────────────────────╮
---│ SHIELD CONFIGURATION                                                     │
---╰──────────────────────────────────────────────────────────────────────────╯
-
--- Used to determine if player is single wield (shield/empty) or dual wield (2 weapons)
+-- • Shield Configuration List
 sets.shields = {
     'Ammurapi',            -- Short name
     'Ammurapi Shield',     -- Full name (FFXI uses both formats!)
@@ -70,11 +62,12 @@ sets.shields = {
     'Srivatsa'
 }
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ IDLE SETS                                                                │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
+sets.idle = {}
 
--- DT Idle (Physical Damage Taken -, cap 50%)
+-- • DT Idle (Physical Damage Taken -, cap 50%)
 sets.idle.DT = {
     ammo = 'Staunch Tathlum +1',
     head = 'Viti. Chapeau +4',
@@ -97,7 +90,7 @@ sets.idle.DT = {
     }
 }
 
--- Refresh Idle (maximize Refresh+)
+-- • Refresh Idle (maximize Refresh+)
 sets.idle.Refresh = set_combine(sets.idle.DT, {
     head = 'Viti. Chapeau +4',
     body = 'Lethargy Sayon +3',
@@ -106,11 +99,12 @@ sets.idle.Refresh = set_combine(sets.idle.DT, {
     right_ring = "Gurebu's Ring"
 })
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ ENGAGED SETS                                                             │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
+sets.engaged = {}
 
--- DT Engaged (defensive melee - Physical Damage Taken -)
+-- • DT Engaged (defensive melee - Physical Damage Taken -)
 sets.engaged.DT = {
     ammo = 'Regal Gem',
     head = 'Malignance Chapeau',
@@ -130,57 +124,57 @@ sets.engaged.DT = {
     }
 }
 
--- Enspell Engaged (enspell bonus)
+-- • Enspell Engaged (enspell bonus)
 sets.engaged.Enspell = set_combine(sets.engaged.DT, {
     head = 'Umuthi Hat',
     hands = 'Ayanmo Manopolas +2',
     back = 'Ghostfyre Cape'
 })
 
--- Refresh Engaged (MP refresh while engaged - add Refresh+ gear if needed)
+-- • Refresh Engaged (MP refresh while engaged - add Refresh+ gear if needed)
 sets.engaged.Refresh = set_combine(sets.engaged.DT, {})
 
--- TP Engaged (maximize Store TP, TP gain - add extra Store TP gear if needed)
+-- • TP Engaged (maximize Store TP, TP gain - add extra Store TP gear if needed)
 sets.engaged.TP = set_combine(sets.engaged.DT, {})
 
--- Acc Engaged (accuracy focus - add Accuracy+ gear for high evasion mobs)
+-- • Acc Engaged (accuracy focus - add Accuracy+ gear for high evasion mobs)
 sets.engaged.Acc = set_combine(sets.engaged.DT, {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ DUAL WIELD ENGAGED SETS (2 WEAPONS)                                      │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ───────────────────────────────────────────────────────────────────────────
+-- Dual Wield Variants (2 weapons equipped)
+-- ───────────────────────────────────────────────────────────────────────────
 
--- DT Dual Wield (defensive melee with dual wield gear)
+-- • DT Dual Wield (defensive melee with dual wield gear)
 sets.engaged.DT.DW = set_combine(sets.engaged.DT, {
     -- left_ear = 'Suppanomimi',    -- DW+5
     -- right_ear = 'Eabani Earring' -- DW+4
 })
 
--- Enspell Dual Wield (enspell bonus with dual wield)
+-- • Enspell Dual Wield (enspell bonus with dual wield)
 sets.engaged.Enspell.DW = set_combine(sets.engaged.Enspell, {
     head = "Nyame Helm",
     -- left_ear = 'Suppanomimi',
     -- right_ear = 'Eabani Earring'
 })
 
--- Refresh Dual Wield (MP refresh while dual wielding - add Refresh+ gear if needed)
+-- • Refresh Dual Wield (MP refresh while dual wielding - add Refresh+ gear if needed)
 sets.engaged.Refresh.DW = set_combine(sets.engaged.DT.DW, {})
 
--- TP Dual Wield (TP gain with dual wield - maximize Store TP)
+-- • TP Dual Wield (TP gain with dual wield - maximize Store TP)
 sets.engaged.TP.DW = set_combine(sets.engaged.DT.DW, {})
 
--- Acc Dual Wield (accuracy focus with dual wield - add Accuracy+ for high evasion)
+-- • Acc Dual Wield (accuracy focus with dual wield - add Accuracy+ for high evasion)
 sets.engaged.Acc.DW = set_combine(sets.engaged.DT.DW, {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ PRECAST SETS                                                             │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Precast table initialization (REQUIRED - do not remove)
+-- • Precast table initialization (REQUIRED - do not remove)
 sets.precast = {}
 sets.precast.JA = {}  -- Job Abilities sub-table
 
--- Fast Cast (generic - maximize Fast Cast % for all spells)
+-- • Fast Cast (generic - maximize Fast Cast % for all spells)
 -- Target: 80% Fast Cast cap (RDM gets 30% from job traits = need 50% from gear)
 sets.precast.FC = {
     ammo = 'Regal Gem',
@@ -201,37 +195,37 @@ sets.precast.FC = {
     }
 }
 
--- Stoneskin Fast Cast (Stoneskin Casting Time-, add if casting Stoneskin often)
+-- • Stoneskin Fast Cast (Stoneskin Casting Time-, add if casting Stoneskin often)
 sets.precast.FC["Stoneskin"] = set_combine(sets.precast.FC, {
     head = "Umuthi Hat",       -- Stoneskin Casting Time-
     waist = "Siegel Sash",     -- Stoneskin Casting Time-
     legs = "Nyame Flanchard"   -- Defensive
 })
 
--- Chainspell (2-hour ability - instant cast magic for 1 minute)
+-- ───────────────────────────────────────────────────────────────────────────
+-- Job Abilities
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Chainspell (2-hour ability - instant cast magic for 1 minute)
 -- Vitiation Tabard +3 enhances Chainspell effect (doubles duration to 2 minutes)
 sets.precast.JA['Chainspell'] = {
     body = 'Vitiation Tabard +4'  -- Extends Chainspell duration 100% (1min >> 2min)
 }
 
--- Convert (swaps HP and MP values - useful for emergency MP recovery)
+-- • Convert (swaps HP and MP values - useful for emergency MP recovery)
 -- Murgleis (Mythic) reduces Convert recast time (10min >> 5min)
 sets.precast.JA['Convert'] = {
     -- main = "Murgleis",  -- Uncomment if you have Murgleis (Mythic RDM sword)
 }
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ MIDCAST SETS                                                             │
---╰──────────────────────────────────────────────────────────────────────────╯
---╭──────────────────────────────────────────────────────────────────────────╮
---│ NAVIGATION TABLES (Removed - no longer needed)                           │
---│ New architecture: spell_family sets created directly at root level       │
---│ Example: sets.midcast.Refresh.Composure (no intermediate path needed)    │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ ELEMENTAL MAGIC (NUKING)                                                 │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ───────────────────────────────────────────────────────────────────────────
+-- Elemental Magic (Nuking)
+-- ───────────────────────────────────────────────────────────────────────────
+sets.midcast = {}
 
 sets.midcast['Elemental Magic'] = {
     main = "Bunzi's Rod",
@@ -251,16 +245,16 @@ sets.midcast['Elemental Magic'] = {
     back = "Aurist's Cape +1"
 }
 
--- Elemental Magic - Nuke Mode Sets (selected via NukeMode state)
+-- • Elemental Magic - Nuke Mode Sets (selected via NukeMode state)
 -- FreeNuke mode (standard nuking - no Magic Burst timing required)
 sets.midcast['Elemental Magic'].FreeNuke = set_combine(sets.midcast['Elemental Magic'], {})
 
 -- Magic Burst mode (Magic Burst Window - add Magic Burst Damage+ gear here)
 sets.midcast['Elemental Magic']['Magic Burst'] = set_combine(sets.midcast['Elemental Magic'], {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ HEALING MAGIC (CURES)                                                    │
---╰──────────────────────────────────────────────────────────────────────────╯
+-- ───────────────────────────────────────────────────────────────────────────
+-- Healing Magic (Cures)
+-- ───────────────────────────────────────────────────────────────────────────
 
 sets.midcast['Healing Magic'] = {
     main = 'Daybreak',
@@ -280,18 +274,18 @@ sets.midcast['Healing Magic'] = {
     back = "Aurist's Cape +1"
 }
 
--- Cure (single target healing - Cure Potency+, Cure Cast Time-)
+-- • Cure (single target healing - Cure Potency+, Cure Cast Time-)
 sets.midcast.Cure = set_combine(sets.midcast['Healing Magic'], {})
 
--- Curaga (AoE healing - inherits from Cure)
+-- • Curaga (AoE healing - inherits from Cure)
 sets.midcast.Curaga = set_combine(sets.midcast['Healing Magic'], {})
 
 -- Cure Self (self-target cure - can add defensive gear here)
 sets.midcast.CureSelf = set_combine(sets.midcast['Healing Magic'], {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ ENFEEBLING MAGIC (DEBUFFS)                                               │
---╰──────────────────────────────────────────────────────────────────────────╯
+--╭──────────────────────────────────────────────────────────────────────────────╮
+--│ ENFEEBLING MAGIC (DEBUFFS)                                                   │
+--╰──────────────────────────────────────────────────────────────────────────────╯
 
 sets.midcast['Enfeebling Magic'] = {
     main = "Bunzi's Rod",
@@ -348,9 +342,9 @@ sets.midcast['Enfeebling Magic'].Saboteur = set_combine(sets.midcast['Enfeebling
     hands = "Leth. Ganth. +3",
 })
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ ENHANCING MAGIC (BUFFS)                                                  │
---╰──────────────────────────────────────────────────────────────────────────╯
+--╭──────────────────────────────────────────────────────────────────────────────╮
+--│ ENHANCING MAGIC (BUFFS)                                                      │
+--╰──────────────────────────────────────────────────────────────────────────────╯
 
 sets.midcast['Enhancing Magic'] = {
     main = 'Colada',
@@ -442,9 +436,9 @@ sets.midcast.Aquaveil = set_combine(sets.midcast['Enhancing Magic'], {})
 -- These sets use base spell name matching (no spell_family in database)
 sets.midcast.Temper = set_combine(sets.midcast['Enhancing Magic'], {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ DARK MAGIC                                                               │
---╰──────────────────────────────────────────────────────────────────────────╯
+--╭──────────────────────────────────────────────────────────────────────────────╮
+--│ DARK MAGIC                                                                   │
+--╰──────────────────────────────────────────────────────────────────────────────╯
 
 -- Generic Dark Magic (Magic Accuracy focus, uses Elemental Magic base)
 sets.midcast['Dark Magic'] = set_combine(sets.midcast['Elemental Magic'], {})
@@ -462,9 +456,9 @@ sets.midcast.Drain = set_combine(sets.midcast['Elemental Magic'], {})
 -- Aspir (MP absorption - Dark Magic Skill+, add Aspir/Drain+ gear if available)
 sets.midcast.Aspir = set_combine(sets.midcast['Elemental Magic'], {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ WEAPONSKILL SETS                                                         │
---╰──────────────────────────────────────────────────────────────────────────╯
+--╭──────────────────────────────────────────────────────────────────────────────╮
+--│ WEAPONSKILL SETS                                                             │
+--╰──────────────────────────────────────────────────────────────────────────────╯
 
 -- Generic Weaponskill (Nyame R25 Path B focus - WSD+, Attack+, Accuracy+)
 sets.precast.WS = {
@@ -509,9 +503,9 @@ sets.precast.WS['Chant du Cygne'] = set_combine(sets.precast.WS, {})
 -- MND-based physical option
 sets.precast.WS['Requiescat'] = set_combine(sets.precast.WS, {})
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ MOVEMENT SETS                                                            │
---╰──────────────────────────────────────────────────────────────────────────╯
+--╭──────────────────────────────────────────────────────────────────────────────╮
+--│ MOVEMENT SETS                                                                │
+--╰──────────────────────────────────────────────────────────────────────────────╯
 
 sets.MoveSpeed = {
     legs = 'Carmine Cuisses +1'
@@ -527,9 +521,10 @@ sets.idle.Town = set_combine(sets.idle.DT, sets.MoveSpeed, {
     body = "Councilor's Garb" -- Speed bonus in Adoulin city
 })
 
---╭──────────────────────────────────────────────────────────────────────────╮
---│ BUFF SETS                                                                │
---╰──────────────────────────────────────────────────────────────────────────╯
+--╭──────────────────────────────────────────────────────────────────────────────╮
+--│ BUFF SETS                                                                    │
+--╰──────────────────────────────────────────────────────────────────────────────╯
+sets.buff = {}
 
 -- Doom (Deadly status - gradually reduces HP to 0, can wipe)
 -- Priority: Equip Nicander's Necklace immediately when Doom detected

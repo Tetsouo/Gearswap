@@ -1,6 +1,6 @@
 -- UI Settings (auto-generated)
 -- Character: Tetsouo
--- File: D:/Windower Tetsouo/addons/GearSwap/data/Tetsouo/config/ui_settings.lua
+-- File: D:\Windower Tetsouo\/addons/gearswap/data/Tetsouo/config/ui_settings.lua
 return {
     -- Position
     pos_x = 1946,

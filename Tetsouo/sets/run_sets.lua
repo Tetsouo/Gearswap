@@ -1,53 +1,42 @@
----============================================================================
---- RUN Equipment Sets - Ultimate Tanking Configuration
----============================================================================
---- Complete equipment configuration for Rune Fencer tank role with optimized
---- defensive and enmity gear across all combat situations.
+---  ═══════════════════════════════════════════════════════════════════════════
+---   RUN Equipment Sets - Ultimate Tank Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Complete equipment configuration for Rune Fencer tank role with optimized
+---   defensive and enmity gear across all combat situations.
 ---
---- @file    jobs/run/sets/run_sets.lua
---- @author  Tetsouo
---- @version 3.1 - Standardized Organization
---- @date    Updated: 2025-11-04
----============================================================================
+---   Features:
+---     • Tank optimization (Erilaz +3, Turms +1, Futhark +3)
+---     • Enmity maximization (Full Enmity sets for all JAs)
+---     • Rune system (No gear swap - maintains tank set)
+---     • Spell Interruption Rate Down (SIRD for Phalanx, Enhancing)
+---     • HybridMode support (PDT/MDT switching)
+---     • Weapon switching (Epeolatry, Lycurgos with auto-grip management)
+---     • Movement speed optimization (Carmine Cuisses +1)
+---     • Weaponskill optimization (Nyame, Herculean augments)
+---
+---   Architecture:
+---     • Equipment definitions (Ogma capes, wardrobe rings)
+---     • Weapon sets (Epeolatry, Lycurgos + grips)
+---     • Idle sets (Base, PDT, MDT, Town)
+---     • Engaged sets (Base, PDT, MDT)
+---     • Precast sets (Job Abilities, Fast Cast)
+---     • Weaponskill sets (Resolution, Dimidiation, Armor Break)
+---     • Midcast sets (Enmity, SIRD, Enhancing Magic, Phalanx)
+---     • Movement & Buff sets (Speed, Doom, Adoulin)
+---
+---   @file    jobs/run/sets/run_sets.lua
+---   @author  Tetsouo
+---   @version 3.2 - Reorganized to BRD format
+---   @date    Updated: 2025-11-11
+---  ═══════════════════════════════════════════════════════════════════════════
 
---[[
-    EQUIPMENT FORMAT EXAMPLE:
+sets = {}
 
-    -- For augmented gear with priority:
-    Ogma = {
-        tank = {
-            name = "Ogma's Cape",
-            priority = 1,
-            augments = {'VIT+20', 'Eva.+20 /Mag. Eva.+20', 'Mag. Evasion+10', 'Enmity+10', 'Phys. dmg. taken-10%'}
-        },
-        FCSIRD = {
-            name = "Ogma's Cape",
-            priority = 12,
-            augments = {'HP+60', 'HP+20', '"Fast Cast"+10', 'Spell interruption rate down-10%'}
-        }
-    }
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
 
-    -- For simple gear:
-    sets.idle = {
-        head = "Turms Cap +1",
-        body = "Runeist's Coat +3",
-        hands = "Turms Mittens +1"
-    }
-]]
-
---============================================================--
---                  EQUIPMENT DEFINITIONS                     --
---============================================================--
-
--- Ogma's Capes
-Ogma = {
-    tank = {},
-    FCSIRD = {},
-    STP = {},
-    WS = {}
-}
-
--- Rings (Wardrobe-specific)
+-- • RINGS (Wardrobe Management)
 ChirichRing1 = {}
 ChirichRing2 = {}
 StikiRing1 = {}
@@ -55,147 +44,358 @@ StikiRing2 = {}
 Moonlight1 = {}
 Moonlight2 = {}
 
---============================================================--
---                      WEAPON SETS                           --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- AUGMENTED EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
 
-sets.Epeolatry = {main="Epeolatry"}
-sets.Lionheart = {main="Lionheart"}
-sets.Aettir = {main="Aettir"}
+-- • OGMA'S CAPES (Tank / FC+SIRD / Store TP / WS)
+Ogma = {
+    tank = {},
+    FCSIRD = {},
+    STP = {},
+    WS = {}
+}
 
--- Sub Weapons (Grips for Great Swords)
-sets.Utu = {sub="Utu Grip"}
-sets.Refined = {sub="Refined Grip +1"}
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---============================================================--
---                      IDLE SETS                             --
---============================================================--
+-- • GREAT SWORDS
+sets.Epeolatry = {main = "Epeolatry"}
 
-sets.idle = {}
-sets.idle.PDT = {}
-sets.idle.MDT = {}
-sets.idle.Town = {}
+-- • GREAT AXES
+sets.Lycurgos = {main = "Lycurgos"}
 
---============================================================--
---                     ENGAGED SETS                           --
---============================================================--
+-- • GRIPS (Great Swords only - skipped for Lycurgos)
+sets.Utu = {sub = "Utu Grip"}
+sets.Refined = {sub = "Refined Grip +1"}
 
-sets.engaged = {}
-sets.engaged.PDT = {}
-sets.engaged.MDT = {}
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---============================================================--
---                      MIDCAST SETS                          --
---        (Defined early for use in precast set_combine)     --
---============================================================--
+-- • BASE IDLE (Defensive with Regen)
+sets.idle = {
+    ammo="Staunch Tathlum",
+    head="Nyame Helm",
+    body="Runeist Coat +3",
+    hands="Turms Mittens +1",
+    legs="Carmine Cuisses +1",
+    feet="Erilaz Greaves +3",
+    neck="Rep. Plat. Medal",
+    waist="Engraved Belt",
+    left_ear="Tuisto Earring",
+    right_ear="Odnowa Earring +1",
+    left_ring="Karieyh Ring",
+    right_ring="Moonlight Ring",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},}
 
-sets.midcast = {}
-sets.midcast.Enmity = {}
-sets.midcast.SIRDEnmity = {}
+-- • PDT MODE (Physical Damage Taken -50%)
+sets.idle.PDT = set_combine(sets.idle, {})
 
---============================================================--
---                   PRECAST: JOB ABILITIES                   --
---============================================================--
+-- • MDT MODE (Magic Damage Taken -50%)
+sets.idle.MDT = set_combine(sets.idle, {})
 
-sets.FullEnmity = {}
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Runes Set (shared by all 8 elemental runes)
-sets.Runes = {}
+-- • BASE ENGAGED (Defensive Melee)
+sets.engaged = {
+    ammo="Staunch Tathlum",
+    head="Nyame Helm",
+    body="Adamantite Armor",
+    hands="Turms Mittens +1",
+    legs="Eri. Leg Guards +3",
+    feet="Erilaz Greaves +3",
+    neck="Warder's Charm +1",
+    waist="Engraved Belt",
+    left_ear="Tuisto Earring",
+    right_ear="Odnowa Earring +1",
+    left_ring="Shadow Ring",
+    right_ring="Moonlight Ring",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},
+}
 
+-- • PDT MODE (Physical Damage Taken -50%)
+sets.engaged.PDT = set_combine(sets.engaged, {})
+
+-- • MDT MODE (Magic Damage Taken -50%)
+sets.engaged.MDT = set_combine(sets.engaged, {
+    ammo="Yamarang",
+    head="Erilaz Galea +3",
+    body="Erilaz Surcoat +3",
+    hands="Erilaz Gauntlets +3",
+    legs="Eri. Leg Guards +3",
+    feet="Erilaz Greaves +3",
+    neck="Warder's Charm +1",
+    waist="Engraved Belt",
+    left_ear="Tuisto Earring",
+    right_ear="Odnowa Earring +1",
+    left_ring="Shadow Ring",
+    right_ring="Moonlight Ring",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},
+})
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: JOB ABILITIES
+-- ═══════════════════════════════════════════════════════════════════════════
+
+sets.precast = {}
 sets.precast.JA = {}
 
--- Elemental Runes (Lv5) - 8 runes total (all use sets.Runes)
-sets.precast.JA['Ignis'] = sets.Runes       -- Fire rune, resist ice
-sets.precast.JA['Gelus'] = sets.Runes       -- Ice rune, resist fire
-sets.precast.JA['Flabra'] = sets.Runes      -- Wind rune, resist earth
-sets.precast.JA['Tellus'] = sets.Runes      -- Earth rune, resist wind
-sets.precast.JA['Sulpor'] = sets.Runes      -- Thunder rune, resist water
-sets.precast.JA['Unda'] = sets.Runes        -- Water rune, resist thunder
-sets.precast.JA['Lux'] = sets.Runes         -- Light rune, resist dark
-sets.precast.JA['Tenebrae'] = sets.Runes    -- Dark rune, resist light
+-- • FULL ENMITY BASE (Used by all JAs below)
+sets.FullEnmity = {
+    ammo="Sapience Orb",
+    head="Halitus Helm",
+    body="Emet Harness +1",
+    hands="Kurys Gloves",
+    legs="Eri. Leg Guards +3",
+    feet="Erilaz Greaves +3",
+    neck="Moonlight Necklace",
+    waist="Kasiri Belt",
+    left_ear="Friomisi Earring",
+    right_ear="Cryptic Earring",
+    left_ring="Eihwaz Ring",
+    right_ring="Vexer Ring +1",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},
+}
 
--- Subjob Accessible Abilities (each with individual set_combine)
-sets.precast.JA['Vallation'] = set_combine(sets.FullEnmity, {})   -- Reduce elemental damage by runes
-sets.precast.JA['Swordplay'] = set_combine(sets.FullEnmity, {})   -- ACC/EVA boost (stacking)
-sets.precast.JA['Swipe'] = set_combine(sets.FullEnmity, {})       -- Single-target damage (1 rune)
-sets.precast.JA['Lunge'] = set_combine(sets.FullEnmity, {})       -- Single-target damage (all runes)
-sets.precast.JA['Pflug'] = set_combine(sets.FullEnmity, {})       -- Enhance elemental status resistance
-sets.precast.JA['Valiance'] = set_combine(sets.FullEnmity, {})    -- Party elemental damage reduction
+-- • RUNES (NO GEAR SWAP - Maintains current idle/engaged set)
+--   Ignis, Gelus, Flabra, Tellus, Sulpor, Unda, Lux, Tenebrae
+--   Strategy: No set defined = no equipment change = keep tank gear
 
--- Main Job Only Abilities (each with individual set_combine)
-sets.precast.JA['Embolden'] = set_combine(sets.FullEnmity, {})    -- Next enhancing +50% potency, -50% duration
-sets.precast.JA['Vivacious Pulse'] = set_combine(sets.FullEnmity, {})  -- Restore HP based on runes
-sets.precast.JA['Gambit'] = set_combine(sets.FullEnmity, {})      -- Reduce enemy elemental defense (all runes)
-sets.precast.JA['Battuta'] = set_combine(sets.FullEnmity, {})     -- Parry rate +40%, counter damage
-sets.precast.JA['Rayke'] = set_combine(sets.FullEnmity, {})       -- Reduce enemy elemental resistance
-sets.precast.JA['Liement'] = set_combine(sets.FullEnmity, {})     -- Absorb elemental damage (10s)
+-- • SUBJOB ACCESSIBLE ABILITIES
+sets.precast.JA['Vallation'] = set_combine(sets.FullEnmity, {
+body="Runeist Coat +3",})   -- Reduce elemental damage by runes
+
+-- • ACC/EVA boost (stacking)
+sets.precast.JA['Swordplay'] = set_combine(sets.FullEnmity, {
+    hands = "Futhark Mitons +3"
+})
+
+-- • Single-target damage (1 rune)
+sets.precast.JA['Swipe'] = set_combine(sets.FullEnmity, {})
+
+-- • Single-target damage (all runes)
+sets.precast.JA['Lunge'] = set_combine(sets.FullEnmity, {})
+
+-- • Enhance elemental status resistance
+sets.precast.JA['Pflug'] = set_combine(sets.FullEnmity, {})
+
+sets.precast.JA['Valiance'] = set_combine(sets.FullEnmity, {
+body="Runeist Coat +3",})    -- Party elemental damage reduction
+
+-- • MAIN JOB ONLY ABILITIES
+sets.precast.JA['Embolden'] = set_combine(sets.FullEnmity, {back = "Evasionist's Cape"}) -- Next enhancing +50% potency, -50% duration
+sets.precast.JA['Vivacious Pulse'] = set_combine(sets.FullEnmity, {
+head="Erilaz Galea +3",})  -- Restore HP based on runes
+sets.precast.JA['Gambit'] = set_combine(sets.FullEnmity, {
+hands="Runeist Mitons +3",})      -- Reduce enemy elemental defense (all runes)
+sets.precast.JA['Battuta'] = set_combine(sets.FullEnmity, {
+    head="Fu. Bandeau +3",})     -- Parry rate +40%, counter damage
+sets.precast.JA['Rayke'] = set_combine(sets.FullEnmity, {
+feet="Futhark Boots +3",})       -- Reduce enemy elemental resistance
+sets.precast.JA['Liement'] = set_combine(sets.FullEnmity, {
+body="Futhark Coat +3",})     -- Absorb elemental damage (10s)
 sets.precast.JA['One for All'] = set_combine(sets.FullEnmity, {}) -- Party Magic Shield (HP × 0.2)
 
--- SP Abilities (each with individual set_combine)
-sets.precast.JA['Elemental Sforzo'] = set_combine(sets.FullEnmity, {})     -- Immune to all magic attacks (30s)
+-- • SP ABILITIES
+sets.precast.JA['Elemental Sforzo'] = set_combine(sets.FullEnmity, {
+body="Futhark Coat +3",})     -- Immune to all magic attacks (30s)
 sets.precast.JA['Odyllic Subterfuge'] = set_combine(sets.FullEnmity, {})   -- Enemy MACC -40 (30s)
 
---============================================================--
---                    PRECAST: FAST CAST                      --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: FAST CAST
+-- ═══════════════════════════════════════════════════════════════════════════
 
-sets.precast.FC = {}
-sets.precast.FC['Enhancing Magic'] = {}
-sets.precast.FC['Phalanx'] = {}
-sets.precast.FC['Stoneskin'] = {}
-sets.precast.FC['Foil'] = {}
-sets.precast.FC['Flash'] = {}
-sets.precast.FC['Cocoon'] = {}
-sets.precast.FC['Crusade'] = {}
+-- • BASE FAST CAST (Used for ALL spells via Mote-Include fallback)
+--   Mote-Include automatic fallback hierarchy:
+--     1. Spell-specific: sets.precast.FC.Blink or sets.precast.FC['Blink']
+--     2. Skill-specific: sets.precast.FC['Enhancing Magic']
+--     3. Base fallback:  sets.precast.FC (this set)
+--
+--   Both notations are equivalent in Lua:
+--     sets.precast.FC.Blink         = {...}  (dot notation - cleaner)
+--     sets.precast.FC['Blink']      = {...}  (bracket notation - for spaces/special chars)
+--     sets.precast.FC['Blue Magic'] = {...}  (bracket required for spaces)
+--
+--   Examples:
+--     sets.precast.FC.Blink = set_combine(sets.precast.FC, {head="Nyame Helm"})
+--     sets.precast.FC['Enhancing Magic'] = set_combine(sets.precast.FC, {waist="Siegel Sash"})
+--
+sets.precast.FC = {
+    ammo="Sapience Orb",
+    head={ name="Carmine Mask +1", augments={'Accuracy+20','Mag. Acc.+12','"Fast Cast"+4',}},
+    body="Erilaz Surcoat +3",
+    hands="Agwu's Gages",
+    legs="Agwu's Slops",
+    feet={ name="Carmine Greaves +1", augments={'Accuracy+11','DEX+11','MND+18',}},
+    neck="Baetyl Pendant",
+    waist="Sailfi Belt +1",
+    left_ear="Enchntr. Earring +1",
+    right_ear="Loquac. Earring",
+    left_ring="Naji's Loop",
+    right_ring="Kishar Ring",
+    back={ name="Ogma's Cape", augments={'"Fast Cast"+10','Spell interruption rate down-10%',}},
+}
 
---============================================================--
---                   PRECAST: WEAPONSKILLS                    --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPONSKILL SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
-sets.precast.WS = {}
+-- • GENERIC WEAPONSKILL (Fallback)
+sets.precast.WS = {
+    ammo="Knobkierrie",
+    head="Nyame Helm",
+    body="Nyame Mail",
+    hands="Nyame Gauntlets",
+    legs="Nyame Flanchard",
+    feet="Nyame Sollerets",
+    neck="Null Loop",
+    waist="Sailfi Belt +1",
+    left_ear="Moonshade Earring",
+    right_ear="Sherida Earring",
+    left_ring="Cornelia's Ring",
+    right_ring="Karieyh Ring",
+    back={ name="Ogma's Cape", augments={'DEX+20','Accuracy+20 Attack+20','Accuracy+5','"Dbl.Atk."+10','Damage taken-5%',}},
+}
+
+-- • GREAT SWORD WEAPONSKILLS
 sets.precast.WS['Resolution'] = {}
 sets.precast.WS['Dimidiation'] = {}
 sets.precast.WS['Herculean Slash'] = {}
 sets.precast.WS['Spinning Slash'] = {}
 sets.precast.WS['Ground Strike'] = {}
 
+-- • DEBUFF WEAPONSKILLS
+sets.precast.WS['Armor Break'] = {
+    ammo="Yamarang",
+    head="Erilaz Galea +3",
+    body="Nyame Mail",
+    hands="Erilaz Gauntlets +3",
+    legs="Eri. Leg Guards +3",
+    feet="Erilaz Greaves +3",
+    neck="Null Loop",
+    waist="Null Belt",
+    left_ear="Hermetic Earring",
+    right_ear="Gwati Earring",
+    left_ring="Metamor. Ring +1",
+    right_ring="Cornelia's Ring",
+    back={ name="Ogma's Cape", augments={'DEX+20','Accuracy+20 Attack+20','Accuracy+5','"Dbl.Atk."+10','Damage taken-5%',}},
+}
+
 -- Note: TPBonus handled automatically by TPBonusHandler system
 -- No need for manual .TPBonus sets
 
---============================================================--
---                      MIDCAST SETS                          --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
+sets.midcast = {}
+
+-- • ENMITY SPELLS (Flash, Foil)
 sets.midcast.Enmity = sets.FullEnmity
-sets.midcast.SIRDEnmity = {}
-sets.midcast.PhalanxPotency = {}
-sets.midcast.SIRDPhalanx = {}
-sets.midcast['Enhancing Magic'] = {}
-sets.midcast['Stoneskin'] = {}
-sets.midcast['Regen'] = {}
 
--- Specific Midcast Spells
-sets.midcast['Flash'] = sets.midcast.Enmity
-sets.midcast['Foil'] = sets.midcast.Enmity
-sets.midcast['Phalanx'] = {}
-sets.midcast['Cocoon'] = {}
-sets.midcast['Crusade'] = {}
-sets.midcast['Reprisal'] = {}
-sets.midcast['Aquaveil'] = {}
-sets.midcast['Refresh'] = {}
-sets.midcast['Haste'] = {}
-sets.midcast['Protect'] = {}
-sets.midcast['Shell'] = {}
+-- • SIRD ENMITY (Flash with Spell Interruption Rate Down)
+sets.midcast.SIRDEnmity = {
+    ammo="Staunch Tathlum",
+    head={ name="Taeon Chapeau", augments={'Spell interruption rate down -10%','Phalanx +3',}},
+    body="Adamantite Armor",
+    hands="Rawhide Gloves",
+    legs="Carmine Cuisses +1",
+    feet="Erilaz Greaves +3",
+    neck="Moonlight Necklace",
+    waist="Audumbla Sash",
+    left_ear="Odnowa Earring +1",
+    right_ear="Cryptic Earring",
+    left_ring="Evanescence Ring",
+    right_ring="Murky Ring",
+    back={ name="Ogma's Cape", augments={'"Fast Cast"+10','Spell interruption rate down-10%',}},
+}
 
---============================================================--
---                     MOVEMENT SETS                          --
---============================================================--
+-- • ENHANCING MAGIC BASE (Used for ALL Enhancing Magic via MidcastManager fallback)
+--   SIRD priority for tank - prevents interruption during combat
+sets.midcast['Enhancing Magic'] = {
+    ammo="Staunch Tathlum",
+    head="Erilaz Galea +3",
+    body="Adamantite Armor",
+    hands="Runeist Mitons +3",
+    legs="Futhark Trousers +3",
+    feet="Erilaz Greaves +3",
+    neck="Incanter's Torque",
+    waist="Engraved Belt",
+    left_ear="Tuisto Earring",
+    right_ear="Odnowa Earring +1",
+    left_ring="Shadow Ring",
+    right_ring="Moonlight Ring",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},
+}
 
-sets.MoveSpeed = {}
-sets.Adoulin = {}
+-- • SPECIFIC ENHANCING SPELLS
+sets.midcast['Regen'] = {
+    ammo="Staunch Tathlum",
+    head="Rune. Bandeau +2",
+    body="Adamantite Armor",
+    hands="Runeist Mitons +3",
+    legs="Futhark Trousers +3",
+    feet="Erilaz Greaves +3",
+    neck="Incanter's Torque",
+    waist="Sroda Belt",
+    left_ear="Tuisto Earring",
+    right_ear="Odnowa Earring +1",
+    left_ring="Shadow Ring",
+    right_ring="Moonlight Ring",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},
+}
 
---============================================================--
---                      BUFF SETS                             --
---============================================================--
+-- • ENMITY SPELLS WITH SIRD
+sets.midcast['Flash'] = sets.midcast.SIRDEnmity
+sets.midcast['Foil'] = sets.midcast.SIRDEnmity
+sets.midcast['Crusade'] = sets.midcast.SIRDEnmity
 
+-- • PHALANX (SIRD + Phalanx+ augments)
+--   RUN tank priority: SIRD to prevent interrupt
+sets.midcast['Phalanx'] = {
+    ammo="Staunch Tathlum",
+    head="Fu. Bandeau +3",
+    body={ name="Herculean Vest", augments={'"Rapid Shot"+4','DEX+4','Phalanx +5','Accuracy+1 Attack+1',}},
+    hands={ name="Herculean Gloves", augments={'Crit. hit damage +1%','Pet: "Dbl. Atk."+1','Phalanx +4','Mag. Acc.+4 "Mag.Atk.Bns."+4',}},
+    legs={ name="Herculean Trousers", augments={'"Cure" potency +1%','Pet: "Dbl. Atk."+3','Phalanx +4',}},
+    feet={ name="Herculean Boots", augments={'Accuracy+18 Attack+18','Pet: Accuracy+28 Pet: Rng. Acc.+28','Phalanx +5',}},
+    neck="Warder's Charm +1",
+    waist="Flume Belt +1",
+    left_ear="Tuisto Earring",
+    right_ear="Odnowa Earring +1",
+    left_ring="Shadow Ring",
+    right_ring="Moonlight Ring",
+    back={ name="Ogma's Cape", augments={'HP+60','Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity+10','Parrying rate+5%',}},
+}
+
+-- • BLUE MAGIC (RUN/BLU subjob - ALL spells use this set)
+--   Includes: Cocoon, Sudden Lunge, Head Butt, etc.
+sets.midcast['Blue Magic'] = sets.midcast.SIRDEnmity
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MOVEMENT SETS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- • MOVEMENT SPEED (Applied when moving)
+sets.MoveSpeed = {
+    legs = "Carmine Cuisses +1"
+}
+
+-- • TOWN IDLE (Movement speed in towns)
+sets.idle.Town = sets.MoveSpeed
+
+-- • ADOULIN SPEED (Councilor's Garb bonus)
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"})
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BUFF SETS
+-- ═══════════════════════════════════════════════════════════════════════════
+sets.buff = {}
+
+-- • DOOM (Cursna Received +10)
 sets.buff.Doom = {}

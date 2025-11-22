@@ -32,24 +32,24 @@ local RUNKeybinds = {}
 RUNKeybinds.binds = { -- Hybrid Mode (PDT/MDT)
 {
     key = "!1",
-    command = "cycle HybridMode",
+    command = "cyclestate HybridMode",
     desc = "Hybrid Mode",
     state = "HybridMode"
 }, -- Weapon Management
 {
     key = "!2",
-    command = "cycle MainWeapon",
+    command = "cyclestate MainWeapon",
     desc = "Main Weapon",
     state = "MainWeapon"
 }, {
     key = "!3",
-    command = "cycle SubWeapon",
+    command = "cyclestate SubWeapon",
     desc = "Sub Weapon",
     state = "SubWeapon"
 }, -- Rune Mode (RUN main job - always available)
 {
     key = "!4",
-    command = "cycle RuneMode",
+    command = "cyclestate RuneMode",
     desc = "Rune Mode",
     state = "RuneMode"
     -- No subjob filter - RuneMode is core RUN functionality

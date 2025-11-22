@@ -32,7 +32,7 @@ WHMKeybinds.binds = {
     -- CureMode cycling (Alt+1 - most important for WHM)
     {
         key = "!1",
-        command = "cycle CureMode",
+        command = "cyclestate CureMode",
         desc = "Cure Mode",
         state = "CureMode"
     },
@@ -40,7 +40,7 @@ WHMKeybinds.binds = {
     -- IdleMode cycling (Ctrl+=)
     {
         key = "!2",
-        command = "cycle IdleMode",
+        command = "cyclestate IdleMode",
         desc = "Idle Mode",
         state = "IdleMode"
     },
@@ -48,7 +48,7 @@ WHMKeybinds.binds = {
     -- AfflatusMode cycling (Alt+3)
     {
         key = "!3",
-        command = "cycle AfflatusMode",
+        command = "cyclestate AfflatusMode",
         desc = "Afflatus Mode",
         state = "AfflatusMode"
     },
@@ -56,7 +56,7 @@ WHMKeybinds.binds = {
     -- CureAutoTier cycling (Alt+4)
     {
         key = "!4",
-        command = "cycle CureAutoTier",
+        command = "cyclestate CureAutoTier",
         desc = "Cure Auto-Tier",
         state = "CureAutoTier"
     },
@@ -64,7 +64,7 @@ WHMKeybinds.binds = {
     -- CombatMode cycling (Alt+0) - Weapon lock control
     {
         key = "!0",
-        command = "cycle CombatMode",
+        command = "cyclestate CombatMode",
         desc = "Combat Mode",
         state = "CombatMode"
     },
@@ -72,7 +72,7 @@ WHMKeybinds.binds = {
     -- CastingMode cycling (Alt+5)
     {
         key = "!5",
-        command = "cycle CastingMode",
+        command = "cyclestate CastingMode",
         desc = "Casting Mode",
         state = "CastingMode"
     },

@@ -13,11 +13,11 @@
 local BRDMacroConfig = {}
 
 -- Default macrobook (used if no subjob config)
-BRDMacroConfig.default = {book = 36, page = 1}
+BRDMacroConfig.default = {book = 40, page = 1}
 
 -- Macrobook per subjob
 BRDMacroConfig.solo = {
-    ['WHM'] = {book = 36, page = 1}, -- Bard/White Mage (cures + songs)
+    ['WHM'] = {book = 40, page = 1}, -- Bard/White Mage (cures + songs)
     ['RDM'] = {book = 36, page = 1}, -- Bard/Red Mage (enfeebles + songs)
     ['NIN'] = {book = 36, page = 1}, -- Bard/Ninja (utility + songs)
     ['DNC'] = {book = 36, page = 1} -- Bard/Dancer (steps + songs)

@@ -29,16 +29,15 @@ BSTKeybinds.binds = {
     ---==========================================================================
     --- WEAPON MANAGEMENT (Number Keys)
     ---==========================================================================
-    { key = "1", command = "cycle WeaponSet", desc = "Main Weapon", state = "WeaponSet" },
-    { key = "4", command = "cycle SubSet", desc = "Sub/Shield", state = "SubSet" },
+    { key = "1", command = "cyclestate WeaponSet", desc = "Main Weapon", state = "WeaponSet" },
+    { key = "4", command = "cyclestate SubSet", desc = "Sub/Shield", state = "SubSet" },
 
     ---==========================================================================
     --- COMBAT MODES (Number Keys)
     ---==========================================================================
-    { key = "5", command = "cycle HybridMode", desc = "Hybrid Mode", state = "HybridMode" },
-    { key = "6", command = "cycle AutoPetEngage", desc = "Auto Pet Engage", state = "AutoPetEngage" },
-    { key = "7", command = "cycle petIdleMode", desc = "Pet Idle Mode", state = "petIdleMode" },
-    { key = "8", command = "cycle QuickReady", desc = "Quick Ready", state = "QuickReady" },
+    { key = "5", command = "cyclestate HybridMode", desc = "Hybrid Mode", state = "HybridMode" },
+    { key = "6", command = "cyclestate AutoPetEngage", desc = "Auto Pet Engage", state = "AutoPetEngage" },
+    { key = "7", command = "cyclestate petIdleMode", desc = "Pet Idle Mode", state = "petIdleMode" },
 
     ---==========================================================================
     --- ECOSYSTEM/SPECIES MANAGEMENT (Alt+Numbers - BST Functions)

@@ -74,6 +74,10 @@ if region_success and RegionConfig then
 end
 
 function get_sets()
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+
     mote_include_version = 2
 
     -- BRD-specific configs (BEFORE Mote-Include so they're available in user_setup)
@@ -83,38 +87,46 @@ function get_sets()
     _G.BRDSongConfig = require('Tetsouo/config/brd/BRD_SONG_CONFIG')
     _G.BRDTimingConfig = require('Tetsouo/config/brd/BRD_TIMING_CONFIG')
 
-    -- Load BRD functions BEFORE Mote-Include (so _G.update_brd_song_slots exists in user_setup)
-    include('../shared/jobs/brd/functions/brd_functions.lua')
-
-    -- Now load Mote-Include (which calls user_setup and creates 'state')
+    -- Load Mote-Include first (calls user_setup and creates 'state')
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
+
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     -- Cancel any pending operations from previous job (including ALL job lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
+
+    -- Load job-specific functions
+    include('../shared/jobs/brd/functions/brd_functions.lua')
+    Profiler.mark('After brd_functions')
 
     -- Register BRD lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_brd_lockstyle_operations then
@@ -123,6 +135,8 @@ function get_sets()
 
     -- Note: Macro/lockstyle are handled by JobChangeManager on job changes
     -- Initial load will be handled by JobChangeManager after initialization
+
+    Profiler.finish()
 end
 
 ---============================================================================
@@ -267,7 +281,7 @@ end
 ---============================================================================
 
 --- Called by Mote-Include after state changes to force gear re-equip
---- This is CRITICAL for IdleMode/HybridMode changes to take effect
+--- This is CRITICAL for IdleMode/EngagedMode changes to take effect
 function update_combat_form()
     -- Force gear update based on current player status
     if not player then return end

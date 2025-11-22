@@ -25,21 +25,21 @@ local MessageFormatter = require('shared/utils/messages/message_formatter')
 -- Format: { key = "key_combination", command = "gs_command", desc = "description", state = "state_name" }
 CORKeybinds.binds = {
     -- Weapon Management
-    { key = "!1", command = "cycle MainWeapon", desc = "Main Weapon",  state = "MainWeapon" },
-    { key = "!2", command = "cycle RangeWeapon", desc = "Range Weapon",  state = "RangeWeapon" },
+    { key = "!1", command = "cyclestate MainWeapon", desc = "Main Weapon",  state = "MainWeapon" },
+    { key = "!2", command = "cyclestate RangeWeapon", desc = "Range Weapon",  state = "RangeWeapon" },
 
     -- Quick Draw Element
-    { key = "!3", command = "cycle QuickDraw", desc = "Quick Draw Element",  state = "QuickDraw" },
+    { key = "!3", command = "cyclestate QuickDraw", desc = "Quick Draw Element",  state = "QuickDraw" },
 
     -- Combat Mode Control
-    { key = "!4", command = "cycle HybridMode", desc = "Hybrid Mode",  state = "HybridMode" },
+    { key = "!4", command = "cyclestate HybridMode", desc = "Hybrid Mode",  state = "HybridMode" },
 
     -- Rolls (Phantom Roll Selection)
-    { key = "!5", command = "cycle MainRoll", desc = "Main Roll",  state = "MainRoll" },
-    { key = "!6", command = "cycle SubRoll", desc = "Sub Roll",  state = "SubRoll" },
+    { key = "!5", command = "cyclestate MainRoll", desc = "Main Roll",  state = "MainRoll" },
+    { key = "!6", command = "cyclestate SubRoll", desc = "Sub Roll",  state = "SubRoll" },
 
     -- Luzaf Ring Toggle (affects roll range: ON=16y, OFF=8y)
-    { key = "!7", command = "cycle LuzafRing", desc = "Luzaf Ring",  state = "LuzafRing" },
+    { key = "!7", command = "cyclestate LuzafRing", desc = "Luzaf Ring",  state = "LuzafRing" },
 }
 
 ---============================================================================

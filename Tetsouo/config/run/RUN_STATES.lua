@@ -56,7 +56,7 @@ function RUNStates.configure()
         M {
         ['description'] = 'Main Weapon',
         'Epeolatry', -- Empyrean Great Sword
-        'Lycurgos', -- Lycurgos (Great Axe) + Utu Grip
+        'Lycurgos', -- Lycurgos (Great Axe, 2H - no grip)
         --'Loxotic' -- Loxotic Mace +1 (Club) + Blurred Shield +1
         --'Lionheart', -- Aeonic Great Sword
         --'Aettir' -- Oboro Great Sword

@@ -52,6 +52,10 @@ if region_success and RegionConfig then
 end
 
 function get_sets()
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+
     mote_include_version = 2
 
     -- DISABLE AUTOMOVE FOR BST (performance optimization)
@@ -66,27 +70,33 @@ function get_sets()
     _G.BSTTPConfig = require('Tetsouo/config/bst/BST_TP_CONFIG')
 
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     -- Cancel pending operations from previous job
     if jcm_success and JobChangeManager then
@@ -95,11 +105,14 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/bst/functions/bst_functions.lua')
+    Profiler.mark('After bst_functions')
 
     -- Register BST lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_bst_lockstyle_operations then
         JobChangeManager.register_lockstyle_cancel("BST", cancel_bst_lockstyle_operations)
     end
+
+    Profiler.finish()
 end
 
 ---============================================================================
@@ -186,6 +199,13 @@ function user_setup()
             end, 0.2)
         end
     end
+
+    -- ==========================================================================
+    -- LOAD BST HUD ADDON
+    -- ==========================================================================
+    coroutine.schedule(function()
+        windower.send_command('lua load bst-hud')
+    end, 2.0)  -- Load after 2s delay (let core systems initialize first)
 
     -- ==========================================================================
     -- START SMART MONITORING (pet status + movement)
@@ -297,8 +317,10 @@ local function smart_pet_monitor()
         if success and PetManager then
             PetManager.monitor_pet_status()
 
-            -- Auto-engage pet if conditions met
-            PetManager.check_and_engage_pet(pet)
+            -- Auto-engage pet if conditions met (UNLESS rdymove sequence active)
+            if not _G.bst_rdymove_active then
+                PetManager.check_and_engage_pet(pet)
+            end
         end
     else
         -- No pet - ensure petEngaged is false
@@ -391,6 +413,9 @@ _G.stop_pet_monitoring = stop_pet_monitoring
 function file_unload()
     -- Stop pet monitoring
     stop_pet_monitoring()
+
+    -- Unload BST HUD addon
+    windower.send_command('lua unload bst-hud')
 
     -- Cancel all JobChangeManager operations
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')

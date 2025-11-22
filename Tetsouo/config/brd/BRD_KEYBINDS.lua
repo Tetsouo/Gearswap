@@ -23,37 +23,37 @@ BRDKeybinds.binds = {
     ---========================================================================
 
     -- Alt+1: Idle Mode (Refresh/DT/Regen)
-    { key = "!1", command = "cycle IdleMode", desc = "Idle Mode", state = "IdleMode" },
+    { key = "!1", command = "cyclestate IdleMode", desc = "Idle Mode", state = "IdleMode" },
 
-    -- Alt+2: Hybrid Mode (PDT/Normal)
-    { key = "!2", command = "cycle HybridMode", desc = "Hybrid Mode", state = "HybridMode" },
+    -- Alt+2: Engaged Mode (STP/Acc/DT/SB)
+    { key = "!2", command = "cyclestate EngagedMode", desc = "Engaged Mode", state = "EngagedMode" },
 
     -- Alt+3: Song Pack Rotation (March/Dirge/Madrigal/Minne/Etude/Carol/Scherzo/Tank/Healer)
-    { key = "!3", command = "cycle SongMode", desc = "Song Pack", state = "SongMode" },
+    { key = "!3", command = "cyclestate SongMode", desc = "Song Pack", state = "SongMode" },
 
     -- Alt+4: Main Instrument (Gjallarhorn/Marsyas/Daurdabla)
-    { key = "!4", command = "cycle MainInstrument", desc = "Instrument", state = "MainInstrument" },
+    { key = "!4", command = "cyclestate MainInstrument", desc = "Instrument", state = "MainInstrument" },
 
     -- Alt+5: Victory March Replacement Mode (Madrigal/Minne/Scherzo)
-    { key = "!5", command = "cycle VictoryMarch", desc = "Victory March Replace", state = "VictoryMarch" },
+    { key = "!5", command = "cyclestate VictoryMarch", desc = "Victory March Replace", state = "VictoryMarch" },
 
     -- Alt+6: Main Weapon (Naegling/Twashtar/Carnwenhan/Mpu Gandring)
-    { key = "!6", command = "cycle MainWeapon", desc = "Main Weapon", state = "MainWeapon" },
+    { key = "!6", command = "cyclestate MainWeapon", desc = "Main Weapon", state = "MainWeapon" },
 
     -- Alt+7: Sub Weapon (Demersal/Genmei/Centovente)
-    { key = "!7", command = "cycle SubWeapon", desc = "Sub Weapon", state = "SubWeapon" },
+    { key = "!7", command = "cyclestate SubWeapon", desc = "Sub Weapon", state = "SubWeapon" },
 
     -- Alt+8: Etude Type (STR/DEX/VIT/AGI/INT/MND/CHR)
-    { key = "!8", command = "cycle EtudeType", desc = "Etude Type", state = "EtudeType" },
+    { key = "!8", command = "cyclestate EtudeType", desc = "Etude Type", state = "EtudeType" },
 
     -- Alt+9: Carol Element (Fire/Ice/Wind/Earth/Lightning/Water/Light/Dark)
-    { key = "!9", command = "cycle CarolElement", desc = "Carol Element", state = "CarolElement" },
+    { key = "!9", command = "cyclestate CarolElement", desc = "Carol Element", state = "CarolElement" },
 
     -- Alt+-: Threnody Element (Fire/Ice/Wind/Earth/Lightning/Water/Light/Dark)
-    { key = "!-", command = "cycle ThrenodyElement", desc = "Threnody Element", state = "ThrenodyElement" },
+    { key = "!-", command = "cyclestate ThrenodyElement", desc = "Threnody Element", state = "ThrenodyElement" },
 
     -- Alt+=: Auto-Marcato Song (HonorMarch/AriaPassion/Off)
-    { key = "!=", command = "cycle MarcatoSong", desc = "Auto-Marcato Song", state = "MarcatoSong" },
+    { key = "!=", command = "cyclestate MarcatoSong", desc = "Auto-Marcato Song", state = "MarcatoSong" },
 
     ---========================================================================
     --- CTRL + KEYS (Actions/Abilities) - ^1 to ^9, ^-, ^=
@@ -133,28 +133,10 @@ function BRDKeybinds.unbind_all()
     MessageFormatter.show_success("BRD keybinds unloaded.")
 end
 
---- Display BRD system intro message with macrobook and lockstyle info
+--- Display BRD system intro message
+--- Note: Macro/lockstyle info is not displayed to avoid triggering lazy module loading during startup
 function BRDKeybinds.show_intro()
-    -- Try to get macro info from BRD_MACROBOOK module
-    local macro_info = nil
-    if _G.get_brd_macro_info then
-        macro_info = _G.get_brd_macro_info()
-    end
-
-    -- Try to get lockstyle info from BRD_LOCKSTYLE module
-    local lockstyle_info = nil
-    local lockstyle_success, BRD_LOCKSTYLE = pcall(require, 'shared/jobs/brd/functions/BRD_LOCKSTYLE')
-    if lockstyle_success and BRD_LOCKSTYLE and BRD_LOCKSTYLE.get_lockstyle_info then
-        lockstyle_info = BRD_LOCKSTYLE.get_lockstyle_info()
-    end
-
-    -- Show complete intro with macro and lockstyle info
-    if macro_info or lockstyle_info then
-        MessageFormatter.show_system_intro_complete("BRD SYSTEM LOADED", BRDKeybinds.binds, macro_info, lockstyle_info)
-    else
-        -- Fallback to regular intro if no additional info available
-        MessageFormatter.show_system_intro("BRD SYSTEM LOADED", BRDKeybinds.binds)
-    end
+    MessageFormatter.show_system_intro("BRD SYSTEM LOADED", BRDKeybinds.binds)
 end
 
 --- Display current keybind configuration

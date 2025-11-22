@@ -88,29 +88,56 @@ local ConfigLoader = require('shared/utils/config/config_loader')
 local UIConfig = ConfigLoader.load_ui_config('Tetsouo', 'COR')
 
 function get_sets()
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+
+    -- ============================================
+    -- CLEANUP OLD COR EVENTS (CRITICAL FIX)
+    -- ============================================
+    -- MUST cleanup old event handlers BEFORE loading new ones
+    -- This prevents duplicate event registration when switching jobs without reload
+    -- (e.g., WAR → COR → WAR → COR causes double messages without this)
+    if _G.cor_action_event_id then
+        windower.unregister_event(_G.cor_action_event_id)
+        _G.cor_action_event_id = nil
+    end
+    if _G.cor_party_event_id then
+        windower.unregister_event(_G.cor_party_event_id)
+        _G.cor_party_event_id = nil
+    end
+    -- Clear pending roll state
+    _G.cor_pending_roll_value = nil
+
     mote_include_version = 2
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     _G.LockstyleConfig = LockstyleConfig
     _G.RECAST_CONFIG = require('Tetsouo/config/RECAST_CONFIG')
@@ -135,6 +162,7 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/cor/functions/cor_functions.lua')
+    Profiler.mark('After cor_functions')
 
     -- Register COR lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_cor_lockstyle_operations then
@@ -143,6 +171,8 @@ function get_sets()
 
     -- Note: Macro/lockstyle are handled by JobChangeManager on job changes
     -- Initial load will be handled by JobChangeManager after initialization
+
+    Profiler.finish()
 end
 
 ---============================================================================

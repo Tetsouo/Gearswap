@@ -4,7 +4,7 @@
 --- Defines all keybindings for Red Mage job.
 ---
 --- @file config/rdm/RDM_KEYBINDS.lua
---- @author Tetsouo
+--- @author Kaories
 --- @version 1.0
 --- @date Created: 2025-10-12
 ---============================================================================
@@ -14,86 +14,44 @@ local RDMKeybinds = {}
 -- Load message formatter
 local MessageFormatter = require('shared/utils/messages/message_formatter')
 
--- Keybind definitions - Simplified Alt/Ctrl Only
+-- Keybind definitions - NUMPAD ONLY (Numpad + Alt+Numpad)
 -- Format: { key = "key", command = "gs_command", desc = "description", state = "state_name" }
 RDMKeybinds.binds = {
     ---========================================================================
-    --- ALT+ KEYS (States/Cycling)
+    --- NUMPAD KEYS (States - 10 touches)
     ---========================================================================
 
-    -- Weapon Management
-    { key = "!1", command = "cycle MainWeapon",     desc = "Main Weapon",   state = "MainWeapon" },
-    { key = "!2", command = "cycle SubWeapon",      desc = "Sub Weapon",    state = "SubWeapon" },
+    -- Weapon & Combat States (1-5)
+    { key = "numpad1", command = "cyclestate MainWeapon",     desc = "Main Weapon",     state = "MainWeapon" },
+    { key = "numpad2", command = "cyclestate SubWeapon",      desc = "Sub Weapon",      state = "SubWeapon" },
+    { key = "numpad3", command = "cyclestate EngagedMode",    desc = "Engaged Mode",    state = "EngagedMode" },
+    { key = "numpad4", command = "cyclestate IdleMode",       desc = "Idle Mode",       state = "IdleMode" },
+    { key = "numpad5", command = "cyclestate CombatMode",     desc = "Combat Mode",     state = "CombatMode" },
 
-    -- Combat Modes
-    { key = "!3", command = "cycle EngagedMode",    desc = "Engaged Mode",  state = "EngagedMode" },
-    { key = "!4", command = "cycle IdleMode",       desc = "Idle Mode",     state = "IdleMode" },
-
-    -- Magic Modes
-    { key = "!5", command = "cycle EnfeebleMode",   desc = "Enfeeble Mode", state = "EnfeebleMode" },
-    { key = "!6", command = "cycle NukeMode",       desc = "Nuke Mode",     state = "NukeMode" },
-    { key = "!p", command = "cycle SaboteurMode",   desc = "Saboteur Mode", state = "SaboteurMode" },
-
-    -- Enspell
-    { key = "!7", command = "cycle EnSpell",        desc = "Enspell",       state = "EnSpell" },
-
-    -- Elemental Spells (Light/Dark)
-    { key = "!8", command = "cycle MainLightSpell", desc = "Main Light",    state = "MainLightSpell" },
-    { key = "!9", command = "cycle SubLightSpell",  desc = "Sub Light",     state = "SubLightSpell" },
-    { key = "!-", command = "cycle MainDarkSpell",  desc = "Main Dark",     state = "MainDarkSpell" },
-    { key = "!=", command = "cycle SubDarkSpell",   desc = "Sub Dark",      state = "SubDarkSpell" },
-
-    -- Weapon Lock
-    { key = "!0", command = "cycle CombatMode",     desc = "Combat Mode",   state = "CombatMode" },
+    -- Magic States (6-9, 0)
+    { key = "numpad6", command = "cyclestate EnfeebleMode",   desc = "Enfeeble Mode",   state = "EnfeebleMode" },
+    { key = "numpad7", command = "cyclestate NukeMode",       desc = "Nuke Mode",       state = "NukeMode" },
+    { key = "numpad8", command = "cyclestate SaboteurMode",   desc = "Saboteur Mode",   state = "SaboteurMode" },
+    { key = "numpad9", command = "cyclestate NukeTier",       desc = "Nuke Tier",       state = "NukeTier" },
+    { key = "numpad0", command = "cyclestate Storm",          desc = "Storm (SCH)",     state = "Storm",    subjob = "SCH" },
 
     ---========================================================================
-    --- F-KEYS (Enhancement Spells)
+    --- ALT+NUMPAD KEYS (Enhancement States & Cast - 10 touches)
     ---========================================================================
 
-    -- Enhancement Spell Selection
-    { key = "f1", command = "cycle GainSpell",      desc = "Gain Spell",    state = "GainSpell" },
-    { key = "f2", command = "cycle Barspell",       desc = "Bar Element",   state = "Barspell" },
-    { key = "f3", command = "cycle BarAilment",     desc = "Bar Ailment",   state = "BarAilment" },
-    { key = "f4", command = "cycle Spike",          desc = "Spike",         state = "Spike" },
-    { key = "f5", command = "cycle Storm",          desc = "Storm (SCH)",   state = "Storm",    subjob = "SCH" },
+    -- Enhancement Spell Selection (1-5)
+    { key = "!numpad1", command = "cyclestate EnSpell",       desc = "Enspell",         state = "EnSpell" },
+    { key = "!numpad2", command = "cyclestate GainSpell",     desc = "Gain Spell",      state = "GainSpell" },
+    { key = "!numpad3", command = "cyclestate Barspell",      desc = "Bar Element",     state = "Barspell" },
+    { key = "!numpad4", command = "cyclestate BarAilment",    desc = "Bar Ailment",     state = "BarAilment" },
+    { key = "!numpad5", command = "cyclestate Spike",         desc = "Spike",           state = "Spike" },
 
-    ---========================================================================
-    --- CTRL+ KEYS (Actions/Cast)
-    ---========================================================================
-
-    -- Job Abilities
-    { key = "^1", command = "convert",              desc = "Convert",       state = nil },
-    { key = "^2", command = "chainspell",           desc = "Chainspell",    state = nil },
-    { key = "^3", command = "saboteur",             desc = "Saboteur",      state = nil },
-    { key = "^4", command = "composure",            desc = "Composure",     state = nil },
-
-    -- Quick Enhancing Spells (using fallback spell cast)
-    { key = "^5", command = "Refresh II",           desc = "Refresh II",    state = nil },
-    { key = "^6", command = "Phalanx",              desc = "Phalanx",       state = nil },
-    { key = "^7", command = "Haste",                desc = "Haste",         state = nil },
-
-    -- Cast Elemental Spells (Main)
-    { key = "^8", command = "castlight",            desc = "Cast Main Light", state = nil },
-    { key = "^9", command = "castdark",             desc = "Cast Main Dark",  state = nil },
-
-    -- Cast Elemental Spells (Sub)
-    { key = "^-", command = "castsublight",         desc = "Cast Sub Light",  state = nil },
-    { key = "^=", command = "castsubdark",          desc = "Cast Sub Dark",   state = nil },
-
-    ---========================================================================
-    --- CTRL+F-KEYS (Cast Enhancement Spells)
-    ---========================================================================
-
-    -- Cast Buff Spells (from states)
-    { key = "^f1", command = "castgain",            desc = "Cast Gain",       state = nil },
-    { key = "^f2", command = "castbar",             desc = "Cast BarElement", state = nil },
-    { key = "^f3", command = "castbarailment",      desc = "Cast BarAilment", state = nil },
-    { key = "!`", command = "castspike",            desc = "Cast Spike",      state = nil },  -- Alt+` (tilde key)
-    { key = "^f5", command = "caststorm",           desc = "Cast Storm",      state = nil, subjob = "SCH" },
-
-    -- Cast Enspell & Nuke Tier
-    { key = "^f6", command = "castenspell",         desc = "Cast Enspell",    state = nil },
-    { key = "^f7", command = "cycle NukeTier",      desc = "Nuke Tier",       state = "NukeTier" },
+    -- Cast Enhancement Spells from states (6-9, 0)
+    { key = "!numpad6", command = "castenspell",         desc = "Cast Enspell",    state = nil },
+    { key = "!numpad7", command = "castgain",            desc = "Cast Gain",       state = nil },
+    { key = "!numpad8", command = "castbar",             desc = "Cast BarElement", state = nil },
+    { key = "!numpad9", command = "castbarailment",      desc = "Cast BarAilment", state = nil },
+    { key = "!numpad0", command = "castspike",           desc = "Cast Spike",      state = nil },
 }
 
 ---============================================================================

@@ -76,29 +76,39 @@ if region_success and RegionConfig then
 end
 
 function get_sets()
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+
     mote_include_version = 2
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     _G.LockstyleConfig = LockstyleConfig
     _G.RECAST_CONFIG = require('Tetsouo/config/RECAST_CONFIG')
@@ -114,6 +124,7 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/blm/functions/blm_functions.lua')
+    Profiler.mark('After blm_functions')
 
     -- Register BLM lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_blm_lockstyle_operations then
@@ -122,6 +133,8 @@ function get_sets()
 
     -- Note: Macro/lockstyle are handled by JobChangeManager on job changes
     -- Initial load will be handled by JobChangeManager after initialization
+
+    Profiler.finish()
 end
 
 ---============================================================================

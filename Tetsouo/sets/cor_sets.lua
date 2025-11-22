@@ -1,39 +1,39 @@
----============================================================================
---- COR Equipment Sets - Ultimate Corsair Gunslinger Configuration
----============================================================================
---- Complete equipment configuration for Corsair support/DPS hybrid role with
---- optimized buff support and ranged damage across all situations.
----
---- Features:
----   • Phantom Roll optimization (Lanun +3, Chasseur +3, Rostam augmented)
----   • Quick Draw magic damage (Malignance set, Magic Attack Bonus)
----   • Ranged attack excellence (Snapshot, Rapid Shot, Store TP)
----   • Melee DPS capability (Dual Wield support, Malignance hybrid)
----   • Savage Blade weaponskill (Nyame +2, Camulus WSD cape)
----   • Roll-specific gear (Caster's, Courser's, Blitzer's, Tactician's, Allies')
----   • Movement speed optimization (Carmine Cuisses +1)
----   • Hybrid survivability (PDT sets with Malignance)
----
---- Architecture:
----   • Equipment definitions (Chirich rings, wardrobe management)
----   • Weapon sets (Naegling, Anarchy, Compensator, Rostam)
----   • Idle sets (Refresh, PDT, Regen)
----   • Engaged sets (Normal, PDT, Dual Wield variants)
----   • Precast sets (Job Abilities, Weaponskills, Ranged Attack)
----   • Midcast sets (Ranged Attack continuation)
----   • Movement sets (Base speed, Adoulin)
----   • Buff sets (Doom resistance)
----
---- @file    jobs/cor/sets/cor_sets.lua
---- @author  Tetsouo
---- @version 3.0 - Standardized Organization
---- @date    Updated: 2025-10-15
----============================================================================
---============================================================--
+---  ═══════════════════════════════════════════════════════════════════════════
+---   COR Equipment Sets - Ultimate Corsair Gunslinger Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Complete equipment configuration for Corsair support/DPS hybrid role with
+---   optimized buff support and ranged damage across all situations.
+---   Features:
+---     • Phantom Roll optimization (Lanun +3, Chasseur +3, Rostam augmented)
+---     • Quick Draw magic damage (Malignance set, Magic Attack Bonus)
+---     • Ranged attack excellence (Snapshot, Rapid Shot, Store TP)
+---     • Melee DPS capability (Dual Wield support, Malignance hybrid)
+---     • Savage Blade weaponskill (Nyame +2, Camulus WSD cape)
+---     • Roll-specific gear (Caster's, Courser's, Blitzer's, Tactician's, Allies')
+---     • Movement speed optimization (Carmine Cuisses +1)
+---     • Hybrid survivability (PDT sets with Malignance)
+---    Architecture:
+---     • Equipment definitions (Chirich rings, wardrobe management)
+---     • Weapon sets (Naegling, Anarchy, Compensator, Rostam)
+---     • Idle sets (Refresh, PDT, Regen)
+---     • Engaged sets (Normal, PDT, Dual Wield variants)
+---     • Precast sets (Job Abilities, Weaponskills, Ranged Attack)
+---     • Midcast sets (Ranged Attack continuation)
+---     • Movement sets (Base speed, Adoulin)
+---     • Buff sets (Doom resistance)
+---   @file    jobs/cor/sets/cor_sets.lua
+---   @author  Tetsouo
+---   @version 3.0 - Standardized Organization
+---   @date    Updated: 2025-11-10
+---  ═════════════════════════════════════════════════════════════════════════
 
---                  EQUIPMENT DEFINITIONS                     --
---============================================================--
--- Chirich Rings in different wardrobes (prevents "already equipped" errors)
+sets = {}
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- • Chirich Rings in different wardrobes (prevents "already equipped" errors)
 ChirichRing1 = {
     name = "Chirich Ring +1",
     bag = "wardrobe 1"
@@ -43,18 +43,17 @@ ChirichRing2 = {
     bag = "wardrobe 2"
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      WEAPON SETS                          --
---============================================================--
-
--- Main + Sub Weapon Sets (combined like DNC/WAR for automatic equip)
+-- • Main + Sub Weapon Sets (combined like DNC/WAR for automatic equip)
 sets['Naegling'] = {
     main = "Naegling",
     sub = "Demers. Degen +1"  -- Default sub for melee
 }
 
--- Range Weapon Sets (separate since COR has ranged focus)
+-- • Range Weapon Sets (separate since COR has ranged focus)
 sets['Anarchy'] = {
     range = "Anarchy +2"
 }
@@ -63,12 +62,11 @@ sets['Compensator'] = {
     range = "Compensator"
 }
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      IDLE SETS                            --
---============================================================--
-
--- Base Idle
+-- • Base Idle
 sets.idle = {}
 sets.idle.Normal = {
     -- Weapons applied by SetBuilder based on subjob (DW for NIN/DNC, single for others)
@@ -93,7 +91,7 @@ sets.idle.Normal = {
     back = "Camulus's Mantle"
 }
 
--- PDT Idle (Physical Damage Taken -)
+-- • PDT Idle (Physical Damage Taken -)
 sets.idle.PDT = set_combine(sets.idle.Normal, {
     head = "Malignance Chapeau",
     body = "Malignance Tabard",
@@ -103,17 +101,16 @@ sets.idle.PDT = set_combine(sets.idle.Normal, {
     right_ring = ChirichRing1
 })
 
--- Refresh Idle (MP recovery)
+-- • Refresh Idle (MP recovery)
 sets.idle.Refresh = set_combine(sets.idle.Normal, {
     -- Refresh gear
 })
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                     ENGAGED SETS                          --
---============================================================--
-
--- Base Engaged
+-- • Base Engaged
 sets.engaged = {}
 
 sets.engaged.Normal = {
@@ -139,7 +136,7 @@ sets.engaged.Normal = {
     back = "Camulus's Mantle"
 }
 
--- PDT Melee (Hybrid)
+-- • PDT Melee (Hybrid)
 sets.engaged.PDT = set_combine(sets.engaged.Normal, {
     head = "Malignance Chapeau",
     body = "Malignance Tabard",
@@ -151,7 +148,7 @@ sets.engaged.PDT = set_combine(sets.engaged.Normal, {
     back = "Null Shawl"
 })
 
--- Dual Wield Engaged
+-- • Dual Wield Engaged
 sets.engaged.DW = set_combine(sets.engaged.Normal, {
     -- Dual Wield gear (for /NIN)
     -- ear1 = "Suppanomimi",
@@ -167,15 +164,15 @@ sets.engaged.DW.PDT = set_combine(sets.engaged.DW, {
     back = "Null Shawl"
 })
 
---============================================================--
---                  PRECAST: JOB ABILITIES                   --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: JOB ABILITIES
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.precast = {}
 sets.precast.JA = {}
 
--- Phantom Roll (Base set for all rolls)
--- Mote looks for sets.precast.CorsairRoll when spell.type == 'CorsairRoll'
+-- • Phantom Roll (Base set for all rolls)
+--   Mote looks for sets.precast.CorsairRoll when spell.type == 'CorsairRoll'
 sets.precast.CorsairRoll = {
     main = {
         name = "Rostam",
@@ -202,10 +199,10 @@ sets.precast.CorsairRoll = {
     back = "Camulus's Mantle"
 }
 
--- Double-Up is handled dynamically in COR_PRECAST.lua
--- It equips the same set as the last roll used (including specific roll gear)
+-- • Double-Up (handled dynamically in COR_PRECAST.lua)
+--   Equips the same set as the last roll used (including specific roll gear)
 
--- Specific roll overrides (gear that enhances specific rolls)
+-- • Specific roll overrides (gear that enhances specific rolls)
 sets.precast.CorsairRoll["Caster's Roll"] = set_combine(sets.precast.CorsairRoll, {
     legs = "Chas. Culottes +3"
 })
@@ -226,8 +223,8 @@ sets.precast.CorsairRoll["Allies' Roll"] = set_combine(sets.precast.CorsairRoll,
     hands = "Chasseur's Gants +3"
 })
 
--- Quick Draw (CorsairShot - magic damage JA)
--- Mote looks for sets.precast.CorsairShot when spell.type == 'CorsairShot'
+-- • Quick Draw (CorsairShot - magic damage JA)
+--   Mote looks for sets.precast.CorsairShot when spell.type == 'CorsairShot'
 sets.precast.CorsairShot = {
     -- Magic Attack Bonus + Magic Accuracy for Quick Draw shots
     head = "Malignance Chapeau",
@@ -237,32 +234,32 @@ sets.precast.CorsairShot = {
     feet = "Malignance Boots"
 }
 
--- Quick Draw element variants (optional - enhance specific shots)
--- sets.precast.CorsairShot['Fire Shot'] = set_combine(sets.precast.CorsairShot, {})
--- sets.precast.CorsairShot['Ice Shot'] = set_combine(sets.precast.CorsairShot, {})
--- etc.
+-- • Quick Draw element variants (optional - enhance specific shots)
+--   sets.precast.CorsairShot['Fire Shot'] = set_combine(sets.precast.CorsairShot, {})
+--   sets.precast.CorsairShot['Ice Shot'] = set_combine(sets.precast.CorsairShot, {})
+--   etc.
 
--- Snake Eye (guarantees lucky number on next roll)
+-- • Snake Eye (guarantees lucky number on next roll)
 sets.precast.JA['Snake Eye'] = {
     legs = "Lanun Trews +3"
 }
 
--- Fold (restores 1 roll charge)
+-- • Fold (restores 1 roll charge)
 sets.precast.JA['Fold'] = {
     hands = "Lanun Gants +3"
 }
 
--- Wild Card (resets all roll timers)
+-- • Wild Card (resets all roll timers)
 sets.precast.JA['Wild Card'] = {
     feet = "Lanun Bottes +3"
 }
 
--- Random Deal (resets all COR JA timers)
+-- • Random Deal (resets all COR JA timers)
 sets.precast.JA['Random Deal'] = {
     body = "Lanun Frac +3"
 }
 
--- Ranged Attack Precast (Snapshot/Rapid Shot)
+-- • Ranged Attack Precast (Snapshot/Rapid Shot)
 sets.precast.RA = {
     -- Snapshot + Rapid Shot gear
     head = "Malignance Chapeau",
@@ -288,13 +285,13 @@ sets.precast.RA = {
     back = "Camulus's Mantle"
 }
 
---============================================================--
---                  PRECAST: WEAPONSKILLS                    --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: WEAPONSKILLS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.precast.WS = {}
 
--- Generic weaponskill set (used as base for all WSs)
+-- • Generic weaponskill set (used as base for all WSs)
 sets.precast.WS = {
     head = {
         name = "Nyame Helm",
@@ -331,7 +328,7 @@ sets.precast.WS = {
     }
 }
 
--- Savage Blade (Melee WS)
+-- • Savage Blade (Melee WS)
 sets.precast.WS['Savage Blade'] = {
     head = {
         name = "Nyame Helm",
@@ -368,14 +365,13 @@ sets.precast.WS['Savage Blade'] = {
     }
 }
 
---============================================================--
-
---                     MIDCAST SETS                          --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.midcast = {}
 
--- Ranged Attack (bullet flight time - RA gear)
+-- • Ranged Attack (bullet flight time - RA gear)
 sets.midcast.RA = {
     -- Ranged Attack gear (R.Acc, R.Atk, Store TP)
     head = "Malignance Chapeau",
@@ -398,32 +394,30 @@ sets.midcast.RA = {
     back = "Camulus's Mantle"
 }
 
--- Note: Phantom Rolls and Quick Draw are JA (instantaneous)
--- They have NO midcast phase - handled in precast.JA only
+-- • Note: Phantom Rolls and Quick Draw are JA (instantaneous)
+--   They have NO midcast phase - handled in precast.JA only
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MOVEMENT SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                     MOVEMENT SETS                         --
---============================================================--
-
--- Base Movement Speed
+-- • Base Movement Speed
 sets.MoveSpeed = {
     legs = "Carmine Cuisses +1" -- Movement +18%
 }
 
--- Adoulin Movement (City-specific speed boost)
+-- • Adoulin Movement (City-specific speed boost)
 sets.Adoulin = set_combine(sets.MoveSpeed, {
     body = "Councilor's Garb"
 })
 
---============================================================--
-
---                       BUFF SETS                           --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BUFF SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.buff = {}
 
--- Doom removal
+-- • Doom removal
 sets.buff.Doom = {
     -- neck = "Nicander's Necklace",
     -- ring1 = "Purity Ring",

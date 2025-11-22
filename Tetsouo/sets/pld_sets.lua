@@ -1,44 +1,42 @@
----============================================================================
---- PLD Equipment Sets - Ultimate Tanking Configuration
----============================================================================
---- Complete equipment configuration for Paladin tank role with optimized
---- defensive and enmity gear across all combat situations.
----
---- Features:
----   • Ultimate tanking systems (PDT/MDT cap optimization)
----   • Enmity maximization with survivability balance
----   • Weapon-specific configurations (Burtgang, Naegling, Shining One, Malevo)
----   • Shield optimization per situation (Duban PDT, Aegis MDT, Priwen Phalanx)
----   • Cure set automation (CureSelf vs CureOther variants)
----   • Phalanx potency vs SIRD variants (XP mode support)
----   • Blue Magic spell support (SIRD + Enmity for AOE rotation)
----   • Weaponskill optimization (Savage Blade, Sanguine Blade, etc.)
----   • Fast Cast + SIRD hybrid gear for spell safety
----   • Movement speed optimization (Adoulin city support)
----   • Rudianos capes for all situations (5 variants: tank, FCSIRD, STP, WS, cure)
----
---- Architecture:
----   • Equipment definitions (Rudianos capes, Jumalik augments, wardrobe rings)
----   • Weapon sets (main weapons + shields)
----   • Idle sets (Normal, PDT, MDT, Town, XP)
----   • Engaged sets (Normal, PDT, MDT, Melee XP)
----   • Precast sets (Job abilities, Fast Cast, Weaponskills with TP bonus)
----   • Midcast sets (Enmity, SIRD+Enmity, Phalanx, Cure, Enhancing Magic)
----   • Movement sets (Base speed, Adoulin city boost)
----   • Buff sets (Doom resistance)
----
---- @file    jobs/pld/sets/pld_sets.lua
---- @author  Tetsouo
---- @version 3.1 - Standardized Organization
---- @date    Updated: 2025-10-08
----============================================================================
+---  ═══════════════════════════════════════════════════════════════════════════
+---   PLD Equipment Sets - Ultimate Tanking Configuration
+---  ═══════════════════════════════════════════════════════════════════════════
+---   Complete equipment configuration for Paladin tank role with optimized
+---   defensive and enmity gear across all combat situations.
+---   Features:
+---     • Ultimate tanking systems (PDT/MDT cap optimization)
+---     • Enmity maximization with survivability balance
+---     • Weapon-specific configurations (Burtgang, Naegling, Shining One, Malevo)
+---     • Shield optimization per situation (Duban PDT, Aegis MDT, Priwen Phalanx)
+---     • Cure set automation (CureSelf vs CureOther variants)
+---     • Phalanx potency vs SIRD variants (XP mode support)
+---     • Blue Magic spell support (SIRD + Enmity for AOE rotation)
+---     • Weaponskill optimization (Savage Blade, Sanguine Blade, etc.)
+---     • Fast Cast + SIRD hybrid gear for spell safety
+---     • Movement speed optimization (Adoulin city support)
+---     • Rudianos capes for all situations (5 variants: tank, FCSIRD, STP, WS, cure)
+---    Architecture:
+---     • Equipment definitions (Rudianos capes, Jumalik augments, wardrobe rings)
+---     • Weapon sets (main weapons + shields)
+---     • Idle sets (Normal, PDT, MDT, Town, XP)
+---     • Engaged sets (Normal, PDT, MDT, Melee XP)
+---     • Precast sets (Job abilities, Fast Cast, Weaponskills with TP bonus)
+---     • Midcast sets (Enmity, SIRD+Enmity, Phalanx, Cure, Enhancing Magic)
+---     • Movement sets (Base speed, Adoulin city boost)
+---     • Buff sets (Doom resistance)
+---   @file    jobs/pld/sets/pld_sets.lua
+---   @author  Tetsouo
+---   @version 3.1 - Standardized Organization
+---   @date    Updated: 2025-11-10
+---  ═════════════════════════════════════════════════════════════════════════
 
---============================================================--
+sets = {}
 
---                  EQUIPMENT DEFINITIONS                     --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- EQUIPMENT DEFINITIONS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Rudianos Capes
+-- • Rudianos Capes
 Rudianos = {
     tank = {
         name = "Rudianos's Mantle",
@@ -73,7 +71,7 @@ Rudianos = {
     }
 }
 
--- Jumalik Gear
+-- • Jumalik Gear
 JumalikHead = {
     name = 'Jumalik Helm',
     priority = 0,
@@ -81,7 +79,7 @@ JumalikHead = {
 }
 JumalikBody = {name = 'Jumalik Mail', priority = 0, augments = {'HP+50', 'Attack+15', 'Enmity+9', '"Refresh"+2'}}
 
--- Rings (Wardrobe-specific)
+-- • Rings (Wardrobe-specific)
 ChirichRing1 = {name = 'Chirich Ring +1', priority = 0, bag = 'wardrobe 1'}
 ChirichRing2 = {name = 'Chirich Ring +1', priority = 0, bag = 'wardrobe 2'}
 StikiRing1 = {name = 'Stikini Ring +1', priority = 0, bag = 'wardrobe 6'}
@@ -89,31 +87,30 @@ StikiRing2 = {name = 'Stikini Ring +1', priority = 0, bag = 'wardrobe 7'}
 Moonlight1 = {name = 'Moonlight Ring', priority = 13, bag = 'wardrobe 2'}
 Moonlight2 = {name = 'Moonlight Ring', priority = 12, bag = 'wardrobe 4'}
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- WEAPON SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      WEAPON SETS                           --
---============================================================--
-
--- Main Weapons
+-- • Main Weapons
 sets.Burtgang = {main = 'Burtgang'}
+sets.BurtgangKC = {main = 'Burtgang', sub = 'Kraken Club'} -- PLD/DNC multi-attack build
 sets['Shining One'] = {main = 'Shining One'}
 sets.Naegling = {main = 'Naegling'}
 sets.Malevo = {
     main = {name = 'Malevolence', augments = {'INT+10', 'Mag. Acc.+10', '"Mag.Atk.Bns."+8', '"Fast Cast"+5'}}
 }
 
--- Sub Weapons
+-- • Sub Weapons
 sets.Duban = {sub = 'Duban'}
 sets.Aegis = {sub = 'Aegis'}
 sets.Alber = {sub = 'Alber Strap'}
 sets['Blurred Shield +1'] = {sub = 'Blurred Shield +1'}
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- IDLE SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      IDLE SETS                             --
---============================================================--
-
--- Base Idle Set (Foundation for all idle variants)
+-- • Base Idle Set (Foundation for all idle variants)
 sets.idle = {
     ammo = {name = 'Staunch Tathlum +1', priority = 0}, -- DT -3%, Status resistance +11, Spell interruption rate -11%
     head = {name = 'Chev. Armet +3', priority = 12}, -- HP+145, DT -11%, Converts 8% of physical damage to MP
@@ -130,7 +127,7 @@ sets.idle = {
     back = Rudianos.tank -- PDT -10%, VIT+20, Enmity+10
 }
 
--- PDT Idle (Physical Defense)
+-- • PDT Idle (Physical Defense)
 sets.idle.PDT =
     set_combine(
     sets.idle,
@@ -139,7 +136,7 @@ sets.idle.PDT =
     }
 )
 
--- MDT Idle (Magical Defense)
+-- • MDT Idle (Magical Defense)
 sets.idle.MDT = {
     ammo = 'Staunch Tathlum +1',
     head = {name = "Sakpata's Helm", augments = {'Path: A'}},
@@ -160,7 +157,7 @@ sets.idle.MDT = {
     sub = 'Aegis' -- MDT shield
 }
 
--- Normal Idle (Balanced)
+-- • Normal Idle (Balanced)
 sets.idleNormal =
     set_combine(
     sets.idle,
@@ -175,7 +172,7 @@ sets.idleNormal =
     }
 )
 
--- XP Idle (Experience points focus)
+-- • XP Idle (Experience points focus)
 sets.idleXp =
     set_combine(
     sets.idle,
@@ -186,29 +183,11 @@ sets.idleXp =
     }
 )
 
--- Town Idle
-sets.idle.Town = {
-    ammo = {name = 'Staunch Tathlum +1', priority = 0},
-    head = {name = 'Chev. Armet +3', priority = 0},
-    body = {name = 'Jumalik Mail', priority = 0},
-    hands = {name = 'Regal Gauntlets', priority = 13},
-    legs = {name = 'Carmine Cuisses +1', priority = 12},
-    feet = {name = 'Chev. Sabatons +3', priority = 1},
-    neck = {name = 'Coatl Gorget +1', priority = 0},
-    waist = {name = 'Plat. Mog. Belt', priority = 8},
-    left_ear = {name = 'Etiolation Earring', priority = 0},
-    right_ear = {name = 'Chev. Earring +1', priority = 0},
-    left_ring = StikiRing1,
-    right_ring = StikiRing2,
-    back = Rudianos.tank
-}
+-- ═══════════════════════════════════════════════════════════════════════════
+-- ENGAGED SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---============================================================--
-
---                     ENGAGED SETS                           --
---============================================================--
-
--- Base Engaged Set
+-- • Base Engaged Set
 sets.engaged =
     set_combine(
     sets.idleNormal,
@@ -229,7 +208,7 @@ sets.engaged =
     }
 )
 
--- PDT Engaged
+-- • PDT Engaged
 sets.engaged.PDT =
     set_combine(
     sets.engaged,
@@ -238,10 +217,33 @@ sets.engaged.PDT =
     }
 )
 
--- MDT Engaged
+-- • MDT Engaged
 sets.engaged.MDT = sets.idle.MDT -- Already has Aegis shield
 
--- Melee XP
+-- • Kraken Club Specialized (PLD/DNC multi-attack build)
+-- Used when BurtgangKC weapon set is active
+-- Focuses on Store TP reduction to leverage Kraken Club's multi-attack proc rate
+sets.engaged.BurtgangKC =
+    set_combine(
+    sets.engaged,
+    {
+        ammo="Aurgelmir Orb +1",
+        head="Sulevia's Mask +2",
+        body="Hjarrandi Breast.",
+        hands="Sakpata's Gauntlets",
+        legs="Chev. Cuisses +3",
+        feet="Chev. Sabatons +3",
+        neck="Null Loop",
+        waist="Null Belt",
+        left_ear="Crep. Earring",
+        right_ear="Dedition Earring",
+        left_ring="Chirich Ring +1",
+        right_ring="Chirich Ring +1",
+        back = Rudianos.STP
+    }
+)
+
+-- • Melee XP
 sets.meleeXp =
     set_combine(
     sets.idleXp,
@@ -250,11 +252,12 @@ sets.meleeXp =
     }
 )
 
---============================================================--
---                   PRECAST: JOB ABILITIES                   --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: JOB ABILITIES
+-- ═══════════════════════════════════════════════════════════════════════════
+sets.precast = {}
 
--- Full Enmity Set (Base for all enmity JAs)
+-- • Full Enmity Set (Base for all enmity JAs)
 sets.FullEnmity = {
     --[[ sub = { name = 'Srivatsa', priority = 14 }, ]] -- Optional: Shield with high DT
     ammo = {name = 'Sapience Orb', priority = 3}, -- Enmity+2, Fast Cast+2%
@@ -274,7 +277,7 @@ sets.FullEnmity = {
     -- Crusade Enmity 189
 }
 
--- Job Abilities
+-- • Job Abilities
 sets.precast.JA = set_combine(sets.FullEnmity, {})
 sets.precast.JA['Divine Emblem'] = set_combine(sets.FullEnmity, {feet = {name = "Chevalier's Sabatons +3"}})
 sets.precast.JA['Palisade'] = set_combine(sets.FullEnmity, {})
@@ -292,9 +295,9 @@ sets.precast.JA['Shield Bash'] = set_combine(sets.FullEnmity, {hands = {name = '
 sets.precast.JA['Sentinel'] = set_combine(sets.FullEnmity, {feet = {name = 'Cab. Leggings +3'}})
 sets.precast.JA['Rampart'] = set_combine(sets.FullEnmity, {head = {name = 'Cab. Coronet +3'}})
 
---============================================================--
---                    PRECAST: FAST CAST                      --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: FAST CAST
+-- ═══════════════════════════════════════════════════════════════════════════
 
 sets.precast.FC = {
     ammo = {name = 'Sapience Orb', priority = 5}, -- Fast Cast +2%, Enmity+2
@@ -330,11 +333,15 @@ sets.precast.FC['Frightful Roar'] = sets.precast.FC
 sets.precast.FC['Metallic Body'] = sets.precast.FC
 sets.precast.FC['Foil'] = sets.precast.FC
 
---============================================================--
---                   PRECAST: WEAPONSKILLS                    --
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- PRECAST: WEAPONSKILLS
+-- ═══════════════════════════════════════════════════════════════════════════
 
--- Base Weaponskill Set
+-- ───────────────────────────────────────────────────────────────────────────
+-- Physical Weaponskills
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Base Weaponskill Set
 sets.precast.WS = {
     ammo = 'Crepuscular Pebble',
     head = "Sakpata's Helm",
@@ -351,16 +358,16 @@ sets.precast.WS = {
     back = Rudianos.WS
 }
 
--- Requiescat
+-- • Requiescat
 sets.precast.WS['Requiescat'] = set_combine(sets.precast.WS, {})
 
--- Chant du Cygne
+-- • Chant du Cygne
 sets.precast.WS['Chant du Cygne'] = set_combine(sets.precast.WS, {})
 
--- Atonement (Enmity WS)
+-- • Atonement (Enmity WS)
 sets.precast.WS['Atonement'] = sets.FullEnmity
 
--- Savage Blade
+-- • Savage Blade
 sets.precast.WS['Savage Blade'] =
     set_combine(
     sets.precast.WS,
@@ -381,7 +388,11 @@ sets.precast.WS['Savage Blade'] =
     }
 )
 
--- Sanguine Blade (Dark Magic WS)
+-- ───────────────────────────────────────────────────────────────────────────
+-- Magic Weaponskills
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Sanguine Blade (Dark Magic WS)
 sets.precast.WS['Sanguine Blade'] =
     set_combine(
     sets.precast.WS,
@@ -399,7 +410,7 @@ sets.precast.WS['Sanguine Blade'] =
     }
 )
 
--- Aeolian Edge (Wind Magic WS)
+-- • Aeolian Edge (Wind Magic WS)
 sets.precast.WS['Aeolian Edge'] =
     set_combine(
     sets.precast.WS,
@@ -420,7 +431,7 @@ sets.precast.WS['Aeolian Edge'] =
     }
 )
 
--- Circle Blade (Magic WS)
+-- • Circle Blade (Magic WS)
 sets.precast.WS['Circle Blade'] =
     set_combine(
     sets.precast.WS,
@@ -441,26 +452,35 @@ sets.precast.WS['Circle Blade'] =
     }
 )
 
--- TPBonus Set (Moonshade Earring for TP scaling)
+-- ───────────────────────────────────────────────────────────────────────────
+-- TP Bonus Adjustments
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • TPBonus Set (Moonshade Earring for TP scaling)
 sets.precast.WS.TPBonus = {
     left_ear = 'Moonshade Earring' -- TP Bonus +250
 }
 
--- TPBonus Variants
+-- • TPBonus Variants
 sets.precast.WS['Savage Blade'].TPBonus = set_combine(sets.precast.WS['Savage Blade'], sets.precast.WS.TPBonus)
 sets.precast.WS['Sanguine Blade'].TPBonus = set_combine(sets.precast.WS['Sanguine Blade'], sets.precast.WS.TPBonus)
 sets.precast.WS['Aeolian Edge'].TPBonus = set_combine(sets.precast.WS['Aeolian Edge'], sets.precast.WS.TPBonus)
 sets.precast.WS['Circle Blade'].TPBonus = set_combine(sets.precast.WS['Circle Blade'], sets.precast.WS.TPBonus)
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MIDCAST SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                      MIDCAST SETS                          --
---============================================================--
+-- ───────────────────────────────────────────────────────────────────────────
+-- Enmity Sets
+-- ───────────────────────────────────────────────────────────────────────────
 
--- Enmity Midcast
+sets.midcast = {}
+
+-- • Enmity Midcast
 sets.midcast.Enmity = sets.FullEnmity
 
--- SIRD + Enmity Midcast (Spell Interruption Rate Down)
+-- • SIRD + Enmity Midcast (Spell Interruption Rate Down)
 sets.midcast.SIRDEnmity = {
     ammo = 'Staunch Tathlum +1',
     head = {name = 'Loess Barbuta +1', augments = {'Path: A'}},
@@ -480,7 +500,11 @@ sets.midcast.SIRDEnmity = {
 -- Crusade Enmity 154
 -- SIRD 106%
 
--- Phalanx Potency Set
+-- ───────────────────────────────────────────────────────────────────────────
+-- Phalanx Sets
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Phalanx Potency Set
 sets.midcast.PhalanxPotency = {
     main = {name = "Sakpata's Sword"},
     sub = {name = 'Priwen', priority = 0, augments = {'HP+50', 'Mag. Evasion+50', 'Damage Taken -3%'}},
@@ -502,7 +526,7 @@ sets.midcast.PhalanxPotency = {
     }
 }
 
--- SIRD Phalanx
+-- • SIRD Phalanx
 sets.midcast.SIRDPhalanx = {
     main = {name = "Sakpata's Sword"},
     sub = {name = 'Priwen', priority = 0, augments = {'HP+50', 'Mag. Evasion+50', 'Damage Taken -3%'}},
@@ -524,7 +548,11 @@ sets.midcast.SIRDPhalanx = {
     back = {name = 'Weard Mantle', priority = 0, augments = {'VIT+4', 'Phalanx +5'}}
 }
 
--- Enlight
+-- ───────────────────────────────────────────────────────────────────────────
+-- Enhancing Magic
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Enlight
 sets.midcast['Enlight'] =
     set_combine(
     sets.midcast.SIRDEnmity,
@@ -538,7 +566,7 @@ sets.midcast['Enlight'] =
     }
 )
 
--- Enhancing Magic
+-- • Enhancing Magic
 sets.midcast['Enhancing Magic'] =
     set_combine(
     sets.midcast.SIRDEnmity,
@@ -547,7 +575,11 @@ sets.midcast['Enhancing Magic'] =
     }
 )
 
--- Cure Base Set
+-- ───────────────────────────────────────────────────────────────────────────
+-- Healing Magic (Cure Sets)
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Cure Base Set
 sets.Cure = {
     ammo = {name = 'staunch Tathlum +1', priority = 1},
     head = {name = 'Souv. Schaller +1', priority = 8},
@@ -559,7 +591,7 @@ sets.Cure = {
     feet = {name = 'Odyssean Greaves', priority = 5}
 }
 
--- Cure Self (PDT/Survivability focused)
+-- • Cure Self (PDT/Survivability focused)
 sets.midcast.CureSelf =
     set_combine(
     sets.Cure,
@@ -580,7 +612,7 @@ sets.midcast.CureSelf =
     }
 )
 
--- Cure Other (Cure Potency focused)
+-- • Cure Other (Cure Potency focused)
 sets.midcast.CureOther =
     set_combine(
     sets.Cure,
@@ -601,37 +633,57 @@ sets.midcast.CureOther =
     }
 )
 
--- Specific Midcast Spells
-sets.midcast['Flash'] = sets.FullEnmity
-sets.midcast['Phalanx'] = sets.midcast.PhalanxPotency
+-- ───────────────────────────────────────────────────────────────────────────
+-- Blue Magic (Subjob spells)
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Blue Magic Spells
 sets.midcast['Cocoon'] = sets.midcast.SIRDEnmity
 sets.midcast['Jettatura'] = sets.FullEnmity
-sets.midcast['Banishga'] = sets.midcast.SIRDEnmity
 sets.midcast['Geist Wall'] = sets.midcast.SIRDEnmity
 sets.midcast['Sheep Song'] = sets.midcast.SIRDEnmity
 sets.midcast['Frightful Roar'] = sets.midcast.SIRDEnmity
 sets.midcast['Cold Wave'] = sets.midcast.SIRDEnmity
 sets.midcast['Stinking Gas'] = sets.midcast.SIRDEnmity
 sets.midcast['Blank Gaze'] = sets.midcast.SIRDEnmity
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- PLD Specific Spells (Divine & Enhancing)
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • Divine Magic
+sets.midcast['Flash'] = sets.FullEnmity
+sets.midcast['Banishga'] = sets.midcast.SIRDEnmity
+
+-- • PLD Enhancing Magic
+sets.midcast['Phalanx'] = sets.midcast.PhalanxPotency
 sets.midcast['Crusade'] = sets.midcast['Enhancing Magic']
 sets.midcast['Reprisal'] = sets.midcast['Enhancing Magic']
 sets.midcast['Protect'] = sets.midcast['Enhancing Magic']
 sets.midcast['Shell'] = sets.midcast['Enhancing Magic']
 sets.midcast['Refresh'] = sets.midcast.SIRDEnmity
 sets.midcast['Haste'] = sets.midcast.SIRDEnmity
+
+-- ───────────────────────────────────────────────────────────────────────────
+-- RUN Subjob Spells
+-- ───────────────────────────────────────────────────────────────────────────
+
+-- • RUN Enhancing Magic
 sets.midcast['Foil'] = sets.midcast.SIRDEnmity
 
---============================================================--
+-- ═══════════════════════════════════════════════════════════════════════════
+-- MOVEMENT SETS
+-- ═══════════════════════════════════════════════════════════════════════════
 
---                     MOVEMENT SETS                          --
---============================================================--
-
--- Base Movement Speed
+-- • Base Movement Speed
 sets.MoveSpeed = {
     legs = 'Carmine Cuisses +1' -- Common item for speed
 }
 
--- Adoulin Movement (City-specific speed boost)
+-- • Town Idle (Movement speed)
+sets.idle.Town = sets.MoveSpeed
+
+-- • Adoulin Movement (City-specific speed boost)
 sets.Adoulin =
     set_combine(
     sets.MoveSpeed,
@@ -640,11 +692,10 @@ sets.Adoulin =
     }
 )
 
---============================================================--
-
---                      BUFF SETS                             --
---============================================================--
-
+-- ═══════════════════════════════════════════════════════════════════════════
+-- BUFF SETS
+-- ═══════════════════════════════════════════════════════════════════════════
+sets.buff = {}
 sets.buff.Doom = {
     neck = {name = "Nicander's Necklace"}, -- Reduces Doom effects
     left_ring = {name = 'Purity Ring'}, -- Additional Doom resistance

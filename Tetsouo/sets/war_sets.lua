@@ -48,14 +48,18 @@ SouvFeet = {
 }
 
 Cichol = {
-    stp = {
+    da = {
         name = "Cichol's Mantle",
         augments = {'STR+20', 'Accuracy+20 Attack+20', 'STR+10', '"Dbl.Atk."+10', 'Phys. dmg. taken-10%'}
+    },
+    stp = { 
+        name="Cichol's Mantle", 
+        augments={'DEX+20','Accuracy+20 Attack+20','DEX+10','"Store TP"+10','Phys. dmg. taken-10%',}
     },
     ws1 = {
         name = "Cichol's Mantle",
         augments = {'STR+20', 'Accuracy+20 Attack+20', 'STR+10', 'Weapon skill damage +10%', 'Phys. dmg. taken-10%'}
-    }
+    },
 }
 
 local MoonlightRing1 = {name = 'Moonlight Ring', bag = 'wardrobe 2'}
@@ -142,7 +146,7 @@ sets.idle = {
     ear2 = 'Boii Earring +1',
     ring1 = 'Niqmaddu Ring',
     ring2 = MoonlightRing2,
-    back = Cichol.stp
+    back = Cichol.da
 }
 
 --- PDT Idle (Physical damage reduction)
@@ -192,7 +196,7 @@ sets.engaged = {
     ear2 = 'Boii Earring +1',
     ring1 = 'Niqmaddu Ring',
     ring2 = 'Moonlight Ring',
-    back = Cichol.stp
+    back = Cichol.da
 }
 
 --- PDTTP Engaged (Balanced PDT + TP for survivability)
@@ -213,7 +217,7 @@ sets.engaged.PDTTP =
         ear2 = 'Boii Earring +1',
         ring1 = 'Niqmaddu Ring',
         ring2 = 'Moonlight Ring',
-        back = Cichol.stp
+        back = Cichol.da
     }
 )
 
@@ -239,7 +243,7 @@ sets.engaged.Normal =
         ear2 = 'Boii Earring +1',
         ring1 = 'Niqmaddu Ring',
         ring2 = 'Moonlight Ring',
-        back = Cichol.stp
+        back = Cichol.da
     }
 )
 
@@ -262,7 +266,7 @@ sets.engaged.PDTAFM3 =
         ear2 = 'Boii Earring +1',
         ring1 = 'Niqmaddu Ring',
         ring2 = 'Moonlight Ring',
-        back = Cichol.stp
+        back = Cichol.da
     }
 )
 
@@ -274,18 +278,18 @@ sets.engaged.PDTKC =
     set_combine(
     sets.engaged.PDTTP,
     {
-        ammo="Seeth. Bomblet +1",
-        head="Boii Mask +3",
+        ammo="Aurgelmir Orb +1",
+        head="Pummeler's Mask +3",
         body="Boii Lorica +3",
         hands="Tatena. Gote +1",
         legs="Tatena. Haidate +1",
-        feet="Tatena. Sune. +1",
+        feet="Boii Calligae +3",
         neck="Null Loop",
         waist="Null Belt",
-        ear1="Crep. Earring",
-        ear2="Dedition Earring",
-        ring1="Moonlight Ring",
-        ring2="Moonlight Ring",
+        left_ear="Dedition Earring",
+        right_ear="Crep. Earring",
+        left_ring="Moonlight Ring",
+        right_ring="Moonlight Ring",
         back = Cichol.stp
     }
 )
@@ -295,6 +299,15 @@ sets.engaged.PDTKC =
 --============================================================--
 
 sets.precast.JA = {}
+sets.LessEnmity = {
+    ammo = "Psilomene",
+    neck = "Orunmila's Torque",
+    waist = "Acerbic Sash +1",
+    ear1 = "Sortiarius Earring",
+    ring1 = "Cacoethic Ring",
+    ring2 = "Prolix Ring",
+
+}
 
 --- Enmity Set (Maximizes enmity generation for tanking)
 --- Used for Provoke and any enmity-focused situations.
@@ -324,7 +337,7 @@ sets.precast.JA['High Jump'] = sets.engaged.PDTTP
 --- Berserk (Enhances attack power + extends duration)
 sets.precast.JA['Berserk'] =
     set_combine(
-    sets.engaged,
+    sets.LessEnmity,
     {
         body = 'Pumm. Lorica +3', -- Duration +18 seconds
         feet = 'Agoge Calligae +4' -- Duration +30 seconds
@@ -343,7 +356,7 @@ sets.precast.JA['Defender'] =
 --- Warcry (Boosts party attack + TP bonus from Savagery merits)
 sets.precast.JA['Warcry'] =
     set_combine(
-    sets.engaged,
+    sets.LessEnmity,
     {
         head = 'Agoge Mask +4' -- Increases TP bonus (requires Savagery merits)
     }
@@ -352,7 +365,7 @@ sets.precast.JA['Warcry'] =
 --- Aggressor (Increases accuracy and attack speed + extends duration)
 sets.precast.JA['Aggressor'] =
     set_combine(
-    sets.engaged,
+    sets.LessEnmity,
     {
         head = "Pummeler's Mask +3", -- Duration +18 seconds
         body = 'Agoge Lorica +3' -- Duration +30 seconds
@@ -362,17 +375,17 @@ sets.precast.JA['Aggressor'] =
 --- Blood Rage (Enhances critical hit rate)
 sets.precast.JA['Blood Rage'] =
     set_combine(
-    sets.engaged,
+    sets.LessEnmity,
     {
         body = 'Boii Lorica +3'
     }
 )
 
 --- Tomahawk (Ranged attack)
-sets.precast.JA['Tomahawk'] = {
+sets.precast.JA['Tomahawk'] = set_combine(sets.LessEnmity,{
     ammo = 'Thr. Tomahawk',
     feet = 'Agoge Calligae +4'
-}
+}) 
 
 --============================================================--
 --                  PRECAST: WEAPONSKILLS                    --
@@ -538,18 +551,19 @@ sets.precast.WS['Savage Blade'] =
     set_combine(
     sets.precast.WS,
     {
-        ammo = 'Crepuscular Pebble',
-        head = 'Agoge Mask +4',
-        body = "Sakpata's Plate",
-        hands = "Sakpata's Gauntlets",
-        legs = "Sakpata's Cuisses",
-        feet = 'Nyame Sollerets',
-        neck = 'War. Beads +2',
-        waist = 'Sailfi Belt +1',
-        ear1 = 'Thrud Earring',
-        ear2 = 'Odnowa Earring +1',
-        ring1 = 'Sroda Ring',
-        ring2 = "Cornelia's ring"
+    ammo="Knobkierrie",
+    head="Agoge Mask +4",
+    body="Nyame Mail",
+    hands="Boii Mufflers +3",
+    legs="Nyame Flanchard",
+    feet="Nyame Sollerets",
+    neck="War. Beads +2",
+    waist="Sailfi Belt +1",
+    ear1="Thrud Earring",
+    ear2 = 'Boii Earring +1',
+    ring1="Gelatinous Ring +1",
+    ring2="Murky Ring",
+    back = Cichol.ws1
     }
 )
 
@@ -560,18 +574,19 @@ sets.precast.WS['Calamity'] =
     set_combine(
     sets.precast.WS,
     {
-        ammo = 'Crepuscular Pebble',
-        head = 'Agoge Mask +4',
-        body = "Sakpata's Plate",
-        hands = "Sakpata's Gauntlets",
-        legs = "Sakpata's Cuisses",
-        feet = 'Nyame Sollerets',
-        neck = 'War. Beads +2',
-        waist = 'Sailfi Belt +1',
-        ear1 = 'Thrud Earring',
-        ear2 = 'Odnowa Earring +1',
-        ring1 = 'Sroda Ring',
-        ring2 = "Cornelia's ring"
+    ammo="Crepuscular Pebble",
+    head="Agoge Mask +4",
+    body="Sakpata's Plate",
+    hands="Sakpata's Gauntlets",
+    legs="Sakpata's Cuisses",
+    feet="Nyame Sollerets",
+    neck="War. Beads +2",
+    waist="Sailfi Belt +1",
+    ear1="Thrud Earring",
+    ear2="Odnowa Earring +1",
+    ring1="Cornelia's ring",
+    ring2="Sroda Ring",
+    back = Cichol.ws1
     }
 )
 

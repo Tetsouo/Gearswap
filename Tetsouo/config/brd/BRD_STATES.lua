@@ -4,7 +4,7 @@
 --- Centralizes all BRD state definitions for consistency and maintainability.
 ---
 --- Features:
----   • Combat modes (HybridMode: PDT/Normal, IdleMode: Refresh/DT/Regen)
+---   • Combat modes (EngagedMode: STP/Acc/DT/SB, IdleMode: Refresh/DT/Regen)
 ---   • Song pack system (SongMode: pre-configured 4-song rotations)
 ---   • Instrument selection (MainInstrument: Gjallarhorn/Daurdabla/etc.)
 ---   • Song customization (VictoryMarch replacement, Etude, Carol, Threnody)
@@ -12,7 +12,7 @@
 ---   • Validation API for state verification
 ---
 --- State Purposes:
----   • HybridMode: PDT = 50% damage reduction, Normal = maximum DPS
+---   • EngagedMode: STP = TP gain, Acc = accuracy, DT = damage reduction, SB = subtle blow
 ---   • IdleMode: Refresh/DT/Regen (idle gear focus)
 ---   • SongMode: Pre-configured song rotation packs (March/Madrigal/Minuet/etc.)
 ---   • MainInstrument: Instrument selection (Gjallarhorn REMA default)
@@ -49,11 +49,17 @@ function BRDStates.configure()
         'DT', -- Damage Taken reduction (Nyame)
         'Regen' -- HP Regen gear (Nyame)
     }
-    state.IdleMode:set('Refresh')
+    state.IdleMode:set('DT')
 
-    -- HybridMode: For engaged combat (PDT vs Normal melee)
-    state.HybridMode = M {['description'] = 'Hybrid Mode', 'PDT', 'Normal'}
-    state.HybridMode:set('Normal')
+    -- EngagedMode: Melee combat focus (Store TP, Accuracy, DT, Subtle Blow)
+    state.EngagedMode = M {
+        ['description'] = 'Engaged Mode',
+        'STP',  -- Store TP focus (default)
+        'Acc',  -- Accuracy for high evasion
+        'DT',   -- Damage Taken reduction
+        'SB'    -- Subtle Blow (reduce enemy TP gain)
+    }
+    state.EngagedMode:set('STP')
 
     -- ========================================
     -- SONG SYSTEM
@@ -70,9 +76,10 @@ function BRDStates.configure()
         'Tank', -- Victory + Minne + Ballad rotation (for tanks)
         'Healer', -- Victory + Minne + Ballad rotation (for healers)
         'Carol', -- Honor + Min5/4 + Carol + Victory
-        'Scherzo' -- Honor + Min5/4 + Scherzo + Victory
+        'Scherzo', -- Honor + Min5/4 + Scherzo + Victory
+        'Arebati' -- Honor + Min5/4 + Scherzo + Victory
     }
-    state.SongMode:set('Madrigal')
+    state.SongMode:set('Arebati')
 
     state.MainInstrument =
         M {
@@ -162,7 +169,7 @@ function BRDStates.configure()
         'Genmei',
         'Centovente'
     }
-    state.SubWeapon:set('Centovente')
+    state.SubWeapon:set('Genmei')
 
     -- ========================================
     -- SONG SLOTS (display only)
@@ -182,8 +189,8 @@ end
 ---============================================================================
 
 function BRDStates.validate()
-    if not state.HybridMode then
-        return false, 'HybridMode not configured'
+    if not state.EngagedMode then
+        return false, 'EngagedMode not configured'
     end
     if not state.IdleMode then
         return false, 'IdleMode not configured'

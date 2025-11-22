@@ -52,6 +52,10 @@ if region_success and RegionConfig then
 end
 
 function get_sets()
+    -- PERFORMANCE PROFILING (Toggle with: //gs c perf start)
+    local Profiler = require('shared/utils/debug/performance_profiler')
+    Profiler.start('get_sets')
+
     mote_include_version = 2
 
     -- Load PUP-specific configs BEFORE Mote-Include (needed by user_setup)
@@ -62,27 +66,33 @@ function get_sets()
     _G.PUPTPConfig = require('Tetsouo/config/pup/PUP_TP_CONFIG')
 
     include('Mote-Include.lua')
+    Profiler.mark('After Mote-Include')
     include('../shared/utils/core/INIT_SYSTEMS.lua')
+    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
+    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
+    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
+    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
+    Profiler.mark('After WS messages')
 
     -- Cancel pending operations from previous job
     if jcm_success and JobChangeManager then
@@ -91,11 +101,14 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/pup/functions/pup_functions.lua')
+    Profiler.mark('After pup_functions')
 
     -- Register PUP lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_pup_lockstyle_operations then
         JobChangeManager.register_lockstyle_cancel("PUP", cancel_pup_lockstyle_operations)
     end
+
+    Profiler.finish()
 end
 
 ---============================================================================

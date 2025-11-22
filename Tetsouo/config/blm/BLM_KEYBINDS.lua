@@ -23,35 +23,35 @@ local MessageFormatter = require('shared/utils/messages/message_formatter')
 --- Key format: ! = Alt, ^ = Ctrl, @ = Windows, # = Shift
 BLMKeybinds.binds = {
     -- Main Elemental Spells (Light then Dark)
-    { key = "!1", command = "cycle MainLightSpell", desc = "Main Light", state = "MainLightSpell" },
-    { key = "!2", command = "cycle MainDarkSpell", desc = "Main Dark", state = "MainDarkSpell" },
+    { key = "!1", command = "cyclestate MainLightSpell", desc = "Main Light", state = "MainLightSpell" },
+    { key = "!2", command = "cyclestate MainDarkSpell", desc = "Main Dark", state = "MainDarkSpell" },
 
     -- Sub Elemental Spells (Light then Dark)
-    { key = "^1", command = "cycle SubLightSpell", desc = "Sub Light", state = "SubLightSpell" },
-    { key = "^2", command = "cycle SubDarkSpell", desc = "Sub Dark", state = "SubDarkSpell" },
+    { key = "^1", command = "cyclestate SubLightSpell", desc = "Sub Light", state = "SubLightSpell" },
+    { key = "^2", command = "cyclestate SubDarkSpell", desc = "Sub Dark", state = "SubDarkSpell" },
 
     -- Spell Tier (VI, V, IV, III, II, I)
-    { key = "!-", command = "cycle SpellTier", desc = "Spell Tier", state = "SpellTier" },
+    { key = "!-", command = "cyclestate SpellTier", desc = "Spell Tier", state = "SpellTier" },
 
     -- AOE Spells (Light then Dark)
-    { key = "!3", command = "cycle MainLightAOE", desc = "Light AOE", state = "MainLightAOE" },
-    { key = "!4", command = "cycle MainDarkAOE", desc = "Dark AOE", state = "MainDarkAOE" },
+    { key = "!3", command = "cyclestate MainLightAOE", desc = "Light AOE", state = "MainLightAOE" },
+    { key = "!4", command = "cyclestate MainDarkAOE", desc = "Dark AOE", state = "MainDarkAOE" },
 
     -- AOE Tier (Aja/III/II/I)
-    { key = "!=", command = "cycle AOETier", desc = "AOE Tier", state = "AOETier" },
+    { key = "!=", command = "cyclestate AOETier", desc = "AOE Tier", state = "AOETier" },
 
     -- Storm Spells (SCH subjob)
-    { key = "!0", command = "cycle Storm", desc = "Storm", state = "Storm" },
+    { key = "!0", command = "cyclestate Storm", desc = "Storm", state = "Storm" },
 
     -- Combat Modes
-    { key = "!5", command = "cycle HybridMode", desc = "Hybrid Mode",  state = "HybridMode" },
-    { key = "!6", command = "cycle CombatMode", desc = "Combat Mode",  state = "CombatMode" },
+    { key = "!5", command = "cyclestate HybridMode", desc = "Hybrid Mode",  state = "HybridMode" },
+    { key = "!6", command = "cyclestate CombatMode", desc = "Combat Mode",  state = "CombatMode" },
 
     -- Magic Burst Mode
-    { key = "!7", command = "cycle MagicBurstMode", desc = "MB Mode", state = "MagicBurstMode" },
+    { key = "!7", command = "cyclestate MagicBurstMode", desc = "MB Mode", state = "MagicBurstMode" },
 
     -- Death Mode
-    { key = "!8", command = "cycle DeathMode", desc = "Death Mode", state = "DeathMode" },
+    { key = "!8", command = "cyclestate DeathMode", desc = "Death Mode", state = "DeathMode" },
 }
 
 ---============================================================================

@@ -57,6 +57,7 @@ function PLDStates.configure()
         M {
         ['description'] = 'Main Weapon',
         'Burtgang', -- Relic sword (ultimate tank weapon)
+        'BurtgangKC', -- Burtgang + Kraken Club (DNC subjob multi-attack)
         'Naegling', -- Savage Blade sword
         'Shining', -- Shining One (Great Sword)
         'Malevo' -- Malevolence (Club)
