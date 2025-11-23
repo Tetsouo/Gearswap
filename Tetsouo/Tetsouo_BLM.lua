@@ -197,13 +197,10 @@ function user_setup()
             add_to_chat(167, '[BLM] Warning: Failed to load keybinds')
         end
 
-        -- UI INITIALIZATION
+        -- UI INITIALIZATION - Handled by JobChangeManager, no need to call here
+        -- JobChangeManager will call init() after job changes
         local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            add_to_chat(122, '[BLM] Initializing UI...')
-            KeybindUI.smart_init("BLM", UIConfig.init_delay)
-            add_to_chat(122, '[BLM] UI initialization complete')
-        else
+        if not ui_success or not KeybindUI then
             add_to_chat(167, '[BLM] WARNING: Failed to load UI_MANAGER!')
         end
 
@@ -219,10 +216,17 @@ function user_setup()
                     macrobook = select_default_macro_book
                 })
 
-                -- Trigger initial macrobook/lockstyle with delay
+                -- Trigger initial macrobook/lockstyle/UI with delay
                 if player then
                     select_default_macro_book()
                     coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
+
+                    -- Initialize UI once on first load (JobChangeManager handles it on job changes)
+                    if ui_success and KeybindUI then
+                        coroutine.schedule(function()
+                            KeybindUI.init()
+                        end, 1.5)  -- Delay to let states initialize
+                    end
                 end
             else
                 -- Functions not loaded yet, schedule for later
@@ -237,6 +241,13 @@ function user_setup()
                         if player then
                             select_default_macro_book()
                             coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
+
+                            -- Initialize UI once on first load (JobChangeManager handles it on job changes)
+                            if ui_success and KeybindUI then
+                                coroutine.schedule(function()
+                                    KeybindUI.init()
+                                end, 1.5)  -- Delay to let states initialize
+                            end
                         end
                     end
                 end, 0.2)
