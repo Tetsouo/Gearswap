@@ -40,7 +40,11 @@
 ---============================================================================
 
 -- Track if this is initial setup (prevents double init on sub job change)
-local is_initial_setup = true
+-- Use global variable to persist across file reloads
+if _G.BLM_initial_setup == nil then
+    _G.BLM_initial_setup = true
+end
+local is_initial_setup = _G.BLM_initial_setup
 
 -- Load lockstyle timing configuration
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
@@ -216,17 +220,10 @@ function user_setup()
                     macrobook = select_default_macro_book
                 })
 
-                -- Trigger initial macrobook/lockstyle/UI with delay
+                -- Trigger initial macrobook/lockstyle with delay
                 if player then
                     select_default_macro_book()
                     coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-
-                    -- Initialize UI once on first load (JobChangeManager handles it on job changes)
-                    if ui_success and KeybindUI then
-                        coroutine.schedule(function()
-                            KeybindUI.init()
-                        end, 1.5)  -- Delay to let states initialize
-                    end
                 end
             else
                 -- Functions not loaded yet, schedule for later
@@ -241,19 +238,13 @@ function user_setup()
                         if player then
                             select_default_macro_book()
                             coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-
-                            -- Initialize UI once on first load (JobChangeManager handles it on job changes)
-                            if ui_success and KeybindUI then
-                                coroutine.schedule(function()
-                                    KeybindUI.init()
-                                end, 1.5)  -- Delay to let states initialize
-                            end
                         end
                     end
                 end, 0.2)
             end
         end
 
+        _G.BLM_initial_setup = false
         is_initial_setup = false
     end
 end
