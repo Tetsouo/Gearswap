@@ -25,25 +25,44 @@
 ---   @version 3.2 - Unified Headers Style
 ---   @date    Updated: 2025-11-10
 ---  ═════════════════════════════════════════════════════════════════════════
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EQUIPMENT DEFINITIONS
 -- ═══════════════════════════════════════════════════════════════════════════
-
 -- • Dual Rings (Different Wardrobes)
-local StikiRing1 = {name = 'Stikini Ring +1', bag = 'wardrobe 6'}
-local StikiRing2 = {name = 'Stikini Ring +1', bag = 'wardrobe 7'}
-local ChirichRing1 = {name = 'Chirich Ring +1', bag = 'wardrobe 6'}
-local ChirichRing2 = {name = 'Chirich Ring +1', bag = 'wardrobe 7'}
+local StikiRing1 = {
+    name = 'Stikini Ring +1',
+    bag = 'wardrobe 6'
+}
+local StikiRing2 = {
+    name = 'Stikini Ring +1',
+    bag = 'wardrobe 7'
+}
+local ChirichRing1 = {
+    name = 'Chirich Ring +1',
+    bag = 'wardrobe 6'
+}
+local ChirichRing2 = {
+    name = 'Chirich Ring +1',
+    bag = 'wardrobe 7'
+}
 
 -- • Merlinic Fast Cast Set (80% FC Augments)
-local MerlinicHead_FC = {name = 'Merlinic Hood', augments = {'Attack+14', '"Fast Cast"+7', 'MND+3'}}
+local MerlinicHead_FC = {
+    name = 'Merlinic Hood',
+    augments = {'Attack+14', '"Fast Cast"+7', 'MND+3'}
+}
 local MerlinicBody_FC = {
     name = 'Merlinic Jubbah',
     augments = {'Mag. Acc.+24', '"Fast Cast"+7', 'CHR+2', '"Mag.Atk.Bns."+3'}
 }
-local MerlinicHands_FC = {name = 'Merlinic Dastanas', augments = {'"Fast Cast"+7', 'Mag. Acc.+5', '"Mag.Atk.Bns."+4'}}
-local MerlinicLegs_FC = {name = 'Merlinic Shalwar', augments = {'"Mag.Atk.Bns."+5', '"Fast Cast"+5', 'Mag. Acc.+11'}}
+local MerlinicHands_FC = {
+    name = 'Merlinic Dastanas',
+    augments = {'"Fast Cast"+7', 'Mag. Acc.+5', '"Mag.Atk.Bns."+4'}
+}
+local MerlinicLegs_FC = {
+    name = 'Merlinic Shalwar',
+    augments = {'"Mag.Atk.Bns."+5', '"Fast Cast"+5', 'Mag. Acc.+11'}
+}
 local MerlinicFeet_FC = {
     name = 'Merlinic Crackows',
     augments = {'"Mag.Atk.Bns."+1', '"Fast Cast"+7', 'STR+9', 'Mag. Acc.+10'}
@@ -64,32 +83,53 @@ local MerlinicHands_Drain = {
 }
 
 -- • Telchine Enhancing Duration Set (+10 Duration)
-local TelchineHead = {name = 'Telchine Cap', augments = {'Enh. Mag. eff. dur. +10'}}
-local TelchineBody = {name = 'Telchine Chas.', augments = {'Enh. Mag. eff. dur. +10'}}
-local TelchineHands = {name = 'Telchine Gloves', augments = {'Enh. Mag. eff. dur. +10'}}
-local TelchineLegs = {name = 'Telchine Braconi', augments = {'Enh. Mag. eff. dur. +10'}}
-local TelchineFeet = {name = 'Telchine Pigaches', augments = {'Enh. Mag. eff. dur. +10'}}
+local TelchineHead = {
+    name = 'Telchine Cap',
+    augments = {'Enh. Mag. eff. dur. +10'}
+}
+local TelchineBody = {
+    name = 'Telchine Chas.',
+    augments = {'Enh. Mag. eff. dur. +10'}
+}
+local TelchineHands = {
+    name = 'Telchine Gloves',
+    augments = {'Enh. Mag. eff. dur. +10'}
+}
+local TelchineLegs = {
+    name = 'Telchine Braconi',
+    augments = {'Enh. Mag. eff. dur. +10'}
+}
+local TelchineFeet = {
+    name = 'Telchine Pigaches',
+    augments = {'Enh. Mag. eff. dur. +10'}
+}
 
 -- • Archmage's Relic +3
-local ArchmageTonban = {name = 'Arch. Tonban +3', augments = {'Increases Elemental Magic debuff time and potency'}}
-local ArchmageSabots = {name = 'Arch. Sabots +3', augments = {'Increases Aspir absorption amount'}}
+local ArchmageTonban = {
+    name = 'Arch. Tonban +3',
+    augments = {'Increases Elemental Magic debuff time and potency'}
+}
+local ArchmageSabots = {
+    name = 'Arch. Sabots +3',
+    augments = {'Increases Aspir absorption amount'}
+}
 
 -- • Rubicundity (Dark Magic Club)
-local Rubicundity = {name = 'Rubicundity', augments = {'Mag. Acc.+6', '"Mag.Atk.Bns."+7', 'Dark magic skill +7'}}
+local Rubicundity = {
+    name = 'Rubicundity',
+    augments = {'Mag. Acc.+6', '"Mag.Atk.Bns."+7', 'Dark magic skill +7'}
+}
 
 -- • Wicce Earring +2
-local WicceEarring = {name = 'Wicce Earring +2', augments = {'System: 1 ID: 1676 Val: 0', 'Mag. Acc.+14', 'Enmity-4'}}
+local WicceEarring = {
+    name = 'Wicce Earring +2',
+    augments = {'System: 1 ID: 1676 Val: 0', 'Mag. Acc.+14', 'Enmity-4'}
+}
 
 -- • Taranus's Cape (MAB/INT)
 local TaranusCape = {
     name = "Taranus's Cape",
-    augments = {
-        'INT+20',
-        'Mag. Acc+20 /Mag. Dmg.+20',
-        'INT+10',
-        '"Mag.Atk.Bns."+10',
-        'Spell interruption rate down-10%'
-    }
+    augments = {'INT+20', 'Mag. Acc+20 /Mag. Dmg.+20', 'INT+10', '"Mag.Atk.Bns."+10', 'Spell interruption rate down-10%'}
 }
 
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -181,24 +221,16 @@ sets.precast.FC.Cure = sets.precast.FC
 sets.precast.FC.Curaga = sets.precast.FC.Cure
 
 -- • Impact Fast Cast (Twilight Cloak Required)
-sets.precast.FC.Impact =
-    set_combine(
-    sets.precast.FC,
-    {
-        body = 'Twilight Cloak'
-    }
-)
+sets.precast.FC.Impact = set_combine(sets.precast.FC, {
+    body = 'Twilight Cloak'
+})
 
 -- • Stoneskin Fast Cast
-sets.precast.FC.Stoneskin =
-    set_combine(
-    sets.precast.FC,
-    {
-        head = 'Umuthi Hat',
-        legs = 'Doyen Pants',
-        waist = 'Siegel Sash'
-    }
-)
+sets.precast.FC.Stoneskin = set_combine(sets.precast.FC, {
+    head = 'Umuthi Hat',
+    legs = 'Doyen Pants',
+    waist = 'Siegel Sash'
+})
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- PRECAST - JOB ABILITIES
@@ -294,28 +326,20 @@ sets.midcast['Enhancing Magic'] = {
 }
 
 -- • Stoneskin (HP Boost)
-sets.midcast.Stoneskin =
-    set_combine(
-    sets.midcast['Enhancing Magic'],
-    {
-        legs = 'Shedir Seraweels',
-        waist = 'Siegel Sash',
-        neck = 'Nodens Gorget'
-    }
-)
+sets.midcast.Stoneskin = set_combine(sets.midcast['Enhancing Magic'], {
+    legs = 'Shedir Seraweels',
+    waist = 'Siegel Sash',
+    neck = 'Nodens Gorget'
+})
 
 -- • Phalanx (Damage Reduction)
 sets.midcast.Phalanx = set_combine(sets.midcast['Enhancing Magic'], {})
 
 -- • Aquaveil (Interrupt Prevention)
-sets.midcast.Aquaveil =
-    set_combine(
-    sets.midcast['Enhancing Magic'],
-    {
-        head = 'Amalric Coif +1',
-        legs = 'Shedir Seraweels'
-    }
-)
+sets.midcast.Aquaveil = set_combine(sets.midcast['Enhancing Magic'], {
+    head = 'Amalric Coif +1',
+    legs = 'Shedir Seraweels'
+})
 
 -- • Refresh (MP Regeneration)
 sets.midcast.Refresh = set_combine(sets.midcast['Enhancing Magic'], {})
@@ -401,38 +425,38 @@ sets.midcast.Aspir = sets.midcast['Dark Magic']
 -- • ELEMENTAL MAGIC (MAB/MACC - Wicce +3 Full Set)
 sets.midcast['Elemental Magic'] = {
     main = "Bunzi's Rod",
-    sub = 'Ammurapi Shield',
-    ammo = 'Ghastly Tathlum +1',
-    head = 'Wicce Petasos +3',
-    body = 'Wicce Coat +3',
-    hands = 'Wicce Gloves +3',
-    legs = 'Wicce Chausses +3',
-    feet = 'Wicce Sabots +3',
-    neck = 'Quanpur Necklace',
-    waist = 'Sacro Cord',
-    left_ear = 'Malignance Earring',
-    right_ear = 'Regal Earring',
-    left_ring = 'Freke Ring',
-    right_ring = 'Metamor. Ring +1',
+    sub = "Ammurapi Shield",
+    ammo = "Sroda Tathlum",
+    head = "Wicce Petasos +3",
+    body = "Wicce Coat +3",
+    hands = "Wicce Gloves +3",
+    legs = "Wicce Chausses +3",
+    feet = "Wicce Sabots +3",
+    neck = "Quanpur Necklace",
+    waist = "Sacro Cord",
+    ear1 = "Malignance Earring",
+    ear2 = "Regal Earring",
+    ring1 = "Freke Ring",
+    ring2 = "Metamor. Ring +1",
     back = "Taranus's Cape"
 }
 
 -- • Magic Burst Variant (Ea Hat +1 + Mujin Band)
 sets.midcast['Elemental Magic'].MagicBurst = {
     main = "Bunzi's Rod",
-    sub = 'Ammurapi Shield',
-    ammo = 'Sroda Tathlum',
-    head = 'Ea Hat +1',
-    body = 'Wicce Coat +3',
+    sub = "Ammurapi Shield",
+    ammo = "Sroda Tathlum",
+    head = "Ea Hat +1",
+    body = "Wicce Coat +3",
     hands = "Agwu's Gages",
-    legs = 'Wicce Chausses +3',
-    feet = 'Wicce Sabots +3',
-    neck = 'Quanpur Necklace',
-    waist = 'Sacro Cord',
-    left_ear = 'Malignance Earring',
-    right_ear = 'Regal Earring',
-    left_ring = 'Freke Ring',
-    right_ring = 'Metamor. Ring +1',
+    legs = "Wicce Chausses +3",
+    feet = "Wicce Sabots +3",
+    neck = "Quanpur Necklace",
+    waist = "Sacro Cord",
+    ear1 = "Malignance Earring",
+    ear2 = "Regal Earring",
+    ring1 = "Freke Ring",
+    ring2 = "Mujin Band",
     back = "Taranus's Cape"
 }
 
@@ -515,13 +539,9 @@ sets.MoveSpeed = {
 sets.idle.Town = sets.MoveSpeed
 
 -- • ADOULIN MOVEMENT (City-Specific Speed Boost)
-sets.Adoulin =
-    set_combine(
-    sets.MoveSpeed,
-    {
-        body = "Councilor's Garb"
-    }
-)
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"
+})
 
 -- • BUFF SETS
 sets.buff = {}
