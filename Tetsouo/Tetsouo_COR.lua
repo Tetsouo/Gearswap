@@ -42,9 +42,6 @@
 -- INITIALIZATION
 ---============================================================================
 
--- Track if this is initial setup (prevents double init on sub job change)
-local is_initial_setup = true
-
 -- Load lockstyle timing configuration
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
 if not lockstyle_config_success or not LockstyleConfig then
@@ -109,6 +106,16 @@ function get_sets()
     -- Clear pending roll state
     _G.cor_pending_roll_value = nil
 
+    -- ============================================
+    -- CLEANUP OLD COR ROLLTRACKER STATE
+    -- ============================================
+    -- Clear RollTracker state in case we're reloading COR after playing another job
+    -- This ensures clean slate for roll tracking
+    local rt_success, RollTracker = pcall(require, 'shared/jobs/cor/functions/logic/roll_tracker')
+    if rt_success and RollTracker and RollTracker.cleanup then
+        RollTracker.cleanup()
+    end
+
     mote_include_version = 2
     include('Mote-Include.lua')
     Profiler.mark('After Mote-Include')
@@ -158,6 +165,7 @@ function get_sets()
     end
 
     -- Unload external rolltracker addon (prevents conflict with integrated roll tracker)
+    -- Will be reloaded automatically in file_unload() when changing away from COR
     send_command('lua unload rolltracker')
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
@@ -184,34 +192,18 @@ end
 --- @param newSubjob string New subjob
 --- @param oldSubjob string Old subjob
 function job_sub_job_change(newSubjob, oldSubjob)
-    -- Note: Mote-Include already called user_setup() before this
-
-    -- Re-initialize JobChangeManager with COR-specific functions
-    -- This ensures correct functions are used when switching back to COR
+    -- Let JobChangeManager handle the full reload sequence
     local success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if success and JobChangeManager then
-        -- Re-register COR modules to ensure they're used (not WAR/PLD/other job modules)
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if CORKeybinds and ui_success and KeybindUI then
-            JobChangeManager.initialize({
-                keybinds = CORKeybinds,
-                ui = KeybindUI,
-                lockstyle = select_default_lockstyle,
-                macrobook = select_default_macro_book
-            })
-        end
-
-        -- Trigger job change sequence (handles lockstyle, macros, keybinds, UI)
         local main_job = player and player.main_job or "COR"
         JobChangeManager.on_job_change(main_job, newSubjob)
-    
+    end
+
     -- DUALBOX: Send job update to MAIN character after subjob change
     local db_success, DualBoxManager = pcall(require, 'shared/utils/dualbox/dualbox_manager')
     if db_success and DualBoxManager then
         DualBoxManager.send_job_update()
     end
-end
-
 end
 
 ---============================================================================
@@ -222,71 +214,52 @@ function user_setup()
     -- ==========================================================================
     -- STATE DEFINITIONS (Loaded from COR_STATES.lua)
     -- ==========================================================================
-
     local CORStates = require('Tetsouo/config/cor/COR_STATES')
     CORStates.configure()
 
-    if is_initial_setup then
-        -- KEYBIND LOADING
-        local success, keybinds = pcall(require, 'Tetsouo/config/cor/COR_KEYBINDS')
-        if success and keybinds then
-            CORKeybinds = keybinds
-            CORKeybinds.bind_all()
-        else
-            add_to_chat(167, '[COR] Warning: Failed to load keybinds')
-        end
-
-        -- UI INITIALIZATION
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            KeybindUI.smart_init("COR", UIConfig.init_delay)
-        end
-
-        -- JOB CHANGE MANAGER INITIALIZATION
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = CORKeybinds,
-                    ui = KeybindUI,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = CORKeybinds,
-                            ui = KeybindUI,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
-        end
-
-        is_initial_setup = false
+    -- ==========================================================================
+    -- KEYBIND LOADING (Always executed after reload)
+    -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/cor/COR_KEYBINDS')
+    if success and keybinds then
+        CORKeybinds = keybinds
+        CORKeybinds.bind_all()
     end
 
-    -- Initialize PartyTracker (roll detection + party job detection)
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        local init_delay = (_G.UIConfig and _G.UIConfig.init_delay) or 5.0
+        KeybindUI.smart_init("COR", init_delay)
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
+        end
+    end
+
+    -- ==========================================================================
+    -- PARTY TRACKER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
     if PartyTracker then
         PartyTracker.init()
     end
 
-    -- ALWAYS apply lockstyle and macrobook on ANY user_setup call (initial or reload)
+    -- ==========================================================================
+    -- LOCKSTYLE WATCHDOG (Always executed after reload)
+    -- ==========================================================================
     -- This ensures lockstyle reapplies after //gs reload or dressup reload
     if player then
         select_default_macro_book()
@@ -298,12 +271,10 @@ function user_setup()
         end, LockstyleConfig.initial_load_delay)
 
         -- Start lockstyle watchdog (detects DressUp reload and auto-reapplies lockstyle)
-        -- Checks every 10 seconds if DressUp state changed
         if not _G.cor_lockstyle_watchdog_active then
             _G.cor_lockstyle_watchdog_active = true
 
             local function lockstyle_watchdog_check()
-                -- Only run if still active and player is COR
                 if not _G.cor_lockstyle_watchdog_active then
                     return
                 end
@@ -321,43 +292,37 @@ function user_setup()
                         end
                     end
 
-                    -- Detect state change: DressUp was reloaded (went from false to true)
+                    -- Detect state change: DressUp was reloaded
                     if _G.cor_lockstyle_watchdog.dressup_was_loaded == false and dressup_loaded == true then
                         add_to_chat(158, '[COR] DressUp reloaded detected - reapplying lockstyle...')
                         if select_default_lockstyle then
-                            -- Delay by 2 seconds to let DressUp initialize
                             coroutine.schedule(function()
                                 select_default_lockstyle()
                             end, 2)
                         end
                     end
 
-                    -- Update state
                     _G.cor_lockstyle_watchdog.dressup_was_loaded = dressup_loaded
                 end
 
-                -- Reschedule next check in 10 seconds (recursive)
                 coroutine.schedule(lockstyle_watchdog_check, 10)
             end
 
-            -- Start watchdog after 15 seconds
             coroutine.schedule(lockstyle_watchdog_check, 15)
         end
     end
 
-    if not is_initial_setup then
-        -- SUBJOB CHANGE: Force gear re-equip after states are initialized
-        -- This is NECESSARY because COR weapon behavior changes based on subjob:
-        --   COR/DNC or COR/NIN: Dual wield (main+sub)
-        --   COR/SCH or other: Single weapon (main only)
-        -- SetBuilder checks player.sub_job to apply correct weapon configuration
-        coroutine.schedule(function()
-            if player and player.status then
-                -- Trigger status_change which forces complete set rebuild
-                status_change(player.status, player.status)
-            end
-        end, 0.5)
-    end
+    -- ==========================================================================
+    -- FORCE GEAR RE-EQUIP (Always executed after reload)
+    -- ==========================================================================
+    -- COR weapon behavior changes based on subjob:
+    --   COR/DNC or COR/NIN: Dual wield (main+sub)
+    --   COR/SCH or other: Single weapon (main only)
+    coroutine.schedule(function()
+        if player and player.status then
+            status_change(player.status, player.status)
+        end
+    end, 0.5)
 end
 
 ---============================================================================
@@ -392,25 +357,28 @@ function file_unload()
         _G.cor_lockstyle_watchdog_active = false
     end
 
+    -- Cleanup RollTracker (clear all roll state and globals)
+    local rt_success, RollTracker = pcall(require, 'shared/jobs/cor/functions/logic/roll_tracker')
+    if rt_success and RollTracker and RollTracker.cleanup then
+        RollTracker.cleanup()
+    end
+
     -- Cleanup PartyTracker (unregister event handlers and clear state)
     if PartyTracker then
         PartyTracker.cleanup()
     end
 
-    -- Cancel all pending operations
+    -- Reload external rolltracker addon when changing away from COR
+    -- (COR unloads it on load to prevent conflicts with integrated tracker)
+    -- If the user doesn't have rolltracker, this will fail silently
+    send_command('lua load rolltracker')
+
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind all keybinds
-    if CORKeybinds then
-        CORKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

@@ -11,8 +11,6 @@
 --- @requires Windower FFXI, GearSwap addon, Mote-Include v2.0+
 ---============================================================================
 
-local is_initial_setup = true
-
 ---============================================================================
 --- CONFIGURATION LOADING
 ---============================================================================
@@ -122,11 +120,6 @@ function user_setup()
     local PUPStates = require('Tetsouo/config/pup/PUP_STATES')
     PUPStates.configure()
 
-    -- Skip additional initialization on subjob change (JobChangeManager handles it)
-    if not is_initial_setup then
-        return
-    end
-
     -- ==========================================================================
     -- DYNAMIC STATE INITIALIZATION (PUP-SPECIFIC)
     -- ==========================================================================
@@ -195,8 +188,6 @@ function user_setup()
             end, 0.2)
         end
     end
-
-    is_initial_setup = false
 end
 
 ---============================================================================
@@ -226,25 +217,12 @@ end
 ---============================================================================
 
 function job_sub_job_change(newSubjob, oldSubjob)
-    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-    if not jcm_success or not JobChangeManager then
-        return
-    end
-
-    -- Re-register PUP modules (ensures correct functions when switching back to PUP)
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if PUPKeybinds and ui_success and KeybindUI then
-        JobChangeManager.initialize({
-            keybinds = PUPKeybinds,
-            ui = KeybindUI,
-            lockstyle = select_default_lockstyle,
-            macrobook = select_default_macro_book
-        })
-    end
-
     -- Let JobChangeManager handle the full reload sequence
-    local main_job = player and player.main_job or "PUP"
-    JobChangeManager.on_job_change(main_job, newSubjob)
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        local main_job = player and player.main_job or "PUP"
+        JobChangeManager.on_job_change(main_job, newSubjob)
+    end
 
     -- DUALBOX: Send job update to MAIN character after subjob change
     local db_success, DualBoxManager = pcall(require, 'shared/utils/dualbox/dualbox_manager')
@@ -286,20 +264,12 @@ end)
 ---============================================================================
 
 function file_unload()
-    -- Cancel all JobChangeManager operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind all keybinds
-    if PUPKeybinds then
-        PUPKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

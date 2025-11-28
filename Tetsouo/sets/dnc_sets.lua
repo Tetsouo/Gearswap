@@ -237,7 +237,7 @@ sets.precast.JA = {}
 -- • Steps (Base set)
 sets.precast.Step = {
     ammo = 'Ginsen',
-    head = 'Maxixi Tiara +3',
+    head = 'Maxixi Tiara +4',
     body = 'Macu. Casaque +3',
     hands = 'maxixi bangles +4',
     legs = 'Maculele Tights +3',
@@ -347,7 +347,7 @@ sets.precast.Waltz['Healing Waltz'] = set_combine(sets.precast.Waltz, {})
 
 -- • Sambas / Jigs (Duration and potency)
 sets.precast.Samba = {
-    head = 'Maxixi Tiara +3',
+    head = 'Maxixi Tiara +4',
     back = Senuna.TP
 }
 

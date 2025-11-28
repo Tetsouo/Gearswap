@@ -8,8 +8,6 @@
 --- @requires Windower FFXI, GearSwap addon, Mote-Include v2.0+
 ---============================================================================
 
-local is_initial_setup = true
-
 -- Load configs
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
 if not lockstyle_config_success or not LockstyleConfig then
@@ -128,63 +126,36 @@ function user_setup()
     local SAMStates = require('Tetsouo/config/sam/SAM_STATES')
     SAMStates.configure()
 
-    if is_initial_setup then
-        -- KEYBIND LOADING
-        local success, keybinds = pcall(require, 'Tetsouo/config/sam/SAM_KEYBINDS')
-        if success and keybinds then
-            SAMKeybinds = keybinds
-            SAMKeybinds.bind_all()
+    -- ==========================================================================
+    -- KEYBIND LOADING (Always executed after reload)
+    -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/sam/SAM_KEYBINDS')
+    if success and keybinds then
+        SAMKeybinds = keybinds
+        SAMKeybinds.bind_all()
+    end
+
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        KeybindUI.smart_init('SAM', UIConfig.init_delay)
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
         end
-
-        -- UI INITIALIZATION
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            KeybindUI.smart_init('SAM', UIConfig.init_delay)
-        end
-
-        -- JOB CHANGE MANAGER INITIALIZATION
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize(
-                    {
-                        keybinds = SAMKeybinds,
-                        ui = KeybindUI,
-                        lockstyle = select_default_lockstyle,
-                        macrobook = select_default_macro_book
-                    }
-                )
-
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(
-                    function()
-                        if select_default_lockstyle and select_default_macro_book then
-                            JobChangeManager.initialize(
-                                {
-                                    keybinds = SAMKeybinds,
-                                    ui = KeybindUI,
-                                    lockstyle = select_default_lockstyle,
-                                    macrobook = select_default_macro_book
-                                }
-                            )
-                            if player then
-                                select_default_macro_book()
-                                coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                            end
-                        end
-                    end,
-                    0.2
-                )
-            end
-        end
-
-        is_initial_setup = false
     end
 end
 
@@ -207,17 +178,12 @@ function init_gear_sets()
 end
 
 function file_unload()
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    if SAMKeybinds then
-        SAMKeybinds.unbind_all()
-    end
-
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

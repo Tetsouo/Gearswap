@@ -29,8 +29,6 @@
 ---============================================================================
 --- INITIALIZATION & CONFIGURATION LOADING
 ---============================================================================
--- State management
-local is_initial_setup = true
 
 -- Load global configurations with fallbacks
 local _, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
@@ -194,13 +192,8 @@ function user_setup()
     local WARStates = require('Tetsouo/config/war/WAR_STATES')
     WARStates.configure()
 
-    -- Skip additional initialization on subjob change (JobChangeManager handles it)
-    if not is_initial_setup then
-        return
-    end
-
     -- ==========================================================================
-    -- KEYBINDS LOADING
+    -- KEYBINDS LOADING (Always executed after reload)
     -- ==========================================================================
     local kb_success, keybinds = pcall(require, 'Tetsouo/config/war/WAR_KEYBINDS')
     if kb_success and keybinds then
@@ -211,50 +204,25 @@ function user_setup()
     end
 
     -- ==========================================================================
-    -- UI INITIALIZATION
+    -- UI INITIALIZATION (Always executed after reload)
     -- ==========================================================================
     if ui_success and KeybindUI then
         KeybindUI.smart_init("WAR", UIConfig.init_delay)
     end
 
     -- ==========================================================================
-    -- JOB CHANGE MANAGER INITIALIZATION
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
     -- ==========================================================================
     if jcm_success and JobChangeManager then
-        -- Check if functions are loaded (they should be after get_sets completes)
-        if select_default_lockstyle and select_default_macro_book then
-            JobChangeManager.initialize({
-                keybinds = WARKeybinds,
-                ui = KeybindUI,
-                lockstyle = select_default_lockstyle,
-                macrobook = select_default_macro_book
-            })
+        -- Initialize with current job state
+        JobChangeManager.initialize()
 
-            -- Trigger initial macrobook/lockstyle with delay
-            if player then
-                select_default_macro_book()
-                coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-            end
-        else
-            -- Functions not loaded yet, schedule for later
-            coroutine.schedule(function()
-                if select_default_lockstyle and select_default_macro_book then
-                    JobChangeManager.initialize({
-                        keybinds = WARKeybinds,
-                        ui = KeybindUI,
-                        lockstyle = select_default_lockstyle,
-                        macrobook = select_default_macro_book
-                    })
-                    if player then
-                        select_default_macro_book()
-                        coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                    end
-                end
-            end, 0.2)
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
         end
     end
-
-    is_initial_setup = false
 end
 
 ---============================================================================
@@ -275,20 +243,13 @@ end
 
 --- @return void
 function file_unload()
-    -- Cancel pending job change operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind keybinds
-    if WARKeybinds then
-        WARKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end
 
 ---============================================================================

@@ -37,8 +37,6 @@
 ---============================================================================
 -- INITIALIZATION
 ---============================================================================
--- Track if this is initial setup (prevents double init on sub job change)
-local is_initial_setup = true
 
 -- Load lockstyle timing configuration
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
@@ -148,34 +146,17 @@ end
 --- @param newSubjob string New subjob
 --- @param oldSubjob string Old subjob
 function job_sub_job_change(newSubjob, oldSubjob)
-    -- Note: Mote-Include already called user_setup() before this
-
-    -- Re-initialize JobChangeManager with BRD-specific functions
-    -- This ensures correct functions are used when switching back to BRD
+    -- Let JobChangeManager handle the full reload sequence
     local success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if success and JobChangeManager then
-        -- Nil check: Only initialize if all required functions are loaded
-        if BRDKeybinds and select_default_lockstyle and select_default_macro_book then
-            local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-            local ui_ref = ui_success and KeybindUI or nil
+        local main_job = player and player.main_job or "BRD"
+        JobChangeManager.on_job_change(main_job, newSubjob)
+    end
 
-            JobChangeManager.initialize({
-                keybinds = BRDKeybinds,
-                ui = ui_ref,
-                lockstyle = select_default_lockstyle,
-                macrobook = select_default_macro_book
-            })
-
-            -- Trigger job change sequence (handles lockstyle, macros, keybinds, UI)
-            local main_job = player and player.main_job or "BRD"
-            JobChangeManager.on_job_change(main_job, newSubjob)
-        
     -- DUALBOX: Send job update to MAIN character after subjob change
     local db_success, DualBoxManager = pcall(require, 'shared/utils/dualbox/dualbox_manager')
     if db_success and DualBoxManager then
         DualBoxManager.send_job_update()
-    end
-end
     end
 end
 
@@ -191,65 +172,45 @@ function user_setup()
     local BRDStates = require('Tetsouo/config/brd/BRD_STATES')
     BRDStates.configure()
 
-    if is_initial_setup then
-        -- KEYBIND LOADING
-        local success, keybinds = pcall(require, 'Tetsouo/config/brd/BRD_KEYBINDS')
-        if success and keybinds then
-            BRDKeybinds = keybinds
-            BRDKeybinds.bind_all()
-        else
-            add_to_chat(167, '[BRD] Warning: Failed to load keybinds')
-        end
-
-        -- UI INITIALIZATION
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            KeybindUI.smart_init("BRD", UIConfig.init_delay)
-        else
-            add_to_chat(167, '[BRD] Warning: Failed to load UI')
-        end
-
-        -- JOB CHANGE MANAGER INITIALIZATION
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            local ui_ref = ui_success and KeybindUI or nil
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = BRDKeybinds,
-                    ui = ui_ref,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = BRDKeybinds,
-                            ui = ui_ref,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
-        end
-
-        is_initial_setup = false
+    -- ==========================================================================
+    -- KEYBIND LOADING (Always executed after reload)
+    -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/brd/BRD_KEYBINDS')
+    if success and keybinds then
+        BRDKeybinds = keybinds
+        BRDKeybinds.bind_all()
     end
 
-    -- Initialize song slots AFTER UI is built (runs on every reload, not just initial setup)
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        local init_delay = (_G.UIConfig and _G.UIConfig.init_delay) or 5.0
+        KeybindUI.smart_init("BRD", init_delay)
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        -- Use schedule to ensure player is loaded before calling
+        coroutine.schedule(function()
+            if player and select_default_macro_book and select_default_lockstyle then
+                select_default_macro_book()
+                coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
+            end
+        end, 0.2)  -- Small delay to ensure player is ready
+    end
+
+    -- ==========================================================================
+    -- SONG SLOTS INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
     coroutine.schedule(function()
         if _G.update_brd_song_slots then
             _G.update_brd_song_slots()
@@ -307,20 +268,12 @@ end
 ---============================================================================
 
 function file_unload()
-    -- Cancel all pending operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind all keybinds
-    if BRDKeybinds then
-        BRDKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

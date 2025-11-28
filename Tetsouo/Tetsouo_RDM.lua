@@ -37,8 +37,6 @@
 ---============================================================================
 -- INITIALIZATION
 ---============================================================================
--- Track if this is initial setup (prevents double init on sub job change)
-local is_initial_setup = true
 
 -- Load lockstyle timing configuration
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
@@ -156,8 +154,6 @@ end
 --- @param newSubjob string New subjob
 --- @param oldSubjob string Old subjob
 function job_sub_job_change(newSubjob, oldSubjob)
-    -- Note: Mote-Include already called user_setup() before this
-
     -- Create/destroy Storm state based on SCH subjob (handled in RDM_STATES.lua)
     local RDMStates = require('Tetsouo/config/rdm/RDM_STATES')
     if RDMStates and RDMStates.configure_storm then
@@ -174,39 +170,23 @@ function job_sub_job_change(newSubjob, oldSubjob)
     end
 
     -- Re-apply weapon locking after subjob change (CombatMode)
-    -- This ensures disable() is maintained after JobChangeManager operations
     if state.CombatMode and state.CombatMode.current == "On" then
         disable('main', 'sub', 'range')
     else
         enable('main', 'sub', 'range')
     end
 
-    -- Re-initialize JobChangeManager with RDM-specific functions
-    -- This ensures correct functions are used when switching back to RDM
+    -- Let JobChangeManager handle the full reload sequence
     local success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if success and JobChangeManager then
-        -- Re-register RDM modules to ensure they're used (not other job modules)
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+        local main_job = player and player.main_job or "RDM"
+        JobChangeManager.on_job_change(main_job, newSubjob)
+    end
 
-        -- Nil check: Only initialize if all required functions are loaded
-        if RDMKeybinds and ui_success and KeybindUI and select_default_lockstyle and select_default_macro_book then
-            JobChangeManager.initialize({
-                keybinds = RDMKeybinds,
-                ui = KeybindUI,
-                lockstyle = select_default_lockstyle,
-                macrobook = select_default_macro_book
-            })
-
-            -- Trigger job change sequence (handles lockstyle, macros, keybinds, UI)
-            local main_job = player and player.main_job or "RDM"
-            JobChangeManager.on_job_change(main_job, newSubjob)
-        
     -- DUALBOX: Send job update to MAIN character after subjob change
     local db_success, DualBoxManager = pcall(require, 'shared/utils/dualbox/dualbox_manager')
     if db_success and DualBoxManager then
         DualBoxManager.send_job_update()
-    end
-end
     end
 end
 
@@ -227,70 +207,46 @@ function user_setup()
     -- ==========================================================================
     -- INITIAL WEAPON LOCKING (CombatMode)
     -- ==========================================================================
+    -- ==========================================================================
+    -- WEAPON LOCK (Always executed after reload)
+    -- ==========================================================================
     -- Apply weapon lock IMMEDIATELY if CombatMode is On at load
-    -- This ensures disable() is active BEFORE any sets are equipped
     if state.CombatMode and state.CombatMode.current == "On" then
         disable('main', 'sub', 'range')
         add_to_chat(122, '[RDM] CombatMode: Weapons locked')
     end
 
-    if is_initial_setup then
-        -- KEYBIND LOADING
-        local success, keybinds = pcall(require, 'Tetsouo/config/rdm/RDM_KEYBINDS')
-        if success and keybinds then
-            RDMKeybinds = keybinds
-            RDMKeybinds.bind_all()
-        else
-            add_to_chat(167, '[RDM] Warning: Failed to load keybinds')
+    -- ==========================================================================
+    -- KEYBIND LOADING (Always executed after reload)
+    -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/rdm/RDM_KEYBINDS')
+    if success and keybinds then
+        RDMKeybinds = keybinds
+        RDMKeybinds.bind_all()
+    end
+
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        local init_delay = (_G.UIConfig and _G.UIConfig.init_delay) or 5.0
+        KeybindUI.smart_init("RDM", init_delay)
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
         end
-
-        -- UI INITIALIZATION
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            add_to_chat(122, '[RDM] Initializing UI...')
-            KeybindUI.smart_init("RDM", UIConfig.init_delay)
-            add_to_chat(122, '[RDM] UI initialization complete')
-        else
-            add_to_chat(167, '[RDM] WARNING: Failed to load UI_MANAGER!')
-        end
-
-        -- JOB CHANGE MANAGER INITIALIZATION
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = RDMKeybinds,
-                    ui = KeybindUI,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = RDMKeybinds,
-                            ui = KeybindUI,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
-        end
-
-        is_initial_setup = false
     end
 end
 
@@ -332,20 +288,12 @@ end
 ---============================================================================
 
 function file_unload()
-    -- Cancel all pending operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind all keybinds
-    if RDMKeybinds then
-        RDMKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

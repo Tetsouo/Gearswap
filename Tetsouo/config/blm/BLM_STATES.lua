@@ -66,7 +66,7 @@ function BLMStates.configure()
         'Off',  -- Normal nuke gear
         'On'    -- Magic Burst potency gear
     }
-    state.MagicBurstMode:set('Off')  -- Default to Off
+    state.MagicBurstMode:set('On')  -- Default to Off
 
     -- DeathMode: Death spell optimization
     state.DeathMode = M {
@@ -114,7 +114,7 @@ function BLMStates.configure()
         "Stone",
         "Water"
     }
-    state.MainDarkSpell:set("Blizzard")  -- Default to Blizzard
+    state.MainDarkSpell:set("Stone")  -- Default to Blizzard
 
     -- SubLightSpell: Sub Light elemental spells (Thunder/Fire/Aero)
     state.SubLightSpell = M {
@@ -164,7 +164,7 @@ function BLMStates.configure()
         "Stonega",
         "Waterga"
     }
-    state.MainDarkAOE:set("Blizzaga")  -- Default to Blizzaga
+    state.MainDarkAOE:set("Stonega")  -- Default to Blizzaga
 
     -- AOETier: AOE spell tier (Aja/III/II/I)
     -- Aja = highest tier (Firaja, Stoneja, etc.) - no numeral

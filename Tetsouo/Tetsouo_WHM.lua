@@ -30,8 +30,6 @@
 ---============================================================================
 --- INITIALIZATION
 ---============================================================================
---- Track if this is initial setup (prevents double init on subjob change)
-local is_initial_setup = true
 
 --- Load global configurations with fallbacks
 local _, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
@@ -165,61 +163,36 @@ function user_setup()
     WHMStates.configure()
 
     -- ==========================================================================
-    -- INITIAL SETUP ONLY
+    -- KEYBINDS LOADING (Always executed after reload)
     -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/whm/WHM_KEYBINDS')
+    if success and keybinds then
+        WHMKeybinds = keybinds
+        WHMKeybinds.bind_all()
+    end
 
-    if is_initial_setup then
-        -- Load keybinds
-        local success, keybinds = pcall(require, 'Tetsouo/config/whm/WHM_KEYBINDS')
-        if success and keybinds then
-            WHMKeybinds = keybinds
-            WHMKeybinds.bind_all()
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        local init_delay = (_G.UIConfig and _G.UIConfig.init_delay) or 5.0
+        KeybindUI.smart_init("WHM", init_delay)
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
         end
-
-        -- Initialize UI
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            local init_delay = (_G.UIConfig and _G.UIConfig.init_delay) or 5.0
-            KeybindUI.smart_init("WHM", init_delay)
-        end
-
-        -- Initialize JobChangeManager
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = WHMKeybinds,
-                    ui = KeybindUI,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = WHMKeybinds,
-                            ui = KeybindUI,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
-        end
-
-        is_initial_setup = false
     end
 end
 
@@ -242,20 +215,12 @@ function init_gear_sets()
 end
 
 function file_unload()
-    -- Cancel pending operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind keybinds
-    if WHMKeybinds then
-        WHMKeybinds.unbind_all()
-    end
-
-    -- Cleanup UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

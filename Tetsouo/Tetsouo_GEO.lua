@@ -37,9 +37,6 @@
 -- INITIALIZATION
 ---============================================================================
 
--- Track if this is initial setup (prevents double init on sub job change)
-local is_initial_setup = true
-
 -- Load lockstyle timing configuration
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
 if not lockstyle_config_success or not LockstyleConfig then
@@ -185,67 +182,46 @@ function user_setup()
     local GEOStates = require('Tetsouo/config/geo/GEO_STATES')
     GEOStates.configure()
 
-    if is_initial_setup then
-        -- ADDON LOADING - PetTP for Luopan management
-        send_command('lua load pettp')
-        add_to_chat(122, '[GEO] Loading PetTP addon for Luopan tracking')
+    -- ==========================================================================
+    -- ADDON LOADING - PetTP for Luopan management (Always executed after reload)
+    -- ==========================================================================
+    send_command('lua load pettp')
+    add_to_chat(122, '[GEO] Loading PetTP addon for Luopan tracking')
 
-        -- KEYBIND LOADING
-        local success, keybinds = pcall(require, 'Tetsouo/config/geo/GEO_KEYBINDS')
-        if success and keybinds then
-            GEOKeybinds = keybinds
-            GEOKeybinds.bind_all()
-        else
-            add_to_chat(167, '[GEO] Warning: Failed to load keybinds')
+    -- ==========================================================================
+    -- KEYBIND LOADING (Always executed after reload)
+    -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/geo/GEO_KEYBINDS')
+    if success and keybinds then
+        GEOKeybinds = keybinds
+        GEOKeybinds.bind_all()
+    else
+        add_to_chat(167, '[GEO] Warning: Failed to load keybinds')
+    end
+
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        KeybindUI.smart_init("GEO", UIConfig.init_delay)
+    else
+        add_to_chat(167, '[GEO] WARNING: Failed to load UI_MANAGER!')
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
         end
-
-        -- UI INITIALIZATION
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if ui_success and KeybindUI then
-            add_to_chat(122, '[GEO] Initializing UI...')
-            KeybindUI.smart_init("GEO", UIConfig.init_delay)
-            add_to_chat(122, '[GEO] UI initialization complete')
-        else
-            add_to_chat(167, '[GEO] WARNING: Failed to load UI_MANAGER!')
-        end
-
-        -- JOB CHANGE MANAGER INITIALIZATION
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = GEOKeybinds,
-                    ui = KeybindUI,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = GEOKeybinds,
-                            ui = KeybindUI,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
-        end
-
-        is_initial_setup = false
     end
 end
 
@@ -287,24 +263,16 @@ end
 ---============================================================================
 
 function file_unload()
-    -- Cancel all pending operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind all keybinds
-    if GEOKeybinds then
-        GEOKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
-
-    -- Unload PetTP addon
+    -- Unload PetTP addon (external addon, must be unloaded manually)
     send_command('lua unload pettp')
     add_to_chat(122, '[GEO] Unloading PetTP addon')
+
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

@@ -37,12 +37,9 @@
 --- @version 1.0
 --- @date    Created: 2025-10-06
 ---============================================================================
-
---============================================================--
-
+-- ============================================================--
 --                  EQUIPMENT DEFINITIONS                     --
---============================================================--
-
+-- ============================================================--
 local Toutatis = {}
 Toutatis.STP = {
     name = "Toutatis's Cape",
@@ -57,51 +54,121 @@ Toutatis.WS2 = {
     augments = {'DEX+20', 'Accuracy+20 Attack+20', 'DEX+10', 'Weapon skill damage +10%', 'Phys. dmg. taken-10%'}
 }
 
-local ChirichRing1 = {name = 'Chirich Ring +1', bag = 'wardrobe 1'}
-local ChirichRing2 = {name = 'Chirich Ring +1', bag = 'wardrobe 2'}
+local ChirichRing1 = {
+    name = 'Chirich Ring +1',
+    bag = 'wardrobe 1'
+}
+local ChirichRing2 = {
+    name = 'Chirich Ring +1',
+    bag = 'wardrobe 2'
+}
+local MoonlightRing1 = {
+    name = 'Moonlight Ring',
+    bag = 'wardrobe 2'
+}
+local MoonlightRing2 = {
+    name = 'Moonlight Ring',
+    bag = 'wardrobe 4'
+}
 
-local MoonShadeEarring = {name = 'Moonshade Earring', augments = {'Accuracy+4', 'TP Bonus +250'}}
+local MoonShadeEarring = {
+    name = 'Moonshade Earring',
+    augments = {'Accuracy+4', 'TP Bonus +250'}
+}
 
---============================================================--
+-- ============================================================--
 
 --                      WEAPON SETS                           --
---============================================================--
+-- ============================================================--
 
 -- Main Weapons
-sets.TwashtarM = {main = 'Twashtar'}
-sets['Mpu Gandring'] = {main = 'Mpu Gandring'}
-sets.Vajra = {main = 'Vajra'}
-sets.Tauret = {main = 'Tauret'}
-sets.Malevolence = {main = 'Malevolence'}
-sets.Dagger = {main = 'Qutrub Knife'}
-sets.Naegling = {main = 'Naegling'}
+sets.TwashtarM = {
+    main = 'Twashtar'
+}
+sets['Mpu Gandring'] = {
+    main = 'Mpu Gandring'
+}
+sets.Vajra = {
+    main = 'Vajra'
+}
+sets.Tauret = {
+    main = 'Tauret'
+}
+sets.Malevolence = {
+    main = 'Malevolence'
+}
+sets.Dagger = {
+    main = 'Qutrub Knife'
+}
+sets.Naegling = {
+    main = 'Naegling'
+}
 
 -- Sub Weapons / Off-hand
-sets.Tanmogayi = {sub = 'Tanmogayi +1'}
-sets.TwashtarS = {sub = 'Twashtar'}
-sets.Jugo = {sub = 'Jugo Kukri +1'}
-sets.Crepu = {sub = 'Crepuscular Knife'}
-sets.Centovente = {sub = 'Centovente'}
-sets.Blurred = {sub = 'Blurred Knife +1'}
-sets.Gleti = {sub = "Gleti's Knife"}
-sets.Kraken = {sub = "Kraken Club"}
+sets.Tanmogayi = {
+    sub = 'Tanmogayi +1'
+}
+sets.TwashtarS = {
+    sub = 'Twashtar'
+}
+sets.Jugo = {
+    sub = 'Jugo Kukri +1'
+}
+sets.Crepu = {
+    sub = 'Crepuscular Knife'
+}
+sets.Centovente = {
+    sub = 'Centovente'
+}
+sets.Blurred = {
+    sub = 'Blurred Knife +1'
+}
+sets.Gleti = {
+    sub = "Gleti's Knife"
+}
+sets.Kraken = {
+    sub = "Kraken Club"
+}
 
 -- Abyssea Proc Weapons (1-handed with dagger sub for DW)
-sets.Sword = {main = 'Excalipoor', sub = 'Qutrub Knife'}
-sets.Club = {main = 'Chac-Chacs', sub = 'Qutrub Knife'}
-sets.Dagger2 = {main = 'Qutrub Knife', sub = 'Chac-Chacs'}
+sets.Sword = {
+    main = 'Excalipoor',
+    sub = 'Qutrub Knife'
+}
+sets.Club = {
+    main = 'Chac-Chacs',
+    sub = 'Qutrub Knife'
+}
+sets.Dagger2 = {
+    main = 'Qutrub Knife',
+    sub = 'Chac-Chacs'
+}
 
 -- Abyssea Proc Weapons (2-handed with Alber Strap)
-sets['Great Sword'] = {main = 'Lament', sub = 'Alber Strap'}
-sets.Polearm = {main = 'Iapetus', sub = 'Alber Strap'}
-sets.Staff = {main = 'Ram staff', sub = 'Alber Strap'}
-sets.Scythe = {main = 'Lost Sickle', sub = 'Alber Strap'}
-sets.Alber = {sub = 'Alber Strap'}
+sets['Great Sword'] = {
+    main = 'Lament',
+    sub = 'Alber Strap'
+}
+sets.Polearm = {
+    main = 'Iapetus',
+    sub = 'Alber Strap'
+}
+sets.Staff = {
+    main = 'Ram staff',
+    sub = 'Alber Strap'
+}
+sets.Scythe = {
+    main = 'Lost Sickle',
+    sub = 'Alber Strap'
+}
+sets.Alber = {
+    sub = 'Alber Strap'
+}
 
---============================================================--
+-- ============================================================--
 
 --                      IDLE SETS                             --
---============================================================--
+-- ============================================================--
 
 -- Base Idle (Refresh/Regen focus)
 sets.idle = {
@@ -121,131 +188,88 @@ sets.idle = {
 }
 
 -- Town Idle (Movement speed)
-sets.idle.Town =
-    set_combine(
-    sets.idle,
-    {
-        feet = 'Pill. Poulaines +3'
-    }
-)
+sets.idle.Town = set_combine(sets.idle, {
+    feet = 'Pill. Poulaines +4'
+})
 
 -- Regen Idle (HP regeneration focus)
-sets.idle.Regen =
-    set_combine(
-    sets.idle,
-    {
-        head = 'Meghanada Visor +2',
-        body = 'Meg. Cuirie +2',
-        hands = 'Meg. Gloves +2',
-        legs = 'Meg. Chausses +2',
-        feet = 'Meg. Jam. +2',
-        ear1 = 'Dawn Earring',
-        ear2 = 'Infused Earring'
-    }
-)
+sets.idle.Regen = set_combine(sets.idle, {
+    head = 'Meghanada Visor +2',
+    body = 'Meg. Cuirie +2',
+    hands = 'Meg. Gloves +2',
+    legs = 'Meg. Chausses +2',
+    feet = 'Meg. Jam. +2',
+    ear1 = 'Dawn Earring',
+    ear2 = 'Infused Earring'
+})
 
 -- PDT Idle (Physical damage reduction)
-sets.idle.PDT =
-    set_combine(
-    sets.idle,
-    {
-        ring2 = 'Defending Ring'
-    }
-)
+sets.idle.PDT = set_combine(sets.idle, {
+    ring2 = 'Defending Ring'
+})
 
 -- Weak Idle (Low HP)
 sets.idle.Weak = sets.idle
 
---============================================================--
+-- ============================================================--
 
 --                      ENGAGED SETS                          --
---============================================================--
+-- ============================================================--
 
 -- Base Engaged (DPS focus)
 sets.engaged = {
-    ammo = 'Crepuscular Pebble',
-    head = "Skulker's Bonnet +3",
-    body = 'Malignance Tabard',
-    hands = 'Malignance Gloves',
-    legs = 'Malignance Tights',
-    feet = 'Skulk. Poulaines +3',
-    neck = {name = 'Asn. Gorget +2', augments = {'Path: A'}},
-    waist = {name = 'Kentarch Belt +1', augments = {'Path: A'}},
-    ear1 = 'Sherida Earring',
-    ear2 = {
-        name = 'Skulk. Earring +1',
-        augments = {'System: 1 ID: 1676 Val: 0', 'Accuracy+12', 'Mag. Acc.+12', '"Store TP"+4'}
-    },
-    ring1 = 'Defending Ring',
-    ring2 = 'Moonlight Ring',
+    ammo = "Coiste Bodhar",
+    head = "Malignance Chapeau",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Samnuha Tights",
+    feet = "Skulk. Poulaines +3",
+    neck = "Iskur Gorget",
+    waist = "Sailfi Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Skulk. Earring +1",
+    ring1 = MoonlightRing1,
+    ring2 = MoonlightRing2,
     back = Toutatis.STP
 }
 
--- Accuracy Engaged
-sets.engaged.Acc =
-    set_combine(
-    sets.engaged,
-    {
-        waist = 'Kentarch belt +1',
-        ring1 = ChirichRing2,
-        ring2 = 'Gere Ring'
-    }
-)
-
 -- PDT Engaged (Defense while engaged)
 sets.engaged.PDT = {
-    ammo = 'C. Palug Stone',
-    head = "Skulker's Bonnet +3",
-    body = 'Pill. Vest +4',
-    hands = 'Malignance Gloves',
-    legs = 'Skulk. Culottes +3',
-    feet = 'Skulk. Poulaines +3',
-    neck = 'Null Loop',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Domin. Earring +1',
-    ear2 = 'Skulk. Earring +1',
-    ring1 = 'Moonlight Ring',
-    ring2 = 'Moonlight Ring',
+    ammo = "Coiste Bodhar",
+    head = "Malignance Chapeau",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Samnuha Tights",
+    feet = "Skulk. Poulaines +3",
+    neck = "Iskur Gorget",
+    waist = "Sailfi Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Skulk. Earring +1",
+    ring1 = MoonlightRing1,
+    ring2 = MoonlightRing2,
     back = Toutatis.STP
 }
 
 -- PDT + Aftermath Lv.3 (For mythic/empyrean weapons with Aftermath)
 sets.engaged.PDTAFM3 = {
-    ammo = 'Aurgelmir Orb +1',
-    head = 'Malignance Chapeau',
-    body = 'Malignance Tabard',
-    hands = 'Malignance Gloves',
-    legs = 'Malignance Tights',
-    feet = 'Skulk. Poulaines +3',
-    neck = 'Asn. Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Sherida Earring',
-    ear2 = 'Skulk. Earring +1',
-    ring1 = 'Moonlight Ring',
-    ring2 = 'Moonlight Ring',
+    ammo = "Aurgelmir Orb +1",
+    head = "Malignance Chapeau",
+    body = "Malignance Tabard",
+    hands = "Adhemar Wrist. +1",
+    legs = "Malignance Tights",
+    feet = "Skulk. Poulaines +3",
+    neck = "Iskur Gorget",
+    waist = "Windbuffet Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Skulk. Earring +1",
+    ring1 = MoonlightRing1,
+    ring2 = MoonlightRing2,
     back = Toutatis.STP
 }
 
--- Accuracy + PDT
-sets.engaged.Acc.PDT = {
-    ammo = 'Aurgelmir Orb +1',
-    head = "Skulker's Bonnet +3",
-    body = 'Malignance Tabard',
-    hands = 'Skulk. Armlets +3',
-    legs = 'Pill. Culottes +3',
-    feet = 'Skulk. Poulaines +3',
-    neck = "Assassin's Gorget +2",
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Crep. Earring',
-    ear2 = 'Skulk. Earring +1',
-    ring1 = ChirichRing1,
-    ring2 = 'Gere Ring',
-    back = Toutatis.STP
-}
-
---============================================================--
+-- ============================================================--
 --                   PRECAST: JOB ABILITIES                   --
---============================================================--
+-- ============================================================--
 
 sets.precast = {}
 sets.precast.JA = {}
@@ -253,7 +277,10 @@ sets.precast.JA = {}
 -- Sneak Attack
 sets.precast.JA['Sneak Attack'] = {
     ammo = 'Yetshila +1',
-    head = {name = 'Adhemar Bonnet +1', augments = {'STR+12', 'DEX+12', 'Attack+20'}},
+    head = {
+        name = 'Adhemar Bonnet +1',
+        augments = {'STR+12', 'DEX+12', 'Attack+20'}
+    },
     body = "Pillager's Vest +4",
     hands = "Skulker's Armlets +3",
     legs = 'Lustr. Subligar +1',
@@ -262,8 +289,8 @@ sets.precast.JA['Sneak Attack'] = {
     waist = 'Kentarch belt +1',
     ear1 = 'Mache Earring +1',
     ear2 = 'Odr Earring',
-    ring1 = 'Ilabrat Ring',
-    ring2 = 'Regal Ring',
+    ring1 = 'Regal Ring',
+    ring2 = 'Ilabrat Ring',
     back = Toutatis.STP
 }
 
@@ -271,33 +298,49 @@ sets.precast.JA['Sneak Attack'] = {
 sets.precast.JA['Trick Attack'] = {
     ammo = 'Yetshila +1',
     head = "Skulker's Bonnet +3",
-    body = {name = "Plunderer's Vest +4", augments = {'Enhances "Ambush" effect'}},
+    body = {
+        name = "Plunderer's Vest +4",
+        augments = {'Enhances "Ambush" effect'}
+    },
     hands = 'Pill. Armlets +4',
-    legs = "Pillager's Culottes +3",
+    legs = "Pillager's Culottes +4",
     feet = "Skulker's Poulaines +3",
     neck = 'Asn. Gorget +2',
     waist = 'Svelt. Gouriz +1',
     ear1 = 'Dawn Earring',
     ear2 = 'Infused Earring',
-    ring1 = 'Ilabrat Ring',
-    ring2 = 'Regal Ring',
-    back = {name = 'Canny Cape', augments = {'DEX+1', 'AGI+2', '"Dual Wield"+3', 'Crit. hit damage +3%'}}
+    ring1 = 'Regal Ring',
+    ring2 = 'Ilabrat Ring',
+    back = {
+        name = 'Canny Cape',
+        augments = {'DEX+1', 'AGI+2', '"Dual Wield"+3', 'Crit. hit damage +3%'}
+    }
 }
 
 -- Hide
-sets.precast.JA.Hide = {body = 'Pill. Vest +4'}
+sets.precast.JA.Hide = {
+    body = 'Pill. Vest +4'
+}
 
 -- Flee
-sets.precast.JA['Flee'] = {feet = 'Pill. Poulaines +3'}
+sets.precast.JA['Flee'] = {
+    feet = 'Pill. Poulaines +4'
+}
 
 -- Perfect Dodge
 sets.precast.JA['Perfect Dodge'] = {
-    hands = {name = 'Plun. Armlets +3', augments = {'Enhances "Perfect Dodge" effect'}}
+    hands = {
+        name = 'Plun. Armlets +3',
+        augments = {'Enhances "Perfect Dodge" effect'}
+    }
 }
 
 -- Feint
 sets.precast.JA['Feint'] = {
-    legs = {name = 'Plun. Culottes +3', augments = {'Enhances "Feint" effect'}}
+    legs = {
+        name = 'Plun. Culottes +4',
+        augments = {'Enhances "Feint" effect'}
+    }
 }
 
 -- Steal
@@ -305,7 +348,7 @@ sets.precast.JA['Steal'] = {
     neck = 'Pentalagus Charm',
     hands = "Thief's Kote",
     legs = "Assassin's Culottes",
-    feet = 'Pill. Poulaines +3'
+    feet = 'Pill. Poulaines +4'
 }
 
 -- Despoil
@@ -325,13 +368,15 @@ sets.precast.JA['Collaborator'] = {
 sets.precast.JA['Accomplice'] = sets.precast.JA['Collaborator']
 
 -- Conspirator
-sets.precast.JA['Conspirator'] = {body = "skulker's Vest +3"}
+sets.precast.JA['Conspirator'] = {
+    body = "skulker's Vest +3"
+}
 
 -- Animated Flourish / Provoke
 sets.precast.JA['Animated Flourish'] = {
     ammo = 'Sapience Orb',
     head = "Skulker's Bonnet +3",
-    body = "Plunderer's Vest +3",
+    body = "Plunderer's Vest +4",
     hands = "Skulker's Armlets +3",
     legs = "Skulker's culottes +3",
     feet = "Skulker's Poulaines +3",
@@ -381,13 +426,16 @@ sets.precast.Step = {
 
 sets.precast.Flourish1 = sets.precast.JA.Provoke
 
---============================================================--
+-- ============================================================--
 --                   PRECAST: FAST CAST                       --
---============================================================--
+-- ============================================================--
 
 sets.precast.FC = {
     ammo = 'Sapience Orb',
-    head = {name = 'Herculean Helm', augments = {'MND+1', 'Attack+23', '"Treasure Hunter"+2'}},
+    head = {
+        name = 'Herculean Helm',
+        augments = {'MND+1', 'Attack+23', '"Treasure Hunter"+2'}
+    },
     body = 'Dread Jupon',
     hands = 'Leyline Gloves',
     legs = 'Enif Cosciales',
@@ -399,282 +447,291 @@ sets.precast.FC = {
 
 sets.precast.FC.Utsusemi = sets.precast.FC
 
---============================================================--
+-- ============================================================--
 --                   PRECAST: WEAPONSKILLS                    --
---============================================================--
+-- ============================================================--
 
 sets.precast.WS = {}
 
 -- Base WS Set
 sets.precast.WS = {
     ammo = 'Yetshila +1',
-    head = {name = 'Adhemar Bonnet +1', augments = {'STR+12', 'DEX+12', 'Attack+20'}},
+    head = {
+        name = 'Adhemar Bonnet +1',
+        augments = {'STR+12', 'DEX+12', 'Attack+20'}
+    },
     body = "Plunderer's Vest +4",
-    hands = {name = 'Adhemar Wrist. +1', augments = {'STR+12', 'DEX+12', 'Attack+20'}},
-    legs = "Pillager's culottes +3",
-    feet = {name = 'Lustra. Leggings +1', augments = {'HP+65', 'STR+15', 'DEX+15'}},
+    hands = {
+        name = 'Adhemar Wrist. +1',
+        augments = {'STR+12', 'DEX+12', 'Attack+20'}
+    },
+    legs = "Pillager's culottes +4",
+    feet = {
+        name = 'Lustra. Leggings +1',
+        augments = {'HP+65', 'STR+15', 'DEX+15'}
+    },
     neck = 'Fotia Gorget',
     waist = 'Fotia Belt',
     ear1 = MoonShadeEarring,
     ear2 = 'Odr Earring',
-    ring1 = "Cornelia's Ring",
-    ring2 = 'Regal Ring',
-    back = Toutatis.WS1
-}
-
--- Rudra's Storm (Main THF WS - DEX/CHR - Crit damage) --
-
-sets.precast.WS["Rudra's Storm"] = {
-    ammo = 'Aurgelmir Orb +1',
-    head = "Skulker's Bonnet +3",
-    body = "Skulker's Vest +3",
-    hands = 'Meg. Gloves +2',
-    legs = 'Plun. Culottes +3',
-    feet = 'Lustra. Leggings +1',
-    neck = 'Asn. Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Odr Earring',
-    ear2 = 'Moonshade Earring',
-    ring1 = "Cornelia's ring",
-    ring2 = 'Regal Ring',
+    ring1 = 'Regal Ring',
+    ring2 = "Cornelia's Ring",
     back = Toutatis.WS2
 }
 
-sets.precast.WS["Rudra's Storm"].SA =
-    set_combine(
-    sets.precast.WS["Rudra's Storm"],
-    {
-        ammo = 'Yetshila +1',
-        hands = 'Meg. Gloves +2',
-        legs = 'Lustr. Subligar +1',
-        ear1 = 'Domin. Earring +1',
-        ring2 = "Epaminondas's Ring"
-    }
-)
+-- Rudra's Storm (Main THF WS - DEX - Crit damage) --
+sets.precast.WS["Rudra's Storm"] = {
+    ammo = "Aurgelmir Orb +1",
+    head = "Nyame Helm",
+    body = "Skulker's Vest +3",
+    hands = "Skulk. Armlets +3",
+    legs = "Plun. Culottes +4",
+    feet = "Nyame Sollerets",
+    neck = "Loricate Torque +1",
+    waist = "Kentarch Belt +1",
+    ear1 = "Odr Earring",
+    ear2 = "Domin. Earring +1",
+    ring1 = "Defending Ring",
+    ring2 = "Cornelia's ring",
+    back = Toutatis.WS2
+}
 
-sets.precast.WS["Rudra's Storm"].TA =
-    set_combine(
-    sets.precast.WS["Rudra's Storm"],
-    {
-        ammo = 'Yetshila +1',
-        feet = "Gleti's Boots",
-        ear1 = 'Odr Earring',
-        ring2 = "Epaminondas's Ring"
-    }
-)
+sets.precast.WS["Rudra's Storm"].SA = set_combine(sets.precast.WS["Rudra's Storm"], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    legs = "Skulk. Culottes +3",
+    feet = "Nyame Sollerets",
+    neck = "Asn. Gorget +2"
+})
 
-sets.precast.WS["Rudra's Storm"].SATA =
-    set_combine(
-    sets.precast.WS["Rudra's Storm"],
-    {
-        hands = 'Pill. Armlets +4',
-        ammo = 'Yetshila +1'
-    }
-)
+sets.precast.WS["Rudra's Storm"].TA = set_combine(sets.precast.WS["Rudra's Storm"], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    feet = "Skulk. Poulaines +3",
+    ear1 = "Odnowa Earring +1"
+})
+
+sets.precast.WS["Rudra's Storm"].SATA = set_combine(sets.precast.WS["Rudra's Storm"], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    legs = "Skulk. Culottes +3",
+    ear1 = "Odnowa Earring +1",
+    ear2 = "Domin. Earring +1",
+    ring1 = "Regal Ring",
+    ring2 = "Cornelia's ring",
+})
 
 -- Evisceration (Multi-hit crit WS) --
-
 sets.precast.WS['Evisceration'] = {
-    ammo = 'Yetshila +1',
-    head = "Skulker's Bonnet +3",
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
     body = "Plunderer's Vest +4",
-    hands = 'Mummu Wrists +2',
-    legs = "Gleti's Breeches",
-    feet = 'Lustra. Leggings +1',
-    neck = 'Fotia Gorget',
-    waist = 'Fotia Belt',
-    ear1 = 'Sherida Earring',
-    ear2 = 'Odr Earring',
-    ring1 = 'Mummu Ring',
-    ring2 = 'Regal Ring',
-    back = Toutatis.WS1
-}
-
-sets.precast.WS['Evisceration'].SA =
-    set_combine(
-    sets.precast.WS['Evisceration'],
-    {
-        hands = "Skulker's Armlets +3"
-    }
-)
-
-sets.precast.WS['Evisceration'].TA =
-    set_combine(
-    sets.precast.WS['Evisceration'],
-    {
-        hands = 'Pill. Armlets +4'
-    }
-)
-
-sets.precast.WS['Evisceration'].SATA =
-    set_combine(
-    sets.precast.WS['Evisceration'],
-    {
-        hands = 'Pill. Armlets +4'
-    }
-)
-
--- Exenterator (Multi-hit AGI WS) --
-
-sets.precast.WS['Exenterator'] = {
-    ammo = 'Aurgelmir Orb +1',
-    head = "Skulker's Bonnet +3",
-    body = "Skulker's Vest +3",
-    hands = 'Skulk. Armlets +3',
-    legs = 'Meg. Chausses +2',
-    feet = 'Skulk. Poulaines +3',
-    neck = 'Fotia Gorget',
-    waist = 'Fotia Belt',
-    ear1 = 'Sherida Earring',
-    ear2 = 'Skulk. Earring +1',
-    ring1 = 'Gere Ring',
-    ring2 = 'Regal Ring',
+    hands = "Skulk. Armlets +3",
+    legs = "Skulk. Culottes +3",
+    feet = "Skulk. Poulaines +3",
+    neck = "Asn. Gorget +2",
+    waist = "Sailfi Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Skulk. Earring +1",
+    ring1 = "Regal Ring",
+    ring2 = "Moonlight Ring",
     back = Toutatis.WS2
 }
 
-sets.precast.WS['Exenterator'].SA =
-    set_combine(
-    sets.precast.WS['Exenterator'],
-    {
-        ammo = 'C. Palug Stone',
-        legs = 'Plun. Culottes +3',
-        ring1 = 'Ilabrat Ring'
-    }
-)
+sets.precast.WS['Evisceration'].SA = set_combine(sets.precast.WS['Evisceration'], {
+    waist = "Kentarch Belt +1",
+    ear2 = "Domin. Earring +1"
+})
 
-sets.precast.WS['Exenterator'].TA =
-    set_combine(
-    sets.precast.WS['Exenterator'],
-    {
-        ammo = 'C. Palug Stone',
-        hands = 'Pill. Armlets +4',
-        ring1 = 'Ilabrat Ring'
-    }
-)
+sets.precast.WS['Evisceration'].TA = set_combine(sets.precast.WS['Evisceration'], {
+    legs = "Pill. Culottes +4",
+    ear1 = "Odnowa Earring +1",
+    ear2 = "Odr Earring",
+    ring1 = "Defending Ring",
+    ring2 = "Moonlight Ring"
+})
 
-sets.precast.WS['Exenterator'].SATA = sets.precast.WS['Exenterator'].SA
+sets.precast.WS['Evisceration'].SATA = set_combine(sets.precast.WS['Evisceration'], {
+    waist = "Kentarch Belt +1",
+    ear2 = "Domin. Earring +1"
+})
+
+-- Exenterator (Multi-hit AGI WS) --
+sets.precast.WS['Exenterator'] = {
+    ammo = "Coiste Bodhar",
+    head = "Skulker's Bonnet +3",
+    body = "Skulker's Vest +3",
+    hands = "Skulk. Armlets +3",
+    legs = "Meg. Chausses +2",
+    feet = "Skulk. Poulaines +3",
+    neck = "Asn. Gorget +2",
+    waist = "Sailfi Belt +1",
+    ear1 = "Odnowa Earring +1",
+    ear2 = "Skulk. Earring +1",
+    ring1 = "Regal Ring",
+    ring2 = "Defending Ring",
+    back = Toutatis.WS2
+}
+
+sets.precast.WS['Exenterator'].SA = set_combine(sets.precast.WS['Exenterator'], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    legs = "Skulk. Culottes +3",
+    ear1 = "Sherida Earring",
+    ear2 = "Skulk. Earring +1",
+    ring2 = "Moonlight Ring"
+})
+
+sets.precast.WS['Exenterator'].TA = set_combine(sets.precast.WS['Exenterator'], {
+    ammo = "Crepuscular Pebble",
+    head = "Pill. Bonnet +4",
+    hands = "Pill. Armlets +4",
+    legs = "Skulk. Culottes +3"
+})
+
+sets.precast.WS['Exenterator'].SATA = set_combine(sets.precast.WS['Exenterator'], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    body = "Plunderer's Vest +4",
+    legs = "Skulk. Culottes +3",
+    ear1 = "Sherida Earring",
+    ear2 = "Odr Earring",
+    ring2 = "Moonlight Ring"
+})
 
 -- Savage Blade (STR/MND WS for Naegling) --
 
 sets.precast.WS['Savage Blade'] = {
-    ammo = "Oshasha's treatise",
-    head = 'Pill. Bonnet +4',
-    body = "skulker's Vest +3",
-    hands = 'Meg. Gloves +2',
-    legs = 'Plun. Culottes +3',
-    feet = 'Lustra. Leggings +1',
-    neck = 'Asn. Gorget +2',
-    waist = 'Kentarch belt +1',
-    ear1 = MoonShadeEarring,
-    ear2 = 'Odr Earring',
-    ring1 = "Cornelia's Ring",
-    ring2 = 'Regal Ring',
+    ammo = "Seeth. Bomblet +1",
+    head = "Plun. Bonnet +4",
+    body = "Skulker's Vest +3",
+    hands = "Skulk. Armlets +3",
+    legs = "Plun. Culottes +4",
+    feet = "Skulk. Poulaines +3",
+    neck = "Loricate Torque +1",
+    waist = "Sailfi Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Odnowa Earring +1",
+    ring1 = "Defending Ring",
+    ring2 = "Cornelia's ring",
     back = Toutatis.WS2
 }
+
+sets.precast.WS['Savage Blade'].SA = set_combine(sets.precast.WS['Savage Blade'], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    legs = "Skulk. Culottes +3",
+    neck = "Null Loop",
+    ear1 = "Sherida Earring",
+    ear2 = "Ishvara Earring",
+    ring1 = "Regal Ring"
+})
+
+sets.precast.WS['Savage Blade'].TA = set_combine(sets.precast.WS['Savage Blade'], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    neck = "Null Loop",
+    ear1 = "Ishvara Earring"
+})
+
+sets.precast.WS['Savage Blade'].SATA = set_combine(sets.precast.WS['Savage Blade'], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    ear1 = "Ishvara Earring",
+    ear2 = "Odnowa Earring +1",
+    ring1 = "Defending Ring",
+    ring2 = "Cornelia's ring"
+})
 
 -- Shark Bite (DEX/MND WS) --
 
 sets.precast.WS['Shark Bite'] = {
-    ammo = 'Aurgelmir Orb +1',
-    head = "Skulker's Bonnet +3",
+    ammo = "Coiste Bodhar",
+    head = "Pill. Bonnet +4",
     body = "Skulker's Vest +3",
-    hands = 'Meg. Gloves +2',
-    legs = 'Plun. Culottes +3',
-    feet = 'Skulk. Poulaines +3',
-    neck = 'Asn. Gorget +2',
-    waist = 'Sailfi Belt +1',
-    ear1 = 'Sherida Earring',
-    ear2 = 'Moonshade Earring',
-    ring1 = "Cornelia's ring",
-    ring2 = 'Regal Ring',
+    hands = "Skulk. Armlets +3",
+    legs = "Plun. Culottes +4",
+    feet = "Skulk. Poulaines +3",
+    neck = "Loricate Torque +1",
+    waist = "Sailfi Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Odnowa Earring +1",
+    ring1 = "Defending Ring",
+    ring2 = "Cornelia's ring",
     back = Toutatis.WS2
 }
 
-sets.precast.WS['Shark Bite'].SA =
-    set_combine(
-    sets.precast.WS['Shark Bite'],
-    {
-        ammo = 'Yetshila +1',
-        feet = "Gleti's Boots",
-        waist = 'Kentarch Belt +1',
-        ear1 = 'Odr Earring',
-        ring2 = "Epaminondas's Ring"
-    }
-)
+sets.precast.WS['Shark Bite'].SA = set_combine(sets.precast.WS['Shark Bite'], {
+    ammo = "Yetshila +1",
+    waist = "Kentarch Belt +1",
+    ear1 = "Ishvara Earring"
+})
 
-sets.precast.WS['Shark Bite'].TA =
-    set_combine(
-    sets.precast.WS['Shark Bite'],
-    {
-        ammo = 'Yetshila +1',
-        waist = 'Kentarch Belt +1',
-        ear1 = 'Ishvara Earring',
-        ring2 = "Epaminondas's Ring"
-    }
-)
+sets.precast.WS['Shark Bite'].TA = set_combine(sets.precast.WS['Shark Bite'], {
+    ammo = "Yetshila +1",
+    ear1 = "Ishvara Earring",
+    ear2 = "Odnowa Earring +1"
+})
 
-sets.precast.WS['Shark Bite'].SATA =
-    set_combine(
-    sets.precast.WS['Shark Bite'],
-    {
-        hands = 'Pill. Armlets +4',
-        ammo = 'Yetshila +1'
-    }
-)
+sets.precast.WS['Shark Bite'].SATA = set_combine(sets.precast.WS['Shark Bite'], {
+    ammo = "Yetshila +1",
+    waist = "Kentarch Belt +1",
+    ear1 = "Ishvara Earring",
+    ear2 = "Odnowa Earring +1"
+})
 
--- Mandalic Stab (DEX/INT WS) --
-
+-- Mandalic Stab (DEX WS)
 sets.precast.WS['Mandalic Stab'] = {
-    ammo = 'Crepuscular Pebble',
-    head = "Skulker's Bonnet +3",
+    ammo = "Coiste Bodhar",
+    head = "Nyame Helm",
     body = "Skulker's Vest +3",
-    hands = 'Malignance Gloves',
-    legs = "Gleti's Breeches",
-    feet = "Gleti's Boots",
-    neck = 'Asn. Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Odr Earring',
-    ear2 = 'Dominance Earring +1',
-    ring1 = "Cornelia's ring",
-    ring2 = "Epaminondas's Ring",
+    hands = "Skulk. Armlets +3",
+    legs = "Plun. Culottes +4",
+    feet = "Skulk. Poulaines +3",
+    neck = "Asn. Gorget +2",
+    waist = "Sailfi Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Odnowa Earring +1",
+    ring1 = "Defending Ring",
+    ring2 = "Cornelia's ring",
     back = Toutatis.WS2
 }
 
-sets.precast.WS['Mandalic Stab'].SA =
-    set_combine(
-    sets.precast.WS['Mandalic Stab'],
-    {
-        ammo = 'Yetshila +1',
-        legs = 'Plun. Culottes +3',
-        feet = 'Lustra. Leggings +1',
-        ear2 = 'Domin. Earring +1'
-    }
-)
+-- Mandalic Stab SA
+sets.precast.WS['Mandalic Stab'].SA = set_combine(sets.precast.WS['Mandalic Stab'], {
+    ammo = "Crepuscular Pebble",
+    head = "Pill. Bonnet +4",
+    feet = "Nyame Sollerets",
+    neck = "Loricate Torque +1",
+    waist = "Kentarch Belt +1",
+    ear1 = "Odr Earring",
+    ear2 = "Odnowa Earring +1"
+})
 
-sets.precast.WS['Mandalic Stab'].TA =
-    set_combine(
-    sets.precast.WS['Mandalic Stab'],
-    {
-        ammo = 'Yetshila +1',
-        legs = 'Plun. Culottes +3',
-        feet = "Gleti's Boots",
-        ear2 = 'Domin. Earring +1'
-    }
-)
+-- Mandalic Stab TA
+sets.precast.WS['Mandalic Stab'].TA = set_combine(sets.precast.WS['Mandalic Stab'], {
+    ammo = "Yetshila +1",
+    head = "Pill. Bonnet +4",
+    legs = "Gleti's Breeches",
+    waist = "Kentarch Belt +1",
+    ear1 = "Odr Earring",
+    ear2 = "Domin. Earring +1"
+})
 
-sets.precast.WS['Mandalic Stab'].SATA =
-    set_combine(
-    sets.precast.WS['Mandalic Stab'],
-    {
-        hands = 'Pill. Armlets +4',
-        ammo = 'Yetshila +1'
-    }
-)
+-- Mandalic Stab SATA
+sets.precast.WS['Mandalic Stab'].SATA = set_combine(sets.precast.WS['Mandalic Stab'], {
+    ammo = "Crepuscular Pebble",
+    head = "Pill. Bonnet +4",
+    body = "Gleti's Cuirass",
+    feet = "Nyame Sollerets",
+    waist = "Kentarch Belt +1",
+    ear1 = "Odr Earring",
+    ear2 = "Domin. Earring +1"
+})
 
 -- Aeolian Edge (Magical WS) --
-
 sets.precast.WS['Aeolian Edge'] = {
-    ammo = "Oshasha's treatise",
+    ammo = "Seeth. Bomblet +1",
     head = 'Nyame Helm',
     body = 'Nyame Mail',
     hands = 'Nyame Gauntlets',
@@ -693,21 +750,13 @@ sets.precast.WS['Aeolian Edge'] = {
 
 sets.precast.WS['Dancing Edge'] = sets.precast.WS
 
-sets.precast.WS['Dancing Edge'].SA =
-    set_combine(
-    sets.precast.WS['Dancing Edge'],
-    {
-        hands = "Skulker's Armlets +3"
-    }
-)
+sets.precast.WS['Dancing Edge'].SA = set_combine(sets.precast.WS['Dancing Edge'], {
+    hands = "Skulker's Armlets +3"
+})
 
-sets.precast.WS['Dancing Edge'].TA =
-    set_combine(
-    sets.precast.WS['Dancing Edge'],
-    {
-        hands = 'Pill. Armlets +4'
-    }
-)
+sets.precast.WS['Dancing Edge'].TA = set_combine(sets.precast.WS['Dancing Edge'], {
+    hands = 'Pill. Armlets +4'
+})
 
 sets.precast.WS['Dancing Edge'].SATA = sets.precast.WS['Dancing Edge'].TA
 
@@ -719,19 +768,22 @@ sets.precast.WS['Circle Blade'] = {
     body = "skulker's Vest +3",
     hands = "Skulker's Armlets +3",
     legs = 'Pill. Culottes +3',
-    feet = {name = 'Plun. Poulaines +3', augments = {"Enhances \"Assassin's Charge\" effect"}},
+    feet = {
+        name = 'Plun. Poulaines +3',
+        augments = {"Enhances \"Assassin's Charge\" effect"}
+    },
     neck = 'Fotia Gorget',
     waist = 'Fotia Belt',
     ear1 = 'Ishvara Earring',
     ear2 = "Skulker's Earring +1",
     ring1 = 'Ilabrat Ring',
     ring2 = 'Mummu Ring',
-    back = Toutatis.WS1
+    back = Toutatis.WS2
 }
 
---============================================================--
+-- ============================================================--
 --                   PRECAST: RANGED ATTACK                   --
---============================================================--
+-- ============================================================--
 
 sets.precast.RA = {
     range = 'Exalted Crossbow',
@@ -750,18 +802,14 @@ sets.precast.RA = {
     back = 'Sacro mantle'
 }
 
-sets.precast.RATH =
-    set_combine(
-    sets.precast.RA,
-    {
-        feet = "Skulker's Poulaines +3"
-    }
-)
+sets.precast.RATH = set_combine(sets.precast.RA, {
+    feet = "Skulker's Poulaines +3"
+})
 
---============================================================--
+-- ============================================================--
 
 --                      MIDCAST SETS                          --
---============================================================--
+-- ============================================================--
 
 sets.midcast = {}
 
@@ -794,30 +842,26 @@ sets.midcast.FastRecast = {
 
 sets.midcast.Utsusemi = sets.midcast.FastRecast
 
---============================================================--
+-- ============================================================--
 
 --                      MOVEMENT SETS                         --
---============================================================--
+-- ============================================================--
 
 -- Base Movement Speed
 sets.MoveSpeed = {
-    feet = 'Pill. Poulaines +3',
+    feet = 'Pill. Poulaines +4',
     ring1 = 'Defending Ring'
 }
 
 -- Adoulin Movement (City-specific speed boost)
-sets.Adoulin =
-    set_combine(
-    sets.MoveSpeed,
-    {
-        body = "Councilor's Garb"
-    }
-)
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"
+})
 
---============================================================--
+-- ============================================================--
 
 --                      BUFF SETS                             --
---============================================================--
+-- ============================================================--
 
 sets.buff = {}
 sets.buff['Sneak Attack'] = sets.precast.JA['Sneak Attack']
@@ -831,9 +875,9 @@ sets.buff.Doom = {
     waist = 'Gishdubar Sash'
 }
 
---============================================================--
+-- ============================================================--
 --                   TREASURE HUNTER SETS                     --
---============================================================--
+-- ============================================================--
 
 -- Base TreasureHunter
 sets.TreasureHunter = {
@@ -843,34 +887,22 @@ sets.TreasureHunter = {
 -- TH with SA/TA (Combined sets)
 sets.TreasureHunterSA = set_combine(sets.TreasureHunter, sets.precast.JA['Sneak Attack'])
 sets.TreasureHunterTA = set_combine(sets.TreasureHunter, sets.precast.JA['Trick Attack'])
-sets.TreasureHunterSATA =
-    set_combine(sets.TreasureHunter, sets.precast.JA['Sneak Attack'], sets.precast.JA['Trick Attack'])
+sets.TreasureHunterSATA = set_combine(sets.TreasureHunter, sets.precast.JA['Sneak Attack'],
+    sets.precast.JA['Trick Attack'])
 
 -- TH Ranged
-sets.TreasureHunterRA =
-    set_combine(
-    sets.precast.RA,
-    {
-        feet = "Skulker's Poulaines +3"
-    }
-)
+sets.TreasureHunterRA = set_combine(sets.precast.RA, {
+    feet = "Skulker's Poulaines +3"
+})
 
-sets.midcast.RA.TH =
-    set_combine(
-    sets.precast.RA,
-    {
-        feet = "Skulker's Poulaines +3"
-    }
-)
+sets.midcast.RA.TH = set_combine(sets.precast.RA, {
+    feet = "Skulker's Poulaines +3"
+})
 
 -- Aeolian Edge TH
-sets.AeolianTH =
-    set_combine(
-    sets.precast.WS['Aeolian Edge'],
-    {
-        feet = "Skulker's Poulaines +3"
-    }
-)
+sets.AeolianTH = set_combine(sets.precast.WS['Aeolian Edge'], {
+    feet = "Skulker's Poulaines +3"
+})
 
 -- Engaged with TH
 sets.engaged.TH = set_combine(sets.engaged, sets.TreasureHunter)

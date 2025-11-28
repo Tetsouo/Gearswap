@@ -31,8 +31,6 @@
 ---============================================================================
 --- INITIALIZATION
 ---============================================================================
---- Track if this is initial setup (prevents double init on subjob change)
-local is_initial_setup = true
 
 --- Load global configurations with fallbacks
 local _, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
@@ -162,70 +160,54 @@ function user_setup()
     local RUNStates = require('Tetsouo/config/run/RUN_STATES')
     RUNStates.configure()
 
-    if is_initial_setup then
-        -- TEST: Load keybinds only (no UI)
-        coroutine.schedule(function()
-            local success, keybinds = pcall(require, 'Tetsouo/config/run/RUN_KEYBINDS')
-            if success and keybinds then
-                RUNKeybinds = keybinds
-                RUNKeybinds.bind_all()
-                print('[RUN] Keybinds loaded (no UI)')
-            end
-        end, 0.5)
-
-        -- Initialize UI (use init() instead of smart_init() to avoid stack overflow)
-        coroutine.schedule(function()
-            local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-            if ui_success and KeybindUI then
-                -- Use init() directly instead of smart_init()
-                KeybindUI.init("RUN")
-            end
-        end, 2.0)
-
-        -- Initialize JobChangeManager
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = RUNKeybinds,
-                    ui = KeybindUI,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = RUNKeybinds,
-                            ui = KeybindUI,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
+    -- ==========================================================================
+    -- KEYBINDS LOADING (Always executed after reload, deferred)
+    -- ==========================================================================
+    coroutine.schedule(function()
+        local success, keybinds = pcall(require, 'Tetsouo/config/run/RUN_KEYBINDS')
+        if success and keybinds then
+            RUNKeybinds = keybinds
+            RUNKeybinds.bind_all()
         end
+    end, 0.5)
 
-        -- Initialize Universal Warp System (auto-detects 81 warp actions)
-        local warp_success, WarpInit = pcall(require, 'shared/utils/warp/warp_init')
-        if warp_success and WarpInit then
-            WarpInit.init()
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload, deferred)
+    -- ==========================================================================
+    coroutine.schedule(function()
+        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+        if ui_success and KeybindUI then
+            KeybindUI.init("RUN")
         end
+    end, 2.0)
 
-        is_initial_setup = false
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
+        end
     end
+
+    -- ==========================================================================
+    -- WARP SYSTEM INITIALIZATION (REMOVED - Redundant with full GearSwap reload)
+    -- ==========================================================================
+    -- WarpInit previously handled equipment locking during warp/teleport actions.
+    -- With JobChangeManager's full reload strategy (windower.send_command('lua reload gearswap')),
+    -- warp protection is no longer necessary as any state is cleared on reload.
+    -- Removed for consistency across all 15 jobs (no job uses WarpInit anymore).
+    --
+    -- local warp_success, WarpInit = pcall(require, 'shared/utils/warp/warp_init')
+    -- if warp_success and WarpInit then
+    --     WarpInit.init()
+    -- end
 end
 
 ---============================================================================
@@ -248,20 +230,12 @@ function init_gear_sets()
 end
 
 function file_unload()
-    -- Cancel pending operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind keybinds
-    if RUNKeybinds then
-        RUNKeybinds.unbind_all()
-    end
-
-    -- Cleanup UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end

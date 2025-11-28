@@ -23,11 +23,10 @@
 ---     • Movement sets (Base speed, Adoulin)
 ---     • Buff sets (Doom resistance)
 ---   @file    jobs/geo/sets/geo_sets.lua
----   @author  Tetsouo
+---   @author  Kaories
 ---   @version 3.0 - Standardized Organization
 ---   @date    Updated: 2025-11-10
 ---  ═════════════════════════════════════════════════════════════════════════
-
 sets = {}
 
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -112,7 +111,6 @@ sets.luopan.idle = {
         augments = {'INT+20', 'Mag. Acc+20 /Mag. Dmg.+20', 'INT+10', 'Pet: "Regen"+10', 'Pet: "Regen"+5'}
     }
 }
-
 
 -- • Legacy idle sets for compatibility (point to new structure)
 sets.idle = {}
@@ -291,6 +289,26 @@ sets.midcast.Geomancy = sets.luopan.idle
 -- • Indi spells (self bubble)
 sets.midcast.Indi = sets.luopan.idle
 
+-- • Indi via Entrust (on party member - max duration/potency)
+-- When using Entrust + Indi on someone else, prioritize effect duration
+sets.midcast.Indi.Entrust = set_combine(sets.midcast.Indi, {
+    main = "Gada",
+    sub = "Genmei Shield",
+    range = "Dunna",
+    head = "Azimuth Hood +3",
+    body = "Azimuth Coat +3",
+    hands = "Geo. Mitaines +4",
+    legs = "Bagua Pants +3",
+    feet = "Azimuth Gaiters +3",
+    neck = "Bagua Charm +2",
+    waist = "Plat. Mog. Belt",
+    left_ear = "Regal Earring",
+    right_ear = "Azimuth Earring +1",
+    left_ring = "Woltaris Ring",
+    right_ring = "Gurebu's Ring",
+    back = "Lifestream Cape",
+})
+
 -- • Geo spells (Luopan bubble)
 sets.midcast.Geo = set_combine(sets.midcast.Geomancy, {})
 
@@ -374,25 +392,21 @@ sets.precast.WS = {
 }
 
 -- • Exudation (Club magic WS)
-sets.precast.WS['Exudation'] =
-    set_combine(
-    sets.precast.WS,
-    {
-        ammo = 'Crepuscular Pebble',
-        head = 'Nyame Helm',
-        body = 'Nyame Mail',
-        hands = 'Nyame Gauntlets',
-        legs = 'Nyame Flanchard',
-        feet = 'Nyame Sollerets',
-        neck = 'Fotia Gorget',
-        waist = 'Fotia Belt',
-        ear1 = 'Malignance Earring',
-        ear2 = 'Regal Earring',
-        ring1 = 'Metamor. Ring +1',
-        ring2 = "Epaminondas's Ring",
-        back = "Nantosuelta's Cape"
-    }
-)
+sets.precast.WS['Exudation'] = set_combine(sets.precast.WS, {
+    ammo = 'Crepuscular Pebble',
+    head = 'Nyame Helm',
+    body = 'Nyame Mail',
+    hands = 'Nyame Gauntlets',
+    legs = 'Nyame Flanchard',
+    feet = 'Nyame Sollerets',
+    neck = 'Fotia Gorget',
+    waist = 'Fotia Belt',
+    ear1 = 'Malignance Earring',
+    ear2 = 'Regal Earring',
+    ring1 = 'Metamor. Ring +1',
+    ring2 = "Epaminondas's Ring",
+    back = "Nantosuelta's Cape"
+})
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- MOVEMENT SETS
@@ -400,24 +414,20 @@ sets.precast.WS['Exudation'] =
 
 -- • Base Movement Speed
 sets.MoveSpeed = {
-    feet = 'Geo. Sandals +3' -- Movement +18%
+    feet = 'Geo. Sandals +4' -- Movement +18%
 }
 
 -- • Town Idle (Movement speed)
 sets.me.idle.Town = set_combine(sets.me.idle, {
-    feet = 'Geo. Sandals +3'
+    feet = 'Geo. Sandals +4'
 })
 
 sets.idle.Town = sets.me.idle.Town
 
 -- • Adoulin Movement (City-specific speed boost)
-sets.Adoulin =
-    set_combine(
-    sets.MoveSpeed,
-    {
-        body = "Councilor's Garb"
-    }
-)
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"
+})
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- BUFF SETS

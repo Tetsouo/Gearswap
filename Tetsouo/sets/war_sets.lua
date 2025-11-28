@@ -60,6 +60,10 @@ Cichol = {
         name = "Cichol's Mantle",
         augments = {'STR+20', 'Accuracy+20 Attack+20', 'STR+10', 'Weapon skill damage +10%', 'Phys. dmg. taken-10%'}
     },
+    LessEnmnity = { 
+        name= "Cichol's Mantle", 
+        augments= {'Eva.+20 /Mag. Eva.+20','Mag. Evasion+10','Enmity-10','Phys. dmg. taken-10%',}
+    },
 }
 
 local MoonlightRing1 = {name = 'Moonlight Ring', bag = 'wardrobe 2'}
@@ -306,6 +310,7 @@ sets.LessEnmity = {
     ear1 = "Sortiarius Earring",
     ring1 = "Cacoethic Ring",
     ring2 = "Prolix Ring",
+    back = Cichol.LessEnmnity,
 
 }
 

@@ -39,13 +39,6 @@
 -- INITIALIZATION
 ---============================================================================
 
--- Track if this is initial setup (prevents double init on sub job change)
--- Use global variable to persist across file reloads
-if _G.BLM_initial_setup == nil then
-    _G.BLM_initial_setup = true
-end
-local is_initial_setup = _G.BLM_initial_setup
-
 -- Load lockstyle timing configuration
 local lockstyle_config_success, LockstyleConfig = pcall(require, 'Tetsouo/config/LOCKSTYLE_CONFIG')
 if not lockstyle_config_success or not LockstyleConfig then
@@ -86,33 +79,27 @@ function get_sets()
 
     mote_include_version = 2
     include('Mote-Include.lua')
-    Profiler.mark('After Mote-Include')
     include('../shared/utils/core/INIT_SYSTEMS.lua')
-    Profiler.mark('After INIT_SYSTEMS')
 
     -- ============================================
     -- UNIVERSAL DATA ACCESS (All Spells/Abilities/Weaponskills)
     -- ============================================
     require('shared/utils/data/data_loader')
-    Profiler.mark('After data_loader')
 
     -- ============================================
     -- UNIVERSAL SPELL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_spell_messages.lua')
-    Profiler.mark('After spell messages')
 
     -- ============================================
     -- UNIVERSAL ABILITY MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ability_messages.lua')
-    Profiler.mark('After ability messages')
 
     -- ============================================
     -- UNIVERSAL WEAPONSKILL MESSAGES (All Jobs/Subjobs)
     -- ============================================
     include('../shared/hooks/init_ws_messages.lua')
-    Profiler.mark('After WS messages')
 
     _G.LockstyleConfig = LockstyleConfig
     _G.RECAST_CONFIG = require('Tetsouo/config/RECAST_CONFIG')
@@ -128,7 +115,6 @@ function get_sets()
 
     -- Load job-specific functions (AutoMove loaded via INIT_SYSTEMS)
     include('../shared/jobs/blm/functions/blm_functions.lua')
-    Profiler.mark('After blm_functions')
 
     -- Register BLM lockstyle cancel function
     if jcm_success and JobChangeManager and cancel_blm_lockstyle_operations then
@@ -137,8 +123,6 @@ function get_sets()
 
     -- Note: Macro/lockstyle are handled by JobChangeManager on job changes
     -- Initial load will be handled by JobChangeManager after initialization
-
-    Profiler.finish()
 end
 
 ---============================================================================
@@ -170,13 +154,13 @@ function job_sub_job_change(newSubjob, oldSubjob)
         -- Trigger job change sequence (handles lockstyle, macros, keybinds, UI)
         local main_job = player and player.main_job or "BLM"
         JobChangeManager.on_job_change(main_job, newSubjob)
-    
+    end
+
     -- DUALBOX: Send job update to MAIN character after subjob change
     local db_success, DualBoxManager = pcall(require, 'shared/utils/dualbox/dualbox_manager')
     if db_success and DualBoxManager then
         DualBoxManager.send_job_update()
     end
-end
 end
 
 ---============================================================================
@@ -187,65 +171,43 @@ function user_setup()
     -- ==========================================================================
     -- STATE DEFINITIONS (Loaded from BLM_STATES.lua)
     -- ==========================================================================
-
     local BLMStates = require('Tetsouo/config/blm/BLM_STATES')
     BLMStates.configure()
 
-    if is_initial_setup then
-        -- KEYBIND LOADING
-        local success, keybinds = pcall(require, 'Tetsouo/config/blm/BLM_KEYBINDS')
-        if success and keybinds then
-            BLMKeybinds = keybinds
-            BLMKeybinds.bind_all()
-        else
-            add_to_chat(167, '[BLM] Warning: Failed to load keybinds')
+    -- ==========================================================================
+    -- KEYBIND LOADING (Always executed after reload)
+    -- ==========================================================================
+    local success, keybinds = pcall(require, 'Tetsouo/config/blm/BLM_KEYBINDS')
+    if success and keybinds then
+        BLMKeybinds = keybinds
+        BLMKeybinds.bind_all()
+    else
+        add_to_chat(167, '[BLM] Warning: Failed to load keybinds')
+    end
+
+    -- ==========================================================================
+    -- UI INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
+    if ui_success and KeybindUI then
+        KeybindUI.smart_init("BLM", UIConfig.init_delay)
+    else
+        add_to_chat(167, '[BLM] WARNING: Failed to load UI_MANAGER!')
+    end
+
+    -- ==========================================================================
+    -- JOB CHANGE MANAGER INITIALIZATION (Always executed after reload)
+    -- ==========================================================================
+    local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
+    if jcm_success and JobChangeManager then
+        -- Initialize with current job state
+        JobChangeManager.initialize()
+
+        -- Trigger initial macrobook/lockstyle with delay
+        if player and select_default_macro_book and select_default_lockstyle then
+            select_default_macro_book()
+            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
         end
-
-        -- UI INITIALIZATION - Handled by JobChangeManager, no need to call here
-        -- JobChangeManager will call init() after job changes
-        local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-        if not ui_success or not KeybindUI then
-            add_to_chat(167, '[BLM] WARNING: Failed to load UI_MANAGER!')
-        end
-
-        -- JOB CHANGE MANAGER INITIALIZATION
-        local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
-        if jcm_success and JobChangeManager then
-            -- Check if functions are loaded (they should be after get_sets completes)
-            if select_default_lockstyle and select_default_macro_book then
-                JobChangeManager.initialize({
-                    keybinds = BLMKeybinds,
-                    ui = KeybindUI,
-                    lockstyle = select_default_lockstyle,
-                    macrobook = select_default_macro_book
-                })
-
-                -- Trigger initial macrobook/lockstyle with delay
-                if player then
-                    select_default_macro_book()
-                    coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                end
-            else
-                -- Functions not loaded yet, schedule for later
-                coroutine.schedule(function()
-                    if select_default_lockstyle and select_default_macro_book then
-                        JobChangeManager.initialize({
-                            keybinds = BLMKeybinds,
-                            ui = KeybindUI,
-                            lockstyle = select_default_lockstyle,
-                            macrobook = select_default_macro_book
-                        })
-                        if player then
-                            select_default_macro_book()
-                            coroutine.schedule(select_default_lockstyle, LockstyleConfig.initial_load_delay)
-                        end
-                    end
-                end, 0.2)
-            end
-        end
-
-        _G.BLM_initial_setup = false
-        is_initial_setup = false
     end
 end
 
@@ -257,6 +219,13 @@ end
 --- Updates the UI to reflect current state values
 --- Note: Movement gear is handled passively via customize_idle_set() in BLM_IDLE.lua
 function job_update(cmdParams, eventArgs)
+    -- DEBUG: Track timing from AutoMove
+    local debug_start = nil
+    if _G.AUTOMOVE_DEBUG and _G.AUTOMOVE_DEBUG_START then
+        debug_start = os.clock()
+        add_to_chat(207, string.format('[job_update] ENTER | dt from AutoMove=%.3fms', (debug_start - _G.AUTOMOVE_DEBUG_START) * 1000))
+    end
+
     -- Handle Combat Mode weapon locking
     if state.CombatMode then
         if state.CombatMode.current == "On" then
@@ -271,7 +240,18 @@ function job_update(cmdParams, eventArgs)
     -- Update UI when states change (F9, F10, etc.)
     local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
     if ui_success and KeybindUI and KeybindUI.update then
-        KeybindUI.update()
+        if _G.AUTOMOVE_DEBUG then
+            local t1 = os.clock()
+            KeybindUI.update()
+            add_to_chat(207, string.format('[job_update] UI.update took %.3fms', (os.clock() - t1) * 1000))
+        else
+            KeybindUI.update()
+        end
+    end
+
+    -- DEBUG: Track total job_update time
+    if _G.AUTOMOVE_DEBUG and debug_start then
+        add_to_chat(207, string.format('[job_update] EXIT | total=%.3fms', (os.clock() - debug_start) * 1000))
     end
 end
 
@@ -288,20 +268,12 @@ end
 ---============================================================================
 
 function file_unload()
-    -- Cancel all pending operations
+    -- Cancel pending job change operations (debounce timer + lockstyles)
     local jcm_success, JobChangeManager = pcall(require, 'shared/utils/core/job_change_manager')
     if jcm_success and JobChangeManager then
         JobChangeManager.cancel_all()
     end
 
-    -- Unbind all keybinds
-    if BLMKeybinds then
-        BLMKeybinds.unbind_all()
-    end
-
-    -- Destroy UI
-    local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
-    if ui_success and KeybindUI then
-        KeybindUI.destroy()
-    end
+    -- Note: Keybinds and UI are automatically cleaned by GearSwap reload
+    -- No need to manually unbind/destroy (reload does it)
 end
