@@ -205,10 +205,24 @@ end
 --- Called by Mote-Include after state changes
 --- Updates the UI to reflect current state values
 function job_update(cmdParams, eventArgs)
+    -- DEBUG: Trace gs c update reception
+    if _G.UPDATE_DEBUG then
+        local now = os.clock()
+        local delta = _G._update_sent_time and (now - _G._update_sent_time) or 0
+        add_to_chat(207, string.format('[UPDATE_DEBUG] 2. job_update RECEIVED | t=%.3f | delta=%.3fms', now, delta * 1000))
+    end
+
     -- Update UI when states change (F9, F10, etc.)
     local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
     if ui_success and KeybindUI and KeybindUI.update then
-        KeybindUI.update()
+        if _G.UPDATE_DEBUG then
+            local before = os.clock()
+            KeybindUI.update()
+            local after = os.clock()
+            add_to_chat(207, string.format('[UPDATE_DEBUG] 3. UI.update DONE | took=%.3fms', (after - before) * 1000))
+        else
+            KeybindUI.update()
+        end
     end
 end
 
