@@ -161,13 +161,13 @@ function job_sub_job_change(newSubjob, oldSubjob)
         -- Trigger job change sequence (handles lockstyle, macros, keybinds, UI)
         local main_job = player and player.main_job or "GEO"
         JobChangeManager.on_job_change(main_job, newSubjob)
-    
+    end
+
     -- DUALBOX: Send job update to MAIN character after subjob change
     local db_success, DualBoxManager = pcall(require, 'shared/utils/dualbox/dualbox_manager')
     if db_success and DualBoxManager then
         DualBoxManager.send_job_update()
     end
-end
 end
 
 ---============================================================================
