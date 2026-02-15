@@ -35,7 +35,6 @@
 ---   @version 1.0
 ---   @date    Updated: 2025-11-10
 ---  ═════════════════════════════════════════════════════════════════════════
-
 sets = {}
 
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -87,6 +86,12 @@ sets['Mpu Gandring'] = {
     sub = 'Centovente'
 }
 
+-- • Mpu Gandring >> Centovente
+sets['Twashtar'] = {
+    main = 'Twashtar',
+    sub = "Gleti's Knife"
+}
+
 -- • Demersal Degen +1 >> Blurred Knife +1
 sets['Demersal'] = {
     main = 'Demersal Degen +1',
@@ -104,7 +109,7 @@ sets['Blurred'] = {
 
 -- • Base Idle
 sets.idle = {
-    ammo = 'Aurgelmir Orb +1',
+    ammo = 'Coiste Bodhar',
     head = "Gleti's Mask",
     body = "Gleti's Cuirass",
     hands = "Gleti's Gauntlets",
@@ -120,20 +125,16 @@ sets.idle = {
 }
 
 -- • PDT Idle (Physical damage reduction)
-sets.idle.PDT =
-    set_combine(
-    sets.idle,
-    {
-        head = 'Malignance Chapeau',
-        body = 'Malignance Tabard',
-        hands = 'Malignance Gloves',
-        legs = 'Malignance Tights',
-        feet = 'Malignance Boots',
-        neck = 'Loricate Torque +1',
-        waist = 'Flume Belt +1',
-        ring2 = 'Defending Ring'
-    }
-)
+sets.idle.PDT = set_combine(sets.idle, {
+    head = 'Malignance Chapeau',
+    body = 'Malignance Tabard',
+    hands = 'Malignance Gloves',
+    legs = 'Malignance Tights',
+    feet = 'Malignance Boots',
+    neck = 'Loricate Torque +1',
+    waist = 'Flume Belt +1',
+    ring2 = 'Defending Ring'
+})
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- ENGAGED SETS
@@ -161,36 +162,36 @@ sets.engaged.Normal = {
 
 -- • No Fan Dance: 50 equipment DT = 50 PDT (Base PDT set)
 sets.engaged.PDT = {
-    ammo = 'Coiste Bodhar',
-    head = 'Malignance Chapeau',
-    body = 'Malignance Tabard',
-    hands = 'Macu. Bangles +3',
-    legs = 'Maculele Tights +3',
-    feet = 'Macu. Toe Sh. +3',
-    neck = 'Etoile Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Sherida Earring',
-    ear2 = 'Cessance Earring',
-    ring1 = 'Moonlight Ring',
-    ring2 = 'Gere Ring',
+    ammo = "Coiste Bodhar",
+    head = "Blistering Sallet +1",
+    body = "Gleti's Cuirass",
+    hands = "Gleti's Gauntlets",
+    legs = "Gleti's Breeches",
+    feet = "Gleti's Boots",
+    neck = "Etoile Gorget +2",
+    waist = "Kentarch Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Macu. Earring +1",
+    ring1 = "Chirich Ring +1",
+    ring2 = "Defending Ring",
     back = Senuna.TP
 }
 
 -- • Fan Dance: Minimum 20 DT + 30 equipment PDT = 50 PDT (With Fan Dance buff active)
 sets.engaged.FanDance = {
-    ammo = 'C. Palug Stone',
-    head = 'Maculele Tiara +3',
-    body = 'Malignance Tabard',
-    hands = 'Adhemar Wrist. +1',
-    legs = 'Meg. Chausses +2',
-    feet = 'Macu. Toe Sh. +3',
-    neck = 'Etoile Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Sherida Earring',
-    ear2 = 'Domin. Earring +1',
-    ring1 = 'Gere Ring',
-    ring2 = 'Moonlight Ring',
-    back = 'Null Shawl'
+    ammo = "Coiste Bodhar",
+    head = "Blistering Sallet +1",
+    body = "Malignance Tabard",
+    hands = "Malignance Gloves",
+    legs = "Malignance Tights",
+    feet = "Macu. Toe Sh. +3",
+    neck = "Etoile Gorget +2",
+    waist = "Windbuffet Belt +1",
+    ear1 = "Sherida Earring",
+    ear2 = "Macu. Earring +1",
+    ring1 = "Moonlight Ring",
+    ring2 = "Moonlight Ring",
+    back = Senuna.TP
 }
 
 -- • Saber Dance: Dual Wield -50%, optimize for Haste/STP/Multi-Attack instead of DW
@@ -215,15 +216,15 @@ sets.engaged.SaberDance.PDT = {
     ammo = 'Coiste Bodhar',
     head = 'Malignance Chapeau',
     body = 'Malignance Tabard',
-    hands = 'Malignance Gloves',
-    legs = 'Samnuha Tights',
+    hands = 'Adhemar Wrist. +1',
+    legs = 'Malignance Tights',
     feet = 'Macu. Toe Sh. +3',
-    neck = 'Etoile Gorget +2',
+    neck = 'etoile Gorget +2',
     waist = 'Windbuffet Belt +1',
     ear1 = 'Sherida Earring',
-    ear2 = 'Dedition Earring',
-    ring1 = 'Gere Ring',
-    ring2 = 'Defending Ring',
+    ear2 = 'Cessance Earring',
+    ring1 = Moonlight1, -- wardrobe 2
+    ring2 = Moonlight2, -- wardrobe 4
     back = Senuna.TP
 }
 
@@ -251,29 +252,17 @@ sets.precast.Step = {
     back = 'Toetapper Mantle'
 }
 
-sets.precast.Step['Feather Step'] =
-    set_combine(
-    sets.precast.Step,
-    {
-        feet = 'Macu. Toe Sh. +3'
-    }
-)
+sets.precast.Step['Feather Step'] = set_combine(sets.precast.Step, {
+    feet = 'Macu. Toe Sh. +3'
+})
 
-sets.precast.Step['Quick Step'] =
-    set_combine(
-    sets.precast.Step,
-    {
-        feet = 'Macu. Toe Sh. +3'
-    }
-)
+sets.precast.Step['Quick Step'] = set_combine(sets.precast.Step, {
+    feet = 'Macu. Toe Sh. +3'
+})
 
-sets.precast.Step['Box Step'] =
-    set_combine(
-    sets.precast.Step,
-    {
-        feet = 'Macu. Toe Sh. +3'
-    }
-)
+sets.precast.Step['Box Step'] = set_combine(sets.precast.Step, {
+    feet = 'Macu. Toe Sh. +3'
+})
 
 -- • Flourishes (Flourish1 & Flourish2)
 sets.precast.Flourish1 = {}
@@ -549,18 +538,18 @@ sets.precast.WS['Ruthless Stroke'].FanDance.Clim = {
 
 --   Saber Dance (High Haste/STP build, no DW needed)
 sets.precast.WS['Ruthless Stroke'].SaberDance = {
-    ammo = 'Crepuscular Pebble',
+    ammo = 'Coiste Bodhar',
     head = 'Maculele Tiara +3',
     body = 'Nyame Mail',
-    hands = 'Maxixi Bangles +4',
+    hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
     neck = 'Etoile Gorget +2',
     waist = 'Sailfi Belt +1',
     ear1 = 'Sherida Earring',
-    ear2 = 'Odnowa Earring +1',
-    ring1 = 'Regal Ring',
-    ring2 = 'Defending Ring',
+    ear2 = 'Ishvara Earring',
+    ring1 = 'Defending Ring',
+    ring2 = "Cornelia's ring",
     back = Senuna.WS
 }
 
@@ -569,15 +558,15 @@ sets.precast.WS['Ruthless Stroke'].SaberDance.Clim = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
     body = 'Meg. Cuirie +2',
-    hands = 'Maxixi Bangles +4',
+    hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
     neck = 'Etoile Gorget +2',
     waist = 'Kentarch Belt +1',
-    ear1 = 'Ishvara Earring',
-    ear2 = 'Macu. Earring +1',
-    ring1 = 'Gelatinous Ring +1',
-    ring2 = 'Defending Ring',
+    ear1 = 'Sherida Earring',
+    ear2 = 'Ishvara Earring',
+    ring1 = 'Defending Ring',
+    ring2 = "Cornelia's ring",
     back = Senuna.WS
 }
 
@@ -653,35 +642,35 @@ sets.precast.WS['Dancing Edge'].FanDance.Clim = {
 -- Dancing Edge: Saber Dance (High Haste/STP build, no DW needed)
 sets.precast.WS['Dancing Edge'].SaberDance = {
     ammo = 'Coiste Bodhar',
-    head = 'Malignance Chapeau',
-    body = 'Malignance Tabard',
+    head = 'Maculele Tiara +3',
+    body = 'Horos Casaque +3',
     hands = 'Macu. Bangles +3',
-    legs = 'Maculele Tights +3',
+    legs = 'Nyame Flanchard',
     feet = 'Macu. Toe Sh. +3',
     neck = 'Etoile Gorget +2',
-    waist = 'Kentarch Belt +1',
+    waist = 'Sailfi Belt +1',
     ear1 = 'Sherida Earring',
-    ear2 = 'Cessance Earring',
-    ring1 = 'Moonlight Ring',
-    ring2 = 'Gere Ring',
+    ear2 = 'Mache Earring +1',
+    ring1 = 'Regal Ring',
+    ring2 = Moonlight2, -- wardrobe 4
     back = Senuna.TP
 }
 
 -- Dancing Edge: Saber Dance + Climactic Flourish (Crit-focused with Haste)
 sets.precast.WS['Dancing Edge'].SaberDance.Clim = {
-    ammo = 'Coiste Bodhar',
-    head = 'Malignance Chapeau',
-    body = 'Malignance Tabard',
-    hands = 'Macu. Bangles +3',
-    legs = 'Maculele Tights +3',
-    feet = 'Macu. Toe Sh. +3',
+    ammo = 'Charis Feather',
+    head = 'Maculele Tiara +3',
+    body = "Gleti's Cuirass",
+    hands = 'Nyame Gauntlets',
+    legs = 'Nyame Flanchard',
+    feet = 'Nyame Sollerets',
     neck = 'Etoile Gorget +2',
-    waist = 'Kentarch Belt +1',
+    waist = 'Sailfi Belt +1',
     ear1 = 'Sherida Earring',
-    ear2 = 'Cessance Earring',
-    ring1 = 'Moonlight Ring',
-    ring2 = 'Gere Ring',
-    back = Senuna.TP
+    ear2 = 'Mache Earring +1',
+    ring1 = 'Defending Ring',
+    ring2 = 'Regal Ring',
+    back = Senuna.WS
 }
 
 -- • Rudra's Storm (6 variants)
@@ -721,51 +710,51 @@ sets.precast.WS["Rudra's Storm"].Clim = {
 
 -- Rudra's Storm: Fan Dance (30 equipment DT)
 sets.precast.WS["Rudra's Storm"].FanDance = {
-    ammo = 'C. Palug Stone',
-    head = 'Maculele Tiara +3',
-    body = 'Macu. Casaque +3',
-    hands = 'Maxixi Bangles +4',
-    legs = 'Horos Tights +4',
-    feet = 'Nyame Sollerets',
-    neck = 'Etoile Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Domin. Earring +1',
-    ear2 = 'Odr Earring',
-    ring1 = 'Regal Ring',
-    ring2 = "Cornelia's ring",
+    ammo = "Coiste Bodhar",
+    head = "Maculele Tiara +3",
+    body = "Nyame Mail",
+    hands = "Maxixi Bangles +4",
+    legs = "Nyame Flanchard",
+    feet = "Nyame Sollerets",
+    neck = "Etoile Gorget +2",
+    waist = "Kentarch Belt +1",
+    ear1 = "Odr Earring",
+    ear2 = "Domin. Earring +1",
+    ring1 = "Cornelia's ring",
+    ring2 = "Epaminondas's Ring",
     back = Senuna.WS
 }
 
 -- Rudra's Storm: Fan Dance + Climactic Flourish (30 equipment DT)
 sets.precast.WS["Rudra's Storm"].FanDance.Clim = {
-    ammo = 'Charis Feather',
-    head = 'Maculele Tiara +3',
-    body = 'Meg. Cuirie +2',
-    hands = 'Maxixi Bangles +4',
-    legs = "Gleti's Breeches",
-    feet = 'Nyame Sollerets',
-    neck = 'Etoile Gorget +2',
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Domin. Earring +1',
-    ear2 = 'Macu. Earring +1',
+    ammo = "Charis Feather",
+    head = "Maculele Tiara +3",
+    body = "Meg. Cuirie +2",
+    hands = "Maxixi Bangles +4",
+    legs = "Nyame Flanchard",
+    feet = "Nyame Sollerets",
+    neck = "Etoile Gorget +2",
+    waist = "Kentarch Belt +1",
+    ear1 = "Odr Earring",
+    ear2 = "Macu. Earring +1",
     ring1 = "Epaminondas's Ring",
     ring2 = "Cornelia's ring",
-    back = Senuna.WS
+    back = "Senuna's Mantle"
 }
 
 -- Rudra's Storm: Saber Dance (DEX/Attack/WSD optimized, no DW needed)
 sets.precast.WS["Rudra's Storm"].SaberDance = {
-    ammo = 'Aurgelmir Orb +1',
+    ammo = 'Coiste Bodhar',
     head = 'Maculele Tiara +3',
-    body = 'Meg. Cuirie +2',
-    hands = 'Maxixi Bangles +4',
-    legs = 'Samnuha Tights',
+    body = 'Nyame Mail',
+    hands = 'Nyame Gauntlets',
+    legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
     neck = 'Etoile Gorget +2',
     waist = 'Kentarch Belt +1',
-    ear1 = 'Sherida Earring',
+    ear1 = 'Domin. Earring +1',
     ear2 = 'Odr Earring',
-    ring1 = 'Regal Ring',
+    ring1 = 'Defending Ring',
     ring2 = "Cornelia's ring",
     back = Senuna.WS
 }
@@ -775,14 +764,14 @@ sets.precast.WS["Rudra's Storm"].SaberDance.Clim = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
     body = 'Meg. Cuirie +2',
-    hands = 'Maxixi Bangles +4',
-    legs = 'Samnuha Tights',
+    hands = 'Nyame Gauntlets',
+    legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
     neck = 'Etoile Gorget +2',
     waist = 'Kentarch Belt +1',
     ear1 = 'Sherida Earring',
-    ear2 = 'Macu. Earring +1',
-    ring1 = "Epaminondas's Ring",
+    ear2 = 'Domin. Earring +1',
+    ring1 = "Defending Ring",
     ring2 = "Cornelia's ring",
     back = Senuna.WS
 }
@@ -823,7 +812,7 @@ sets.precast.WS['Shark Bite'].Clim = {
 }
 
 -- Shark Bite: Fan Dance (30 equipment DT)
-sets.precast.WS['Shark Bite'].Fandance = {
+sets.precast.WS['Shark Bite'].FanDance = {
     ammo = 'C. Palug Stone',
     head = 'Maculele Tiara +3',
     body = 'Macu. Casaque +3',
@@ -840,7 +829,7 @@ sets.precast.WS['Shark Bite'].Fandance = {
 }
 
 -- Shark Bite: Fan Dance + Climactic Flourish (30 equipment DT)
-sets.precast.WS['Shark Bite'].Fandance.Clim = {
+sets.precast.WS['Shark Bite'].FanDance.Clim = {
     ammo = 'Charis Feather',
     head = 'Maculele Tiara +3',
     body = 'Meg. Cuirie +2',
@@ -978,13 +967,9 @@ sets.MoveSpeed = {
 sets.idle.Town = sets.MoveSpeed
 
 -- • Adoulin Movement (City-specific speed boost)
-sets.Adoulin =
-    set_combine(
-    sets.MoveSpeed,
-    {
-        body = "Councilor's Garb"
-    }
-)
+sets.Adoulin = set_combine(sets.MoveSpeed, {
+    body = "Councilor's Garb"
+})
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- BUFF SETS
@@ -1001,9 +986,15 @@ sets.buff['Climactic Flourish'] = {
 }
 
 sets.buff.Doom = {
-    neck = {name = "Nicander's Necklace"}, -- Reduces Doom effects
-    left_ring = {name = 'Purity Ring'}, -- Additional Doom resistance
-    waist = {name = 'Gishdubar Sash'} -- Enhances Doom recovery effects
+    neck = {
+        name = "Nicander's Necklace"
+    }, -- Reduces Doom effects
+    left_ring = {
+        name = 'Purity Ring'
+    }, -- Additional Doom resistance
+    waist = {
+        name = 'Gishdubar Sash'
+    } -- Enhances Doom recovery effects
 }
 
 -- ═══════════════════════════════════════════════════════════════════════════
