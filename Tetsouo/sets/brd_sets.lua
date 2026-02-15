@@ -335,7 +335,7 @@ sets.midcast.BardSong = {
     head = 'Fili Calot +3',
     neck = 'Mnbw. Whistle +1',
     ear1 = 'Musical Earring',
-    ear2 = 'Fili Earring +1 +1',
+    ear2 = 'Fili Earring +1',
     body = 'Fili Hongreline +3',
     hands = 'Fili Manchettes +3',
     ring1 = StikiRing1,
@@ -420,9 +420,9 @@ sets.midcast['Herb Pastoral'] = sets.midcast.DummySong
 -- • DEBUFF SONGS (Magic Accuracy Focus)
 
 -- • Lullaby (Sleep) - NO weapon swap to avoid waking targets
-sets.midcast.Lullaby = set_combine(sets.idle.DT, {
+sets.midcast.Lullaby = {
     -- NO main/sub - DO NOT change weapons for Lullaby!
-    --[[ range = 'Daurdabla',
+    range = 'Daurdabla',
     head = 'Brioso Roundlet +3',
     body = 'Fili Hongreline +3',
     hands = 'Fili Manchettes +3',
@@ -434,10 +434,8 @@ sets.midcast.Lullaby = set_combine(sets.idle.DT, {
     ring1 = StikiRing1,
     ring2 = StikiRing2,
     waist = 'Acuity Belt +1',
-    back = Intarabus.fc ]]
-})
-
-sets.midcast['Pining Nocturne'] = set_combine ( sets.idle.DT,{ })
+    back = Intarabus.fc
+}
 
 sets.midcast['Horde Lullaby'] = sets.midcast.Lullaby
 sets.midcast['Horde Lullaby II'] = sets.midcast.Lullaby
@@ -461,6 +459,8 @@ sets.midcast.DebuffSong = {
     back = Intarabus.fc
 }
 
+sets.midcast['Pining Nocturne'] = set_combine(sets.midcast.DebuffSong, {})
+
 -- • Magic Finale (Dispel)
 sets.midcast['Magic Finale'] = sets.midcast.DebuffSong
 
@@ -469,7 +469,7 @@ sets.midcast['Battlefield Elegy'] = sets.midcast.DebuffSong
 sets.midcast['Carnage Elegy'] = sets.midcast.DebuffSong
 
 -- • Requiem (DoT)
-sets.midcast['Foe Requiem'] = sets.midcast.DebuffSong
+sets.midcast['Foe Requiem VII'] = sets.midcast.DebuffSong
 
 -- • Other Debuffs
 sets.midcast["Maiden's Virelai"] = sets.midcast.DebuffSong
