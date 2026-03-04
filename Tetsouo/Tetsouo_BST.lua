@@ -51,9 +51,7 @@ function get_sets()
 
     mote_include_version = 2
 
-    -- DISABLE AUTOMOVE FOR BST (performance optimization)
-    -- BST has its own lightweight movement system in BST_IDLE.lua
-    _G.DISABLE_AUTOMOVE = true
+    -- AutoMove handles movement gear (shared system, all jobs)
 
     -- Load BST-specific configs BEFORE Mote-Include (needed by user_setup)
     _G.LockstyleConfig = LockstyleConfig
@@ -220,6 +218,8 @@ function user_setup()
     -- Start monitoring immediately on load (doesn't require pet)
     -- Will check pet status if pet exists, skip if no pet
     coroutine.schedule(function()
+        if player and player.main_job ~= 'BST' then return end
+        if not _G.start_pet_monitoring then return end
         start_pet_monitoring()
     end, 3.0)  -- Start after 3s delay (let UI/keybinds load first)
 end
@@ -231,6 +231,7 @@ end
 --- Called by Mote-Include after state changes
 --- Updates the UI to reflect current state values
 function job_update(cmdParams, eventArgs)
+    if _G.LagDebugger then _G.LagDebugger.on_job_update() end
     -- Update UI when states change (F9, F10, etc.)
     local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
     if ui_success and KeybindUI and KeybindUI.update then
@@ -266,133 +267,77 @@ function job_sub_job_change(newSubjob, oldSubjob)
 end
 
 ---============================================================================
---- PET MONITORING (SMART BACKGROUND MONITORING)
+--- PET MONITORING (prerender event - 1s throttle)
 ---============================================================================
---- Lightweight background monitoring that only runs when pet exists
---- Checks every 3 seconds (vs 2.4s time change event)
---- Stops automatically when no pet (vs constant polling)
+--- Uses windower prerender event (fires every frame, throttled to 1s).
+--- Tracks: pet engaged status + auto-engage only.
+--- Movement gear handled by AutoMove (shared system, 80ms polling).
+--- Prerender events cannot die like coroutine.schedule chains.
 ---============================================================================
 
-local pet_monitor_active = false
-local last_monitor_check = 0
+local monitor_event_id = nil
+local last_check = 0
+local prev_pet_eng = 'false'
 
--- Movement tracking (lightweight - no distance calculation)
-local last_position = {x = 0, y = 0, z = 0}
+-- Upvalues for hot path (prerender fires ~60fps)
+local os_clock = os.clock
+local get_mob = windower.ffxi.get_mob_by_target
+local get_player = windower.ffxi.get_player
 
--- Dirty flag tracking (Option 2: only update if states changed)
-local previous_states = {
-    petEngaged = 'false',
-    moving = 'false'
-}
+local function start_pet_monitoring()
+    if monitor_event_id then return end
 
---- Smart pet monitoring loop - monitors pet status + movement
---- Always active (checks every 1 second), works with or without pet
-local function smart_pet_monitor()
-    if not pet_monitor_active then
-        return  -- Monitoring stopped
-    end
+    monitor_event_id = windower.raw_register_event('prerender', function()
+        local now = os_clock()
+        if now - last_check < 1.0 then return end
+        last_check = now
 
-    -- DEBOUNCING: Prevent multiple simultaneous loops (strict 1 second minimum)
-    local current_time = os.clock()
-    if current_time - last_monitor_check < 1.0 then
-        return  -- Too soon, skip this call
-    end
-    last_monitor_check = current_time
+        local ok, err = pcall(function()
+            local pet = get_mob('pet')
+            local pet_eng_val = 'false'
 
-    -- ==========================================================================
-    -- CHECK 1: Pet Status (Idle/Engaged) + Auto-Engage
-    -- ==========================================================================
-    local pet = _G.pet
-    if pet and pet.id and pet.id ~= 0 then
-        -- Pet exists - check status
-        local success, PetManager = pcall(require, 'shared/jobs/bst/functions/logic/pet_manager')
-        if success and PetManager then
-            PetManager.monitor_pet_status()
+            if pet and pet.id and pet.id ~= 0 then
+                local pet_fighting = (pet.status == 1)
+                pet_eng_val = pet_fighting and 'true' or 'false'
 
-            -- Auto-engage pet if conditions met (UNLESS rdymove sequence active)
-            if not _G.bst_rdymove_active then
-                PetManager.check_and_engage_pet(pet)
+                -- Auto-engage: player fighting + pet idle + auto on
+                if not pet_fighting
+                    and not _G.bst_rdymove_active
+                    and state.AutoPetEngage
+                    and state.AutoPetEngage.value == 'On'
+                then
+                    local lp = get_player()
+                    if lp and lp.status == 1 then
+                        windower.send_command('input /pet "Fight" <t>')
+                    end
+                end
             end
+
+            -- Update petEngaged state + gear refresh (only on change)
+            if state.petEngaged and state.petEngaged.value ~= pet_eng_val then
+                state.petEngaged:set(pet_eng_val)
+            end
+            local sent_update = pet_eng_val ~= prev_pet_eng
+            if sent_update then
+                if _G.LagDebugger then _G.LagDebugger.on_prerender_check(pet_eng_val, prev_pet_eng, true) end
+                windower.send_command('gs c update')
+                prev_pet_eng = pet_eng_val
+            end
+        end)
+
+        if not ok then
+            print('[BST] Monitor error: ' .. tostring(err))
         end
-    else
-        -- No pet - ensure petEngaged is false
-        if state and state.petEngaged and state.petEngaged.value ~= "false" then
-            state.petEngaged:set('false')
-        end
-    end
-
-    -- ==========================================================================
-    -- CHECK 2: Movement Detection (position tracking - checks every 1s)
-    -- ==========================================================================
-    if player and player.status == 'Idle' then
-        -- Get REAL-TIME position from windower API (not cached player global)
-        local player_mob = windower.ffxi.get_mob_by_target('me')
-        local current_x = player_mob and player_mob.x or 0
-        local current_y = player_mob and player_mob.y or 0
-        local current_z = player_mob and player_mob.z or 0
-
-        -- Check if position changed since last check
-        local moved = (current_x ~= last_position.x or
-                      current_y ~= last_position.y or
-                      current_z ~= last_position.z)
-
-        -- Update state.Moving if changed (silent)
-        if moved and state.Moving and state.Moving.value ~= "true" then
-            state.Moving:set('true')
-        elseif not moved and state.Moving and state.Moving.value ~= "false" then
-            state.Moving:set('false')
-        end
-
-        -- Save current position for next check
-        last_position.x = current_x
-        last_position.y = current_y
-        last_position.z = current_z
-    else
-        -- Not idle - ensure Moving is false
-        if state.Moving and state.Moving.value ~= "false" then
-            state.Moving:set('false')
-        end
-    end
-
-    -- ==========================================================================
-    -- REFRESH GEAR (ONLY if states changed - dirty flag optimization)
-    -- ==========================================================================
-    local current_petEngaged = state.petEngaged and state.petEngaged.value or 'false'
-    local current_moving = state.Moving and state.Moving.value or 'false'
-
-    -- Check if any state changed
-    local states_changed = (current_petEngaged ~= previous_states.petEngaged or
-                           current_moving ~= previous_states.moving)
-
-    if states_changed then
-        -- States changed - force gear refresh (silent)
-        windower.send_command('gs c update')
-
-        -- Update previous states
-        previous_states.petEngaged = current_petEngaged
-        previous_states.moving = current_moving
-    end
-
-    -- Schedule next check (1 second - balanced performance)
-    coroutine.schedule(smart_pet_monitor, 1.0)
+    end)
 end
 
---- Start pet monitoring (called when pet is summoned)
-function start_pet_monitoring()
-    if pet_monitor_active then
-        return  -- Already running
+local function stop_pet_monitoring()
+    if monitor_event_id then
+        windower.unregister_event(monitor_event_id)
+        monitor_event_id = nil
     end
-
-    pet_monitor_active = true
-    coroutine.schedule(smart_pet_monitor, 1.0)
 end
 
---- Stop pet monitoring (called on unload or pet release)
-function stop_pet_monitoring()
-    pet_monitor_active = false
-end
-
--- Export for use in other modules
 _G.start_pet_monitoring = start_pet_monitoring
 _G.stop_pet_monitoring = stop_pet_monitoring
 

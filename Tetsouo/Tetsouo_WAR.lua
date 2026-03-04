@@ -230,6 +230,7 @@ end
 --- Called by Mote-Include after state changes
 --- Updates the UI to reflect current state values
 function job_update(cmdParams, eventArgs)
+    if _G.LagDebugger then _G.LagDebugger.on_job_update() end
     -- Update UI when states change (F9, F10, etc.)
     local ui_success, KeybindUI = pcall(require, 'shared/utils/ui/UI_MANAGER')
     if ui_success and KeybindUI and KeybindUI.update then

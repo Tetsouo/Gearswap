@@ -342,7 +342,7 @@ sets.precast.Samba = {
 
 sets.precast.Jig = {
     legs = 'Horos Tights +4',
-    feet = 'Maxixi Toe Shoes +3'
+    feet = 'Maxixi Toe Shoes +4'
 }
 
 -- • Other Job Abilities (No Foot Rise, Trance, Provoke, Fan Dance, Jumps)

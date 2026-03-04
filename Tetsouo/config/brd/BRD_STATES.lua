@@ -80,7 +80,7 @@ function BRDStates.configure()
         'Arebati', -- Honor + Min5/4 + Scherzo + Victory
         'Ngai' -- Honor + Minuet 5 + Water Carol II + Minne 5 + Scherzo
     }
-    state.SongMode:set('Ngai')
+    state.SongMode:set('Madrigal')
 
     state.MainInstrument =
         M {
