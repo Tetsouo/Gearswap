@@ -35,11 +35,11 @@ sets = {}
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- • RINGS (Wardrobe Management)
-local StikiRing1 = {name = 'Stikini Ring +1', bag = 'wardrobe 6'}
-local StikiRing2 = {name = 'Stikini Ring +1', bag = 'wardrobe 7'}
-local MoonlightRing1 = {name = 'Moonlight Ring', bag = 'wardrobe 2'}
-local MoonlightRing2 = {name = 'Moonlight Ring', bag = 'wardrobe 4'}
-local ChirichRing1 = {name = 'Chirich Ring +1', bag = 'wardrobe'}
+local StikiRing1 = {name = 'Stikini Ring +1', bag = 'wardrobe 1'}
+local StikiRing2 = {name = 'Stikini Ring +1', bag = 'wardrobe 2'}
+local MoonlightRing1 = {name = 'Moonlight Ring', bag = 'wardrobe 1'}
+local MoonlightRing2 = {name = 'Moonlight Ring', bag = 'wardrobe 2'}
+local ChirichRing1 = {name = 'Chirich Ring +1', bag = 'wardrobe 1'}
 local ChirichRing2 = {name = 'Chirich Ring +1', bag = 'wardrobe 2'}
 
 -- • INSTRUMENTS (Linos for TP/WS)
@@ -117,7 +117,7 @@ sets.idle.DT = set_combine(sets.idle, {
     legs="Nyame Flanchard",
     feet="Nyame Sollerets",
     neck="Unmoving Collar +1",
-    waist="Trance Belt",
+    waist="Null Belt",
     left_ear="Trux Earring",
     right_ear="Cryptic Earring",
     left_ring= "Provocare Ring",
@@ -141,15 +141,15 @@ sets.idle.Regen = set_combine(sets.idle, {
 -- • BASE ENGAGED (Fallback)
 sets.engaged = {
     ranged = LinosTP,
-    head="Fili Calot +3",
-    body="Fili Hongreline +3",
+    head="Revelation Masque",
+    body="Revelation Platemail",
     hands="Fili Manchettes +3",
-    legs="Fili Rhingrave +3",
-    feet="Fili Cothurnes +3",
+    legs="Revelation Brais",
+    feet="Revelation Sabatons",
     neck="Bard's Charm +2",
-    waist="Null Belt",
-    left_ear="Domin. Earring +1",
-    right_ear="Telos Earring",
+    waist="Kentarch Belt +1",
+    left_ear="Telos Earring",
+    right_ear="Crepuscular Earring",
     left_ring= ChirichRing1,
     right_ring=MoonlightRing2,
     back = Intarabus.stp
@@ -189,7 +189,7 @@ sets.precast.FC = {
     left_ear = 'Enchntr. Earring +1',
     right_ear = 'Loquac. Earring',
     ring1 = 'Prolix Ring',
-    ring2 = 'Defending Ring',
+    ring2 = 'Murky Ring',
     back = Intarabus.fc
 }
 
@@ -205,11 +205,11 @@ sets.precast['Aria of Passion'] = set_combine(sets.precast.FC, {range = 'Loughna
 -- • Nightingale (Extend song duration) - Bihu Slippers +3
 sets.precast.JA.Nightingale = {feet = 'Bihu Slippers +3'}
 
--- • Troubadour (Enhance song effects) - Bihu Justaucorps +3
-sets.precast.JA.Troubadour = {body = 'Bihu Justaucorps +3'}
+-- • Troubadour (Enhance song effects) - Bihu Justaucorps +4
+sets.precast.JA.Troubadour = {body = 'Bihu Justaucorps +4'}
 
--- • Troubadour (Enhance song effects) - Bihu Justaucorps +3
-sets.precast.JA['Soul Voice'] = {legs = 'Bihu cannions +3'}
+-- • Troubadour (Enhance song effects) - Bihu Justaucorps +4
+sets.precast.JA['Soul Voice'] = {legs = 'Bihu Cannions +3'}
 
 
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -220,7 +220,7 @@ sets.precast.JA['Soul Voice'] = {legs = 'Bihu cannions +3'}
 sets.precast.WS = {
     ranged = LinosWS,
     head = 'Nyame Helm',
-    body = 'Bihu Justaucorps +3',
+    body = 'Bihu Justaucorps +4',
     hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
@@ -238,7 +238,7 @@ sets.precast.WS = {
 sets.precast.WS['Evisceration'] = {
     ranged = LinosWS,
     head = 'Blistering Sallet +1',
-    body = 'Bihu Justaucorps +3',
+    body = 'Bihu Justaucorps +4',
     hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Lustra. Leggings +1',
@@ -246,7 +246,7 @@ sets.precast.WS['Evisceration'] = {
     waist = 'Fotia Belt',
     ear1 = 'Odnowa Earring +1',
     ear2 = 'Domin. Earring +1',
-    ring1 = 'Defending Ring',
+    ring1 = 'Murky Ring',
     ring2 = MoonlightRing2,
     back = "Intarabus's Cape"
 }
@@ -255,7 +255,7 @@ sets.precast.WS['Evisceration'] = {
 sets.precast.WS["Rudra's Storm"] = {
     ranged = LinosWS,
     head = 'Nyame Helm',
-    body = 'Bihu Justaucorps +3',
+    body = 'Bihu Justaucorps +4',
     hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
@@ -272,7 +272,7 @@ sets.precast.WS["Rudra's Storm"] = {
 sets.precast.WS['Mordant Rime'] = {
     ranged = LinosWS,
     head = 'Nyame Helm',
-    body = 'Bihu Justaucorps +3',
+    body = 'Bihu Justaucorps +4',
     hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
@@ -280,7 +280,7 @@ sets.precast.WS['Mordant Rime'] = {
     waist = 'Sailfi Belt +1',
     ear1 = 'Ishvara Earring',
     ear2 = 'Regal Earring',
-    ring1 = "Cornelia's ring",
+    ring1 = "Cornelia's Ring",
     ring2 = 'Metamor. Ring +1',
     back = Intarabus.ws_str
 }
@@ -289,16 +289,16 @@ sets.precast.WS['Mordant Rime'] = {
 sets.precast.WS['Ruthless Stroke'] = {
     ranged = LinosWS,
     head = 'Nyame Helm',
-    body = 'Bihu Justaucorps +3',
+    body = 'Bihu Justaucorps +4',
     hands = 'Nyame Gauntlets',
     legs = 'Nyame Flanchard',
     feet = 'Nyame Sollerets',
-    neck = "Bard's Charm +2",
-    waist = 'Kentarch Belt +1',
-    ear1 = 'Domin. Earring +1',
-    ear2 = 'Ishvara Earring',
-    ring1 = "Epaminondas's Ring",
-    ring2 = 'Moonlight Ring',
+    neck = "Null Loop",
+    waist = 'Sailfi Belt +1',
+    ear1 = 'Ishvara Earring',
+    ear2 = 'Domin. Earring +1',
+    ring1 = "Cornelia's Ring",
+    ring2 = 'Ilabrat Ring',
     back = Intarabus.ws_str
 }
 
@@ -307,15 +307,15 @@ sets.precast.WS['Ruthless Stroke'] = {
 sets.precast.WS['Savage Blade'] = {
     ranged = LinosWS,
     head = {name = 'Nyame Helm', augments = {'Path: B'}},
-    body = {name = 'Bihu Justaucorps +3', augments = {'Enhances "Troubadour" effect'}},
+    body = {name = 'Bihu Justaucorps +4', augments = {'Enhances "Troubadour" effect'}},
     hands = {name = 'Nyame Gauntlets', augments = {'Path: B'}},
     legs = {name = 'Nyame Flanchard', augments = {'Path: B'}},
     feet = {name = 'Nyame Sollerets', augments = {'Path: B'}},
-    neck = {name = "Bard's Charm +2", augments = {'Path: A'}},
-    waist = {name = 'Sailfi Belt +1', augments = {'Path: A'}},
+    neck = "Null Loop",
+    waist = "Sailfi Belt +1",
     ear1 = 'Ishvara Earring',
-    ear2 = 'Crep. Earring',
-    ring1 = MoonlightRing1,
+    ear2 = 'Regal Earring',
+    ring1 = "Sroda Ring",
     ring2 = "Cornelia's Ring",
     back = Intarabus.ws_str
 }
@@ -378,7 +378,7 @@ sets.midcast.Minne = set_combine(sets.midcast.BardSong, {legs = 'Mousai Seraweel
 sets.midcast.Etude = set_combine(sets.midcast.BardSong, {head = 'Mousai Turban +1'})
 
 -- • March 
-sets.midcast.March = set_combine(sets.midcast.BardSong, {hands = 'Fili manchettes +3'})
+sets.midcast.March = set_combine(sets.midcast.BardSong, {hands = 'Fili Manchettes +3'})
 
 -- • Paeon 
 sets.midcast["Army's Paeon"] = set_combine(sets.midcast.BardSong, {head = 'Brioso Roundlet +4'})
@@ -485,7 +485,7 @@ sets.midcast.Threnody = set_combine(sets.midcast.DebuffSong, {body = 'Mousai Man
 sets.MoveSpeed = {feet = 'Fili Cothurnes +3'}
 
 -- • TOWN IDLE (Movement Speed Priority)
-sets.idle.Town = sets.MoveSpeed
+sets.idle.Town = set_combine(sets.idle.DT, sets.MoveSpeed)
 
 -- • ADOULIN MOVEMENT (City-Specific Speed Boost)
 sets.Adoulin = set_combine(sets.MoveSpeed, {body = "Councilor's Garb"})

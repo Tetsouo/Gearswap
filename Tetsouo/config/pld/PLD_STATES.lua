@@ -73,6 +73,17 @@ function PLDStates.configure()
         'On' -- SIRD Phalanx
     }
 
+    --- PhalanxSIRD: Force SIRD Phalanx set regardless of XP mode
+    --- Options:
+    ---   • 'Off' - Use normal Phalanx routing (Potency or XP-based)
+    ---   • 'On'  - Force SIRD Phalanx set (Spell Interruption Rate Down)
+    state.PhalanxSIRD =
+        M {
+        ['description'] = 'Phalanx SIRD',
+        'Off', -- Normal routing (default)
+        'On' -- Force SIRD set
+    }
+
     --- RuneMode: Rune selection (RUN subjob)
     --- Keybind: Alt+5 to cycle (RUN subjob only)
     state.RuneMode =

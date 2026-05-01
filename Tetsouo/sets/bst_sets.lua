@@ -25,7 +25,7 @@ local RINGS = {
     Stikini1 = 'Stikini Ring +1',
     Stikini2 = 'Stikini Ring +1',
     Varar2 = 'Varar Ring +1',
-    Defending = 'Defending Ring',
+    Murky = 'Murky Ring',
     CPalug = 'C. Palug Ring',
     Gere = 'Gere Ring',
     Hetairoi = 'Hetairoi Ring',
@@ -427,7 +427,7 @@ local baseIdleSet =
         waist = 'Flume Belt +1',
         left_ear = EARRINGS.Odnowa,
         right_ear = EARRINGS.Nukumi,
-        left_ring = RINGS.Defending,
+        left_ring = RINGS.Murky,
         right_ring = 'Chirich Ring +1',
         back = Artio.STP
     }
@@ -482,12 +482,10 @@ sets.pet.idle.PDT =
 --                  ENGAGED (MELEE COMBAT) SETS               --
 --============================================================--
 
--- Base engaged set (used by Mote-Include - will be customized by SetBuilder)
-sets.engaged = set_combine(sets.me.engaged, {})
 
 -- Master engaged set (balanced ACC/DT hybrid)
 sets.me.engaged =
-    set_combine(
+set_combine(
     malignanceSet,
     {
         neck = NECK.BstCollar,
@@ -502,7 +500,7 @@ sets.me.engaged =
 
 -- Master engaged PDT variant (tankier)
 sets.me.engaged.PDT =
-    set_combine(
+set_combine(
     sets.me.engaged,
     {
         head = 'Nuk. Cabasset +3',
@@ -511,6 +509,9 @@ sets.me.engaged.PDT =
         back = Pastoralist.petDT
     }
 )
+
+-- Base engaged set (used by Mote-Include - will be customized by SetBuilder)
+sets.engaged = set_combine(sets.me.engaged, {})
 
 -- Pet engaged set (offensive focus)
 sets.pet.engaged = {
@@ -576,7 +577,7 @@ local summonSet = {
     hands = 'Ankusa Gloves +3',
     ear2 = EARRINGS.Nukumi,
     legs = 'Acro Breeches',
-    feet = 'Adaman sollerets',
+    feet = 'Adaman Sollerets',
 }
 
 -- Configure JA sets
@@ -613,7 +614,7 @@ sets.precast.JA['Reward'] = {
 
 -- Killer Instinct (buff)
 sets.precast.JA['Killer Instinct'] = {
-    sub = 'Diamond aspis',
+    sub = 'Diamond Aspis',
     head = 'Ankusa Helm +3',
     body = 'Nukumi Gausape +3'
 }
@@ -754,8 +755,8 @@ sets.precast.WS['Bora Axe'] = {
     waist = 'Sailfi Belt +1',
     ear1 = 'Odnowa Earring +1',
     ear2 = 'Nukumi Earring +1',
-    ring1 = 'Defending Ring',
-    ring2 = "Cornelia's ring",
+    ring1 = 'Murky Ring',
+    ring2 = "Cornelia's Ring",
     back = Artio.WS1
 }
 
@@ -772,7 +773,7 @@ sets.precast.WS['Calamity'] = {
     left_ear = EARRINGS.Thrud,
     right_ear = EARRINGS.Nukumi,
     left_ring = RINGS.Cornelia,
-    right_ring = RINGS.Defending,
+    right_ring = RINGS.Murky,
     back = Artio.WS1
 }
 

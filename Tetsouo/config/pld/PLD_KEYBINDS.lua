@@ -41,6 +41,12 @@ PLDKeybinds.binds = { -- Hybrid Mode (PDT/MDT)
     command = "cyclestate MainWeapon",
     desc = "Main Weapon",
     state = "MainWeapon"
+}, -- Phalanx SIRD Mode
+{
+    key = "!3",
+    command = "cyclestate PhalanxSIRD",
+    desc = "Phalanx SIRD",
+    state = "PhalanxSIRD"
 }, -- XP Mode (PLD/RDM subjob only)
 {
     key = "!4",

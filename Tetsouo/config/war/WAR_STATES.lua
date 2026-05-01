@@ -38,10 +38,11 @@ function WARStates.configure()
 
     --- HybridMode: Defensive stance configuration
     --- Options:
-    ---   • 'PDT'    - Physical Damage Taken -50% (safe mode)
-    ---   • 'Normal' - Full offense (max DPS)
+    ---   • 'PDT'        - Physical Damage Taken -50% (safe mode)
+    ---   • 'Normal'     - Full offense (max DPS)
+    ---   • 'SubtleBlow' - Reduces TP fed to mob (uses sets.engaged.SubtleBlow)
     --- Keybind: Alt+2 to cycle
-    state.HybridMode = M{['description']='Hybrid Mode', 'PDT', 'Normal'}
+    state.HybridMode = M{['description']='Hybrid Mode', 'PDT', 'Normal', 'SubtleBlow'}
     state.HybridMode:set('PDT') -- Default to PDT for safety
 
     -- ==========================================================================

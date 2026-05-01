@@ -155,10 +155,8 @@ function BRDStates.configure()
     state.MainWeapon =
         M {
         ['description'] = 'Main Weapon',
+        'Mpu Gandring',
         'Naegling',
-        'Twashtar',
-        'Carnwenhan',
-        'Mpu Gandring'
     }
     state.MainWeapon:set('Mpu Gandring')
 
@@ -166,11 +164,10 @@ function BRDStates.configure()
         M {
         ['description'] = 'Sub Weapon',
         'Kraken',
-        'Demersal',
+        'Centovente',
         'Genmei',
-        'Centovente'
     }
-    state.SubWeapon:set('Genmei')
+    state.SubWeapon:set('Kraken')
 
     -- ========================================
     -- SONG SLOTS (display only)

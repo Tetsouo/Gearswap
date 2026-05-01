@@ -67,11 +67,11 @@ Cichol = {
 
 local MoonlightRing1 = {
     name = 'Moonlight Ring',
-    bag = 'wardrobe 2'
+    bag = 'wardrobe 1'
 }
 local MoonlightRing2 = {
     name = 'Moonlight Ring',
-    bag = 'wardrobe 4'
+    bag = 'wardrobe 2'
 }
 
 -- ============================================================--
@@ -166,14 +166,14 @@ sets.idle.PDT = set_combine(sets.idle, {
     hands = "Sakpata's Gauntlets",
     legs = "Sakpata's Cuisses",
     feet = "Sakpata's Leggings",
-    ring1 = 'Defending Ring',
+    ring1 = 'Murky Ring',
     ring2 = 'Gelatinous Ring +1',
     back = 'Moonlight Cape'
 })
 
 --- Town Idle (Movement speed + aesthetics)
 --- Applied when in safe city zones (not Dynamis).
-sets.idle.Town = set_combine(sets.idle, {
+sets.idle.Town = set_combine(sets.idle.PDT, {
     neck = 'Elite Royal Collar',
     feet = "Hermes' Sandals"
 })
@@ -256,6 +256,25 @@ sets.engaged.PDTAFM3 = set_combine(sets.engaged.PDTTP, {
     ear2 = 'Boii Earring +1',
     ring1 = 'Niqmaddu Ring',
     ring2 = 'Sroda Ring',
+    back = Cichol.da
+})
+
+--- Subtle Blow (Reduces TP fed to mob — toggled via state.SubtleBlow)
+--- Activated when state.SubtleBlow.current == 'On'.
+--- See: set_builder.lua select_engaged_base()
+sets.engaged.SubtleBlow = set_combine(sets.engaged, {
+    ammo = 'Coiste Bodhar',
+    head = 'Hjarrandi Helm',
+    body = 'Dagon Breast.',
+    hands = "Sakpata's Gauntlets",
+    legs = 'Pumm. Cuisses +4',
+    feet = 'Pumm. Calligae +4',
+    neck = 'War. Beads +2',
+    waist = 'Sailfi Belt +1',
+    left_ear = 'Schere Earring',
+    right_ear = 'Boii Earring +1',
+    left_ring = 'Chirich Ring +1',
+    right_ring = 'Chirich Ring +1',
     back = Cichol.da
 })
 
@@ -426,7 +445,7 @@ sets.precast.WS['Fell Cleave'] = set_combine(sets.precast.WS, {
     waist = 'Fotia Belt',
     ear2 = 'Thrud Earring',
     ear1 = 'Schere Earring',
-    ring1 = 'Defending Ring',
+    ring1 = 'Murky Ring',
     ring2 = "Cornelia's Ring",
     back = Cichol.ws1
 })
@@ -442,7 +461,7 @@ sets.precast.WS["King's Justice"] = set_combine(sets.precast.WS, {
     waist = 'Sailfi Belt +1',
     ear1 = 'Schere Earring',
     ear2 = 'Boii Earring +1',
-    ring1 = 'Defending Ring',
+    ring1 = 'Murky Ring',
     ring2 = "Cornelia's Ring",
     back = Cichol.ws1
 })
@@ -458,7 +477,7 @@ sets.precast.WS['Impulse Drive'] = set_combine(sets.precast.WS, {
     ear2 = 'Boii Earring +1',
     body = "Sakpata's Plate",
     hands = 'Boii Mufflers +3',
-    ring1 = 'Defending Ring',
+    ring1 = 'Murky Ring',
     ring2 = "Cornelia's Ring",
     waist = 'Sailfi Belt +1',
     legs = 'Boii Cuisses +3',
@@ -496,7 +515,7 @@ sets.precast.WS['Savage Blade'] = set_combine(sets.precast.WS, {
     waist = "Kentarch Belt +1",
     ear1 = "Thrud Earring",
     ear2 = "Odnowa Earring +1",
-    ring1 = "Cornelia's ring",
+    ring1 = "Cornelia's Ring",
     ring2 = "Sroda Ring",
     back = Cichol.ws1
 })
@@ -515,7 +534,7 @@ sets.precast.WS['Calamity'] = set_combine(sets.precast.WS, {
     waist = "Sailfi Belt +1",
     ear1 = "Thrud Earring",
     ear2 = "Odnowa Earring +1",
-    ring1 = "Cornelia's ring",
+    ring1 = "Cornelia's Ring",
     ring2 = "Sroda Ring",
     back = Cichol.ws1
 })
@@ -532,7 +551,7 @@ sets.precast.WS['Judgment'] = set_combine(sets.precast.WS, {
         name = 'Nyame Sollerets',
         augments = {'Path: B'}
     },
-    ring2 = 'Defending Ring'
+    ring2 = 'Murky Ring'
 })
 
 -- ============================================================--
