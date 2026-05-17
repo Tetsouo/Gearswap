@@ -13,6 +13,7 @@ M.store_bag = 'case'
 
 M.default = {
     {name = 'Panacea', target = 12},
+    {name = 'Echo Drops', target = 12},
     {name = 'Antacid', target = 12},
     {name = 'Holy Water', target = 12},
     {name = 'Remedy', target = 12},
@@ -27,7 +28,13 @@ M.subjobs = {
         {name = 'Antacid', target = 12},
         {name = 'Holy Water', target = 12},
         {name = 'Remedy', target = 12},
-        {name = 'Echo Drops', target = 12},
+        {name = {'Omelette Sandwich +1', 'Omelette Sandwich'}, target = 12}
+    },
+    RDM = {
+        {name = 'Panacea', target = 12},
+        {name = 'Antacid', target = 12},
+        {name = 'Holy Water', target = 12},
+        {name = 'Remedy', target = 12},
         {name = {'Omelette Sandwich +1', 'Omelette Sandwich'}, target = 12}
     }
 }
